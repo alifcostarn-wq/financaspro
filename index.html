@@ -382,47 +382,160 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <h1>Dashboard</h1>
       <p id="dash-sub">Resumo financeiro do mês</p>
     </div>
-    <div class="topbar-right">
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center">
       <select id="dash-mes" onchange="renderDash()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:8px 12px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
         <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
         <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
         <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
         <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
       </select>
+      <button class="btn btn-green" onclick="openM('m-lanc')" style="white-space:nowrap">+ Lançamento</button>
     </div>
   </div>
 
-  <div class="kpi-grid cols6">
-    <div class="kpi g"><div class="kpi-label">Receitas</div><div class="kpi-val g" id="dk-rec">R$ 0</div><div class="kpi-sub" id="dk-rec-sub"></div></div>
-    <div class="kpi r"><div class="kpi-label">Despesas</div><div class="kpi-val r" id="dk-des">R$ 0</div><div class="kpi-sub" id="dk-des-sub"></div></div>
-    <div class="kpi b"><div class="kpi-label">Investimentos</div><div class="kpi-val b" id="dk-inv">R$ 0</div><div class="kpi-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">Saldo do Mês</div><div class="kpi-val" id="dk-sal">R$ 0</div><div class="kpi-sub" id="dk-sal-sub"></div></div>
-    <div class="kpi a"><div class="kpi-label">Contas Pendentes</div><div class="kpi-val a" id="dk-pend">0</div><div class="kpi-sub" id="dk-pend-v"></div></div>
-    <div class="kpi p"><div class="kpi-label">Fatura Cartões</div><div class="kpi-val p" id="dk-cc">R$ 0</div><div class="kpi-sub">mês atual</div></div>
+  <!-- ── LINHA 1: KPIs principais com tendência ── -->
+  <div class="kpi-grid cols4" style="margin-bottom:12px">
+    <div class="kpi g" style="position:relative">
+      <div class="kpi-label">Receitas do Mês</div>
+      <div class="kpi-val g" id="dk-rec">R$ 0</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <span id="dk-rec-trend" style="font-size:10px"></span>
+        <span id="dk-rec-sub" style="font-size:10px;color:var(--t3)"></span>
+      </div>
+    </div>
+    <div class="kpi r">
+      <div class="kpi-label">Despesas do Mês</div>
+      <div class="kpi-val r" id="dk-des">R$ 0</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <span id="dk-des-trend" style="font-size:10px"></span>
+        <span id="dk-des-sub" style="font-size:10px;color:var(--t3)"></span>
+      </div>
+    </div>
+    <div class="kpi b">
+      <div class="kpi-label">Investimentos</div>
+      <div class="kpi-val b" id="dk-inv">R$ 0</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <span id="dk-inv-trend" style="font-size:10px"></span>
+        <span style="font-size:10px;color:var(--t3)" id="dk-inv-pct"></span>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Saldo Líquido</div>
+      <div class="kpi-val" id="dk-sal">R$ 0</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <span id="dk-sal-trend" style="font-size:10px"></span>
+        <span id="dk-sal-sub" style="font-size:10px;color:var(--t3)"></span>
+      </div>
+    </div>
   </div>
 
-  <div class="g2">
+  <!-- ── LINHA 2: Score + Patrimônio + Projeção + Contas ── -->
+  <div class="kpi-grid cols4" style="margin-bottom:20px">
+    <!-- Score de Saúde -->
+    <div class="kpi" style="background:var(--surface1);border:1px solid var(--line);cursor:pointer" onclick="go('rel',document.querySelector('.nav-btn:nth-child(2)'))">
+      <div class="kpi-label">Score de Saúde</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+        <div class="kpi-val" id="dk-score" style="font-size:28px">0</div>
+        <span style="font-size:11px;color:var(--t3)">/100</span>
+      </div>
+      <div id="dk-score-bar" style="margin-top:8px">
+        <div style="height:4px;background:var(--surface3);border-radius:2px;overflow:hidden">
+          <div id="dk-score-fill" style="height:100%;border-radius:2px;transition:width .6s ease;width:0%"></div>
+        </div>
+        <div id="dk-score-label" style="font-size:9px;margin-top:4px;color:var(--t3)"></div>
+      </div>
+    </div>
+    <!-- Patrimônio Líquido -->
+    <div class="kpi c">
+      <div class="kpi-label">Patrimônio Líquido</div>
+      <div class="kpi-val c" id="dk-patrimonio">R$ 0</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px" id="dk-patrimonio-sub"></div>
+    </div>
+    <!-- Projeção de Fechamento -->
+    <div class="kpi a">
+      <div class="kpi-label">Projeção Fechamento</div>
+      <div class="kpi-val a" id="dk-proj">R$ 0</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px" id="dk-proj-sub"></div>
+    </div>
+    <!-- Contas + Cartão -->
+    <div class="kpi p">
+      <div class="kpi-label">Contas Pendentes</div>
+      <div class="kpi-val p" id="dk-pend">0</div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:10px;color:var(--t3)" id="dk-pend-v"></span>
+        <span style="font-size:10px;color:var(--purple)" id="dk-cc-mini"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LINHA 3: Gráficos principais ── -->
+  <div class="g2" style="margin-bottom:16px">
+    <!-- Gráfico Receita vs Despesa 12 meses -->
     <div class="card">
-      <div class="card-header"><span class="card-title">Receitas vs Despesas — 12 meses</span></div>
+      <div class="card-header">
+        <div>
+          <span class="card-title">Receitas vs Despesas — 12 meses</span>
+          <div class="card-sub" id="dk-grafico-sub">Clique em uma barra para ver o mês</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green)"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Receita</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--red)"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Despesa</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--blue)"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block"></span>Saldo</span>
+        </div>
+      </div>
       <div class="chart-box" style="height:220px"><canvas id="ch-dash-ano"></canvas></div>
     </div>
+    <!-- Evolução do Patrimônio -->
     <div class="card">
-      <div class="card-header"><span class="card-title">Despesas por Categoria</span></div>
-      <div class="chart-box" style="height:220px"><canvas id="ch-dash-cat"></canvas></div>
+      <div class="card-header">
+        <span class="card-title">Evolução do Patrimônio Líquido</span>
+        <span class="badge bdg-cyan">Anual</span>
+      </div>
+      <div class="chart-box" style="height:180px"><canvas id="ch-dash-patrimonio"></canvas></div>
+      <div id="dk-patrimonio-detalhe" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
   </div>
 
+  <!-- ── LINHA 4: Categorias + Alertas ── -->
+  <div class="g2" style="margin-bottom:16px">
+    <!-- Despesas por Categoria com orçamento -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Despesas por Categoria</span>
+        <span id="dk-cat-mes-label" class="badge bdg-gray" style="font-size:9px"></span>
+      </div>
+      <div class="chart-box" style="height:180px"><canvas id="ch-dash-cat"></canvas></div>
+      <div id="dk-cat-orcamento" style="margin-top:12px"></div>
+    </div>
+    <!-- Saúde financeira detalhada -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Saúde Financeira</span>
+        <span id="dk-saude-badge" class="badge" style="font-size:9px"></span>
+      </div>
+      <div id="dash-saude" style="margin-bottom:8px"></div>
+      <div class="div" style="margin:8px 0"></div>
+      <div class="card-title" style="margin-bottom:10px;font-size:12px">Alertas</div>
+      <div id="dash-alertas"></div>
+    </div>
+  </div>
+
+  <!-- ── LINHA 5: Últimos lançamentos + Projeção por dia ── -->
   <div class="g2">
     <div class="card">
-      <div class="card-header"><span class="card-title">Últimos Lançamentos</span></div>
+      <div class="card-header">
+        <span class="card-title">Últimos Lançamentos</span>
+        <button class="btn btn-ghost btn-xs" onclick="go('lanc',document.querySelectorAll('.nav-btn')[3])">Ver todos</button>
+      </div>
       <div id="dash-ultimos"></div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Alertas & Saúde Financeira</span></div>
-      <div id="dash-alertas"></div>
-      <div class="div"></div>
-      <div class="card-title" style="margin-bottom:12px">Indicadores</div>
-      <div id="dash-saude"></div>
+      <div class="card-header">
+        <span class="card-title">Ritmo de Gastos — Semana Atual</span>
+        <span class="badge bdg-amber" style="font-size:9px">Esta semana</span>
+      </div>
+      <div class="chart-box" style="height:160px"><canvas id="ch-dash-semana"></canvas></div>
+      <div id="dk-ritmo-detalhe" style="margin-top:10px"></div>
     </div>
   </div>
 </div>
@@ -1800,88 +1913,388 @@ function allCatsFlat(){
 
 // ── DASHBOARD ──
 function renderDash(){
-  const d=gs();
-  const mes=parseInt(document.getElementById('dash-mes').value);
-  document.getElementById('dash-sub').textContent=`${MESES[mes]} ${d.cfg.ano}`;
+  const d  = gs();
+  const mes = parseInt(document.getElementById('dash-mes').value);
+  const ano = d.cfg.ano || new Date().getFullYear();
+  document.getElementById('dash-sub').textContent = `${MESES[mes]} ${ano}`;
 
-  const ml=d.lancs.filter(l=>getMes(l.data)===mes&&l.status!=='cancelado');
-  const rec=ml.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-  const des=ml.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-  const inv=ml.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-  const sal=rec-des-inv;
-  const pend=d.contas.filter(c=>getMes(c.venc)===mes&&c.status!=='Pago');
+  const ativos = d.lancs.filter(l => l.status !== 'cancelado');
+  const ml  = ativos.filter(l => getMes(l.data) === mes);
+  const rec = ml.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
+  const des = ml.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
+  const inv = ml.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
+  const sal = rec - des - inv;
 
-  set('dk-rec',fmtR(rec)); set('dk-des',fmtR(des)); set('dk-inv',fmtR(inv));
-  setC('dk-sal',fmtR(sal),sal>=0?'var(--green)':'var(--red)');
-  set('dk-pend',pend.length);
-  set('dk-pend-v',fmtR(pend.reduce((a,c)=>a+c.valor,0)));
+  // Mês anterior para tendências
+  const mesAnt = mes > 0 ? mes - 1 : 11;
+  const mlAnt  = ativos.filter(l => getMes(l.data) === mesAnt);
+  const recAnt = mlAnt.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
+  const desAnt = mlAnt.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
+  const invAnt = mlAnt.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
+  const salAnt = recAnt - desAnt - invAnt;
 
-  // Fatura cartões
-  const fatCC=d.ccs.reduce((a,c)=>a+getFatAberta(c,mes),0);
-  set('dk-cc',fmtR(fatCC));
-
-  // Gráfico anual
-  const recArr=[],desArr=[];
-  for(let m=0;m<12;m++){
-    const ml2=d.lancs.filter(l=>getMes(l.data)===m&&l.status!=='cancelado');
-    recArr.push(ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0));
-    desArr.push(ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0));
-  }
-  mkCh('ch-dash-ano',{type:'bar',data:{labels:MESES3,datasets:[
-    {label:'Receita',data:recArr,backgroundColor:'#00d97e30',borderColor:'#00d97e',borderWidth:1.5,borderRadius:4},
-    {label:'Despesa',data:desArr,backgroundColor:'#ff4d6d30',borderColor:'#ff4d6d',borderWidth:1.5,borderRadius:4},
-  ]},options:{...chartBase,maintainAspectRatio:false}});
-
-  // Gráfico categorias mês
-  const catM={};
-  ml.filter(l=>l.tipo==='Despesa'&&l.status!=='cancelado').forEach(l=>{catM[l.cat]=(catM[l.cat]||0)+l.valor;});
-  const cKeys=Object.keys(catM),cVals=Object.values(catM);
-  if(cKeys.length){
-    mkCh('ch-dash-cat',{type:'doughnut',data:{labels:cKeys,datasets:[{data:cVals,backgroundColor:CORES_CAT,borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:'#8fa3bf',font:{size:10},boxWidth:10,padding:8}}}}});
+  // ── KPIs com tendência ──
+  function trendBadge(curr, prev, inverted) {
+    if (!prev || prev === 0) return '';
+    const diff = curr - prev;
+    const pctDiff = Math.abs(diff / prev * 100).toFixed(1);
+    const up = diff >= 0;
+    const good = inverted ? !up : up; // para despesas, subir é ruim
+    const cor  = good ? 'var(--green)' : 'var(--red)';
+    const arr  = up ? '▲' : '▼';
+    return `<span style="color:${cor};font-weight:600">${arr} ${pctDiff}%</span>`;
   }
 
-  // Últimos lançamentos
-  const ult=[...d.lancs].sort((a,b)=>b.data.localeCompare(a.data)).slice(0,7);
-  document.getElementById('dash-ultimos').innerHTML=ult.length?ult.map(l=>{
-    const c=l.tipo==='Receita'?'var(--green)':l.tipo==='Investimento'?'var(--blue)':'var(--red)';
-    const s=l.tipo==='Receita'?'+':'-';
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
-      <div><div style="font-size:12px;color:var(--t1);margin-bottom:2px">${l.desc}</div>
-      <div style="font-size:10px;color:var(--t3)">${l.data} · <span class="cat-tag" style="font-size:9px">${l.cat}</span></div></div>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${c};white-space:nowrap">${s}${fmtR(l.valor)}</span>
-    </div>`;}).join(''):'<p style="color:var(--t3);font-size:12px;padding:12px 0">Nenhum lançamento ainda.</p>';
+  set('dk-rec', fmtR(rec));
+  document.getElementById('dk-rec-trend').innerHTML = trendBadge(rec, recAnt, false);
+  set('dk-rec-sub', recAnt ? `vs ${fmtR(recAnt)} mês ant.` : '');
 
-  // Alertas
-  const hoje=new Date(); const em7=new Date(); em7.setDate(em7.getDate()+7);
-  const avencer=d.contas.filter(c=>{
-    const dv=new Date(c.venc+'T00:00:00');
-    return dv>=hoje&&dv<=em7&&c.status!=='Pago';
+  set('dk-des', fmtR(des));
+  document.getElementById('dk-des-trend').innerHTML = trendBadge(des, desAnt, true);
+  set('dk-des-sub', desAnt ? `vs ${fmtR(desAnt)} mês ant.` : '');
+
+  set('dk-inv', fmtR(inv));
+  document.getElementById('dk-inv-trend').innerHTML = trendBadge(inv, invAnt, false);
+  const salario = d.cfg.sal || 1;
+  set('dk-inv-pct', salario ? `${(inv/salario*100).toFixed(1)}% do salário` : '');
+
+  setC('dk-sal', fmtR(sal), sal >= 0 ? 'var(--green)' : 'var(--red)');
+  document.getElementById('dk-sal-trend').innerHTML = trendBadge(sal, salAnt, false);
+  set('dk-sal-sub', salAnt ? `vs ${fmtR(salAnt)} mês ant.` : '');
+
+  // ── Contas pendentes ──
+  const pend = d.contas.filter(c => getMes(c.venc) === mes && c.status !== 'Pago');
+  const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes), 0);
+  set('dk-pend', pend.length);
+  set('dk-pend-v', fmtR(pend.reduce((a,c) => a+c.valor, 0)));
+  set('dk-cc-mini', fatCC > 0 ? `💳 ${fmtR(fatCC)}` : '');
+
+  // ── Score de Saúde Financeira (0–100) ──
+  const salDiv = d.cfg.sal > 0 ? d.divs.reduce((a,dv) => a+dv.mensal, 0) / d.cfg.sal * 100 : 0;
+  const pctDes = salario > 0 ? des / salario * 100 : 100;
+  const pctInv = salario > 0 ? inv / salario * 100 : 0;
+  const taxaPoup = rec > 0 ? sal / rec * 100 : 0;
+
+  let score = 100;
+  // Penalidades
+  if (salDiv > d.cfg.pct)        score -= Math.min(25, (salDiv - d.cfg.pct) * 1.5);
+  if (pctDes > 70)               score -= Math.min(25, (pctDes - 70) * 0.8);
+  if (pctInv < 10 && inv > 0)    score -= Math.min(15, (10 - pctInv) * 1);
+  if (pctInv === 0)              score -= 15;
+  if (taxaPoup < 20 && rec > 0)  score -= Math.min(20, (20 - taxaPoup) * 0.6);
+  if (sal < 0)                   score -= 20;
+  if (pend.length > 0)           score -= Math.min(10, pend.length * 2);
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  const scoreEl  = document.getElementById('dk-score');
+  const scoreFill = document.getElementById('dk-score-fill');
+  const scoreLbl  = document.getElementById('dk-score-label');
+  if (scoreEl) scoreEl.textContent = score;
+  const scoreColor = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : score >= 40 ? 'var(--orange, #f97316)' : 'var(--red)';
+  const scoreNota  = score >= 80 ? '😊 Excelente' : score >= 60 ? '🙂 Bom' : score >= 40 ? '😐 Atenção' : '😟 Crítico';
+  if (scoreEl)   scoreEl.style.color = scoreColor;
+  if (scoreFill) { scoreFill.style.width = score + '%'; scoreFill.style.background = scoreColor; }
+  if (scoreLbl)  scoreLbl.textContent = scoreNota;
+
+  // ── Patrimônio Líquido ──
+  const saldoBancos = (d.bancos || []).reduce((a, b) => {
+    const si = b.saldoInicial || 0;
+    const movs = (b.movs || []).filter(m => !m.cat?.includes('Transferência'));
+    const ent = movs.filter(m => m.tipo === 'entrada').reduce((a, m) => a+m.val, 0);
+    const sai = movs.filter(m => m.tipo === 'saida').reduce((a, m) => a+m.val, 0);
+    return a + si + ent - sai;
+  }, 0);
+  const saldoLancs = d.cfg.si || 0;
+  const totalInv   = ativos.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
+  const totalDiv   = d.divs.reduce((a, dv) => a + (dv.saldo || dv.total || 0), 0);
+  const patrimonioBase = saldoBancos || saldoLancs;
+  const patrimonio = patrimonioBase + totalInv - totalDiv;
+
+  setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
+  const detPat = [];
+  if (saldoBancos > 0) detPat.push(`Saldo contas: ${fmtR(saldoBancos)}`);
+  if (totalInv > 0)    detPat.push(`Investimentos: ${fmtR(totalInv)}`);
+  if (totalDiv > 0)    detPat.push(`Dívidas: −${fmtR(totalDiv)}`);
+  set('dk-patrimonio-sub', detPat.join(' · ') || 'Sem dados suficientes');
+
+  // Detalhe patrimônio
+  const patDetalhe = document.getElementById('dk-patrimonio-detalhe');
+  if (patDetalhe) {
+    patDetalhe.innerHTML = [
+      { l: '🏦 Contas', v: saldoBancos || saldoLancs, c: 'var(--green)' },
+      { l: '📈 Invest.', v: totalInv, c: 'var(--blue)' },
+      { l: '💳 Dívidas', v: -totalDiv, c: totalDiv > 0 ? 'var(--red)' : 'var(--t3)' },
+    ].map(x => `
+      <div style="flex:1;min-width:80px;background:var(--surface2);border-radius:var(--r2);padding:8px 10px;text-align:center">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:2px">${x.l}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${x.c}">${fmtR(Math.abs(x.v))}</div>
+      </div>`).join('');
+  }
+
+  // ── Projeção de fechamento ──
+  const hoje = new Date();
+  const isMesAtual = mes === hoje.getMonth() && ano === hoje.getFullYear();
+  let projEl = document.getElementById('dk-proj');
+  let projSubEl = document.getElementById('dk-proj-sub');
+  if (isMesAtual) {
+    const diaAtual = hoje.getDate();
+    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const ritmoRec = diaAtual > 0 ? rec / diaAtual : 0;
+    const ritroDes = diaAtual > 0 ? des / diaAtual : 0;
+    const projRec = ritmoRec * diasNoMes;
+    const projDes = ritroDes * diasNoMes;
+    const projSal = projRec - projDes - inv;
+    setC('dk-proj', fmtR(projSal), projSal >= 0 ? 'var(--amber)' : 'var(--red)');
+    if (projSubEl) projSubEl.textContent = `Dia ${diaAtual}/${diasNoMes} · rec. proj. ${fmtR(projRec)}`;
+  } else {
+    setC('dk-proj', fmtR(sal), sal >= 0 ? 'var(--amber)' : 'var(--red)');
+    if (projSubEl) projSubEl.textContent = 'Mês encerrado';
+  }
+
+  // ── Gráfico 12 meses com linha de saldo ──
+  const recArr=[], desArr=[], salArr=[];
+  for (let m = 0; m < 12; m++) {
+    const ml2 = ativos.filter(l => getMes(l.data) === m);
+    const r = ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
+    const de= ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
+    const iv= ml2.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+    recArr.push(r); desArr.push(de); salArr.push(r-de-iv);
+  }
+  mkCh('ch-dash-ano', {
+    type:'bar',
+    data:{ labels:MESES3, datasets:[
+      {label:'Receita', data:recArr, backgroundColor:'#00d97e28', borderColor:'#00d97e', borderWidth:1.5, borderRadius:4, order:2},
+      {label:'Despesa', data:desArr, backgroundColor:'#ff4d6d28', borderColor:'#ff4d6d', borderWidth:1.5, borderRadius:4, order:3},
+      {label:'Saldo',   data:salArr, type:'line', borderColor:'#4dabf7', backgroundColor:'transparent',
+        borderWidth:2, pointRadius:4, pointBackgroundColor: salArr.map(v=>v>=0?'#4dabf7':'#ff4d6d'),
+        pointBorderWidth:0, tension:.3, order:1},
+    ]},
+    options:{
+      ...chartBase, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      onClick:(evt, els) => {
+        if (els.length) {
+          const idx = els[0].index;
+          document.getElementById('dash-mes').value = idx;
+          renderDash();
+        }
+      }
+    }
   });
-  const alertEl=document.getElementById('dash-alertas');
-  const alertas=[];
-  if(avencer.length)alertas.push(`<div class="alert alert-a">⏰ ${avencer.length} conta(s) vencem nos próximos 7 dias — ${fmtR(avencer.reduce((a,c)=>a+c.valor,0))}</div>`);
-  const salDiv=d.cfg.sal>0?d.divs.reduce((a,dv)=>a+dv.mensal,0)/d.cfg.sal*100:0;
-  if(salDiv>d.cfg.pct)alertas.push(`<div class="alert alert-r">⚠ Comprometimento de ${pct(salDiv)} do salário em dívidas (limite: ${pct(d.cfg.pct)})</div>`);
-  if(sal<0)alertas.push(`<div class="alert alert-r">💸 Saldo negativo em ${MESES[mes]}: ${fmtR(sal)}</div>`);
-  alertEl.innerHTML=alertas.join('')||'<div class="alert alert-g">✓ Nenhum alerta para este mês</div>';
 
-  // Saúde
-  const salario=d.cfg.sal||1;
-  const indicadores=[
-    {l:'% Salário em Dívidas',v:salDiv,ok:salDiv<=d.cfg.pct,max:60,cor:'var(--red)'},
-    {l:'% Salário em Despesas',v:des/salario*100,ok:des/salario*100<=70,max:120,cor:'var(--amber)'},
-    {l:'% Salário em Investimentos',v:inv/salario*100,ok:inv/salario*100>=10,max:50,cor:'var(--blue)'},
-    {l:'Taxa de Poupança do Mês',v:rec>0?sal/rec*100:0,ok:rec>0&&sal/rec*100>=20,max:60,cor:'var(--green)'},
+  // ── Gráfico evolução patrimônio ──
+  let patAcum = d.cfg.si || 0;
+  const patArr = [];
+  for (let m = 0; m < 12; m++) {
+    const ml2 = ativos.filter(l => getMes(l.data) === m);
+    const r  = ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
+    const de = ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
+    const iv = ml2.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+    patAcum += r - de;
+    patArr.push(patAcum + iv);
+  }
+  mkCh('ch-dash-patrimonio', {
+    type:'line',
+    data:{ labels:MESES3, datasets:[{
+      label:'Patrimônio', data:patArr,
+      borderColor:'#22d3ee', backgroundColor:'#22d3ee12',
+      borderWidth:2, fill:true, tension:.35,
+      pointRadius: patArr.map((_,i)=> i===mes ? 5 : 3),
+      pointBackgroundColor: patArr.map((_,i)=> i===mes ? '#22d3ee' : '#22d3ee88'),
+    }]},
+    options:{
+      ...chartBase, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ' ' + fmtR(ctx.raw) } }
+      }
+    }
+  });
+
+  // ── Gráfico categorias com barra de orçamento ──
+  const catM = {};
+  ml.filter(l => l.tipo === 'Despesa').forEach(l => { catM[l.cat] = (catM[l.cat]||0)+l.valor; });
+  const cKeys = Object.keys(catM), cVals = Object.values(catM);
+  const catLabel = document.getElementById('dk-cat-mes-label');
+  if (catLabel) catLabel.textContent = MESES[mes];
+  if (cKeys.length) {
+    mkCh('ch-dash-cat', {
+      type:'doughnut',
+      data:{ labels:cKeys, datasets:[{data:cVals, backgroundColor:CORES_CAT, borderWidth:0, hoverOffset:6}] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins:{ legend:{ position:'right', labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:10, padding:6 } },
+          tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${fmtR(ctx.raw)} (${(ctx.raw/cVals.reduce((a,v)=>a+v,0)*100).toFixed(1)}%)` } }
+        }
+      }
+    });
+  } else {
+    const cv = document.getElementById('ch-dash-cat');
+    if (cv) { const ctx = cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); }
+  }
+
+  // Barras de orçamento por categoria
+  const orcDetalhe = document.getElementById('dk-cat-orcamento');
+  if (orcDetalhe) {
+    const metasMes = d.orcs.filter(o => o.mes === mes && o.tipo === 'Despesa');
+    if (metasMes.length && cKeys.length) {
+      const catComMeta = cKeys.filter(cat => metasMes.find(m2 => m2.cat === cat));
+      if (catComMeta.length) {
+        orcDetalhe.innerHTML = '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">vs. orçamento</div>' +
+          catComMeta.slice(0,4).map(cat => {
+            const real = catM[cat] || 0;
+            const meta = metasMes.filter(m2 => m2.cat === cat).reduce((a,m2) => a+m2.val, 0);
+            const pp   = meta > 0 ? Math.min(100, real/meta*100) : 100;
+            const over = real > meta;
+            return `<div style="margin-bottom:7px">
+              <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px">
+                <span style="color:var(--t2)">${cat}</span>
+                <span class="mono" style="color:${over?'var(--red)':'var(--t2)'}">${fmtR(real)} / ${fmtR(meta)}</span>
+              </div>
+              <div class="prog-track" style="height:5px"><div class="prog-fill" style="width:${pp}%;background:${over?'var(--red)':pp>80?'var(--amber)':'var(--green)'}"></div></div>
+            </div>`;
+          }).join('');
+      } else {
+        orcDetalhe.innerHTML = '';
+      }
+    } else {
+      orcDetalhe.innerHTML = metasMes.length === 0 && cKeys.length > 0
+        ? `<div style="font-size:10px;color:var(--t4);margin-top:4px">💡 <a href="#" onclick="go('orc',document.querySelectorAll('.nav-btn')[4]);return false" style="color:var(--t3)">Defina metas de orçamento</a> para ver progresso aqui</div>`
+        : '';
+    }
+  }
+
+  // ── Saúde financeira com indicadores detalhados ──
+  const indicadores = [
+    { l:'Taxa de Poupança',    v:taxaPoup,                ok:taxaPoup>=20,        max:60,  cor:'var(--green)', dica: taxaPoup>=20?'✓':'Meta: 20%+' },
+    { l:'Despesas/Salário',    v:pctDes,                  ok:pctDes<=70,          max:120, cor:'var(--amber)', dica: pctDes<=70?'✓':`${pctDes.toFixed(0)}% — ideal ≤70%` },
+    { l:'Investimentos/Sal.',  v:pctInv,                  ok:pctInv>=10,          max:50,  cor:'var(--blue)',  dica: pctInv>=10?'✓':'Meta: 10%+' },
+    { l:'Dívidas/Salário',     v:salDiv,                  ok:salDiv<=d.cfg.pct,   max:60,  cor:'var(--red)',   dica: salDiv<=d.cfg.pct?'✓':`${salDiv.toFixed(0)}% — limite ${d.cfg.pct}%` },
   ];
-  document.getElementById('dash-saude').innerHTML=indicadores.map(i=>`
-    <div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+
+  const saudeBadge = document.getElementById('dk-saude-badge');
+  if (saudeBadge) {
+    const ok = indicadores.filter(i=>i.ok).length;
+    saudeBadge.textContent = `${ok}/4 indicadores OK`;
+    saudeBadge.className = `badge ${ok>=3?'bdg-green':ok>=2?'bdg-amber':'bdg-red'}`;
+    saudeBadge.style.fontSize = '9px';
+  }
+
+  document.getElementById('dash-saude').innerHTML = indicadores.map(i => `
+    <div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;align-items:center">
         <span style="color:var(--t2)">${i.l}</span>
-        <span style="font-family:'JetBrains Mono',monospace;color:${i.ok?'var(--green)':'var(--red)'}">${pct(i.v)} ${i.ok?'✓':'✗'}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--t3)">${i.dica}</span>
+          <span class="mono" style="color:${i.ok?'var(--green)':'var(--red)'}">${pct(i.v)}</span>
+        </div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${Math.min(100,i.v/i.max*100)}%;background:${i.ok?'var(--green)':i.cor}"></div></div>
     </div>`).join('');
+
+  // ── Alertas inteligentes ──
+  const hojeD = new Date();
+  const em7   = new Date(); em7.setDate(em7.getDate()+7);
+  const alertas = [];
+
+  // Contas vencendo
+  const avencer = d.contas.filter(c => {
+    const dv = new Date(c.venc+'T00:00:00');
+    return dv >= hojeD && dv <= em7 && c.status !== 'Pago';
+  });
+  if (avencer.length) alertas.push({ tipo:'a', msg:`⏰ ${avencer.length} conta(s) vencem em 7 dias — ${fmtR(avencer.reduce((a,c)=>a+c.valor,0))}` });
+
+  // Saldo negativo
+  if (sal < 0) alertas.push({ tipo:'r', msg:`💸 Saldo negativo em ${MESES[mes]}: ${fmtR(sal)}` });
+
+  // Comprometimento dívidas
+  if (salDiv > d.cfg.pct) alertas.push({ tipo:'r', msg:`⚠ Dívidas comprometem ${pct(salDiv)} do salário (limite: ${pct(d.cfg.pct)})` });
+
+  // Categorias estourando orçamento
+  const metas = d.orcs.filter(o => o.mes === mes && o.tipo === 'Despesa');
+  metas.forEach(m2 => {
+    const real = (catM[m2.cat] || 0);
+    if (real > m2.val) alertas.push({ tipo:'r', msg:`📊 ${m2.cat} estourou o orçamento: ${fmtR(real)} de ${fmtR(m2.val)}` });
+    else if (real / m2.val > 0.8) alertas.push({ tipo:'a', msg:`📊 ${m2.cat} em 80%+ do orçamento: ${fmtR(real)} de ${fmtR(m2.val)}` });
+  });
+
+  // Sem investimentos
+  if (inv === 0 && rec > 0) alertas.push({ tipo:'b', msg:`📈 Nenhum investimento registrado em ${MESES[mes]}` });
+
+  // Projeção negativa no mês atual
+  if (isMesAtual) {
+    const diaAtual2 = hojeD.getDate();
+    const diasNoMes2 = new Date(ano, mes+1, 0).getDate();
+    const projSal2 = (rec/diaAtual2*diasNoMes2) - (des/diaAtual2*diasNoMes2) - inv;
+    if (projSal2 < 0 && sal >= 0) alertas.push({ tipo:'a', msg:`🔮 Projeção indica saldo negativo ao fim do mês: ${fmtR(projSal2)}` });
+  }
+
+  const alertEl = document.getElementById('dash-alertas');
+  if (alertEl) alertEl.innerHTML = alertas.length
+    ? alertas.slice(0,5).map(a => `<div class="alert alert-${a.tipo}" style="margin-bottom:6px;font-size:11px">${a.msg}</div>`).join('')
+    : '<div class="alert alert-g" style="font-size:11px">✓ Nenhum alerta — finanças em ordem!</div>';
+
+  // ── Últimos lançamentos ──
+  const ult = [...d.lancs].filter(l=>l.status!=='cancelado').sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts).slice(0,8);
+  document.getElementById('dash-ultimos').innerHTML = ult.length ? ult.map(l => {
+    const c = l.tipo==='Receita'?'var(--green)':l.tipo==='Investimento'?'var(--blue)':'var(--red)';
+    const s = l.tipo==='Receita'?'+':'-';
+    const isCurrent = getMes(l.data) === mes;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);${!isCurrent?'opacity:.5':''}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.desc}</div>
+        <div style="font-size:10px;color:var(--t3);display:flex;gap:6px;align-items:center">
+          <span>${l.data}</span>
+          <span class="cat-tag" style="font-size:9px">${l.cat||'—'}</span>
+          ${l.subcat?`<span style="color:var(--t4);font-size:9px">› ${l.subcat}</span>`:''}
+        </div>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${c};white-space:nowrap;margin-left:12px;font-weight:600">${s}${fmtR(l.valor)}</span>
+    </div>`;
+  }).join('') : '<p style="color:var(--t3);font-size:12px;padding:12px 0;text-align:center">Nenhum lançamento ainda.</p>';
+
+  // ── Ritmo de gastos — semana atual ──
+  const DIAS_SEMANA_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const inicioDaSemana = new Date(hojeD);
+  inicioDaSemana.setDate(hojeD.getDate() - hojeD.getDay());
+  const gasSemana = Array(7).fill(0);
+  const recSemana = Array(7).fill(0);
+  ml.forEach(l => {
+    const dt = new Date(l.data+'T00:00:00');
+    const diff = Math.floor((dt - inicioDaSemana) / 86400000);
+    if (diff >= 0 && diff < 7) {
+      if (l.tipo === 'Despesa') gasSemana[diff] += l.valor;
+      if (l.tipo === 'Receita') recSemana[diff] += l.valor;
+    }
+  });
+  mkCh('ch-dash-semana', {
+    type:'bar',
+    data:{ labels: DIAS_SEMANA_PT, datasets:[
+      { label:'Despesa', data:gasSemana, backgroundColor: gasSemana.map((_,i)=>i===hojeD.getDay()?'#ff4d6d':'#ff4d6d44'), borderColor:'#ff4d6d', borderWidth:1, borderRadius:4 },
+      { label:'Receita', data:recSemana, backgroundColor: recSemana.map((_,i)=>i===hojeD.getDay()?'#00d97e':'#00d97e44'), borderColor:'#00d97e', borderWidth:1, borderRadius:4 },
+    ]},
+    options:{...chartBase, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+  });
+
+  const totalSemDes = gasSemana.reduce((a,v)=>a+v,0);
+  const totalSemRec = recSemana.reduce((a,v)=>a+v,0);
+  const ritmoEl = document.getElementById('dk-ritmo-detalhe');
+  if (ritmoEl) {
+    const diasRestantes = 7 - hojeD.getDay() - 1;
+    ritmoEl.innerHTML = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Despesas semana</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red);margin-top:3px">${fmtR(totalSemDes)}</div>
+        </div>
+        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Receitas semana</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green);margin-top:3px">${fmtR(totalSemRec)}</div>
+        </div>
+        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
+          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Dias restantes</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--t1);margin-top:3px">${diasRestantes}</div>
+        </div>
+      </div>`;
+  }
 
   updSbSaldo();
 }
