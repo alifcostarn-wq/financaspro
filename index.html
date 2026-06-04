@@ -598,28 +598,103 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <div class="page" id="page-orc">
   <div class="topbar">
     <div class="topbar-left"><h1>Orçamento</h1><p>Planejamento por categoria e mês</p></div>
-    <div class="topbar-right"><button class="btn btn-blue" onclick="openM('m-orc')">+ Definir Meta</button></div>
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center">
+      <!-- Toggle Previsto / Realizado -->
+      <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
+        <button id="orc-btn-prev" onclick="setOrcView('previsto')"
+          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
+          📋 Previsto
+        </button>
+        <button id="orc-btn-real" onclick="setOrcView('realizado')"
+          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          ✓ Realizado
+        </button>
+        <button id="orc-btn-comp" onclick="setOrcView('comparativo')"
+          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          ⇄ Comparativo
+        </button>
+      </div>
+      <button class="btn btn-blue" onclick="openM('m-orc')">+ Definir Meta</button>
+    </div>
   </div>
   <div class="month-tabs" id="orc-tabs"></div>
-  <div class="g2">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Resumo do Mês</span></div>
-      <div id="orc-resumo"></div>
+
+  <!-- KPIs do orçamento -->
+  <div class="kpi-grid cols4" id="orc-kpis" style="margin-bottom:16px">
+    <div class="kpi b"><div class="kpi-label">Previsto (Despesas)</div><div class="kpi-val b" id="orc-k-prev-des">R$ 0</div></div>
+    <div class="kpi r"><div class="kpi-label">Realizado (Despesas)</div><div class="kpi-val r" id="orc-k-real-des">R$ 0</div></div>
+    <div class="kpi g"><div class="kpi-label">Saldo Orçamentário</div><div class="kpi-val g" id="orc-k-saldo">R$ 0</div></div>
+    <div class="kpi a"><div class="kpi-label">% Executado</div><div class="kpi-val a" id="orc-k-pct">0%</div></div>
+  </div>
+
+  <!-- Visão: Previsto -->
+  <div id="orc-view-previsto">
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Resumo Previsto do Mês</span></div>
+        <div id="orc-resumo-prev"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Distribuição Prevista por Categoria</span></div>
+        <div id="orc-dist-prev"></div>
+      </div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Progresso por Categoria</span></div>
-      <div id="orc-prog"></div>
+      <div class="card-header">
+        <span class="card-title">Metas Cadastradas</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="orc-fil-tipo" onchange="renderOrc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+            <option value="">Todos os tipos</option>
+            <option value="Receita">Receita</option>
+            <option value="Despesa">Despesa</option>
+            <option value="Investimento">Investimento</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Categoria</th><th>Subcategoria</th><th>Tipo</th><th>Meta (Previsto)</th><th>Observação</th><th></th></tr></thead>
+          <tbody id="orc-tbody-prev"></tbody>
+        </table>
+      </div>
+      <div id="orc-empty-prev" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma meta definida para este mês. Clique em "+ Definir Meta".</div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Metas Cadastradas</span></div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th>Categoria</th><th>Tipo</th><th>Meta</th><th>Realizado</th><th>Saldo</th><th>%</th><th></th></tr></thead>
-        <tbody id="orc-tbody"></tbody>
-      </table>
+
+  <!-- Visão: Realizado -->
+  <div id="orc-view-realizado" style="display:none">
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Resumo Realizado do Mês</span></div>
+        <div id="orc-resumo-real"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Progresso por Categoria</span></div>
+        <div id="orc-prog"></div>
+      </div>
     </div>
-    <div id="orc-empty" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma meta definida para este mês.</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Realizado por Categoria e Subcategoria</span></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Categoria</th><th>Subcategoria</th><th>Tipo</th><th>Meta</th><th>Realizado</th><th>Saldo</th><th>%</th></tr></thead>
+          <tbody id="orc-tbody-real"></tbody>
+        </table>
+      </div>
+      <div id="orc-empty-real" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma meta definida para este mês.</div>
+    </div>
+  </div>
+
+  <!-- Visão: Comparativo -->
+  <div id="orc-view-comparativo" style="display:none">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Comparativo Previsto × Realizado</span></div>
+      <div class="chart-box" style="height:280px"><canvas id="ch-orc-comp"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Análise Detalhada por Categoria</span></div>
+      <div id="orc-comp-detalhe"></div>
+    </div>
   </div>
 </div>
 
@@ -1124,12 +1199,18 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
 <!-- Modal: Orçamento -->
 <div class="overlay" id="m-orc" style="display:none" onclick="cmoOut(event,'m-orc')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Definir Meta de Orçamento</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-orc')">✕</button></div>
+  <div class="modal" style="max-width:580px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <h2 id="m-orc-titulo">Definir Meta de Orçamento</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Configure metas por categoria e subcategoria</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-orc')">✕</button>
+    </div>
     <div class="modal-bd">
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Tipo</label>
-          <select id="o-tipo"><option>Receita</option><option selected>Despesa</option><option>Investimento</option></select>
+          <select id="o-tipo" onchange="updOrcCats();updOrcSubcats()"><option>Receita</option><option selected>Despesa</option><option>Investimento</option></select>
         </div>
         <div class="fg"><label>Mês</label>
           <select id="o-mes">
@@ -1140,9 +1221,24 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           </select>
         </div>
       </div>
-      <div class="form-grid cols2">
-        <div class="fg"><label>Categoria</label><select id="o-cat"></select></div>
-        <div class="fg"><label>Valor Meta (R$)</label><input type="number" id="o-val" step="0.01" min="0" placeholder="0,00"></div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Categoria *</label><select id="o-cat" onchange="updOrcSubcats()"></select></div>
+        <div class="fg"><label>Subcategoria <span style="color:var(--t3)">(opcional)</span></label><select id="o-subcat"></select></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Valor Meta (R$) *</label><input type="number" id="o-val" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="fg"><label>Observação</label><input type="text" id="o-obs" placeholder="Opcional"></div>
+      </div>
+      <!-- Preview da meta -->
+      <div style="background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:12px">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Preview da Meta</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <span id="o-prev-cat" style="font-size:13px;font-weight:600;color:var(--t1)">—</span>
+            <span id="o-prev-subcat" style="font-size:11px;color:var(--t3);margin-left:6px"></span>
+          </div>
+          <span id="o-prev-val" style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--blue)">R$ 0,00</span>
+        </div>
       </div>
     </div>
     <div class="modal-ft">
@@ -1597,6 +1693,11 @@ function openM(id){
   }
   if(id==='m-orc'){
     document.getElementById('o-mes').value=_orcMes;
+    // Reset edit mode
+    const hid=document.getElementById('o-edit-id'); if(hid) hid.value='';
+    document.getElementById('m-orc-titulo').textContent='Definir Meta de Orçamento';
+    document.getElementById('o-val').value='';
+    document.getElementById('o-obs').value='';
     updOrcCats();
   }
   if(id==='m-gasto'){document.getElementById('g-data').value=today();}
@@ -2578,97 +2679,330 @@ function renderLanc(){
 
 // ── ORÇAMENTO ──
 let _orcMes = curMes();
+let _orcView = 'previsto'; // 'previsto' | 'realizado' | 'comparativo'
+
+function setOrcView(v){
+  _orcView = v;
+  // Atualiza botões
+  ['previsto','realizado','comparativo'].forEach(x=>{
+    const btn = document.getElementById('orc-btn-'+x.replace('comparativo','comp'));
+    if(!btn) return;
+    if(x===v){
+      btn.style.background = x==='previsto'?'var(--blue-dim)':x==='realizado'?'var(--green-dim)':'var(--purple-dim)';
+      btn.style.color = x==='previsto'?'var(--blue)':x==='realizado'?'var(--green)':'var(--purple)';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--t3)';
+    }
+  });
+  // Mostra/oculta views
+  ['previsto','realizado','comparativo'].forEach(x=>{
+    const el = document.getElementById('orc-view-'+x);
+    if(el) el.style.display = x===v ? 'block' : 'none';
+  });
+  renderOrc();
+}
+
 function renderOrc(){
   const d = gs();
+  const tipoFil = document.getElementById('orc-fil-tipo')?.value||'';
+
+  // Tabs de meses
   const tabs = document.getElementById('orc-tabs');
   if(tabs) tabs.innerHTML = MESES.map((m,i)=>
     `<div class="mtab ${i===_orcMes?'active':''}" onclick="_orcMes=${i};renderOrc()">${m.slice(0,3)}</div>`
   ).join('');
 
-  const metas = d.orcs.filter(o=>o.mes===_orcMes);
-  // Excluir cancelados do cálculo
+  let metas = d.orcs.filter(o=>o.mes===_orcMes);
+  if(tipoFil) metas = metas.filter(m=>m.tipo===tipoFil);
+
+  // Lançamentos ativos do mês
   const lancs = d.lancs.filter(l=>getMes(l.data)===_orcMes && l.status!=='cancelado');
 
-  // Resumo
-  const resEl = document.getElementById('orc-resumo');
-  if(resEl){
-    const mr = metas.filter(m=>m.tipo==='Receita').reduce((a,m)=>a+m.val,0);
-    const md = metas.filter(m=>m.tipo==='Despesa').reduce((a,m)=>a+m.val,0);
-    const mi = metas.filter(m=>m.tipo==='Investimento').reduce((a,m)=>a+m.val,0);
-    const rr = lancs.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-    const rd = lancs.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-    const ri = lancs.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-    resEl.innerHTML = [
-      ['Receita Prevista',mr,'var(--green)'],['Receita Realizada',rr,'var(--green)'],
-      ['Despesa Prevista',md,'var(--red)'],  ['Despesa Realizada',rd,'var(--red)'],
-      ['Saldo Previsto',mr-md-mi,''],        ['Saldo Realizado',rr-rd-ri,''],
-    ].map(([l,v,c])=>
-      `<div class="sum-row"><span class="sum-lbl">${l}</span><span class="sum-val" style="color:${c||'var(--t1)'}">${fmtR(v)}</span></div>`
-    ).join('');
+  // ── KPIs ──
+  const metaDes   = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa').reduce((a,o)=>a+o.val,0);
+  const realDes   = lancs.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
+  const saldoOrc  = metaDes - realDes;
+  const pctExec   = metaDes>0 ? realDes/metaDes*100 : 0;
+  set('orc-k-prev-des', fmtR(metaDes));
+  setC('orc-k-real-des', fmtR(realDes), realDes>metaDes?'var(--red)':'var(--t1)');
+  setC('orc-k-saldo', fmtR(saldoOrc), saldoOrc>=0?'var(--green)':'var(--red)');
+  setC('orc-k-pct', pct(pctExec), pctExec>100?'var(--red)':pctExec>80?'var(--amber)':'var(--green)');
+
+  // ── VISÃO: PREVISTO ──
+  if(_orcView==='previsto'){
+    // Resumo previsto
+    const resEl = document.getElementById('orc-resumo-prev');
+    if(resEl){
+      const allMetas = d.orcs.filter(o=>o.mes===_orcMes);
+      const mr = allMetas.filter(m=>m.tipo==='Receita').reduce((a,m)=>a+m.val,0);
+      const md = allMetas.filter(m=>m.tipo==='Despesa').reduce((a,m)=>a+m.val,0);
+      const mi = allMetas.filter(m=>m.tipo==='Investimento').reduce((a,m)=>a+m.val,0);
+      resEl.innerHTML = [
+        ['Total Previsto de Receitas', mr, 'var(--green)'],
+        ['Total Previsto de Despesas', md, 'var(--red)'],
+        ['Total Previsto Investimentos', mi, 'var(--blue)'],
+        ['Saldo Previsto', mr-md-mi, ''],
+      ].map(([l,v,c])=>
+        `<div class="sum-row"><span class="sum-lbl">${l}</span><span class="sum-val" style="color:${c||'var(--t1)'}">${fmtR(v)}</span></div>`
+      ).join('');
+    }
+    // Distribuição prevista
+    const distEl = document.getElementById('orc-dist-prev');
+    if(distEl){
+      const desMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
+      const totalPrev = desMetas.reduce((a,m)=>a+m.val,0);
+      if(!desMetas.length){
+        distEl.innerHTML='<p style="color:var(--t3);font-size:12px">Nenhuma meta de despesa cadastrada.</p>';
+      } else {
+        distEl.innerHTML = desMetas.sort((a,b)=>b.val-a.val).map((m,i)=>{
+          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
+          const pp = totalPrev>0 ? m.val/totalPrev*100 : 0;
+          return `<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:var(--t2)">${label}</span>
+              <span class="mono" style="color:var(--blue)">${fmtR(m.val)} <span style="color:var(--t3)">${pct(pp)}</span></span>
+            </div>
+            <div class="prog-track"><div class="prog-fill" style="width:${pp}%;background:${CORES_CAT[i%CORES_CAT.length]}"></div></div>
+          </div>`;
+        }).join('');
+      }
+    }
+    // Tabela previsto
+    const tbodyP = document.getElementById('orc-tbody-prev');
+    const emptyP = document.getElementById('orc-empty-prev');
+    if(!tbodyP) return;
+    if(!metas.length){ tbodyP.innerHTML=''; if(emptyP) emptyP.style.display='block'; return; }
+    if(emptyP) emptyP.style.display='none';
+    tbodyP.innerHTML = metas.sort((a,b)=>{
+      if(a.tipo!==b.tipo) return a.tipo.localeCompare(b.tipo);
+      return a.cat.localeCompare(b.cat);
+    }).map(m=>{
+      const label = m.cat + (m.subcat ? ` › ${m.subcat}` : '');
+      return `<tr>
+        <td style="color:var(--t1);font-weight:500">${m.cat}</td>
+        <td style="color:var(--t3);font-size:11px">${m.subcat||'<span style="color:var(--t4)">—</span>'}</td>
+        <td><span class="badge ${m.tipo==='Receita'?'bdg-green':m.tipo==='Investimento'?'bdg-blue':'bdg-red'}" style="font-size:9px">${m.tipo}</span></td>
+        <td class="mono" style="color:var(--blue);font-weight:600">${fmtR(m.val)}</td>
+        <td style="color:var(--t3);font-size:11px">${m.obs||'—'}</td>
+        <td class="tbl-actions">
+          <button class="btn btn-ghost btn-xs" onclick="editOrc('${m.id}')" title="Editar">✏</button>
+          <button class="btn btn-red btn-xs" onclick="delOrc('${m.id}')">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
   }
 
-  // Progresso por categoria
-  const progEl = document.getElementById('orc-prog');
-  if(progEl){
-    if(!metas.length){
-      progEl.innerHTML = '<p style="color:var(--t3);font-size:12px">Sem metas para este mês.</p>';
-    } else {
-      progEl.innerHTML = metas.map(m=>{
-        const real = lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
-        const p    = m.val>0 ? Math.min(100,real/m.val*100) : 0;
-        const over = real>m.val;
-        return `<div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-            <span style="color:var(--t2)">${m.cat}</span>
-            <span class="mono" style="color:${over?'var(--red)':'var(--green)'}">${fmtR(real)} / ${fmtR(m.val)}</span>
-          </div>
-          <div class="prog-track"><div class="prog-fill" style="width:${p}%;background:${over?'var(--red)':p>80?'var(--amber)':'var(--green)'}"></div></div>
-        </div>`;
-      }).join('');
+  // ── VISÃO: REALIZADO ──
+  if(_orcView==='realizado'){
+    // Resumo realizado
+    const resReal = document.getElementById('orc-resumo-real');
+    if(resReal){
+      const allMetas = d.orcs.filter(o=>o.mes===_orcMes);
+      const mr = allMetas.filter(m=>m.tipo==='Receita').reduce((a,m)=>a+m.val,0);
+      const md = allMetas.filter(m=>m.tipo==='Despesa').reduce((a,m)=>a+m.val,0);
+      const mi = allMetas.filter(m=>m.tipo==='Investimento').reduce((a,m)=>a+m.val,0);
+      const rr = lancs.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
+      const rd = lancs.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
+      const ri = lancs.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+      resReal.innerHTML = [
+        ['Receita Prevista', mr, 'var(--green)'],
+        ['Receita Realizada', rr, 'var(--green)'],
+        ['Despesa Prevista', md, 'var(--red)'],
+        ['Despesa Realizada', rd, 'var(--red)'],
+        ['Saldo Previsto', mr-md-mi, ''],
+        ['Saldo Realizado', rr-rd-ri, ''],
+      ].map(([l,v,c])=>
+        `<div class="sum-row"><span class="sum-lbl">${l}</span><span class="sum-val" style="color:${c||'var(--t1)'}">${fmtR(v)}</span></div>`
+      ).join('');
+    }
+    // Progresso por categoria
+    const progEl = document.getElementById('orc-prog');
+    if(progEl){
+      const desMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
+      if(!desMetas.length){
+        progEl.innerHTML = '<p style="color:var(--t3);font-size:12px">Sem metas de despesa para este mês.</p>';
+      } else {
+        progEl.innerHTML = desMetas.map(m=>{
+          // Realizado: considera subcat se houver, senão soma toda a categoria
+          const real = m.subcat
+            ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0)
+            : lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
+          const pp    = m.val>0 ? Math.min(100,real/m.val*100) : 0;
+          const over  = real>m.val;
+          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
+          return `<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:var(--t2)">${label}</span>
+              <span class="mono" style="color:${over?'var(--red)':'var(--green)'}">${fmtR(real)} / ${fmtR(m.val)}</span>
+            </div>
+            <div class="prog-track"><div class="prog-fill" style="width:${pp}%;background:${over?'var(--red)':pp>80?'var(--amber)':'var(--green)'}"></div></div>
+          </div>`;
+        }).join('');
+      }
+    }
+    // Tabela realizado
+    const tbodyR = document.getElementById('orc-tbody-real');
+    const emptyR = document.getElementById('orc-empty-real');
+    if(!tbodyR) return;
+    if(!metas.length){ tbodyR.innerHTML=''; if(emptyR) emptyR.style.display='block'; return; }
+    if(emptyR) emptyR.style.display='none';
+    tbodyR.innerHTML = metas.sort((a,b)=>{
+      if(a.tipo!==b.tipo) return a.tipo.localeCompare(b.tipo);
+      return a.cat.localeCompare(b.cat);
+    }).map(m=>{
+      const real = m.subcat
+        ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0)
+        : lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
+      const saldo = m.val - real;
+      const pp    = m.val>0 ? real/m.val*100 : 0;
+      return `<tr>
+        <td style="color:var(--t1);font-weight:500">${m.cat}</td>
+        <td style="color:var(--t3);font-size:11px">${m.subcat||'<span style="color:var(--t4)">—</span>'}</td>
+        <td><span class="badge ${m.tipo==='Receita'?'bdg-green':m.tipo==='Investimento'?'bdg-blue':'bdg-red'}" style="font-size:9px">${m.tipo}</span></td>
+        <td class="mono" style="color:var(--blue)">${fmtR(m.val)}</td>
+        <td class="mono" style="color:${real>m.val?'var(--red)':'var(--green)'};font-weight:600">${fmtR(real)}</td>
+        <td class="mono" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmtR(saldo)}</td>
+        <td class="mono" style="color:${pp>100?'var(--red)':pp>80?'var(--amber)':'var(--t2)'}">${pct(pp)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── VISÃO: COMPARATIVO ──
+  if(_orcView==='comparativo'){
+    const allMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
+    const labels  = allMetas.map(m=>m.subcat?`${m.cat} › ${m.subcat}`:m.cat);
+    const prevVals = allMetas.map(m=>m.val);
+    const realVals = allMetas.map(m=>
+      m.subcat
+        ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0)
+        : lancs.filter(l=>l.cat===m.cat&&l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0)
+    );
+    mkCh('ch-orc-comp',{type:'bar',data:{labels,datasets:[
+      {label:'Previsto', data:prevVals, backgroundColor:'#4dabf730',borderColor:'#4dabf7',borderWidth:1.5,borderRadius:4},
+      {label:'Realizado',data:realVals, backgroundColor:'#ff4d6d30',borderColor:'#ff4d6d',borderWidth:1.5,borderRadius:4},
+    ]},options:{...chartBase,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8fa3bf',font:{size:11},boxWidth:12}}}}});
+
+    const compEl = document.getElementById('orc-comp-detalhe');
+    if(compEl){
+      if(!allMetas.length){
+        compEl.innerHTML='<p style="color:var(--t3);font-size:12px;text-align:center;padding:24px">Nenhuma meta cadastrada para este mês.</p>';
+      } else {
+        compEl.innerHTML = allMetas.map((m,i)=>{
+          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
+          const real  = realVals[i];
+          const over  = real > m.val;
+          const pp    = m.val>0 ? real/m.val*100 : 0;
+          const saldo = m.val - real;
+          const cor   = over ? 'var(--red)' : pp>80 ? 'var(--amber)' : 'var(--green)';
+          return `<div style="background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:14px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+              <div>
+                <span style="font-size:13px;font-weight:600;color:var(--t1)">${label}</span>
+                ${over?'<span class="badge bdg-red" style="font-size:9px;margin-left:8px">⚠ Estourou</span>':pp>80?'<span class="badge bdg-amber" style="font-size:9px;margin-left:8px">⚡ Atenção</span>':'<span class="badge bdg-green" style="font-size:9px;margin-left:8px">✓ OK</span>'}
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;color:var(--t3)">Previsto → Realizado</div>
+                <div class="mono" style="font-size:12px">${fmtR(m.val)} → <span style="color:${real>m.val?'var(--red)':'var(--green)'}">${fmtR(real)}</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="flex:1">
+                <div class="prog-track lg"><div class="prog-fill" style="width:${Math.min(100,pp)}%;background:${cor}"></div></div>
+              </div>
+              <span class="mono" style="font-size:11px;color:${cor};min-width:50px;text-align:right">${pct(pp)}</span>
+              <span class="mono" style="font-size:11px;color:${saldo>=0?'var(--green)':'var(--red)'};min-width:90px;text-align:right">${saldo>=0?'sobra ':'excesso '}${fmtR(Math.abs(saldo))}</span>
+            </div>
+          </div>`;
+        }).join('');
+      }
     }
   }
-
-  // Tabela de metas
-  const tbody = document.getElementById('orc-tbody');
-  const empty = document.getElementById('orc-empty');
-  if(!tbody) return;
-  if(!metas.length){ tbody.innerHTML=''; if(empty) empty.style.display='block'; return; }
-  if(empty) empty.style.display='none';
-  tbody.innerHTML = metas.map(m=>{
-    const real  = lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
-    const saldo = m.val-real;
-    const p     = m.val>0 ? real/m.val*100 : 0;
-    return `<tr>
-      <td style="color:var(--t1)">${m.cat}</td>
-      <td><span class="badge ${m.tipo==='Receita'?'bdg-green':m.tipo==='Investimento'?'bdg-blue':'bdg-red'}" style="font-size:9px">${m.tipo}</span></td>
-      <td class="mono">${fmtR(m.val)}</td>
-      <td class="mono" style="color:${real>m.val?'var(--red)':'var(--green)'}">${fmtR(real)}</td>
-      <td class="mono" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmtR(saldo)}</td>
-      <td class="mono" style="color:${p>100?'var(--red)':p>80?'var(--amber)':'var(--t2)'}">${pct(p)}</td>
-      <td><button class="btn btn-red btn-xs" onclick="delOrc('${m.id}')">✕</button></td>
-    </tr>`;
-  }).join('');
 }
 
 function saveOrc(){
-  const tipo = document.getElementById('o-tipo')?.value;
-  const mes  = parseInt(document.getElementById('o-mes')?.value);
-  const cat  = document.getElementById('o-cat')?.value;
-  const val  = parseFloat(document.getElementById('o-val')?.value)||0;
-  if(!cat||!val){alert('Preencha todos os campos.');return;}
+  const tipo   = document.getElementById('o-tipo')?.value;
+  const mes    = parseInt(document.getElementById('o-mes')?.value);
+  const cat    = document.getElementById('o-cat')?.value;
+  const subcat = document.getElementById('o-subcat')?.value||'';
+  const val    = parseFloat(document.getElementById('o-val')?.value)||0;
+  const obs    = document.getElementById('o-obs')?.value?.trim()||'';
+  const editId = document.getElementById('o-edit-id')?.value||'';
+  if(!cat||!val){alert('Preencha categoria e valor.');return;}
   const d = gs();
-  d.orcs = d.orcs.filter(o=>!(o.cat===cat&&o.tipo===tipo&&o.mes===mes));
-  d.orcs.push({id:uid(),tipo,mes,cat,val});
+  if(editId){
+    const m = d.orcs.find(o=>o.id===editId);
+    if(m) Object.assign(m,{tipo,mes,cat,subcat,val,obs});
+  } else {
+    // Impede duplicata exata (mesma cat+subcat+tipo+mes)
+    d.orcs = d.orcs.filter(o=>!(o.cat===cat&&o.subcat===(subcat||'')&&o.tipo===tipo&&o.mes===mes));
+    d.orcs.push({id:uid(),tipo,mes,cat,subcat,val,obs});
+  }
   ss(d); closeM('m-orc'); _orcMes=mes; renderOrc();
+}
+
+function editOrc(id){
+  const d = gs();
+  const m = d.orcs.find(o=>o.id===id);
+  if(!m) return;
+  document.getElementById('m-orc-titulo').textContent = 'Editar Meta de Orçamento';
+  document.getElementById('o-tipo').value = m.tipo;
+  document.getElementById('o-mes').value  = m.mes;
+  document.getElementById('o-val').value  = m.val;
+  document.getElementById('o-obs').value  = m.obs||'';
+  // Hidden field para edit mode
+  let hid = document.getElementById('o-edit-id');
+  if(!hid){ hid=document.createElement('input'); hid.type='hidden'; hid.id='o-edit-id'; document.getElementById('m-orc').querySelector('.modal-bd').appendChild(hid); }
+  hid.value = id;
+  updOrcCats();
+  setTimeout(()=>{
+    document.getElementById('o-cat').value = m.cat||'';
+    updOrcSubcats();
+    setTimeout(()=>{ const sc=document.getElementById('o-subcat'); if(sc) sc.value=m.subcat||''; },60);
+  },60);
+  updOrcPreview();
+  openM('m-orc');
 }
 
 function updOrcCats(){
   const tipo = document.getElementById('o-tipo')?.value||'Despesa';
   const el   = document.getElementById('o-cat');
   if(el) el.innerHTML = allCats(tipo).map(c=>`<option>${c}</option>`).join('');
+  updOrcSubcats();
 }
+
+function updOrcSubcats(){
+  const tipo = document.getElementById('o-tipo')?.value||'Despesa';
+  const cat  = document.getElementById('o-cat')?.value||'';
+  const el   = document.getElementById('o-subcat');
+  if(!el) return;
+  const sc = subcats(tipo, cat);
+  el.innerHTML = '<option value="">— Toda a categoria —</option>' + sc.map(s=>`<option>${s}</option>`).join('');
+  updOrcPreview();
+}
+
+function updOrcPreview(){
+  const cat    = document.getElementById('o-cat')?.value||'';
+  const subcat = document.getElementById('o-subcat')?.value||'';
+  const val    = parseFloat(document.getElementById('o-val')?.value)||0;
+  const prevCat   = document.getElementById('o-prev-cat');
+  const prevSubcat= document.getElementById('o-prev-subcat');
+  const prevVal   = document.getElementById('o-prev-val');
+  if(prevCat)    prevCat.textContent    = cat||'—';
+  if(prevSubcat) prevSubcat.textContent = subcat ? `› ${subcat}` : '';
+  if(prevVal)    prevVal.textContent    = fmtR(val);
+}
+
 document.getElementById('o-tipo')?.addEventListener('change', updOrcCats);
-function delOrc(id){ const d=gs(); d.orcs=d.orcs.filter(o=>o.id!==id); ss(d); renderOrc(); }
+document.getElementById('o-cat')?.addEventListener('change', ()=>{updOrcSubcats();updOrcPreview();});
+document.getElementById('o-subcat')?.addEventListener('change', updOrcPreview);
+document.getElementById('o-val')?.addEventListener('input', updOrcPreview);
+function delOrc(id){
+  const d=gs(); d.orcs=d.orcs.filter(o=>o.id!==id); ss(d);
+  // reset edit id
+  const hid = document.getElementById('o-edit-id'); if(hid) hid.value='';
+  renderOrc();
+}
 
 // ── CONTAS A PAGAR ──
 // ── Helpers de data para parcelas ──
