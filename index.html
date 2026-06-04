@@ -1208,6 +1208,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <button class="btn btn-ghost btn-xs" onclick="closeM('m-orc')">✕</button>
     </div>
     <div class="modal-bd">
+      <input type="hidden" id="o-edit-id" value="">
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Tipo</label>
           <select id="o-tipo" onchange="updOrcCats();updOrcSubcats()"><option>Receita</option><option selected>Despesa</option><option>Investimento</option></select>
@@ -1244,6 +1245,35 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-orc')">Cancelar</button>
       <button class="btn btn-blue" onclick="saveOrc()">Salvar Meta</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar exclusão de orçamento -->
+<div class="overlay" id="m-orc-del" style="display:none" onclick="if(event.target===this)cancelarDelOrc()">
+  <div class="modal" style="max-width:400px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h2 style="color:var(--red)">Excluir Meta</h2>
+      <button class="btn btn-ghost btn-xs" onclick="cancelarDelOrc()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="background:var(--red-dim);border:1px solid #ff4d6d44;border-radius:var(--r2);padding:16px;margin-bottom:16px;text-align:center">
+        <div style="font-size:24px;margin-bottom:10px">🗑️</div>
+        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">Confirmar exclusão</div>
+        <div style="font-size:12px;color:var(--t2)">Esta ação não pode ser desfeita.</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--r2);padding:14px">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Meta selecionada</div>
+        <div style="font-size:14px;font-weight:700;color:var(--t1)" id="m-orc-del-label">—</div>
+        <div style="display:flex;gap:16px;margin-top:8px;align-items:center">
+          <span style="font-size:11px;color:var(--t3)" id="m-orc-del-tipo">—</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--blue)" id="m-orc-del-valor">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="cancelarDelOrc()" style="flex:1;justify-content:center">Cancelar</button>
+      <button class="btn btn-red" onclick="confirmarDelOrc()" style="flex:1;justify-content:center">Sim, excluir</button>
     </div>
   </div>
 </div>
@@ -1693,12 +1723,12 @@ function openM(id){
   }
   if(id==='m-orc'){
     document.getElementById('o-mes').value=_orcMes;
-    // Reset edit mode
-    const hid=document.getElementById('o-edit-id'); if(hid) hid.value='';
+    document.getElementById('o-edit-id').value='';
     document.getElementById('m-orc-titulo').textContent='Definir Meta de Orçamento';
     document.getElementById('o-val').value='';
     document.getElementById('o-obs').value='';
     updOrcCats();
+    updOrcPreview();
   }
   if(id==='m-gasto'){document.getElementById('g-data').value=today();}
   if(id==='m-pag-fat'){document.getElementById('pf-data').value=today();document.getElementById('pf-mes').value=curMes();}
@@ -2945,23 +2975,60 @@ function editOrc(id){
   const d = gs();
   const m = d.orcs.find(o=>o.id===id);
   if(!m) return;
+
+  // Preenche o modal diretamente (sem chamar openM que reseta tudo)
   document.getElementById('m-orc-titulo').textContent = 'Editar Meta de Orçamento';
-  document.getElementById('o-tipo').value = m.tipo;
-  document.getElementById('o-mes').value  = m.mes;
-  document.getElementById('o-val').value  = m.val;
-  document.getElementById('o-obs').value  = m.obs||'';
-  // Hidden field para edit mode
-  let hid = document.getElementById('o-edit-id');
-  if(!hid){ hid=document.createElement('input'); hid.type='hidden'; hid.id='o-edit-id'; document.getElementById('m-orc').querySelector('.modal-bd').appendChild(hid); }
-  hid.value = id;
+  document.getElementById('o-edit-id').value  = id;
+  document.getElementById('o-tipo').value     = m.tipo;
+  document.getElementById('o-mes').value      = m.mes;
+  document.getElementById('o-val').value      = m.val;
+  document.getElementById('o-obs').value      = m.obs||'';
+
+  // Popula categorias do tipo e depois define a selecionada
   updOrcCats();
   setTimeout(()=>{
-    document.getElementById('o-cat').value = m.cat||'';
+    const catEl = document.getElementById('o-cat');
+    if(catEl) catEl.value = m.cat||'';
     updOrcSubcats();
-    setTimeout(()=>{ const sc=document.getElementById('o-subcat'); if(sc) sc.value=m.subcat||''; },60);
-  },60);
-  updOrcPreview();
-  openM('m-orc');
+    setTimeout(()=>{
+      const scEl = document.getElementById('o-subcat');
+      if(scEl) scEl.value = m.subcat||'';
+      updOrcPreview();
+    }, 60);
+  }, 60);
+
+  // Abre o overlay
+  document.getElementById('m-orc').style.display = 'flex';
+}
+
+let _delOrcId = null;
+function delOrc(id){
+  _delOrcId = id;
+  const d = gs();
+  const m = d.orcs.find(o=>o.id===id);
+  if(!m) return;
+
+  const label = m.cat + (m.subcat ? ` › ${m.subcat}` : '');
+  // Mostra modal de confirmação de exclusão
+  document.getElementById('m-orc-del-label').textContent  = label;
+  document.getElementById('m-orc-del-tipo').textContent   = m.tipo;
+  document.getElementById('m-orc-del-valor').textContent  = fmtR(m.val);
+  document.getElementById('m-orc-del').style.display      = 'flex';
+}
+
+function confirmarDelOrc(){
+  if(!_delOrcId) return;
+  const d = gs();
+  d.orcs = d.orcs.filter(o=>o.id!==_delOrcId);
+  ss(d);
+  _delOrcId = null;
+  document.getElementById('m-orc-del').style.display = 'none';
+  renderOrc();
+}
+
+function cancelarDelOrc(){
+  _delOrcId = null;
+  document.getElementById('m-orc-del').style.display = 'none';
 }
 
 function updOrcCats(){
@@ -2997,12 +3064,6 @@ document.getElementById('o-tipo')?.addEventListener('change', updOrcCats);
 document.getElementById('o-cat')?.addEventListener('change', ()=>{updOrcSubcats();updOrcPreview();});
 document.getElementById('o-subcat')?.addEventListener('change', updOrcPreview);
 document.getElementById('o-val')?.addEventListener('input', updOrcPreview);
-function delOrc(id){
-  const d=gs(); d.orcs=d.orcs.filter(o=>o.id!==id); ss(d);
-  // reset edit id
-  const hid = document.getElementById('o-edit-id'); if(hid) hid.value='';
-  renderOrc();
-}
 
 // ── CONTAS A PAGAR ──
 // ── Helpers de data para parcelas ──
