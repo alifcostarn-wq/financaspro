@@ -54,7 +54,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-heig
   background:var(--surface0);border-right:1px solid var(--line);
   display:flex;flex-direction:column;z-index:50;overflow-y:auto;
 }
-.logo{padding:22px 20px 18px;border-bottom:1px solid var(--line)}
+.logo{padding:22px 20px 18px;border-bottom:1px solid var(--line);position:relative}
 .logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:2px}
 .logo-icon{
   width:36px;height:36px;border-radius:10px;
@@ -243,10 +243,172 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .page.active{animation:fadeIn .2s ease}
 .modal{animation:fadeIn .15s ease}
 
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .sidebar{display:none}.main{margin-left:0;}.kpi-grid.cols4,.kpi-grid.cols5,.kpi-grid.cols6{grid-template-columns:1fr 1fr}
-  .g2,.g3{grid-template-columns:1fr}.page{padding:16px 14px 32px}
+/* ══════════════════════════════════════════
+   MOBILE — Bottom Nav + Drawer
+══════════════════════════════════════════ */
+
+/* ── Hamburger / Mobile topbar ── */
+.mob-topbar{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:80;
+  height:56px;background:var(--surface0);border-bottom:1px solid var(--line);
+  padding:0 16px;align-items:center;justify-content:space-between;
+}
+.mob-topbar-logo{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;letter-spacing:-.3px}
+.mob-topbar-logo .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:14px}
+.mob-topbar-right{display:flex;align-items:center;gap:8px}
+.mob-icon-btn{width:36px;height:36px;border-radius:var(--r2);background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all .15s;flex-shrink:0}
+.mob-icon-btn:hover,.mob-icon-btn:active{background:var(--surface3);color:var(--t1)}
+.mob-icon-btn svg{width:16px;height:16px;stroke-width:2}
+
+/* ── Drawer overlay ── */
+#drawer-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(3px);z-index:90;
+}
+#drawer-overlay.open{display:block}
+
+/* ── Sidebar as drawer on mobile ── */
+/* Desktop stays as is, mobile turns sidebar into drawer */
+
+/* ── Bottom nav ── */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:80;
+  background:var(--surface0);border-top:1px solid var(--line);
+  padding:6px 0 env(safe-area-inset-bottom,6px);
+}
+.bottom-nav-inner{display:flex;align-items:center;justify-content:space-around}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 8px;cursor:pointer;color:var(--t3);min-width:52px;
+  transition:color .15s;position:relative;border-radius:var(--r2);
+}
+.bn-item.active{color:var(--green)}
+.bn-item svg{width:20px;height:20px;stroke-width:1.8}
+.bn-item span{font-size:9px;font-weight:600;letter-spacing:.02em}
+.bn-item .bn-pill{
+  position:absolute;top:2px;right:6px;background:var(--red);color:#fff;
+  font-size:8px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center;
+}
+
+/* ── FAB — quick add ── */
+.mob-fab{
+  display:none;position:fixed;bottom:72px;right:18px;z-index:85;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),var(--cyan));
+  box-shadow:0 4px 20px rgba(0,217,126,.4);
+  border:none;cursor:pointer;font-size:24px;color:#000;font-weight:700;
+  align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;
+}
+.mob-fab:active{transform:scale(.93);box-shadow:0 2px 10px rgba(0,217,126,.3)}
+
+/* ── Mobile page padding ── */
+@media(max-width:768px){
+  /* Topbar & bottom nav */
+  .mob-topbar{display:flex}
+  .bottom-nav{display:block}
+  .mob-fab{display:flex}
+
+  /* Sidebar becomes drawer */
+  .sidebar{
+    transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+    z-index:100;box-shadow:8px 0 40px rgba(0,0,0,.5);
+  }
+  .sidebar.drawer-open{transform:translateX(0)}
+
+  /* Main shifts for topbar + bottom nav */
+  .main{margin-left:0;padding-top:56px;padding-bottom:72px}
+  .page{padding:16px 14px 24px}
+
+  /* KPI grids */
+  .kpi-grid.cols4,.kpi-grid.cols5,.kpi-grid.cols6{grid-template-columns:1fr 1fr}
+  .kpi-grid.cols3{grid-template-columns:1fr 1fr}
+  .kpi{padding:12px}
+  .kpi-val{font-size:16px}
+  .kpi-label{font-size:9px}
+
+  /* Grids */
+  .g2,.g3{grid-template-columns:1fr}
+
+  /* Topbar inside pages — hide on mobile (we use mob-topbar) */
+  .topbar{flex-direction:column;gap:8px;margin-bottom:16px}
+  .topbar-left h1{font-size:18px}
+  .topbar-right{width:100%;flex-wrap:wrap}
+  .topbar-right select{flex:1;min-width:0}
+  .topbar-right .btn{flex:1;justify-content:center}
+
+  /* Cards */
+  .card{padding:14px;margin-bottom:12px}
+  .card-header{flex-wrap:wrap;gap:6px;margin-bottom:12px}
+
+  /* Tables → horizontal scroll */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbl{min-width:520px}
+  .tbl th,.tbl td{padding:8px 10px;font-size:11px}
+
+  /* Month tabs */
+  .month-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .month-tabs::-webkit-scrollbar{display:none}
+  .mtab{flex-shrink:0}
+
+  /* Modals full-screen on mobile */
+  .overlay{padding:0;align-items:flex-end}
+  .modal{
+    max-width:100%!important;width:100%;max-height:92vh;
+    border-radius:20px 20px 0 0;border-bottom:none;
+  }
+  .modal-hd{padding:16px 18px}
+  .modal-bd{padding:14px 18px}
+  .modal-ft{padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+
+  /* Forms 1 col on mobile */
+  .form-grid.cols2,.form-grid.cols3{grid-template-columns:1fr}
+
+  /* Buttons */
+  .btn{padding:9px 14px}
+  .btn-xs{padding:4px 8px}
+
+  /* Charts */
+  .chart-box[style*="height:280px"]{height:200px!important}
+  .chart-box[style*="height:260px"]{height:180px!important}
+  .chart-box[style*="height:220px"]{height:160px!important}
+  .chart-box[style*="height:180px"]{height:140px!important}
+  .chart-box[style*="height:160px"]{height:130px!important}
+
+  /* Logout button */
+  #logout-btn{display:none}
+
+  /* Toggle rows scroll */
+  .toggle-row{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .tgl{flex-shrink:0}
+
+  /* Orçamento toggle */
+  #page-orc .topbar-right{flex-direction:column}
+  #page-orc .topbar-right > div:first-child{width:100%;overflow-x:auto}
+
+  /* CC grid */
+  .cc-grid{grid-template-columns:1fr}
+  .cc-visual{min-height:130px}
+
+  /* Debt cards */
+  .debt-hd{flex-wrap:wrap;gap:8px}
+
+  /* KPI sub text smaller */
+  .kpi-sub{font-size:9px}
+
+  /* Score card */
+  #dk-score{font-size:22px!important}
+
+  /* Dashboard ritmo detalhe */
+  #dk-ritmo-detalhe > div{flex-direction:column}
+}
+
+/* ── Small phones ── */
+@media(max-width:380px){
+  .kpi-grid.cols4,.kpi-grid.cols5,.kpi-grid.cols6{grid-template-columns:1fr 1fr}
+  .kpi-val{font-size:14px}
+  .page{padding:12px 10px 20px}
+  .bottom-nav-inner{gap:0}
+  .bn-item{min-width:44px;padding:4px 4px}
 }
 </style>
 </head>
@@ -310,14 +472,65 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 </script>
 
 
-<!-- ═══════════════ SIDEBAR ═══════════════ -->
-<nav class="sidebar">
+<!-- ═══ MOBILE TOPBAR ═══ -->
+<div class="mob-topbar" id="mob-topbar">
+  <div class="mob-topbar-logo">
+    <div class="logo-icon">💰</div>
+    FinançasPro
+  </div>
+  <div class="mob-topbar-right">
+    <div class="mob-icon-btn" onclick="openM('m-lanc')" title="Novo lançamento">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <div class="mob-icon-btn" id="mob-menu-btn" onclick="toggleDrawer()" title="Menu">
+      <svg id="mob-ham-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DRAWER OVERLAY ═══ -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-inner">
+    <div class="bn-item active" id="bn-dash" onclick="goMob('dash')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Início</span>
+    </div>
+    <div class="bn-item" id="bn-lanc" onclick="goMob('lanc')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Lançamentos</span>
+    </div>
+    <div class="bn-item" id="bn-orc" onclick="goMob('orc')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span>Orçamento</span>
+    </div>
+    <div class="bn-item" id="bn-contas" onclick="goMob('contas')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      <span>Contas</span>
+      <span class="bn-pill" id="bn-pill-contas" style="display:none">0</span>
+    </div>
+    <div class="bn-item" id="bn-more" onclick="toggleDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg>
+      <span>Mais</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ FAB ═══ -->
+<button class="mob-fab" onclick="openM('m-lanc')" title="Novo lançamento" aria-label="Novo lançamento">＋</button>
+
+
+<nav class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-mark">
       <div class="logo-icon">💰</div>
       <span class="logo-text">FinançasPro</span>
     </div>
     <div class="logo-sub">Controle Financeiro</div>
+    <!-- Close button only visible on mobile -->
+    <button onclick="closeDrawer()" style="display:none;position:absolute;top:18px;right:16px;background:var(--surface3);border:1px solid var(--line);color:var(--t2);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;align-items:center;justify-content:center" id="sidebar-close-btn">✕</button>
   </div>
 
   <div class="nav-section">Visão Geral</div>
@@ -4826,6 +5039,135 @@ seedLancamentos();
 document.getElementById('dash-mes').value=curMes();
 updSbSaldo();
 renderDash();
+
+// ═══════════════════════════════════════
+// MOBILE — Drawer, Bottom Nav, FAB
+// ═══════════════════════════════════════
+
+function isMobile(){ return window.innerWidth <= 768; }
+
+// ── Drawer ──
+function toggleDrawer(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('drawer-overlay');
+  const closeBtn = document.getElementById('sidebar-close-btn');
+  const isOpen = sidebar.classList.contains('drawer-open');
+  if(isOpen){ closeDrawer(); } else { openDrawer(); }
+}
+function openDrawer(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('drawer-overlay');
+  const closeBtn = document.getElementById('sidebar-close-btn');
+  sidebar.classList.add('drawer-open');
+  overlay.classList.add('open');
+  if(closeBtn){ closeBtn.style.display='flex'; }
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('drawer-overlay');
+  const closeBtn = document.getElementById('sidebar-close-btn');
+  sidebar.classList.remove('drawer-open');
+  overlay.classList.remove('open');
+  if(closeBtn){ closeBtn.style.display='none'; }
+  document.body.style.overflow='';
+}
+
+// ── Bottom nav navigation ──
+const BN_PAGES = ['dash','lanc','orc','contas'];
+function goMob(p){
+  // Close drawer if open
+  closeDrawer();
+  // Navigate using existing go()
+  go(p, null);
+  // Sync sidebar active state
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    if(onclick.includes("'"+p+"'")) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  // Update bottom nav active state
+  document.querySelectorAll('.bn-item').forEach(i => i.classList.remove('active'));
+  const active = document.getElementById('bn-'+p);
+  if(active) active.classList.add('active');
+  // Scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Sync sidebar nav clicks to close drawer on mobile ──
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(isMobile()) {
+      // Small delay so go() runs first, then close
+      setTimeout(closeDrawer, 80);
+      // Sync bottom nav
+      const onclick = btn.getAttribute('onclick') || '';
+      const match = onclick.match(/'([a-z]+)'/);
+      if(match){
+        const p = match[1];
+        document.querySelectorAll('.bn-item').forEach(i => i.classList.remove('active'));
+        const bn = document.getElementById('bn-'+p);
+        if(bn) bn.classList.add('active');
+        // "Mais" stays highlighted for pages not in bottom nav
+        if(!BN_PAGES.includes(p)){
+          document.getElementById('bn-more')?.classList.add('active');
+        }
+      }
+    }
+  });
+});
+
+// ── Sync pill counts to bottom nav ──
+const origUpdSbSaldo = updSbSaldo;
+function updSbSaldo(){
+  const d = gs();
+  const si = d.cfg.si||0;
+  const ativos = d.lancs.filter(l=>l.status!=='cancelado');
+  const total  = ativos.reduce((a,l)=>a+(l.tipo==='Receita'?l.valor:-(l.valor)),0);
+  const saldo  = si + total;
+  setC('sb-saldo-val', fmtR(saldo), saldo>=0?'var(--green)':'var(--red)');
+  const pend = d.contas.filter(c=>c.status!=='Pago').length;
+  set('pill-contas', pend||'');
+  const pill = document.getElementById('pill-contas');
+  if(pill) pill.style.display = pend?'inline':'none';
+  // Sync bottom nav pill
+  const bnPill = document.getElementById('bn-pill-contas');
+  if(bnPill){
+    bnPill.textContent = pend||'';
+    bnPill.style.display = pend?'inline':'none';
+  }
+  // Update mob topbar title if needed
+  const mobTopbar = document.getElementById('mob-topbar');
+  if(mobTopbar){
+    const pageNames = {dash:'Dashboard',rel:'Relatórios',lanc:'Lançamentos',orc:'Orçamento',contas:'Contas a Pagar',dividas:'Dívidas',cartoes:'Cartões',bancos:'Contas Bancárias',cfg:'Configurações'};
+  }
+}
+
+// ── Show/hide sidebar close button based on screen size ──
+function handleResize(){
+  const closeBtn = document.getElementById('sidebar-close-btn');
+  if(!isMobile()){
+    // Desktop: reset drawer state
+    closeDrawer();
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.transform = '';
+    if(closeBtn) closeBtn.style.display = 'none';
+  }
+}
+window.addEventListener('resize', handleResize);
+
+// ── Swipe to close drawer ──
+let _touchStartX = 0;
+document.addEventListener('touchstart', e => { _touchStartX = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - _touchStartX;
+  const sidebar = document.getElementById('sidebar');
+  if(sidebar.classList.contains('drawer-open') && dx < -60) closeDrawer();
+  if(!sidebar.classList.contains('drawer-open') && _touchStartX < 20 && dx > 60) openDrawer();
+}, {passive:true});
+
+// Re-run updSbSaldo once to sync pills on load
+updSbSaldo();
 </script>
 </body>
 </html>
