@@ -903,11 +903,16 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <button class="btn btn-green" onclick="openM('m-lanc')">+ Novo Lançamento</button>
     </div>
   </div>
-  <div class="kpi-grid cols4">
+  <div class="kpi-grid cols5">
     <div class="kpi g"><div class="kpi-label">Receitas do Mês</div><div class="kpi-val g" id="lk-rec">R$ 0</div></div>
     <div class="kpi r"><div class="kpi-label">Despesas do Mês</div><div class="kpi-val r" id="lk-des">R$ 0</div></div>
     <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div></div>
     <div class="kpi b"><div class="kpi-label">Investimentos</div><div class="kpi-val b" id="lk-inv">R$ 0</div></div>
+    <div class="kpi c" style="border:1px solid var(--cyan);position:relative;overflow:hidden">
+      <div class="kpi-label" style="color:var(--cyan)">Saldo Acumulado</div>
+      <div class="kpi-val c" id="lk-acum">R$ 0</div>
+      <div id="lk-acum-sub" style="font-size:10px;color:var(--t3);margin-top:4px"></div>
+    </div>
   </div>
   <div class="card">
     <div class="card-header">
@@ -3339,6 +3344,26 @@ function renderLanc(){
   const inv = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
+
+  // Saldo Acumulado — saldo inicial + todos os meses até mFil (inclusive)
+  const si = d.cfg.si || 0;
+  let acum = si;
+  for(let m = 0; m <= mFil; m++){
+    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado');
+    const mr = ml.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
+    const md = ml.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
+    const mi = ml.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+    acum += mr - md - mi;
+  }
+  setC('lk-acum', fmtR(acum), acum>=0?'var(--cyan)':'var(--red)');
+  const acumSubEl = document.getElementById('lk-acum-sub');
+  if(acumSubEl){
+    const MESES_ABREV=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const saldoAntes = acum - (rec - des - inv);
+    acumSubEl.textContent = mFil > 0
+      ? `Acum. até ${MESES_ABREV[mFil]} · anterior: ${fmtRs(saldoAntes)}`
+      : `Início do ano · S.I.: ${fmtRs(si)}`;
+  }
 
   const tbody = document.getElementById('l-tbody');
   const empty = document.getElementById('l-empty');
