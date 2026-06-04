@@ -410,114 +410,6 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   .bottom-nav-inner{gap:0}
   .bn-item{min-width:44px;padding:4px 4px}
 }
-
-/* ══════════════════════════════════════════
-   BUSCA GLOBAL — Spotlight style
-══════════════════════════════════════════ */
-#search-overlay{
-  position:fixed;inset:0;background:rgba(4,8,16,.85);
-  backdrop-filter:blur(8px);z-index:500;
-  display:none;align-items:flex-start;justify-content:center;
-  padding:80px 16px 32px;
-}
-#search-overlay.open{display:flex}
-
-#search-box{
-  width:100%;max-width:640px;
-  background:var(--surface1);border:1px solid var(--line2);
-  border-radius:16px;overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(0,217,126,.15);
-  animation:searchIn .18s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes searchIn{
-  from{opacity:0;transform:scale(.95) translateY(-12px)}
-  to{opacity:1;transform:none}
-}
-
-#search-input-wrap{
-  display:flex;align-items:center;gap:12px;
-  padding:16px 20px;border-bottom:1px solid var(--line);
-}
-#search-input-icon{color:var(--t3);flex-shrink:0}
-#search-input-icon svg{width:18px;height:18px;stroke-width:2}
-#search-input{
-  flex:1;background:transparent;border:none;outline:none;
-  color:var(--t1);font-size:16px;font-family:'Sora',sans-serif;
-  font-weight:500;
-}
-#search-input::placeholder{color:var(--t4)}
-#search-kbd{
-  font-size:10px;color:var(--t4);background:var(--surface3);
-  border:1px solid var(--line);padding:2px 6px;border-radius:4px;
-  font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0;
-}
-
-#search-filters{
-  display:flex;gap:6px;padding:10px 16px;
-  border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;
-}
-#search-filters::-webkit-scrollbar{display:none}
-.sf-chip{
-  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;
-  border:1px solid var(--line);background:var(--surface2);color:var(--t3);
-  cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;
-}
-.sf-chip:hover{border-color:var(--line2);color:var(--t2)}
-.sf-chip.active{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-
-#search-results{
-  max-height:420px;overflow-y:auto;
-  scrollbar-width:thin;scrollbar-color:var(--line) transparent;
-}
-#search-results::-webkit-scrollbar{width:4px}
-#search-results::-webkit-scrollbar-thumb{background:var(--line)}
-
-.sr-section{
-  padding:8px 16px 4px;
-  font-size:10px;font-weight:700;color:var(--t4);
-  text-transform:uppercase;letter-spacing:.1em;
-}
-.sr-item{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;cursor:pointer;transition:background .1s;
-  border-left:2px solid transparent;
-}
-.sr-item:hover,.sr-item.focused{
-  background:var(--surface2);border-left-color:var(--green);
-}
-.sr-item.focused{background:var(--surface3)}
-.sr-icon{
-  width:34px;height:34px;border-radius:9px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:15px;
-}
-.sr-body{flex:1;min-width:0}
-.sr-title{font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sr-title mark{background:transparent;color:var(--green);font-weight:700}
-.sr-sub{font-size:11px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sr-right{text-align:right;flex-shrink:0}
-.sr-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
-.sr-tag{font-size:9px;color:var(--t4);margin-top:2px}
-
-#search-empty{
-  padding:40px 20px;text-align:center;color:var(--t3);
-}
-#search-empty svg{width:36px;height:36px;stroke-width:1.2;margin-bottom:12px;opacity:.3}
-#search-empty p{font-size:13px;margin-bottom:4px}
-#search-empty small{font-size:11px;color:var(--t4)}
-
-#search-footer{
-  padding:10px 16px;border-top:1px solid var(--line);
-  display:flex;gap:16px;align-items:center;
-}
-.sk-hint{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t4)}
-.sk-hint kbd{background:var(--surface3);border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3)}
-
-@media(max-width:768px){
-  #search-overlay{padding:12px;align-items:flex-start;padding-top:12px}
-  #search-box{border-radius:14px;max-height:calc(100vh - 24px)}
-  #search-input{font-size:15px}
-  #search-results{max-height:calc(100vh - 200px)}
-}
 </style>
 </head>
 <body>
@@ -587,9 +479,6 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     FinançasPro
   </div>
   <div class="mob-topbar-right">
-    <div class="mob-icon-btn" onclick="openSearch()" title="Buscar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    </div>
     <div class="mob-icon-btn" onclick="openM('m-lanc')" title="Novo lançamento">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
@@ -690,49 +579,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 
   <div class="sidebar-footer">
-    <!-- Search button in sidebar -->
-    <div onclick="openSearch()" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);cursor:pointer;margin-bottom:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--line2)'" onmouseout="this.style.borderColor='var(--line)'">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <span style="font-size:11px;color:var(--t3);flex:1">Busca global...</span>
-      <span style="font-size:10px;color:var(--t4);background:var(--surface3);border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace">⌘K</span>
-    </div>
     <div class="sidebar-footer-info" id="sb-saldo">
       Saldo atual<br><strong id="sb-saldo-val" style="color:var(--green);font-family:'JetBrains Mono',monospace">R$ 0,00</strong>
     </div>
   </div>
 </nav>
-
-<!-- ═══════════════ BUSCA GLOBAL ═══════════════ -->
-<div id="search-overlay" onclick="if(event.target===this)closeSearch()">
-  <div id="search-box">
-    <!-- Input -->
-    <div id="search-input-wrap">
-      <div id="search-input-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-      <input id="search-input" type="text" placeholder="Buscar lançamentos, contas, dívidas..." autocomplete="off" oninput="runSearch()" onkeydown="searchKeyNav(event)">
-      <span id="search-kbd">ESC</span>
-    </div>
-    <!-- Filtros rápidos -->
-    <div id="search-filters">
-      <div class="sf-chip active" data-filter="all"    onclick="setSearchFilter('all',this)">Tudo</div>
-      <div class="sf-chip"        data-filter="lanc"   onclick="setSearchFilter('lanc',this)">💸 Lançamentos</div>
-      <div class="sf-chip"        data-filter="contas" onclick="setSearchFilter('contas',this)">📋 Contas a Pagar</div>
-      <div class="sf-chip"        data-filter="dividas"onclick="setSearchFilter('dividas',this)">⏱ Dívidas</div>
-      <div class="sf-chip"        data-filter="orc"    onclick="setSearchFilter('orc',this)">🎯 Orçamento</div>
-      <div class="sf-chip"        data-filter="cartoes"onclick="setSearchFilter('cartoes',this)">💳 Cartões</div>
-    </div>
-    <!-- Resultados -->
-    <div id="search-results"></div>
-    <!-- Footer com atalhos -->
-    <div id="search-footer">
-      <div class="sk-hint"><kbd>↑↓</kbd> navegar</div>
-      <div class="sk-hint"><kbd>Enter</kbd> abrir</div>
-      <div class="sk-hint"><kbd>ESC</kbd> fechar</div>
-      <div style="margin-left:auto;font-size:10px;color:var(--t4)" id="search-count"></div>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════ MAIN ═══════════════ -->
 <main class="main">
@@ -744,7 +595,18 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <h1>Dashboard</h1>
       <p id="dash-sub">Resumo financeiro do mês</p>
     </div>
-    <div class="topbar-right" style="display:flex;gap:8px;align-items:center">
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <!-- Filtro Previsto / Realizado -->
+      <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
+        <button id="dash-btn-prev" onclick="setDashView('previsto')"
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
+          📋 Previsto
+        </button>
+        <button id="dash-btn-real" onclick="setDashView('realizado')"
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          ✓ Realizado
+        </button>
+      </div>
       <select id="dash-mes" onchange="renderDash()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:8px 12px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
         <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
         <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
@@ -906,13 +768,25 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <div class="page" id="page-rel">
   <div class="topbar">
     <div class="topbar-left"><h1>Relatórios & DRE</h1><p>Demonstrativo de Resultado e análise financeira completa</p></div>
-    <div class="topbar-right" id="rel-dre-selmes" style="display:none;gap:8px;align-items:center">
-      <select id="rel-dre-mes" onchange="renderRel()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
-        <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
-        <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
-        <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
-        <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
-      </select>
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
+        <button id="rel-btn-prev" onclick="setRelView('previsto')"
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
+          📋 Previsto
+        </button>
+        <button id="rel-btn-real" onclick="setRelView('realizado')"
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          ✓ Realizado
+        </button>
+      </div>
+      <div id="rel-dre-selmes" style="display:none;gap:8px;align-items:center">
+        <select id="rel-dre-mes" onchange="renderRel()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+          <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+          <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+          <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+          <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+      </div>
     </div>
   </div>
   <div class="toggle-row">
@@ -2274,13 +2148,42 @@ function allCatsFlat(){
 }
 
 // ── DASHBOARD ──
+let _dashView = 'previsto'; // 'previsto' | 'realizado'
+let _relFilterView = 'previsto'; // 'previsto' | 'realizado'
+
+function setDashView(v){
+  _dashView = v;
+  const btnP = document.getElementById('dash-btn-prev');
+  const btnR = document.getElementById('dash-btn-real');
+  if(btnP){ btnP.style.background = v==='previsto'?'var(--blue-dim)':'transparent'; btnP.style.color = v==='previsto'?'var(--blue)':'var(--t3)'; }
+  if(btnR){ btnR.style.background = v==='realizado'?'var(--green-dim)':'transparent'; btnR.style.color = v==='realizado'?'var(--green)':'var(--t3)'; }
+  renderDash();
+}
+
+function setRelView(v){
+  _relFilterView = v;
+  const btnP = document.getElementById('rel-btn-prev');
+  const btnR = document.getElementById('rel-btn-real');
+  if(btnP){ btnP.style.background = v==='previsto'?'var(--blue-dim)':'transparent'; btnP.style.color = v==='previsto'?'var(--blue)':'var(--t3)'; }
+  if(btnR){ btnR.style.background = v==='realizado'?'var(--green-dim)':'transparent'; btnR.style.color = v==='realizado'?'var(--green)':'var(--t3)'; }
+  renderRel();
+}
+
+// Retorna lançamentos filtrados pelo modo previsto/realizado
+function filtrarPorView(lancs, view){
+  if(view === 'realizado') return lancs.filter(l => l.pago === 'Pago');
+  return lancs; // previsto = todos ativos
+}
+
 function renderDash(){
   const d  = gs();
   const mes = parseInt(document.getElementById('dash-mes').value);
   const ano = d.cfg.ano || new Date().getFullYear();
-  document.getElementById('dash-sub').textContent = `${MESES[mes]} ${ano}`;
+  const modoLabel = _dashView === 'realizado' ? ' · ✓ Realizado' : ' · 📋 Previsto';
+  document.getElementById('dash-sub').textContent = `${MESES[mes]} ${ano}${modoLabel}`;
 
-  const ativos = d.lancs.filter(l => l.status !== 'cancelado');
+  const ativosBase = d.lancs.filter(l => l.status !== 'cancelado');
+  const ativos = filtrarPorView(ativosBase, _dashView);
   const ml  = ativos.filter(l => getMes(l.data) === mes);
   const rec = ml.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
   const des = ml.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
@@ -2685,7 +2588,8 @@ function tglRel(v,el){
 
 function renderRel(){
   const d=gs();
-  const ativos=d.lancs.filter(l=>l.status!=='cancelado');
+  const ativosBase=d.lancs.filter(l=>l.status!=='cancelado');
+  const ativos=filtrarPorView(ativosBase, _relFilterView);
   const mData=MESES.map((_,m)=>({
     r :ativos.filter(l=>l.tipo==='Receita'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
     de:ativos.filter(l=>l.tipo==='Despesa'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
@@ -2694,6 +2598,11 @@ function renderRel(){
 
   // ── Visão Anual ──
   if(_relView==='anual'){
+    const modoTag = _relFilterView==='realizado'
+      ? '<span class="badge bdg-green" style="font-size:9px;margin-left:8px">✓ Realizado</span>'
+      : '<span class="badge bdg-blue" style="font-size:9px;margin-left:8px">📋 Previsto</span>';
+    const hdrEl = document.querySelector('#rel-anual .card-header .card-title');
+    if(hdrEl) hdrEl.innerHTML = 'Receita / Despesa / Investimento por Mês' + modoTag;
     mkCh('ch-rel-ano',{type:'bar',data:{labels:MESES3,datasets:[
       {label:'Receita',    data:mData.map(m=>m.r), backgroundColor:'#00d97e30',borderColor:'#00d97e',borderWidth:1.5,borderRadius:4},
       {label:'Despesa',    data:mData.map(m=>m.de),backgroundColor:'#ff4d6d30',borderColor:'#ff4d6d',borderWidth:1.5,borderRadius:4},
@@ -2784,9 +2693,9 @@ function dreTotal(label, valor, destaque=false){
 }
 
 // ── Helpers de fluxo de caixa (inclui movimentações bancárias) ──
-function getCashFlowForMonth(d, mes) {
+function getCashFlowForMonth(d, mes, ativosParam) {
   const ano = d.cfg.ano || new Date().getFullYear();
-  const ativos = d.lancs.filter(l => l.status !== 'cancelado');
+  const ativos = ativosParam || filtrarPorView(d.lancs.filter(l => l.status !== 'cancelado'), _relFilterView);
   const ml = ativos.filter(l => getMes(l.data) === mes);
 
   // Fluxo de lançamentos
@@ -2845,7 +2754,7 @@ function renderDREMensal(d, ativos) {
   const ano = d.cfg.ano || new Date().getFullYear();
   document.getElementById('dre-m-titulo').textContent = MESES[mes] + ' ' + ano;
 
-  const { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos } = getCashFlowForMonth(d, mes);
+  const { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos } = getCashFlowForMonth(d, mes, ativos);
 
   // Mesclar receitas de lançamentos + bancário
   const allRecCats = { ...recCats };
@@ -5317,286 +5226,6 @@ document.addEventListener('touchend', e => {
 
 // Re-run updSbSaldo once to sync pills on load
 updSbSaldo();
-
-// ═══════════════════════════════════════
-// BUSCA GLOBAL
-// ═══════════════════════════════════════
-
-let _searchFilter = 'all';
-let _searchFocused = -1;
-let _searchResults = [];
-
-function openSearch(){
-  const overlay = document.getElementById('search-overlay');
-  overlay.classList.add('open');
-  const input = document.getElementById('search-input');
-  input.value = '';
-  _searchFocused = -1;
-  _searchFilter = 'all';
-  document.querySelectorAll('.sf-chip').forEach(c=>c.classList.remove('active'));
-  document.querySelector('.sf-chip[data-filter="all"]').classList.add('active');
-  renderSearchEmpty();
-  setTimeout(()=>input.focus(), 60);
-  document.body.style.overflow = 'hidden';
-}
-
-function closeSearch(){
-  document.getElementById('search-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-  _searchFocused = -1;
-}
-
-function setSearchFilter(f, el){
-  _searchFilter = f;
-  document.querySelectorAll('.sf-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  runSearch();
-  document.getElementById('search-input').focus();
-}
-
-function renderSearchEmpty(){
-  const q = document.getElementById('search-input').value.trim();
-  const el = document.getElementById('search-results');
-  set('search-count','');
-  if(!q){
-    el.innerHTML = `
-      <div id="search-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <p>Digite para buscar em todo o sistema</p>
-        <small>Lançamentos · Contas · Dívidas · Orçamento · Cartões</small>
-      </div>`;
-    return;
-  }
-}
-
-// Highlight matching text
-function hl(text, q){
-  if(!q || !text) return text||'';
-  const safe = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return String(text).replace(new RegExp(`(${safe})`, 'gi'), '<mark>$1</mark>');
-}
-
-// Fuzzy-ish: does text contain all chars of query in order? Also plain includes.
-function matches(text, q){
-  if(!text||!q) return false;
-  return String(text).toLowerCase().includes(q.toLowerCase());
-}
-
-function runSearch(){
-  const q = document.getElementById('search-input').value.trim();
-  const el = document.getElementById('search-results');
-  _searchFocused = -1;
-  _searchResults = [];
-
-  if(!q){ renderSearchEmpty(); return; }
-
-  const d = gs();
-  const groups = [];
-
-  // ── Lançamentos ──
-  if(_searchFilter==='all'||_searchFilter==='lanc'){
-    const hits = d.lancs.filter(l=>
-      matches(l.desc,q)||matches(l.cat,q)||matches(l.subcat,q)||matches(l.obs,q)||matches(l.data,q)||matches(fmtR(l.valor),q)
-    ).sort((a,b)=>b.data.localeCompare(a.data)).slice(0,12);
-
-    if(hits.length){
-      groups.push({ section:'💸 Lançamentos', items: hits.map(l=>{
-        const cor = l.tipo==='Receita'?'var(--green)':l.tipo==='Investimento'?'var(--blue)':'var(--red)';
-        const bg  = l.tipo==='Receita'?'var(--green-dim)':l.tipo==='Investimento'?'var(--blue-dim)':'var(--red-dim)';
-        const sig = l.tipo==='Receita'?'+':'-';
-        return {
-          icon:`<div class="sr-icon" style="background:${bg}"><span style="font-size:12px">${l.tipo==='Receita'?'💰':l.tipo==='Investimento'?'📈':'💸'}</span></div>`,
-          title: hl(l.desc||'Sem descrição', q),
-          sub: `${l.data} · ${hl(l.cat,q)}${l.subcat?' › '+hl(l.subcat,q):''}`,
-          val: `<span style="color:${cor}">${sig}${fmtR(l.valor)}</span>`,
-          tag: l.status==='cancelado'?'<span style="color:var(--t4)">cancelado</span>':'',
-          action: ()=>{ closeSearch(); go('lanc', document.querySelector('.nav-btn:nth-of-type(3)')); setTimeout(()=>{ const s=document.getElementById('lanc-search'); if(s){s.value=l.desc||'';s.dispatchEvent(new Event('input'));} },300); }
-        };
-      })});
-    }
-  }
-
-  // ── Contas a Pagar ──
-  if(_searchFilter==='all'||_searchFilter==='contas'){
-    const hits = d.contas.filter(c=>
-      matches(c.desc,q)||matches(c.cat,q)||matches(fmtR(c.valor),q)||matches(c.venc,q)||matches(c.status,q)
-    ).sort((a,b)=>a.venc.localeCompare(b.venc)).slice(0,8);
-
-    if(hits.length){
-      groups.push({ section:'📋 Contas a Pagar', items: hits.map(c=>{
-        const isPago = c.status==='Pago';
-        const isVenc = !isPago && c.venc < new Date().toISOString().slice(0,10);
-        const cor = isPago?'var(--green)':isVenc?'var(--red)':'var(--amber)';
-        const badge = isPago?'✓ Pago':isVenc?'⚠ Vencida':'⏰ Pendente';
-        return {
-          icon:`<div class="sr-icon" style="background:var(--amber-dim)">📋</div>`,
-          title: hl(c.desc||'Sem descrição', q),
-          sub: `Venc. ${c.venc} · ${hl(c.cat||'',q)}`,
-          val: `<span style="color:var(--amber)">${fmtR(c.valor)}</span>`,
-          tag: `<span style="color:${cor};font-size:9px">${badge}</span>`,
-          action: ()=>{ closeSearch(); go('contas', document.querySelector('[onclick*="contas"]')); }
-        };
-      })});
-    }
-  }
-
-  // ── Dívidas ──
-  if(_searchFilter==='all'||_searchFilter==='dividas'){
-    const hits = d.divs.filter(dv=>
-      matches(dv.nome,q)||matches(dv.credor,q)||matches(fmtR(dv.total),q)||matches(dv.tipo,q)
-    ).slice(0,6);
-
-    if(hits.length){
-      groups.push({ section:'⏱ Dívidas', items: hits.map(dv=>{
-        const pct_pg = dv.total>0?(1-(dv.saldo||dv.total)/dv.total)*100:0;
-        return {
-          icon:`<div class="sr-icon" style="background:var(--red-dim)">⏱</div>`,
-          title: hl(dv.nome||dv.credor||'Dívida', q),
-          sub: `Credor: ${hl(dv.credor||'—',q)} · Parcela: ${fmtR(dv.mensal)}`,
-          val: `<span style="color:var(--red)">${fmtR(dv.saldo||dv.total)}</span>`,
-          tag: `<span style="color:var(--t4);font-size:9px">${pct_pg.toFixed(0)}% quitado</span>`,
-          action: ()=>{ closeSearch(); go('dividas', document.querySelector('[onclick*="dividas"]')); }
-        };
-      })});
-    }
-  }
-
-  // ── Orçamento ──
-  if(_searchFilter==='all'||_searchFilter==='orc'){
-    const hits = d.orcs.filter(o=>
-      matches(o.cat,q)||matches(o.subcat,q)||matches(o.tipo,q)||matches(MESES[o.mes],q)||matches(fmtR(o.val),q)
-    ).slice(0,6);
-
-    if(hits.length){
-      groups.push({ section:'🎯 Orçamento', items: hits.map(o=>{
-        const cor = o.tipo==='Receita'?'var(--green)':o.tipo==='Investimento'?'var(--blue)':'var(--blue)';
-        return {
-          icon:`<div class="sr-icon" style="background:var(--blue-dim)">🎯</div>`,
-          title: hl(o.cat+(o.subcat?' › '+o.subcat:''), q),
-          sub: `${MESES[o.mes]} · ${hl(o.tipo,q)}`,
-          val: `<span style="color:var(--blue)">${fmtR(o.val)}</span>`,
-          tag: o.obs?`<span style="color:var(--t4);font-size:9px">${o.obs}</span>`:'',
-          action: ()=>{ closeSearch(); _orcMes=o.mes; go('orc', document.querySelector('[onclick*="orc"]')); }
-        };
-      })});
-    }
-  }
-
-  // ── Cartões ──
-  if(_searchFilter==='all'||_searchFilter==='cartoes'){
-    const hits = d.ccs.filter(cc=>
-      matches(cc.nome,q)||matches(cc.bandeira,q)||matches(cc.numero,q)
-    ).slice(0,4);
-
-    if(hits.length){
-      groups.push({ section:'💳 Cartões de Crédito', items: hits.map(cc=>{
-        const fat = getFatAberta(cc, new Date().getMonth());
-        return {
-          icon:`<div class="sr-icon" style="background:var(--purple-dim)">💳</div>`,
-          title: hl(cc.nome||'Cartão', q),
-          sub: `${cc.bandeira||''}${cc.numero?' · ****'+cc.numero.slice(-4):''}`,
-          val: `<span style="color:var(--purple)">${fmtR(fat)}</span>`,
-          tag: `<span style="color:var(--t4);font-size:9px">fatura atual</span>`,
-          action: ()=>{ closeSearch(); go('cartoes', document.querySelector('[onclick*="cartoes"]')); }
-        };
-      })});
-    }
-  }
-
-  // ── Render resultados ──
-  let totalItems = 0;
-  groups.forEach(g => totalItems += g.items.length);
-
-  if(!totalItems){
-    el.innerHTML=`
-      <div id="search-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <p>Nenhum resultado para "<strong style="color:var(--t2)">${q}</strong>"</p>
-        <small>Tente outros termos ou mude o filtro</small>
-      </div>`;
-    set('search-count','');
-    return;
-  }
-
-  set('search-count', `${totalItems} resultado${totalItems!==1?'s':''}`);
-
-  // Flatten para navegação por teclado
-  _searchResults = [];
-  let html = '';
-  groups.forEach(g=>{
-    html += `<div class="sr-section">${g.section}</div>`;
-    g.items.forEach((item,i)=>{
-      const idx = _searchResults.length;
-      _searchResults.push(item);
-      html += `<div class="sr-item" data-idx="${idx}" onclick="execSearchAction(${idx})" onmouseenter="focusSearchItem(${idx})">
-        ${item.icon}
-        <div class="sr-body">
-          <div class="sr-title">${item.title}</div>
-          <div class="sr-sub">${item.sub}</div>
-        </div>
-        <div class="sr-right">
-          <div class="sr-val">${item.val}</div>
-          <div class="sr-tag">${item.tag||''}</div>
-        </div>
-      </div>`;
-    });
-  });
-
-  el.innerHTML = html;
-}
-
-function focusSearchItem(idx){
-  _searchFocused = idx;
-  document.querySelectorAll('.sr-item').forEach(el=>{
-    el.classList.toggle('focused', parseInt(el.dataset.idx)===idx);
-  });
-}
-
-function execSearchAction(idx){
-  const item = _searchResults[idx];
-  if(item && item.action) item.action();
-}
-
-function searchKeyNav(e){
-  const total = _searchResults.length;
-  if(e.key==='Escape'){ closeSearch(); return; }
-  if(e.key==='ArrowDown'){
-    e.preventDefault();
-    _searchFocused = Math.min(_searchFocused+1, total-1);
-    syncSearchFocus();
-  }
-  if(e.key==='ArrowUp'){
-    e.preventDefault();
-    _searchFocused = Math.max(_searchFocused-1, 0);
-    syncSearchFocus();
-  }
-  if(e.key==='Enter' && _searchFocused >= 0){
-    e.preventDefault();
-    execSearchAction(_searchFocused);
-  }
-}
-
-function syncSearchFocus(){
-  document.querySelectorAll('.sr-item').forEach(el=>{
-    el.classList.toggle('focused', parseInt(el.dataset.idx)===_searchFocused);
-  });
-  const focused = document.querySelector('.sr-item.focused');
-  if(focused) focused.scrollIntoView({block:'nearest'});
-}
-
-// ── Atalho Ctrl+K / Cmd+K ──
-document.addEventListener('keydown', e=>{
-  if((e.ctrlKey||e.metaKey) && e.key==='k'){
-    e.preventDefault();
-    const overlay = document.getElementById('search-overlay');
-    if(overlay.classList.contains('open')) closeSearch();
-    else openSearch();
-  }
-  if(e.key==='Escape'){
-    const overlay = document.getElementById('search-overlay');
-    if(overlay.classList.contains('open')) closeSearch();
-  }
-});
 </script>
 </body>
 </html>
