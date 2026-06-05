@@ -146,6 +146,10 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl th{padding:9px 12px;font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;background:var(--surface0)}
 .tbl td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--t2);vertical-align:middle}
+/* Lançamentos — tabela compacta para caber todas as colunas */
+#page-lanc .tbl{font-size:11px}
+#page-lanc .tbl th{padding:7px 8px;font-size:9px;letter-spacing:.05em}
+#page-lanc .tbl td{padding:7px 8px}
 .tbl tr:hover td{background:var(--surface2);transition:background .1s}
 .tbl tr:last-child td{border-bottom:none}
 .mono{font-family:'JetBrains Mono',monospace;font-size:12px}
@@ -940,7 +944,18 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Subcategoria</th><th>Caixa / Conta</th><th>Tipo</th><th>Status</th><th>Valor</th><th style="color:var(--cyan);white-space:nowrap">Saldo em Caixa</th><th></th></tr></thead>
+        <thead><tr>
+          <th style="width:82px">Data</th>
+          <th>Descrição</th>
+          <th style="width:110px">Categoria</th>
+          <th style="width:100px">Subcateg.</th>
+          <th style="width:105px">Caixa/Conta</th>
+          <th style="width:78px">Tipo</th>
+          <th style="width:88px">Status</th>
+          <th style="width:88px">Valor</th>
+          <th style="color:var(--cyan);white-space:nowrap;width:92px">Saldo Caixa</th>
+          <th style="width:34px"></th>
+        </tr></thead>
         <tbody id="l-tbody"></tbody>
       </table>
     </div>
@@ -3419,8 +3434,8 @@ function renderLanc(){
 
     return `<tr style="${isCanceled?'opacity:.4;':''}${isTransf?'background:rgba(0,200,200,.03);':''}" >
       <td class="mono" style="color:var(--t3);white-space:nowrap">${l.data}</td>
-      <td style="max-width:220px">
-        <div style="color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.desc}</div>
+      <td style="max-width:160px">
+        <div style="color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${l.desc}</div>
         ${l.obs?`<div style="font-size:9px;color:var(--t3);margin-top:1px">${l.obs}</div>`:''}
         ${isTransf && l.transfPar?`<div style="font-size:9px;color:var(--cyan);margin-top:1px">⇄ ${l.transfDir==='saida'?'→':'←'} ${l.transfPar}</div>`:''}
       </td>
