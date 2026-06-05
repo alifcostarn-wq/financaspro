@@ -511,7 +511,19 @@ function doLogin(e){
   // 1) Admin master
   if(u===AUTH_USER&&p===AUTH_PASS){
     localStorage.setItem(AUTH_KEY,'1');
-    localStorage.setItem('fpro_logged_user', JSON.stringify({nome:'Administrador',perfil:'admin',email:u}));
+    // Pega nome salvo nas configs, ou extrai do e-mail como fallback
+    let adminNome = 'Administrador';
+    try {
+      const cfg = JSON.parse(localStorage.getItem('fpro_v2')||'{}');
+      if (cfg.cfg && cfg.cfg.adminNome) adminNome = cfg.cfg.adminNome;
+      else {
+        // Extrai parte antes do @ e capitaliza
+        const part = u.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim();
+        adminNome = part.charAt(0).toUpperCase() + part.slice(1).split(/\s+/)[0];
+      }
+    } catch(_) {}
+    localStorage.setItem(AUTH_KEY,'1');
+    localStorage.setItem('fpro_logged_user', JSON.stringify({nome:adminNome,perfil:'admin',email:u}));
     document.getElementById('login-overlay').classList.add('hidden');
     errEl.textContent='';
     try{updSbUser();updDashWelcome();go('dash')}catch(_){}
@@ -1331,6 +1343,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="card">
       <div class="card-header"><span class="card-title">Perfil Financeiro</span></div>
       <div class="form-grid cols2">
+        <div class="fg" style="grid-column:1/-1"><label>Seu Nome (exibido nas boas-vindas)</label><input type="text" id="cfg-admin-nome" placeholder="Ex: Alif Costa" onchange="saveConfig()"></div>
         <div class="fg"><label>Salário Líquido Mensal</label><input type="number" id="cfg-sal" value="6000" onchange="saveConfig()"></div>
         <div class="fg"><label>Saldo Inicial em Conta</label><input type="number" id="cfg-si" value="1369.57" onchange="saveConfig()"></div>
         <div class="fg"><label>Ano de Referência</label><input type="number" id="cfg-ano" value="2026" onchange="saveConfig()"></div>
@@ -4609,7 +4622,21 @@ function saveConfig(){
   d.cfg.si=parseFloat(document.getElementById('cfg-si')?.value)||0;
   d.cfg.ano=parseInt(document.getElementById('cfg-ano')?.value)||2026;
   d.cfg.pct=parseFloat(document.getElementById('cfg-pct')?.value)||20;
+  const nomeEl=document.getElementById('cfg-admin-nome');
+  if(nomeEl && nomeEl.value.trim()) d.cfg.adminNome=nomeEl.value.trim();
   ss(d);updSbSaldo();
+  // Atualiza nome no logged_user e nas boas-vindas
+  if(nomeEl && nomeEl.value.trim()){
+    try{
+      const lu=JSON.parse(localStorage.getItem('fpro_logged_user')||'null');
+      if(lu && lu.perfil==='admin'){
+        lu.nome=nomeEl.value.trim();
+        localStorage.setItem('fpro_logged_user',JSON.stringify(lu));
+        updSbUser();
+        updDashWelcome();
+      }
+    }catch(_){}
+  }
   const ok=document.getElementById('cfg-ok');
   if(ok){ok.style.display='block';setTimeout(()=>ok.style.display='none',2500);}
 }
@@ -4619,6 +4646,8 @@ function renderCfg(){
   document.getElementById('cfg-si').value=d.cfg.si;
   document.getElementById('cfg-ano').value=d.cfg.ano;
   document.getElementById('cfg-pct').value=d.cfg.pct;
+  const nomeEl=document.getElementById('cfg-admin-nome');
+  if(nomeEl) nomeEl.value=d.cfg.adminNome||'';
   const fl=document.getElementById('formas-list');
   if(fl)fl.innerHTML=d.formas.map((f,i)=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
@@ -5518,8 +5547,14 @@ function updDashWelcome() {
   try {
     const u = JSON.parse(localStorage.getItem('fpro_logged_user') || 'null');
     if (u && u.nome) {
-      // Pegar só o primeiro nome
-      nomeUsuario = u.nome.split(' ')[0];
+      // Se for admin, verifica se há nome personalizado salvo nas configs
+      if (u.perfil === 'admin') {
+        const d = gs();
+        const nomeCfg = d.cfg && d.cfg.adminNome ? d.cfg.adminNome : u.nome;
+        nomeUsuario = nomeCfg.split(' ')[0];
+      } else {
+        nomeUsuario = u.nome.split(' ')[0];
+      }
     }
   } catch(_) {}
 
