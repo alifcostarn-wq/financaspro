@@ -5147,7 +5147,15 @@ function seedLancamentos() {
 seedLancamentos();
 
 // ── INIT ──
-document.getElementById('dash-mes').value=curMes();
+// ── Define mês atual como padrão em todos os filtros de mês ──
+(function initMesAtual() {
+  const mes = curMes();
+  const selects = ['dash-mes', 'rel-dre-mes', 'l-fil-mes', 'cp-fil-mes', 'bk-fil-mes'];
+  selects.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.value = mes;
+  });
+})();
 updSbSaldo();
 renderDash();
 
