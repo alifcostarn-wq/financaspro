@@ -3345,7 +3345,7 @@ function renderLanc(){
   const statusF = document.getElementById('l-fil-status')?.value;
   const busca   = (document.getElementById('l-busca')?.value||'').toLowerCase();
 
-  let items = [...d.lancs].sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts);
+  let items = [...d.lancs].sort((a,b)=>a.data.localeCompare(b.data)||a.ts-b.ts);
   if(mesF!==''&&mesF!==undefined) items = items.filter(l=>getMes(l.data)===parseInt(mesF));
   if(tipoF)   items = items.filter(l=>l.tipo===tipoF);
   if(statusF) items = items.filter(l=>(l.status||'ativo')===statusF);
@@ -3458,10 +3458,10 @@ function renderLanc(){
     </tr>`;
   }).join('');
 
-  // Garante que o scroll da tabela começa do topo (mais recente primeiro)
+  // Rola para o fim para mostrar os lançamentos mais recentes (que ficam embaixo)
   const wrap = tbody.closest('.tbl-wrap');
   if(wrap) wrap.scrollTop = 0;
-  window.scrollTo({top: 0, behavior: 'instant'});
+  window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'});
 }
 
 // ── ORÇAMENTO ──
