@@ -3457,6 +3457,11 @@ function renderLanc(){
       </td>
     </tr>`;
   }).join('');
+
+  // Garante que o scroll da tabela começa do topo (mais recente primeiro)
+  const wrap = tbody.closest('.tbl-wrap');
+  if(wrap) wrap.scrollTop = 0;
+  window.scrollTo({top: 0, behavior: 'instant'});
 }
 
 // ── ORÇAMENTO ──
