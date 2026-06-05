@@ -599,11 +599,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <!-- Filtro Previsto / Realizado -->
       <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
         <button id="dash-btn-prev" onclick="setDashView('previsto')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
           📋 Previsto
         </button>
         <button id="dash-btn-real" onclick="setDashView('realizado')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--green-dim);color:var(--green)">
           ✓ Realizado
         </button>
       </div>
@@ -771,11 +771,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
         <button id="rel-btn-prev" onclick="setRelView('previsto')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
           📋 Previsto
         </button>
         <button id="rel-btn-real" onclick="setRelView('realizado')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
+          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--green-dim);color:var(--green)">
           ✓ Realizado
         </button>
       </div>
@@ -2153,8 +2153,8 @@ function allCatsFlat(){
 }
 
 // ── DASHBOARD ──
-let _dashView = 'previsto'; // 'previsto' | 'realizado'
-let _relFilterView = 'previsto'; // 'previsto' | 'realizado'
+let _dashView = 'realizado'; // 'previsto' | 'realizado'
+let _relFilterView = 'realizado'; // 'previsto' | 'realizado'
 
 function setDashView(v){
   _dashView = v;
