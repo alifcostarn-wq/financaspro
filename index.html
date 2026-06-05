@@ -44,14 +44,57 @@
   /* Spacing */
   --r:12px;--r2:8px;--r3:6px;
   --sidebar:240px;
+  /* Theme transition */
+  --theme-transition: background .25s ease, color .25s ease, border-color .25s ease;
 }
 
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:13px;overflow-x:hidden}
+/* ── LIGHT THEME ── */
+body.theme-light{
+  --bg:#f0f4f8;
+  --surface0:#ffffff;
+  --surface1:#f7f9fc;
+  --surface2:#eef2f7;
+  --surface3:#e3e9f0;
+  --surface4:#d8e0ea;
+  --line:#d0d9e6;
+  --line2:#b8c5d6;
+  --t1:#0d1a2b;
+  --t2:#3a5068;
+  --t3:#7a94aa;
+  --t4:#a8c0d0;
+  --green:#00a85e;
+  --green-dim:#00a85e18;
+  --green-dark:#007f47;
+  --red:#e03050;
+  --red-dim:#e0305018;
+  --blue:#2980d4;
+  --blue-dim:#2980d418;
+  --amber:#c49000;
+  --amber-dim:#c4900018;
+  --purple:#9b30d0;
+  --purple-dim:#9b30d018;
+  --cyan:#0099bb;
+  --cyan-dim:#0099bb18;
+  --pink:#d04070;
+  --pink-dim:#d0407018;
+}
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:var(--r2);
+  background:var(--surface2);border:1px solid var(--line2);
+  cursor:pointer;color:var(--t2);transition:all .15s;flex-shrink:0;
+  font-size:15px;
+}
+.theme-toggle:hover{color:var(--t1);background:var(--surface3)}
+
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:13px;overflow-x:hidden;transition:background .25s,color .25s}
 
 /* ── SIDEBAR ── */
 .sidebar{
   position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;
-  background:var(--surface0);border-right:1px solid var(--line);
+  background:var(--surface0);border-right:1px solid var(--line);transition:background .25s,border-color .25s;
   display:flex;flex-direction:column;z-index:50;overflow-y:auto;
 }
 .logo{padding:22px 20px 18px;border-bottom:1px solid var(--line);position:relative}
@@ -105,7 +148,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-heig
 .kpi-sub{font-size:10px;color:var(--t3);margin-top:4px}
 
 /* ── CARDS ── */
-.card{background:var(--surface1);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.card{background:var(--surface1);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px;transition:background .25s,border-color .25s}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .card-title{font-size:13px;font-weight:600;color:var(--t1)}
 .card-sub{font-size:11px;color:var(--t3);margin-top:2px}
@@ -451,27 +494,55 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 const AUTH_KEY='financaspro_auth';
 const AUTH_USER='alifcostarn@gmail.com';
 const AUTH_PASS='netmais1010';
+
+// Hash simples para login (deve ser idêntico ao do módulo de usuários)
+function _hashLogin(s){
+  let h=0;
+  for(let i=0;i<s.length;i++){h=(Math.imul(31,h)+s.charCodeAt(i))|0;}
+  return h.toString(16);
+}
+
 function doLogin(e){
   e.preventDefault();
   const u=document.getElementById('login-email').value.trim().toLowerCase();
   const p=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+
+  // 1) Admin master
   if(u===AUTH_USER&&p===AUTH_PASS){
     localStorage.setItem(AUTH_KEY,'1');
+    localStorage.setItem('fpro_logged_user', JSON.stringify({nome:'Administrador',perfil:'admin',email:u}));
     document.getElementById('login-overlay').classList.add('hidden');
-    document.getElementById('login-error').textContent='';
-    try{go('dash')}catch(_){}
-  } else {
-    document.getElementById('login-error').textContent='E-mail ou senha incorretos';
+    errEl.textContent='';
+    try{updSbUser();go('dash')}catch(_){}
+    return;
   }
+
+  // 2) Usuários cadastrados
+  const users = JSON.parse(localStorage.getItem('fpro_users')||'[]');
+  const found = users.find(x => x.email===u && x.senhaHash===_hashLogin(p) && x.status==='ativo');
+  if(found){
+    localStorage.setItem(AUTH_KEY,'1');
+    localStorage.setItem('fpro_logged_user', JSON.stringify({nome:found.nome,perfil:found.perfil,email:found.email}));
+    document.getElementById('login-overlay').classList.add('hidden');
+    errEl.textContent='';
+    try{updSbUser();go('dash')}catch(_){}
+    return;
+  }
+
+  errEl.textContent='E-mail ou senha incorretos, ou usuário inativo.';
 }
+
 function doLogout(){
   localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem('fpro_logged_user');
   document.getElementById('login-overlay').classList.remove('hidden');
   document.getElementById('login-email').value='';
   document.getElementById('login-password').value='';
 }
 if(localStorage.getItem(AUTH_KEY)==='1'){
   document.getElementById('login-overlay').classList.add('hidden');
+  try{updSbUser();}catch(_){}
 }
 </script>
 
@@ -483,6 +554,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     FinançasPro
   </div>
   <div class="mob-topbar-right">
+    <div class="mob-icon-btn" id="mob-theme-btn" onclick="toggleTheme()" title="Alternar tema" style="font-size:15px">🌙</div>
     <div class="mob-icon-btn" onclick="openM('m-lanc')" title="Novo lançamento">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
@@ -583,6 +655,18 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 
   <div class="sidebar-footer">
+    <!-- Usuário logado -->
+    <div id="sb-user-info" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:10px">
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">👤</div>
+      <div style="overflow:hidden;min-width:0">
+        <div id="sb-user-nome" style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Usuário</div>
+        <div id="sb-user-perfil" style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">—</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Aparência</span>
+      <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Alternar tema">🌙</div>
+    </div>
     <div class="sidebar-footer-info" id="sb-saldo">
       Saldo atual<br><strong id="sb-saldo-val" style="color:var(--green);font-family:'JetBrains Mono',monospace">R$ 0,00</strong>
     </div>
@@ -1247,6 +1331,26 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <button class="btn btn-ghost" onclick="exportarDados()">⬇ Exportar JSON</button>
       <button class="btn btn-red" onclick="if(confirm('Apagar TODOS os dados?'))limparTudo()">🗑 Limpar Dados</button>
     </div>
+  </div>
+
+  <!-- GERENCIAMENTO DE USUÁRIOS -->
+  <div class="card" id="cfg-users-card">
+    <div class="card-header">
+      <div>
+        <span class="card-title">👤 Gerenciamento de Usuários</span>
+        <div class="card-sub">Controle quem tem acesso ao FinançasPro</div>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="openM('m-novo-user')">+ Novo Usuário</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Criado em</th><th></th>
+        </tr></thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+    <div id="users-empty" style="display:none;text-align:center;padding:32px;color:var(--t3)">Nenhum usuário cadastrado além do administrador.</div>
   </div>
 </div>
 
@@ -1983,6 +2087,52 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </div>
 
+<!-- Modal: Novo Usuário -->
+<div class="overlay" id="m-novo-user" style="display:none" onclick="cmoOut(event,'m-novo-user')">
+  <div class="modal" style="max-width:480px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <h2 id="m-user-titulo">Novo Usuário</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Cadastre um novo acesso ao sistema</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-novo-user')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="user-edit-id" value="">
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="fg"><label>Nome Completo *</label><input type="text" id="user-nome" placeholder="Ex: Maria Silva"></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="fg"><label>E-mail *</label><input type="email" id="user-email" placeholder="Ex: maria@email.com"></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Senha *</label><input type="password" id="user-senha" placeholder="Mínimo 6 caracteres"></div>
+        <div class="fg"><label>Confirmar Senha *</label><input type="password" id="user-senha2" placeholder="Repita a senha"></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Perfil de Acesso</label>
+          <select id="user-perfil">
+            <option value="visualizador">Visualizador (somente leitura)</option>
+            <option value="editor">Editor (pode lançar)</option>
+            <option value="admin">Administrador (acesso total)</option>
+          </select>
+        </div>
+        <div class="fg"><label>Status</label>
+          <select id="user-status">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+      </div>
+      <div id="user-err" style="display:none" class="alert alert-r"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-novo-user')">Cancelar</button>
+      <button class="btn btn-green" onclick="saveUser()">Salvar Usuário</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONSTANTS ──
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -2040,7 +2190,16 @@ const curMes=()=>new Date().getMonth();
 const getMes=(d)=>d?new Date(d+'T00:00:00').getMonth():-1;
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
 const setC=(id,v,c)=>{const e=document.getElementById(id);if(e){e.textContent=v;e.style.color=c||''}};
-const chartBase={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4d6178',font:{size:10}},grid:{color:'#1f2838'}},y:{ticks:{color:'#4d6178',font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:'#1f2838'}}}};
+// ── Chart base: theme-aware colors ──
+function getChartBase(){
+  const isLight = document.body.classList.contains('theme-light');
+  const tickColor = isLight ? '#3a5068' : '#4d6178';
+  const gridColor = isLight ? '#d0d9e630' : '#1f2838';
+  return {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor}},y:{ticks:{color:tickColor,font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:gridColor}}}};
+}
+// chartBase is now a getter — use getChartBase() for spreads internally
+// For backward compat with ...chartBase spread, we redefine mkCh to inject colors
+const chartBase = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4d6178',font:{size:10}},grid:{color:'#1f2838'}},y:{ticks:{color:'#4d6178',font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:'#1f2838'}}}};
 
 // ── NAVIGATION ──
 let _page='dash';
@@ -5307,6 +5466,228 @@ document.addEventListener('touchend', e => {
 
 // Re-run updSbSaldo once to sync pills on load
 updSbSaldo();
+
+
+// ══════════════════════════════════════════════
+// ── MÓDULO: TEMA CLARO / ESCURO ──
+// ══════════════════════════════════════════════
+
+const THEME_KEY = 'fpro_theme';
+
+function updSbUser() {
+  try {
+    const u = JSON.parse(localStorage.getItem('fpro_logged_user') || 'null');
+    const nomeEl = document.getElementById('sb-user-nome');
+    const perfilEl = document.getElementById('sb-user-perfil');
+    if (nomeEl) nomeEl.textContent = u ? u.nome : 'Usuário';
+    if (perfilEl) perfilEl.textContent = u ? u.perfil : '—';
+  } catch(_) {}
+}
+
+function applyTheme(theme) {
+  const body = document.body;
+  const btn  = document.getElementById('theme-toggle-btn');
+  const mob  = document.getElementById('mob-theme-btn');
+  if (theme === 'light') {
+    body.classList.add('theme-light');
+    if (btn) btn.textContent = '☀️';
+    if (mob) mob.textContent = '☀️';
+  } else {
+    body.classList.remove('theme-light');
+    if (btn) btn.textContent = '🌙';
+    if (mob) mob.textContent = '🌙';
+  }
+  localStorage.setItem(THEME_KEY, theme);
+  // Update chartBase colors live
+  const isLight = theme === 'light';
+  const tickColor = isLight ? '#3a5068' : '#4d6178';
+  const gridColor = isLight ? '#d0d9e630' : '#1f2838';
+  chartBase.scales.x.ticks.color = tickColor;
+  chartBase.scales.x.grid.color  = gridColor;
+  chartBase.scales.y.ticks.color = tickColor;
+  chartBase.scales.y.grid.color  = gridColor;
+  // Rebuild all charts with new colors
+  setTimeout(() => { try { if (typeof refreshAll === 'function') refreshAll(); } catch(_){} }, 80);
+}
+
+function toggleTheme() {
+  const current = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
+})();
+
+// ══════════════════════════════════════════════
+// ── MÓDULO: GERENCIAMENTO DE USUÁRIOS ──
+// ══════════════════════════════════════════════
+
+const USERS_KEY = 'fpro_users';
+
+function getUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+}
+function setUsers(arr) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(arr));
+}
+
+// Hash simples (não criptográfico) para armazenar senha
+function hashSenha(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; }
+  return h.toString(16);
+}
+
+function renderUsers() {
+  const users = getUsers();
+  const tbody = document.getElementById('users-tbody');
+  const empty = document.getElementById('users-empty');
+  if (!tbody) return;
+
+  const perfilLabel = { admin: '🔑 Admin', editor: '✏️ Editor', visualizador: '👁 Visualizador' };
+  const perfilColor = { admin: 'var(--red)', editor: 'var(--blue)', visualizador: 'var(--t3)' };
+
+  if (!users.length) {
+    tbody.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  tbody.innerHTML = users.map(u => `<tr>
+    <td style="color:var(--t1);font-weight:600">${u.nome}</td>
+    <td style="color:var(--t2)">${u.email}</td>
+    <td><span style="font-size:11px;color:${perfilColor[u.perfil]||'var(--t3)'}">${perfilLabel[u.perfil]||u.perfil}</span></td>
+    <td><span class="badge ${u.status==='ativo'?'bdg-green':'bdg-gray'}">${u.status==='ativo'?'Ativo':'Inativo'}</span></td>
+    <td style="color:var(--t3);font-size:11px">${u.criadoEm||'—'}</td>
+    <td>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-xs" onclick="editUser('${u.id}')">✎</button>
+        <button class="btn btn-red btn-xs" onclick="delUser('${u.id}')">✕</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function openMNovoUser() {
+  document.getElementById('m-user-titulo').textContent = 'Novo Usuário';
+  document.getElementById('user-edit-id').value = '';
+  document.getElementById('user-nome').value = '';
+  document.getElementById('user-email').value = '';
+  document.getElementById('user-senha').value = '';
+  document.getElementById('user-senha2').value = '';
+  document.getElementById('user-perfil').value = 'editor';
+  document.getElementById('user-status').value = 'ativo';
+  document.getElementById('user-senha').required = true;
+  document.getElementById('user-senha2').required = true;
+  document.getElementById('user-senha').placeholder = 'Mínimo 6 caracteres';
+  document.getElementById('user-senha2').placeholder = 'Repita a senha';
+  const errEl = document.getElementById('user-err');
+  if (errEl) errEl.style.display = 'none';
+  document.getElementById('m-novo-user').style.display = 'flex';
+}
+
+function editUser(id) {
+  const users = getUsers();
+  const u = users.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('m-user-titulo').textContent = 'Editar Usuário';
+  document.getElementById('user-edit-id').value = u.id;
+  document.getElementById('user-nome').value = u.nome;
+  document.getElementById('user-email').value = u.email;
+  document.getElementById('user-senha').value = '';
+  document.getElementById('user-senha2').value = '';
+  document.getElementById('user-perfil').value = u.perfil;
+  document.getElementById('user-status').value = u.status;
+  document.getElementById('user-senha').required = false;
+  document.getElementById('user-senha').placeholder = 'Deixe em branco para manter';
+  document.getElementById('user-senha2').placeholder = 'Deixe em branco para manter';
+  const errEl = document.getElementById('user-err');
+  if (errEl) errEl.style.display = 'none';
+  document.getElementById('m-novo-user').style.display = 'flex';
+}
+
+function saveUser() {
+  const editId  = document.getElementById('user-edit-id').value;
+  const nome    = document.getElementById('user-nome').value.trim();
+  const email   = document.getElementById('user-email').value.trim().toLowerCase();
+  const senha   = document.getElementById('user-senha').value;
+  const senha2  = document.getElementById('user-senha2').value;
+  const perfil  = document.getElementById('user-perfil').value;
+  const status  = document.getElementById('user-status').value;
+  const errEl   = document.getElementById('user-err');
+
+  function showErr(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  if (!nome) return showErr('Informe o nome completo.');
+  if (!email || !email.includes('@')) return showErr('Informe um e-mail válido.');
+
+  const users = getUsers();
+
+  // Verificar e-mail duplicado
+  const emailJaExiste = users.some(u => u.email === email && u.id !== editId);
+  if (emailJaExiste) return showErr('Esse e-mail já está cadastrado.');
+
+  if (editId) {
+    // Edição
+    const u = users.find(x => x.id === editId);
+    if (!u) return;
+    u.nome   = nome;
+    u.email  = email;
+    u.perfil = perfil;
+    u.status = status;
+    if (senha) {
+      if (senha.length < 6) return showErr('A senha deve ter ao menos 6 caracteres.');
+      if (senha !== senha2) return showErr('As senhas não conferem.');
+      u.senhaHash = hashSenha(senha);
+    }
+  } else {
+    // Criação
+    if (!senha || senha.length < 6) return showErr('A senha deve ter ao menos 6 caracteres.');
+    if (senha !== senha2) return showErr('As senhas não conferem.');
+    users.push({
+      id: uid(),
+      nome, email,
+      senhaHash: hashSenha(senha),
+      perfil, status,
+      criadoEm: new Date().toLocaleDateString('pt-BR')
+    });
+  }
+
+  setUsers(users);
+  closeM('m-novo-user');
+  renderUsers();
+}
+
+function delUser(id) {
+  if (!confirm('Excluir este usuário?')) return;
+  let users = getUsers();
+  users = users.filter(u => u.id !== id);
+  setUsers(users);
+  renderUsers();
+}
+
+// Sobrescrever renderCfg para incluir renderUsers
+const _renderCfgOrig = renderCfg;
+renderCfg = function() {
+  _renderCfgOrig();
+  renderUsers();
+};
+
+// Sobrescrever openM para lidar com m-novo-user
+const _openMOrig = openM;
+openM = function(id) {
+  if (id === 'm-novo-user') { openMNovoUser(); return; }
+  _openMOrig(id);
+};
+
 </script>
 </body>
 </html>
