@@ -1243,6 +1243,34 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="kpi g"><div class="kpi-label">Pago</div><div class="kpi-val g" id="ck-pago">R$ 0</div></div>
     <div class="kpi r"><div class="kpi-label">Vencidas</div><div class="kpi-val r" id="ck-venc">0</div></div>
   </div>
+
+  <!-- KPI lembrete do dia -->
+  <div id="ck-hoje-wrap" style="display:none;margin-bottom:16px">
+    <div style="background:linear-gradient(135deg,#ffd43b18,#ffd43b08);border:1px solid #ffd43b44;border-radius:var(--r);padding:16px 20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:10px;background:#ffd43b22;border:1px solid #ffd43b55;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔔</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--amber)">Contas que vencem HOJE</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px" id="ck-hoje-sub">—</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="text-align:right">
+            <div style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Qtd.</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--amber)" id="ck-hoje-qtd">0</div>
+          </div>
+          <div style="width:1px;height:36px;background:var(--line)"></div>
+          <div style="text-align:right">
+            <div style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Total</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--amber)" id="ck-hoje-total">R$ 0</div>
+          </div>
+        </div>
+      </div>
+      <!-- Lista das contas do dia -->
+      <div id="ck-hoje-list" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-header">
       <span class="card-title">Contas</span>
@@ -4300,6 +4328,38 @@ function renderContas(){
   const vencN = items.filter(c=>c.status==='Vencida').length;
   set('ck-total',fmtR(total)); set('ck-pend',fmtR(pendV));
   set('ck-pago',fmtR(pago));   set('ck-venc',vencN+' conta'+(vencN!==1?'s':''));
+
+  // ── LEMBRETE DO DIA ──
+  const hojeStr = today(); // "YYYY-MM-DD"
+  const contasHoje = d.contas.filter(c => c.venc === hojeStr && c.status !== 'Pago');
+  const wrapHoje = document.getElementById('ck-hoje-wrap');
+  if(wrapHoje){
+    if(contasHoje.length){
+      const totalHoje = contasHoje.reduce((a,c)=>a+c.valor,0);
+      const nomes = contasHoje.map(c=>c.desc).join(', ');
+      set('ck-hoje-qtd', contasHoje.length);
+      set('ck-hoje-total', fmtRs(totalHoje));
+      set('ck-hoje-sub', `${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${nomes.length>60?nomes.slice(0,60)+'…':nomes}`);
+      const listEl = document.getElementById('ck-hoje-list');
+      if(listEl) listEl.innerHTML = contasHoje.map(c=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;background:#ffd43b0d;border:1px solid #ffd43b33;border-radius:var(--r2);padding:9px 14px;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0">
+            <span style="font-size:14px;flex-shrink:0">📄</span>
+            <div style="min-width:0">
+              <div style="font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.desc}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px">${c.cat||'—'}${c.totalParcelas>1?' · Parcela '+c.parcela+'/'+c.totalParcelas:''}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--amber)">${fmtRs(c.valor)}</span>
+            <button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>
+          </div>
+        </div>`).join('');
+      wrapHoje.style.display = 'block';
+    } else {
+      wrapHoje.style.display = 'none';
+    }
+  }
 
   const tbody = document.getElementById('cp-tbody');
   const empty = document.getElementById('cp-empty');
