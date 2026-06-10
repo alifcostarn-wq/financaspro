@@ -1044,27 +1044,29 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   <div class="card">
     <div class="card-header">
       <span class="card-title">Extrato</span>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select id="l-fil-ano" onchange="updLancDiaOpts();renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
-        <select id="l-fil-mes" onchange="updLancDiaOpts();renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <select id="l-fil-ano" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
+        <select id="l-fil-mes" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os meses</option>
           <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
           <option value="3">Abr</option><option value="4">Mai</option><option value="5">Jun</option>
           <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
           <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
         </select>
-        <select id="l-fil-dia" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
-          <option value="">Todos os dias</option>
-        </select>
+        <div style="position:relative;display:flex;align-items:center">
+          <input id="l-fil-dia" type="text" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtDiaInput(this);renderLanc()"
+            style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'JetBrains Mono',monospace;width:112px;letter-spacing:.03em">
+          <button id="l-fil-dia-clear" onclick="document.getElementById('l-fil-dia').value='';renderLanc()" title="Limpar"
+            style="display:none;position:absolute;right:6px;background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;line-height:1;padding:0">✕</button>
+        </div>
         <select id="l-fil-tipo" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os tipos</option>
           <option>Receita</option><option>Despesa</option><option>Investimento</option><option>Transferência</option>
         </select>
         <select id="l-fil-status" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os status</option>
-          <option value="ativo">Ativos</option>
-          <option value="cancelado">Cancelados</option>
-          <option value="estornado">Estornados</option>
+          <option value="pago">✓ Pago</option>
+          <option value="aberto">⏳ Aberto (a pagar / a receber)</option>
         </select>
         <input id="l-busca" type="text" placeholder="Buscar…" oninput="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
       </div>
@@ -3594,77 +3596,85 @@ function delLanc(id){
 }
 
 
-function updLancDiaOpts(){
-  const d = gs();
-  const anoF = document.getElementById('l-fil-ano')?.value;
-  const mesF = document.getElementById('l-fil-mes')?.value;
-  const diaEl = document.getElementById('l-fil-dia');
-  if(!diaEl) return;
-  // Coleta dias disponíveis com base nos filtros de ano e mês
-  const diasSet = new Set();
-  d.lancs.forEach(l => {
-    if(!l.data) return;
-    const [a,,m,,dia] = [l.data.slice(0,4), null, l.data.slice(5,7), null, l.data.slice(8,10)];
-    if(anoF && a !== anoF) return;
-    if(mesF!==''&&mesF!==undefined && parseInt(m)-1 !== parseInt(mesF)) return;
-    diasSet.add(parseInt(dia));
-  });
-  const dias = [...diasSet].sort((a,b)=>a-b);
-  const prev = diaEl.value;
-  diaEl.innerHTML = '<option value="">Todos os dias</option>' +
-    dias.map(d => `<option value="${d}" ${parseInt(prev)===d?'selected':''}>${String(d).padStart(2,'0')}</option>`).join('');
+// Máscara automática dd/mm/aaaa para o input de dia
+function fmtDiaInput(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length > 2)  v = v.slice(0,2) + '/' + v.slice(2);
+  if(v.length > 5)  v = v.slice(0,5) + '/' + v.slice(5);
+  if(v.length > 10) v = v.slice(0,10);
+  el.value = v;
+  // Destaca borda quando data completa e válida
+  const parts = v.split('/');
+  const ok = v.length===10 && parts.length===3 && !isNaN(new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`));
+  el.style.borderColor = v.length===10 ? (ok ? 'var(--green)' : 'var(--red)') : 'var(--line)';
 }
 
 function initLancAnoOpts(){
   const d = gs();
   const anosSet = new Set();
   d.lancs.forEach(l => { if(l.data) anosSet.add(l.data.slice(0,4)); });
-  // Sempre inclui o ano atual e o de configuração
   const anoAtual = String(new Date().getFullYear());
   const anoCfg   = String(d.cfg?.ano || anoAtual);
-  anosSet.add(anoAtual);
-  anosSet.add(anoCfg);
+  anosSet.add(anoAtual); anosSet.add(anoCfg);
   const anos = [...anosSet].sort().reverse();
   const el = document.getElementById('l-fil-ano');
   if(!el) return;
   const prev = el.value || anoAtual;
   el.innerHTML = '<option value="">Todos os anos</option>' +
     anos.map(a => `<option value="${a}" ${a===prev?'selected':''}>${a}</option>`).join('');
-  updLancDiaOpts();
 }
 
 function renderLanc(){
   const d = gs();
   const anoF    = document.getElementById('l-fil-ano')?.value;
   const mesF    = document.getElementById('l-fil-mes')?.value;
-  const diaF    = document.getElementById('l-fil-dia')?.value;
+  const diaRaw  = (document.getElementById('l-fil-dia')?.value||'').trim();
   const tipoF   = document.getElementById('l-fil-tipo')?.value;
   const statusF = document.getElementById('l-fil-status')?.value;
   const busca   = (document.getElementById('l-busca')?.value||'').toLowerCase();
 
+  // Mostrar/ocultar botão limpar dia
+  const clearDia = document.getElementById('l-fil-dia-clear');
+  if(clearDia) clearDia.style.display = diaRaw ? 'block' : 'none';
+
+  // Converte dd/mm/aaaa → aaaa-mm-dd para comparar com l.data
+  let diaISO = '';
+  if(diaRaw.length === 10){
+    const [dd, mm, aaaa] = diaRaw.split('/');
+    if(dd && mm && aaaa && aaaa.length === 4) diaISO = `${aaaa}-${mm}-${dd}`;
+  }
+
   let items = [...d.lancs].sort((a,b)=>a.data.localeCompare(b.data)||a.ts-b.ts);
-  if(anoF)                              items = items.filter(l=>l.data&&l.data.slice(0,4)===anoF);
-  if(mesF!==''&&mesF!==undefined)       items = items.filter(l=>getMes(l.data)===parseInt(mesF));
-  if(diaF!==''&&diaF!==undefined&&diaF) items = items.filter(l=>l.data&&parseInt(l.data.slice(8,10))===parseInt(diaF));
+
+  // Se digitou data completa, ela tem precedência sobre ano e mês
+  if(diaISO){
+    items = items.filter(l=>l.data===diaISO);
+  } else {
+    if(anoF)                        items = items.filter(l=>l.data&&l.data.slice(0,4)===anoF);
+    if(mesF!==''&&mesF!==undefined) items = items.filter(l=>getMes(l.data)===parseInt(mesF));
+  }
+
   if(tipoF)   items = items.filter(l=>l.tipo===tipoF);
-  if(statusF) items = items.filter(l=>(l.status||'ativo')===statusF);
+  if(statusF === 'pago')   items = items.filter(l=>l.pago==='Pago' && l.status!=='cancelado');
+  else if(statusF === 'aberto') items = items.filter(l=>(l.pago==='Pendente'||l.pago==='Agendado') && l.status!=='cancelado');
   if(busca)   items = items.filter(l=>(l.desc||'').toLowerCase().includes(busca)||(l.cat||'').toLowerCase().includes(busca));
 
-  // KPIs — excluir cancelados
-  const mFil = mesF!==''&&mesF!==undefined ? parseInt(mesF) : curMes();
-  const anoKpi = anoF || String(new Date().getFullYear());
-  const ativos = d.lancs.filter(l=>getMes(l.data)===mFil && l.status!=='cancelado' && (!anoF || l.data.slice(0,4)===anoF));
+  // KPIs — derivados do filtro de data completa, ou mês/ano dos selects, ou mês atual
+  const kpiAno = diaISO ? diaISO.slice(0,4) : (anoF || String(new Date().getFullYear()));
+  const kpiMes = diaISO ? new Date(diaISO+'T00:00:00').getMonth()
+                        : (mesF!==''&&mesF!==undefined ? parseInt(mesF) : curMes());
+  const ativos = d.lancs.filter(l=>getMes(l.data)===kpiMes && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno);
   const rec = ativos.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
   const des = ativos.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
   const inv = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
 
-  // Saldo Acumulado — saldo inicial + todos os meses até mFil (inclusive), dentro do ano filtrado
+  // Saldo Acumulado
   const si = d.cfg.si || 0;
   let acum = si;
-  for(let m = 0; m <= mFil; m++){
-    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado' && (!anoF || l.data.slice(0,4)===anoKpi));
+  for(let m = 0; m <= kpiMes; m++){
+    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno);
     const mr = ml.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
     const md = ml.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
     const mi = ml.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
@@ -3675,8 +3685,8 @@ function renderLanc(){
   if(acumSubEl){
     const MESES_ABREV=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const saldoAntes = acum - (rec - des - inv);
-    acumSubEl.textContent = mFil > 0
-      ? `Acum. até ${MESES_ABREV[mFil]} · anterior: ${fmtRs(saldoAntes)}`
+    acumSubEl.textContent = kpiMes > 0
+      ? `Acum. até ${MESES_ABREV[kpiMes]} · anterior: ${fmtRs(saldoAntes)}`
       : `Início do ano · S.I.: ${fmtRs(si)}`;
   }
 
@@ -5580,7 +5590,6 @@ seedLancamentos();
 })();
 updSbSaldo();
 renderDash();
-// Pré-popula o select de ano dos lançamentos para quando o usuário navegar até lá
 setTimeout(()=>{ try{ initLancAnoOpts(); }catch(_){} }, 200);
 
 // ═══════════════════════════════════════
