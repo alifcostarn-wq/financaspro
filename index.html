@@ -195,6 +195,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #page-lanc .tbl td{padding:7px 8px}
 .tbl tr:hover td{background:var(--surface2);transition:background .1s}
 .tbl tr:last-child td{border-bottom:none}
+.l-row{cursor:pointer;transition:outline .1s,background .1s}
 .mono{font-family:'JetBrains Mono',monospace;font-size:12px}
 .tbl-actions{display:flex;gap:4px;align-items:center}
 
@@ -1043,13 +1044,17 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   <div class="card">
     <div class="card-header">
       <span class="card-title">Extrato</span>
-      <div style="display:flex;gap:8px">
-        <select id="l-fil-mes" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="l-fil-ano" onchange="updLancDiaOpts();renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
+        <select id="l-fil-mes" onchange="updLancDiaOpts();renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os meses</option>
           <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
           <option value="3">Abr</option><option value="4">Mai</option><option value="5">Jun</option>
           <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
           <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
+        </select>
+        <select id="l-fil-dia" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="">Todos os dias</option>
         </select>
         <select id="l-fil-tipo" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os tipos</option>
@@ -1061,12 +1066,16 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <option value="cancelado">Cancelados</option>
           <option value="estornado">Estornados</option>
         </select>
-        <input id="l-busca" type="text" placeholder="Buscar…" oninput="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:140px">
+        <input id="l-busca" type="text" placeholder="Buscar…" oninput="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
       </div>
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr>
+          <th style="width:28px;padding:7px 6px 7px 10px">
+            <input type="checkbox" id="l-chk-all" title="Selecionar todos" onchange="lancSelAll(this.checked)"
+              style="width:14px;height:14px;cursor:pointer;accent-color:var(--green)">
+          </th>
           <th style="width:82px">Data</th>
           <th>Descrição</th>
           <th style="width:110px">Categoria</th>
@@ -1082,6 +1091,37 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </table>
     </div>
     <div id="l-empty" style="text-align:center;padding:40px;color:var(--t3)">Nenhum lançamento. Clique em "+ Novo Lançamento".</div>
+
+    <!-- ── RODAPÉ DE SELEÇÃO ── -->
+    <div id="l-sel-footer" style="display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;color:var(--t3)" id="l-sel-count">0 selecionados</span>
+          <button class="btn btn-ghost btn-xs" onclick="lancDeselectAll()" style="color:var(--t3)">Limpar seleção</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Receitas selecionadas</span>
+            <span id="l-sel-rec" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">R$ 0,00</span>
+          </div>
+          <div style="width:1px;height:32px;background:var(--line)"></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Despesas selecionadas</span>
+            <span id="l-sel-des" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)">R$ 0,00</span>
+          </div>
+          <div style="width:1px;height:32px;background:var(--line)"></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Investimentos</span>
+            <span id="l-sel-inv" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--blue)">R$ 0,00</span>
+          </div>
+          <div style="width:1px;height:32px;background:var(--line)"></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Saldo líquido</span>
+            <span id="l-sel-liq" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700">R$ 0,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1516,6 +1556,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="modal-bd">
       <input type="hidden" id="l-edit-id">
+      <div id="l-lanc-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Data *</label><input type="date" id="l-data"></div>
         <div class="fg"><label>Tipo *</label>
@@ -2249,6 +2290,7 @@ function go(p,el){
   if(el)el.classList.add('active');
   _page=p;
   const fns={dash:renderDash,rel:renderRel,lanc:renderLanc,orc:renderOrc,contas:renderContas,dividas:renderDividas,cartoes:renderCartoes,bancos:renderBancos,cfg:renderCfg};
+  if(p==='lanc') initLancAnoOpts();
   if(fns[p])fns[p]();
   updSbSaldo();
 }
@@ -2278,6 +2320,8 @@ function openM(id){
     document.getElementById('l-pago').value = 'Pago';
     updLancCats();
     popCaixas('l-caixa');
+    const errLanc = document.getElementById('l-lanc-err');
+    if(errLanc) errLanc.style.display='none';
   }
   if(id==='m-conta'){
     document.getElementById('cp-venc').value=today();
@@ -3381,7 +3425,20 @@ function saveLanc(){
   const caixaId = document.getElementById('l-caixa')?.value||'';
   const pago    = document.getElementById('l-pago')?.value;
   const obs     = document.getElementById('l-obs')?.value?.trim();
-  if(!data||!tipo||!desc||!valor){alert('Preencha os campos obrigatórios.');return;}
+  if(!data||!tipo||!desc||!valor){
+    const errEl = document.getElementById('l-lanc-err');
+    const msgs = [];
+    if(!data)  msgs.push('Data');
+    if(!desc)  msgs.push('Descrição');
+    if(!valor) msgs.push('Valor');
+    if(errEl){ errEl.textContent = '⚠️ Preencha os campos obrigatórios: ' + msgs.join(', ') + '.'; errEl.style.display='block'; }
+    if(!data)  document.getElementById('l-data')?.focus();
+    else if(!desc)  document.getElementById('l-desc')?.focus();
+    else if(!valor) document.getElementById('l-valor')?.focus();
+    return;
+  }
+  const errEl2 = document.getElementById('l-lanc-err');
+  if(errEl2) errEl2.style.display='none';
   const d = gs();
   const caixaNome = caixaId ? (d.bancos||[]).find(b=>b.id===caixaId)?.nome||'' : '';
   if(editId){
@@ -3537,33 +3594,77 @@ function delLanc(id){
 }
 
 
+function updLancDiaOpts(){
+  const d = gs();
+  const anoF = document.getElementById('l-fil-ano')?.value;
+  const mesF = document.getElementById('l-fil-mes')?.value;
+  const diaEl = document.getElementById('l-fil-dia');
+  if(!diaEl) return;
+  // Coleta dias disponíveis com base nos filtros de ano e mês
+  const diasSet = new Set();
+  d.lancs.forEach(l => {
+    if(!l.data) return;
+    const [a,,m,,dia] = [l.data.slice(0,4), null, l.data.slice(5,7), null, l.data.slice(8,10)];
+    if(anoF && a !== anoF) return;
+    if(mesF!==''&&mesF!==undefined && parseInt(m)-1 !== parseInt(mesF)) return;
+    diasSet.add(parseInt(dia));
+  });
+  const dias = [...diasSet].sort((a,b)=>a-b);
+  const prev = diaEl.value;
+  diaEl.innerHTML = '<option value="">Todos os dias</option>' +
+    dias.map(d => `<option value="${d}" ${parseInt(prev)===d?'selected':''}>${String(d).padStart(2,'0')}</option>`).join('');
+}
+
+function initLancAnoOpts(){
+  const d = gs();
+  const anosSet = new Set();
+  d.lancs.forEach(l => { if(l.data) anosSet.add(l.data.slice(0,4)); });
+  // Sempre inclui o ano atual e o de configuração
+  const anoAtual = String(new Date().getFullYear());
+  const anoCfg   = String(d.cfg?.ano || anoAtual);
+  anosSet.add(anoAtual);
+  anosSet.add(anoCfg);
+  const anos = [...anosSet].sort().reverse();
+  const el = document.getElementById('l-fil-ano');
+  if(!el) return;
+  const prev = el.value || anoAtual;
+  el.innerHTML = '<option value="">Todos os anos</option>' +
+    anos.map(a => `<option value="${a}" ${a===prev?'selected':''}>${a}</option>`).join('');
+  updLancDiaOpts();
+}
+
 function renderLanc(){
   const d = gs();
+  const anoF    = document.getElementById('l-fil-ano')?.value;
   const mesF    = document.getElementById('l-fil-mes')?.value;
+  const diaF    = document.getElementById('l-fil-dia')?.value;
   const tipoF   = document.getElementById('l-fil-tipo')?.value;
   const statusF = document.getElementById('l-fil-status')?.value;
   const busca   = (document.getElementById('l-busca')?.value||'').toLowerCase();
 
   let items = [...d.lancs].sort((a,b)=>a.data.localeCompare(b.data)||a.ts-b.ts);
-  if(mesF!==''&&mesF!==undefined) items = items.filter(l=>getMes(l.data)===parseInt(mesF));
+  if(anoF)                              items = items.filter(l=>l.data&&l.data.slice(0,4)===anoF);
+  if(mesF!==''&&mesF!==undefined)       items = items.filter(l=>getMes(l.data)===parseInt(mesF));
+  if(diaF!==''&&diaF!==undefined&&diaF) items = items.filter(l=>l.data&&parseInt(l.data.slice(8,10))===parseInt(diaF));
   if(tipoF)   items = items.filter(l=>l.tipo===tipoF);
   if(statusF) items = items.filter(l=>(l.status||'ativo')===statusF);
   if(busca)   items = items.filter(l=>(l.desc||'').toLowerCase().includes(busca)||(l.cat||'').toLowerCase().includes(busca));
 
   // KPIs — excluir cancelados
   const mFil = mesF!==''&&mesF!==undefined ? parseInt(mesF) : curMes();
-  const ativos = d.lancs.filter(l=>getMes(l.data)===mFil && l.status!=='cancelado');
+  const anoKpi = anoF || String(new Date().getFullYear());
+  const ativos = d.lancs.filter(l=>getMes(l.data)===mFil && l.status!=='cancelado' && (!anoF || l.data.slice(0,4)===anoF));
   const rec = ativos.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
   const des = ativos.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
   const inv = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
 
-  // Saldo Acumulado — saldo inicial + todos os meses até mFil (inclusive)
+  // Saldo Acumulado — saldo inicial + todos os meses até mFil (inclusive), dentro do ano filtrado
   const si = d.cfg.si || 0;
   let acum = si;
   for(let m = 0; m <= mFil; m++){
-    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado');
+    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado' && (!anoF || l.data.slice(0,4)===anoKpi));
     const mr = ml.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
     const md = ml.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
     const mi = ml.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
@@ -3631,7 +3732,14 @@ function renderLanc(){
         ? `<td class="mono" style="color:var(--t3);font-size:10px" title="Transferências não alteram o saldo total">—</td>`
         : `<td class="mono" style="color:${sLinha>=0?'var(--cyan)':'var(--red)'};font-weight:600;white-space:nowrap;font-size:11px">${fmtRs(sLinha)}</td>`;
 
-    return `<tr style="${isCanceled?'opacity:.4;':''}${isTransf?'background:rgba(0,200,200,.03);':''}" >
+    return `<tr data-id="${l.id}" data-tipo="${l.tipo}" data-valor="${l.valor}" data-canceled="${isCanceled}" data-transf="${isTransf}"
+      style="${isCanceled?'opacity:.4;':''}${isTransf?'background:rgba(0,200,200,.03);':''}"
+      onclick="lancRowClick(event,'${l.id}')" class="l-row">
+      <td style="padding:7px 6px 7px 10px" onclick="event.stopPropagation()">
+        <input type="checkbox" class="l-chk" data-id="${l.id}"
+          onchange="updLancSel()"
+          style="width:14px;height:14px;cursor:pointer;accent-color:var(--green)">
+      </td>
       <td class="mono" style="color:var(--t3);white-space:nowrap">${l.data}</td>
       <td style="max-width:160px">
         <div style="color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${l.desc}</div>
@@ -3657,10 +3765,89 @@ function renderLanc(){
     </tr>`;
   }).join('');
 
+  // Resetar estado de seleção ao re-renderizar
+  updLancSel();
+
   // Rola para o fim para mostrar os lançamentos mais recentes (que ficam embaixo)
   const wrap = tbody.closest('.tbl-wrap');
   if(wrap) wrap.scrollTop = 0;
   window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'});
+}
+
+// ── SELEÇÃO DE LANÇAMENTOS ──
+function lancRowClick(e, id){
+  // Clique na linha (fora do botão de ações) marca/desmarca o checkbox
+  if(e.target.closest('.tbl-actions') || e.target.closest('.l-chk')) return;
+  const chk = document.querySelector(`.l-chk[data-id="${id}"]`);
+  if(chk){ chk.checked = !chk.checked; updLancSel(); }
+}
+
+function updLancSel(){
+  const chks   = [...document.querySelectorAll('.l-chk')];
+  const sel    = chks.filter(c => c.checked);
+  const allChk = document.getElementById('l-chk-all');
+  const footer = document.getElementById('l-sel-footer');
+
+  // Estado do checkbox "selecionar todos"
+  if(allChk){
+    allChk.checked       = sel.length > 0 && sel.length === chks.length;
+    allChk.indeterminate = sel.length > 0 && sel.length < chks.length;
+  }
+
+  if(!sel.length){
+    if(footer) footer.style.display = 'none';
+    return;
+  }
+
+  // Calcular totais por tipo com base nos data-* da linha
+  let rec = 0, des = 0, inv = 0;
+  sel.forEach(c => {
+    const row  = c.closest('tr');
+    const tipo = row?.dataset.tipo  || '';
+    const val  = parseFloat(row?.dataset.valor) || 0;
+    if(tipo === 'Receita')      rec += val;
+    else if(tipo === 'Despesa') des += val;
+    else if(tipo === 'Investimento') inv += val;
+    // Transferências não entram no saldo líquido
+  });
+  const liq = rec - des - inv;
+
+  // Atualizar rodapé
+  const count = sel.length;
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('l-sel-count', `${count} lançamento${count>1?'s':''} selecionado${count>1?'s':''}`);
+  set('l-sel-rec', fmtRs(rec));
+  set('l-sel-des', fmtRs(des));
+  set('l-sel-inv', fmtRs(inv));
+
+  const liqEl = document.getElementById('l-sel-liq');
+  if(liqEl){
+    liqEl.textContent = (liq >= 0 ? '+' : '') + fmtRs(liq);
+    liqEl.style.color = liq >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+
+  // Destacar linhas selecionadas
+  document.querySelectorAll('.l-row').forEach(row => {
+    const chk = row.querySelector('.l-chk');
+    row.style.outline = chk?.checked ? '1px solid var(--green)' : '';
+    row.style.background = chk?.checked
+      ? 'var(--green-dim)'
+      : (row.dataset.transf === 'true' ? 'rgba(0,200,200,.03)' : '');
+  });
+
+  if(footer) footer.style.display = 'block';
+}
+
+function lancSelAll(checked){
+  document.querySelectorAll('.l-chk').forEach(c => c.checked = checked);
+  updLancSel();
+}
+
+function lancDeselectAll(){
+  document.querySelectorAll('.l-chk').forEach(c => c.checked = false);
+  const allChk = document.getElementById('l-chk-all');
+  if(allChk){ allChk.checked = false; allChk.indeterminate = false; }
+  updLancSel();
 }
 
 // ── ORÇAMENTO ──
@@ -5393,6 +5580,8 @@ seedLancamentos();
 })();
 updSbSaldo();
 renderDash();
+// Pré-popula o select de ano dos lançamentos para quando o usuário navegar até lá
+setTimeout(()=>{ try{ initLancAnoOpts(); }catch(_){} }, 200);
 
 // ═══════════════════════════════════════
 // MOBILE — Drawer, Bottom Nav, FAB
