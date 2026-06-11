@@ -1864,8 +1864,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Conta a Pagar -->
 <div class="overlay" id="m-conta" style="display:none" onclick="cmoOut(event,'m-conta')">
   <div class="modal" style="max-width:580px" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Nova Conta a Pagar</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-conta')">✕</button></div>
+    <div class="modal-hd"><h2 id="m-conta-titulo">Nova Conta a Pagar</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-conta')">✕</button></div>
     <div class="modal-bd">
+      <input type="hidden" id="cp-edit-id">
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Descrição *</label><input type="text" id="cp-desc" placeholder="Ex: Aluguel de junho"></div>
         <div class="fg"><label>Categoria</label>
@@ -1907,16 +1908,24 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <select id="cp-rec"><option>Única</option><option>Mensal</option><option>Anual</option></select>
         </div>
       </div>
-      <div class="form-grid cols2">
+      <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Data de Pagamento (1ª parcela)</label><input type="date" id="cp-data-pg"></div>
         <div class="fg"><label>Status (1ª parcela)</label>
-          <select id="cp-st"><option>Pendente</option><option>Pago</option></select>
+          <select id="cp-st" onchange="toggleCpCaixa()"><option>Pendente</option><option>Pago</option></select>
+        </div>
+      </div>
+      <!-- Campo conta bancária — aparece só quando Pago -->
+      <div id="cp-caixa-wrap" style="display:none;margin-bottom:12px">
+        <div class="fg"><label>Conta Bancária (débito)</label>
+          <select id="cp-caixa">
+            <option value="">— Sem vínculo de caixa —</option>
+          </select>
         </div>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-conta')">Cancelar</button>
-      <button class="btn btn-green" onclick="saveConta()">Salvar</button>
+      <button class="btn btn-green" id="btn-salvar-conta" onclick="saveConta()">Salvar</button>
     </div>
   </div>
 </div>
@@ -2354,11 +2363,19 @@ function openM(id){
     if(errLanc) errLanc.style.display='none';
   }
   if(id==='m-conta'){
+    document.getElementById('cp-edit-id').value='';
+    document.getElementById('m-conta-titulo').textContent='Nova Conta a Pagar';
+    document.getElementById('btn-salvar-conta').textContent='Salvar';
     document.getElementById('cp-venc').value=today();
     document.getElementById('cp-val').value='';
     document.getElementById('cp-desc').value='';
     document.getElementById('cp-obs').value='';
     document.getElementById('cp-parc').value='1';
+    document.getElementById('cp-st').value='Pendente';
+    document.getElementById('cp-data-pg').value='';
+    const caiWrap=document.getElementById('cp-caixa-wrap');
+    if(caiWrap) caiWrap.style.display='none';
+    popCaixas('cp-caixa');
     calcParcelaConta();
     updCpSubcat();
   }
@@ -4263,7 +4280,48 @@ function calcParcelaConta(){
   if(elVP) elVP.textContent = fmtR(val/parc);
 }
 
+function toggleCpCaixa(){
+  const st = document.getElementById('cp-st')?.value;
+  const wrap = document.getElementById('cp-caixa-wrap');
+  if(wrap) wrap.style.display = st==='Pago' ? 'block' : 'none';
+}
+
+function editConta(id){
+  const d = gs();
+  const c = d.contas.find(x=>x.id===id);
+  if(!c) return;
+  popCaixas('cp-caixa');
+  updCpSubcat();
+  document.getElementById('cp-edit-id').value = c.id;
+  document.getElementById('m-conta-titulo').textContent = 'Editar Conta a Pagar';
+  document.getElementById('btn-salvar-conta').textContent = 'Salvar Alterações';
+  document.getElementById('cp-desc').value = c.totalParcelas>1
+    ? c.desc.replace(/ \(\d+\/\d+\)$/,'') : c.desc;
+  document.getElementById('cp-cat').value = c.cat||'Outras Despesas';
+  updCpSubcat();
+  setTimeout(()=>{
+    const sc = document.getElementById('cp-subcat'); if(sc) sc.value = c.subcat||'';
+  },60);
+  document.getElementById('cp-obs').value = c.obs||'';
+  document.getElementById('cp-val').value = c.valor;
+  document.getElementById('cp-parc').value = '1'; // edição é por parcela
+  document.getElementById('cp-venc').value = c.venc;
+  document.getElementById('cp-rec').value = c.rec||'Única';
+  document.getElementById('cp-data-pg').value = c.dataPg||'';
+  document.getElementById('cp-st').value = c.status==='Pago'?'Pago':'Pendente';
+  const wrap = document.getElementById('cp-caixa-wrap');
+  if(wrap) wrap.style.display = c.status==='Pago' ? 'block' : 'none';
+  if(c.caixaId){
+    setTimeout(()=>{
+      const cx=document.getElementById('cp-caixa'); if(cx) cx.value=c.caixaId;
+    },80);
+  }
+  calcParcelaConta();
+  document.getElementById('m-conta').style.display='flex';
+}
+
 function saveConta(){
+  const editId = document.getElementById('cp-edit-id')?.value||'';
   const venc  = document.getElementById('cp-venc')?.value;
   const val   = parseFloat(document.getElementById('cp-val')?.value)||0;
   const desc   = document.getElementById('cp-desc')?.value?.trim();
@@ -4274,29 +4332,82 @@ function saveConta(){
   const parc  = parseInt(document.getElementById('cp-parc')?.value)||1;
   const dataPg= document.getElementById('cp-data-pg')?.value;
   const st    = document.getElementById('cp-st')?.value||'Pendente';
+  const caixaId = document.getElementById('cp-caixa')?.value||'';
   if(!venc||!val||!desc){alert('Preencha os campos obrigatórios.');return;}
 
   const d = gs();
-  const valParcela = +(val/parc).toFixed(2);
-  const grupoId = uid(); // vincula todas as parcelas de um mesmo lote
 
+  // ── MODO EDIÇÃO ──
+  if(editId){
+    const c = d.contas.find(x=>x.id===editId);
+    if(!c) return;
+    const temIrmaos = c.grupoId && d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==editId).length>0;
+    let replicar = false;
+    if(temIrmaos){
+      replicar = confirm(`Esta conta tem ${d.contas.filter(x=>x.grupoId===c.grupoId).length} parcelas no total.\n\nDeseja replicar as alterações (descrição, categoria, subcategoria, observação) para TODAS as parcelas do grupo?`);
+    }
+    // Aplica na parcela atual
+    const descBase = desc;
+    const numLabel = c.totalParcelas>1 ? ` (${c.parcela}/${c.totalParcelas})` : '';
+    c.desc = descBase + numLabel;
+    c.cat = cat; c.subcat = subcat; c.obs = obs;
+    c.venc = venc; c.rec = rec;
+    c.valor = val;
+    c.dataPg = dataPg||'';
+    c.status = st==='Pago' ? 'Pago' : (new Date(venc+'T00:00:00')<new Date() ? 'Vencida' : 'Pendente');
+    c.caixaId = caixaId;
+    // Gera lançamento se passou a Pago
+    if(st==='Pago'){
+      // Remove lançamento anterior desta parcela se existir
+      d.lancs = d.lancs.filter(l=>l.refContaId!==c.id || l.status==='cancelado');
+      c.caixaNome = caixaId ? (d.bancos||[]).find(b=>b.id===caixaId)?.nome||'' : '';
+      gerarLancDaConta(c, d);
+      // Espelha no extrato bancário se tiver conta
+      if(caixaId){
+        const lancGerado = d.lancs.find(l=>l.refContaId===c.id&&l.status!=='cancelado');
+        if(lancGerado){ lancGerado.caixaId=caixaId; lancGerado.caixaNome=c.caixaNome; lancToCaixa(lancGerado,d); }
+      }
+    }
+    // Replica campos textuais/categorias nas irmãs
+    if(replicar){
+      d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==editId).forEach(irma=>{
+        const nl = irma.totalParcelas>1 ? ` (${irma.parcela}/${irma.totalParcelas})` : '';
+        irma.desc = descBase + nl;
+        irma.cat = cat; irma.subcat = subcat; irma.obs = obs;
+      });
+    }
+    ss(d); closeM('m-conta'); refreshAll();
+    return;
+  }
+
+  // ── MODO CRIAÇÃO ──
+  const valParcela = +(val/parc).toFixed(2);
+  const grupoId = uid();
   for(let i=0;i<parc;i++){
     const vencParcela = addMeses(venc, i);
     const numLabel = parc>1 ? ` (${i+1}/${parc})` : '';
     const stParcela = (i===0 && st==='Pago') ? 'Pago' : 'Pendente';
     const dataPgParcela = (i===0 && st==='Pago') ? (dataPg||today()) : '';
+    const caixaIdParcela = (i===0 && st==='Pago') ? caixaId : '';
+    const caixaNome = caixaIdParcela ? (d.bancos||[]).find(b=>b.id===caixaIdParcela)?.nome||'' : '';
     const id = uid();
     const conta = {
       id, venc:vencParcela, valor:valParcela, desc:desc+numLabel,
       cat, subcat, obs, rec: parc>1 ? 'Mensal' : rec,
       dataPg:dataPgParcela, status:stParcela,
       parcela:i+1, totalParcelas:parc, grupoId,
+      caixaId:caixaIdParcela, caixaNome,
       ts:Date.now()+i
     };
     d.contas.push(conta);
-    if(stParcela==='Pago') gerarLancDaConta(conta, d);
+    if(stParcela==='Pago'){
+      gerarLancDaConta(conta, d);
+      if(caixaIdParcela){
+        const lancGerado = d.lancs.find(l=>l.refContaId===conta.id&&l.status!=='cancelado');
+        if(lancGerado){ lancGerado.caixaId=caixaIdParcela; lancGerado.caixaNome=caixaNome; lancToCaixa(lancGerado,d); }
+      }
+    }
   }
-
   ss(d); closeM('m-conta'); refreshAll();
 }
 
@@ -4401,6 +4512,7 @@ function renderContas(){
       <td><span class="badge ${stBdg[c.status]||'bdg-gray'}">${c.status}</span></td>
       <td class="tbl-actions">
         ${c.status!=='Pago'?`<button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>`:''}
+        <button class="btn btn-ghost btn-xs" onclick="editConta('${c.id}')" title="Editar">✎</button>
         <button class="btn btn-red btn-xs" onclick="delConta('${c.id}')">✕</button>
       </td>
     </tr>`;
@@ -4419,8 +4531,23 @@ function pagarConta(id){
 
 function delConta(id){
   const d = gs();
-  d.lancs.filter(l=>l.refContaId===id).forEach(l=>{ l.status='cancelado'; });
-  d.contas = d.contas.filter(c=>c.id!==id);
+  const c = d.contas.find(x=>x.id===id);
+  if(!c) return;
+  const irmaos = c.grupoId ? d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==id) : [];
+  let excluirTodas = false;
+  if(irmaos.length>0){
+    const total = irmaos.length+1;
+    const resp = confirm(`Esta conta faz parte de um grupo de ${total} parcelas.\n\nClique OK para excluir TODAS as parcelas do grupo.\nClique Cancelar para excluir somente esta parcela.`);
+    excluirTodas = resp;
+  }
+  if(excluirTodas){
+    const idsGrupo = d.contas.filter(x=>x.grupoId===c.grupoId).map(x=>x.id);
+    idsGrupo.forEach(gid=>{ d.lancs.filter(l=>l.refContaId===gid).forEach(l=>{ l.status='cancelado'; }); });
+    d.contas = d.contas.filter(x=>x.grupoId!==c.grupoId);
+  } else {
+    d.lancs.filter(l=>l.refContaId===id).forEach(l=>{ l.status='cancelado'; });
+    d.contas = d.contas.filter(x=>x.id!==id);
+  }
   ss(d); refreshAll();
 }
 
