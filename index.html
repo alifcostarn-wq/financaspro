@@ -458,6 +458,50 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   .bottom-nav-inner{gap:0}
   .bn-item{min-width:44px;padding:4px 4px}
 }
+
+/* ── KANBAN ── */
+#page-kanban .kb-alert{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,var(--red-dim),transparent);
+  border:1px solid var(--red);border-radius:var(--r);
+  padding:14px 18px;margin-bottom:20px;
+  animation:kb-pulse 2s ease-in-out infinite;
+}
+@keyframes kb-pulse{0%,100%{box-shadow:0 0 0 0 var(--red-dim)}50%{box-shadow:0 0 0 6px transparent}}
+#page-kanban .kb-alert-icon{font-size:22px;flex-shrink:0}
+#page-kanban .kb-alert-body{flex:1}
+#page-kanban .kb-alert-title{color:var(--red);font-size:13px;font-weight:700;letter-spacing:.04em}
+#page-kanban .kb-alert-list{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px}
+#page-kanban .kb-alert-tag{background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+#page-kanban .kb-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+@media(max-width:860px){#page-kanban .kb-board{grid-template-columns:1fr}}
+#page-kanban .kb-col{background:var(--surface1);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-height:200px}
+#page-kanban .kb-col-hd{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+#page-kanban .kb-col-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+#page-kanban .kb-col-title{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t2);flex:1}
+#page-kanban .kb-col-count{font-size:11px;color:var(--t3);background:var(--surface3);border-radius:20px;padding:1px 8px}
+#page-kanban .kb-cards{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
+#page-kanban .kb-card{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:12px;cursor:pointer;transition:border-color .15s,transform .15s;position:relative}
+#page-kanban .kb-card:hover{border-color:var(--line2);transform:translateY(-1px)}
+#page-kanban .kb-card.overdue{border-color:var(--red)!important;background:linear-gradient(135deg,var(--red-dim),var(--surface2))}
+#page-kanban .kb-card-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;word-break:break-word}
+#page-kanban .kb-card-desc{font-size:11px;color:var(--t2);margin-bottom:8px;line-height:1.5;word-break:break-word}
+#page-kanban .kb-card-ft{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#page-kanban .kb-card-due{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+#page-kanban .kb-card-due.ok{background:var(--blue-dim);color:var(--blue)}
+#page-kanban .kb-card-due.warn{background:var(--amber-dim);color:var(--amber)}
+#page-kanban .kb-card-due.late{background:var(--red-dim);color:var(--red)}
+#page-kanban .kb-card-tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+#page-kanban .kb-card-actions{display:flex;gap:4px;margin-left:auto}
+#page-kanban .kb-add-btn{margin:0 10px 10px;background:transparent;border:1px dashed var(--line2);color:var(--t3);border-radius:var(--r2);padding:8px;font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;width:calc(100% - 20px)}
+#page-kanban .kb-add-btn:hover{border-color:var(--green);color:var(--green)}
+/* Modal Kanban */
+#m-kanban .kb-type-row{display:flex;gap:8px;margin-bottom:14px}
+#m-kanban .kb-type-btn{flex:1;padding:8px;border:1px solid var(--line2);border-radius:var(--r2);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;transition:.15s;text-align:center}
+#m-kanban .kb-type-btn.active{border-color:currentColor;background:var(--surface3)}
+#m-kanban .kb-type-btn.t-note.active{color:var(--blue)}
+#m-kanban .kb-type-btn.t-reminder.active{color:var(--amber)}
+#m-kanban .kb-type-btn.t-todo.active{color:var(--green)}
 </style>
 </head>
 <body>
@@ -661,6 +705,13 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M7 3v4M17 3v4"/></svg>
     Contas Bancárias
   </div>
+  <div class="nav-section">Organização</div>
+  <div class="nav-btn" onclick="go('kanban',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/></svg>
+    Kanban
+    <span class="pill" id="pill-kanban" style="display:none">0</span>
+  </div>
+
   <div class="nav-section">Sistema</div>
   <div class="nav-btn" onclick="go('cfg',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M4.93 4.93l1.41 1.41M21 12h-2M5 12H3M12 21v-2M12 5V3"/></svg>
@@ -1574,6 +1625,112 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
 <!-- ═══════════════ MODAIS ═══════════════ -->
 
+<!-- ───── KANBAN ───── -->
+<div class="page" id="page-kanban">
+  <div class="topbar">
+    <div class="topbar-left"><h1>Kanban</h1><p>Anotações, lembretes e tarefas</p></div>
+    <div class="topbar-right">
+      <button class="btn btn-green" onclick="openKanbanModal()">+ Nova Tarefa</button>
+    </div>
+  </div>
+
+  <!-- Alerta de tarefas atrasadas -->
+  <div id="kb-alert-bar" style="display:none" class="kb-alert">
+    <div class="kb-alert-icon">⚠️</div>
+    <div class="kb-alert-body">
+      <div class="kb-alert-title">TAREFAS EM ATRASO</div>
+      <div class="kb-alert-list" id="kb-alert-list"></div>
+    </div>
+  </div>
+
+  <!-- Board -->
+  <div class="kb-board">
+    <!-- Coluna: A Fazer -->
+    <div class="kb-col">
+      <div class="kb-col-hd">
+        <div class="kb-col-dot" style="background:var(--blue)"></div>
+        <div class="kb-col-title">A Fazer</div>
+        <div class="kb-col-count" id="kb-count-todo">0</div>
+      </div>
+      <div class="kb-cards" id="kb-col-todo" ondragover="event.preventDefault()" ondrop="kbDrop(event,'todo')"></div>
+      <button class="kb-add-btn" onclick="openKanbanModal('todo')">+ Adicionar</button>
+    </div>
+    <!-- Coluna: Em Andamento -->
+    <div class="kb-col">
+      <div class="kb-col-hd">
+        <div class="kb-col-dot" style="background:var(--amber)"></div>
+        <div class="kb-col-title">Em Andamento</div>
+        <div class="kb-col-count" id="kb-count-doing">0</div>
+      </div>
+      <div class="kb-cards" id="kb-col-doing" ondragover="event.preventDefault()" ondrop="kbDrop(event,'doing')"></div>
+      <button class="kb-add-btn" onclick="openKanbanModal('doing')">+ Adicionar</button>
+    </div>
+    <!-- Coluna: Concluído -->
+    <div class="kb-col">
+      <div class="kb-col-hd">
+        <div class="kb-col-dot" style="background:var(--green)"></div>
+        <div class="kb-col-title">Concluído</div>
+        <div class="kb-col-count" id="kb-count-done">0</div>
+      </div>
+      <div class="kb-cards" id="kb-col-done" ondragover="event.preventDefault()" ondrop="kbDrop(event,'done')"></div>
+      <button class="kb-add-btn" onclick="openKanbanModal('done')">+ Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Kanban Card -->
+<div class="overlay" id="m-kanban" style="display:none" onclick="cmoOut(event,'m-kanban')">
+  <div class="modal" style="max-width:500px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h2 id="m-kanban-titulo">Nova Tarefa</h2>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-kanban')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="kb-edit-id">
+      <!-- Tipo -->
+      <div id="m-kanban" class="kb-type-row">
+        <button class="kb-type-btn t-todo active" id="kbt-todo" onclick="setKbType('todo-type')">📝 Anotação</button>
+        <button class="kb-type-btn t-reminder" id="kbt-reminder" onclick="setKbType('reminder')">🔔 Lembrete</button>
+        <button class="kb-type-btn t-note" id="kbt-task" onclick="setKbType('task')">✅ A Fazer</button>
+      </div>
+      <input type="hidden" id="kb-type" value="todo-type">
+      <div class="form-grid cols1" style="margin-bottom:12px">
+        <div class="fg"><label>Título *</label><input type="text" id="kb-title" placeholder="Título da tarefa"></div>
+      </div>
+      <div class="form-grid cols1" style="margin-bottom:12px">
+        <div class="fg"><label>Descrição</label><textarea id="kb-desc" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:10px;color:var(--t1);font-family:inherit;font-size:13px;resize:vertical" placeholder="Detalhes opcionais..."></textarea></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Data limite</label><input type="date" id="kb-due"></div>
+        <div class="fg"><label>Coluna</label>
+          <select id="kb-col-sel">
+            <option value="todo">A Fazer</option>
+            <option value="doing">Em Andamento</option>
+            <option value="done">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid cols1" style="margin-bottom:4px">
+        <div class="fg"><label>Etiqueta (cor)</label>
+          <select id="kb-label">
+            <option value="">Nenhuma</option>
+            <option value="blue">🔵 Azul</option>
+            <option value="green">🟢 Verde</option>
+            <option value="amber">🟡 Amarelo</option>
+            <option value="red">🔴 Vermelho</option>
+            <option value="purple">🟣 Roxo</option>
+            <option value="pink">🩷 Rosa</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-kanban')">Cancelar</button>
+      <button class="btn btn-green" onclick="saveKbCard()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Lançamento (novo + edição) -->
 <div class="overlay" id="m-lanc" style="display:none" onclick="cmoOut(event,'m-lanc')">
   <div class="modal" style="max-width:600px" onclick="event.stopPropagation()">
@@ -2328,7 +2485,7 @@ function go(p,el){
   document.getElementById('page-'+p).classList.add('active');
   if(el)el.classList.add('active');
   _page=p;
-  const fns={dash:renderDash,rel:renderRel,lanc:renderLanc,orc:renderOrc,contas:renderContas,dividas:renderDividas,cartoes:renderCartoes,bancos:renderBancos,cfg:renderCfg};
+  const fns={dash:renderDash,rel:renderRel,lanc:renderLanc,orc:renderOrc,contas:renderContas,dividas:renderDividas,cartoes:renderCartoes,bancos:renderBancos,cfg:renderCfg,kanban:renderKanban};
   if(p==='lanc') initLancAnoOpts();
   if(fns[p])fns[p]();
   updSbSaldo();
@@ -6168,6 +6325,153 @@ const _openMOrig = openM;
 openM = function(id) {
   if (id === 'm-novo-user') { openMNovoUser(); return; }
   _openMOrig(id);
+};
+
+// ── KANBAN ──
+let _kbDragId = null;
+
+function kbData(){ return (gs().kanban||[]); }
+function kbSave(cards){ const d=gs(); d.kanban=cards; ss(d); }
+
+function renderKanban(){
+  const cards = kbData();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const cols = ['todo','doing','done'];
+  const labelColors = {blue:'var(--blue)',green:'var(--green)',amber:'var(--amber)',red:'var(--red)',purple:'var(--purple)',pink:'var(--pink)'};
+  const labelDims   = {blue:'var(--blue-dim)',green:'var(--green-dim)',amber:'var(--amber-dim)',red:'var(--red-dim)',purple:'var(--purple-dim)',pink:'var(--pink-dim)'};
+  const typeIcon = {'todo-type':'📝','reminder':'🔔','task':'✅'};
+
+  // Overdue alert
+  const overdue = cards.filter(c=>c.col!=='done'&&c.due&&new Date(c.due+'T00:00:00')<today);
+  const bar = document.getElementById('kb-alert-bar');
+  const list = document.getElementById('kb-alert-list');
+  if(bar){ bar.style.display = overdue.length ? 'flex' : 'none'; }
+  if(list) list.innerHTML = overdue.map(c=>`<span class="kb-alert-tag">⚠ ${c.title}</span>`).join('');
+
+  // Pill on nav
+  const totalPending = cards.filter(c=>c.col!=='done').length;
+  const pill = document.getElementById('pill-kanban');
+  if(pill){ pill.style.display=totalPending>0?'inline-flex':'none'; pill.textContent=totalPending; }
+
+  cols.forEach(col=>{
+    const el = document.getElementById('kb-col-'+col);
+    const cnt = document.getElementById('kb-count-'+col);
+    const colCards = cards.filter(c=>c.col===col);
+    if(cnt) cnt.textContent = colCards.length;
+    if(!el) return;
+    el.innerHTML = colCards.length===0
+      ? `<div style="text-align:center;padding:24px 0;color:var(--t3);font-size:12px">Nenhuma tarefa</div>`
+      : colCards.map(c=>{
+          const dueDate = c.due ? new Date(c.due+'T00:00:00') : null;
+          const isLate  = dueDate && dueDate < today && col!=='done';
+          const isWarn  = dueDate && !isLate && ((dueDate-today)/(1000*60*60*24))<=2;
+          const dueCls  = isLate?'late':isWarn?'warn':'ok';
+          const dueStr  = c.due ? `<span class="kb-card-due ${dueCls}">📅 ${fmtDateBR(c.due)}</span>` : '';
+          const labelHtml = c.label ? `<span class="kb-card-tag" style="background:${labelDims[c.label]||''};color:${labelColors[c.label]||''}">${c.label}</span>` : '';
+          const icon = typeIcon[c.type]||'📝';
+          return `<div class="kb-card${isLate?' overdue':''}" draggable="true"
+            ondragstart="kbDragStart(event,'${c.id}')"
+            ondragend="kbDragEnd(event)">
+            <div class="kb-card-title">${icon} ${escH(c.title)}</div>
+            ${c.desc?`<div class="kb-card-desc">${escH(c.desc)}</div>`:''}
+            <div class="kb-card-ft">
+              ${dueStr}${labelHtml}
+              <div class="kb-card-actions">
+                ${col!=='done'?`<button class="btn btn-green btn-xs" onclick="kbMoveDone('${c.id}')" title="Concluir">✓</button>`:''}
+                <button class="btn btn-ghost btn-xs" onclick="kbEdit('${c.id}')" title="Editar">✎</button>
+                <button class="btn btn-red btn-xs" onclick="kbDel('${c.id}')" title="Excluir">✕</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+  });
+}
+
+function fmtDateBR(iso){
+  if(!iso) return '';
+  const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`;
+}
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function openKanbanModal(col){
+  document.getElementById('kb-edit-id').value='';
+  document.getElementById('m-kanban-titulo').textContent='Nova Tarefa';
+  document.getElementById('kb-title').value='';
+  document.getElementById('kb-desc').value='';
+  document.getElementById('kb-due').value='';
+  document.getElementById('kb-label').value='';
+  document.getElementById('kb-col-sel').value=col||'todo';
+  setKbType('todo-type');
+  document.getElementById('m-kanban').style.display='flex';
+}
+
+function setKbType(t){
+  document.getElementById('kb-type').value=t;
+  ['kbt-todo','kbt-reminder','kbt-task'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  const map={'todo-type':'kbt-todo','reminder':'kbt-reminder','task':'kbt-task'};
+  document.getElementById(map[t]||'kbt-todo')?.classList.add('active');
+}
+
+function saveKbCard(){
+  const title = document.getElementById('kb-title').value.trim();
+  if(!title){ alert('Informe o título.'); return; }
+  const cards = kbData();
+  const editId = document.getElementById('kb-edit-id').value;
+  const card = {
+    id: editId||uid(), title,
+    desc: document.getElementById('kb-desc').value.trim(),
+    due:  document.getElementById('kb-due').value,
+    col:  document.getElementById('kb-col-sel').value,
+    type: document.getElementById('kb-type').value,
+    label:document.getElementById('kb-label').value,
+    ts:   Date.now()
+  };
+  if(editId){
+    const idx = cards.findIndex(c=>c.id===editId);
+    if(idx>=0) cards[idx]=card; else cards.push(card);
+  } else { cards.push(card); }
+  kbSave(cards);
+  closeM('m-kanban');
+  renderKanban();
+}
+
+function kbEdit(id){
+  const c = kbData().find(x=>x.id===id); if(!c) return;
+  document.getElementById('kb-edit-id').value=c.id;
+  document.getElementById('m-kanban-titulo').textContent='Editar Tarefa';
+  document.getElementById('kb-title').value=c.title||'';
+  document.getElementById('kb-desc').value=c.desc||'';
+  document.getElementById('kb-due').value=c.due||'';
+  document.getElementById('kb-label').value=c.label||'';
+  document.getElementById('kb-col-sel').value=c.col||'todo';
+  setKbType(c.type||'todo-type');
+  document.getElementById('m-kanban').style.display='flex';
+}
+
+function kbDel(id){
+  if(!confirm('Excluir esta tarefa?')) return;
+  kbSave(kbData().filter(c=>c.id!==id));
+  renderKanban();
+}
+
+function kbMoveDone(id){
+  const cards=kbData(); const c=cards.find(x=>x.id===id); if(c) c.col='done';
+  kbSave(cards); renderKanban();
+}
+
+function kbDragStart(e,id){ _kbDragId=id; e.currentTarget.style.opacity='.45'; }
+function kbDragEnd(e){ e.currentTarget.style.opacity=''; _kbDragId=null; }
+function kbDrop(e,col){
+  if(!_kbDragId) return;
+  const cards=kbData(); const c=cards.find(x=>x.id===_kbDragId); if(c) c.col=col;
+  kbSave(cards); renderKanban();
+}
+
+// Hook into go() for kanban
+const _go_orig_kb = go;
+go = function(p,el){
+  _go_orig_kb(p,el);
+  if(p==='kanban') renderKanban();
 };
 
 </script>
