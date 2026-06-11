@@ -459,7 +459,84 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   .bn-item{min-width:44px;padding:4px 4px}
 }
 
-/* ── KANBAN ── */
+/* ── PAINEL O QUE FAZER AGORA ── */
+#dash-agora-wrap .agora-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+#dash-agora-wrap .agora-title{
+  font-size:13px;font-weight:700;color:var(--t1);
+  display:flex;align-items:center;gap:8px;
+}
+#dash-agora-wrap .agora-title span.pulse{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  display:inline-block;animation:ag-pulse 1.8s ease-in-out infinite;
+}
+#dash-agora-wrap .agora-title span.pulse.red{ background:var(--red); }
+@keyframes ag-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+#dash-agora-wrap .agora-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;
+}
+#dash-agora-wrap .agora-card{
+  background:var(--surface1);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;display:flex;gap:12px;align-items:flex-start;
+  cursor:pointer;transition:border-color .15s,transform .15s;position:relative;
+  overflow:hidden;
+}
+#dash-agora-wrap .agora-card:hover{transform:translateY(-2px);}
+#dash-agora-wrap .agora-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;
+}
+#dash-agora-wrap .agora-card.urgente{ border-color:var(--red); }
+#dash-agora-wrap .agora-card.urgente::before{ background:var(--red); }
+#dash-agora-wrap .agora-card.urgente:hover{ box-shadow:0 4px 20px var(--red-dim); }
+#dash-agora-wrap .agora-card.atencao{ border-color:var(--amber); }
+#dash-agora-wrap .agora-card.atencao::before{ background:var(--amber); }
+#dash-agora-wrap .agora-card.atencao:hover{ box-shadow:0 4px 20px var(--amber-dim); }
+#dash-agora-wrap .agora-card.info{ border-color:var(--blue); }
+#dash-agora-wrap .agora-card.info::before{ background:var(--blue); }
+#dash-agora-wrap .agora-card.info:hover{ box-shadow:0 4px 20px var(--blue-dim); }
+#dash-agora-wrap .agora-card.ok{ border-color:var(--green); }
+#dash-agora-wrap .agora-card.ok::before{ background:var(--green); }
+#dash-agora-wrap .agora-card.ok:hover{ box-shadow:0 4px 20px var(--green-dim); }
+#dash-agora-wrap .agora-icon{
+  font-size:22px;flex-shrink:0;width:40px;height:40px;border-radius:var(--r2);
+  display:flex;align-items:center;justify-content:center;
+}
+#dash-agora-wrap .agora-card.urgente .agora-icon{ background:var(--red-dim); }
+#dash-agora-wrap .agora-card.atencao .agora-icon{ background:var(--amber-dim); }
+#dash-agora-wrap .agora-card.info    .agora-icon{ background:var(--blue-dim); }
+#dash-agora-wrap .agora-card.ok      .agora-icon{ background:var(--green-dim); }
+#dash-agora-wrap .agora-body{ flex:1;min-width:0; }
+#dash-agora-wrap .agora-label{
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:3px;
+}
+#dash-agora-wrap .agora-card.urgente .agora-label{ color:var(--red); }
+#dash-agora-wrap .agora-card.atencao .agora-label{ color:var(--amber); }
+#dash-agora-wrap .agora-card.info    .agora-label{ color:var(--blue); }
+#dash-agora-wrap .agora-card.ok      .agora-label{ color:var(--green); }
+#dash-agora-wrap .agora-msg{
+  font-size:12px;color:var(--t1);font-weight:600;line-height:1.4;margin-bottom:4px;
+}
+#dash-agora-wrap .agora-sub{
+  font-size:11px;color:var(--t3);line-height:1.4;
+}
+#dash-agora-wrap .agora-action{
+  font-size:10px;font-weight:700;letter-spacing:.04em;margin-top:6px;
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:20px;
+}
+#dash-agora-wrap .agora-card.urgente .agora-action{ background:var(--red-dim);color:var(--red); }
+#dash-agora-wrap .agora-card.atencao .agora-action{ background:var(--amber-dim);color:var(--amber); }
+#dash-agora-wrap .agora-card.info    .agora-action{ background:var(--blue-dim);color:var(--blue); }
+#dash-agora-wrap .agora-card.ok      .agora-action{ background:var(--green-dim);color:var(--green); }
+#dash-agora-wrap .agora-tudo-ok{
+  background:linear-gradient(135deg,var(--green-dim),transparent);
+  border:1px solid var(--green);border-radius:var(--r);
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+}
+
 #page-kanban .kb-alert{
   display:flex;align-items:center;gap:12px;
   background:linear-gradient(135deg,var(--red-dim),transparent);
@@ -794,6 +871,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <button class="btn btn-green" onclick="openM('m-lanc')" style="white-space:nowrap">+ Lançamento</button>
     </div>
   </div>
+
+  <!-- ── PAINEL: O QUE FAZER AGORA ── -->
+  <div id="dash-agora-wrap" style="margin-bottom:20px"></div>
 
   <!-- ── LINHA 1: KPIs principais com tendência ── -->
   <div class="kpi-grid cols4" style="margin-bottom:12px">
@@ -3029,6 +3109,161 @@ function renderDash(){
   }
 
   updSbSaldo();
+
+  // ── O QUE FAZER AGORA ──
+  renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv);
+}
+
+function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv){
+  const wrap = document.getElementById('dash-agora-wrap');
+  if(!wrap) return;
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const em3  = new Date(); em3.setDate(hoje.getDate()+3);
+  const em7  = new Date(); em7.setDate(hoje.getDate()+7);
+  const MESES_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const isMesAtual = mes===new Date().getMonth() && ano===new Date().getFullYear();
+
+  const acoes = [];
+
+  // 1. Contas VENCIDAS
+  const vencidas = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv<hoje && c.status!=='Pago'; });
+  if(vencidas.length){
+    const total=vencidas.reduce((a,c)=>a+c.valor,0);
+    acoes.push({ nivel:'urgente', icon:'🚨', label:'Ação imediata',
+      msg:`${vencidas.length} conta${vencidas.length>1?'s':''} vencida${vencidas.length>1?'s':''}`,
+      sub:`Total em atraso: ${fmtR(total)}. Regularize para evitar juros.`,
+      acao:'Ver Contas a Pagar →',
+      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
+    });
+  }
+
+  // 2. Vencendo em até 3 dias
+  const urgentes3 = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv>=hoje && dv<=em3 && c.status!=='Pago'; });
+  if(urgentes3.length){
+    const total=urgentes3.reduce((a,c)=>a+c.valor,0);
+    const nomes=urgentes3.slice(0,2).map(c=>c.desc.length>26?c.desc.slice(0,26)+'…':c.desc).join(', ');
+    acoes.push({ nivel:'urgente', icon:'⏰', label:'Vence em até 3 dias',
+      msg:`${urgentes3.length} conta${urgentes3.length>1?'s':''} urgente${urgentes3.length>1?'s':''}`,
+      sub:`${nomes}${urgentes3.length>2?` +${urgentes3.length-2} mais`:''} — ${fmtR(total)}`,
+      acao:'Pagar agora →',
+      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
+    });
+  }
+
+  // 3. Vencendo em 4–7 dias
+  const urgentes7 = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv>em3 && dv<=em7 && c.status!=='Pago'; });
+  if(urgentes7.length){
+    const total=urgentes7.reduce((a,c)=>a+c.valor,0);
+    acoes.push({ nivel:'atencao', icon:'📅', label:'Vence esta semana',
+      msg:`${urgentes7.length} conta${urgentes7.length>1?'s':''} nos próximos 7 dias`,
+      sub:`Separe ${fmtR(total)} para esses pagamentos.`,
+      acao:'Ver agenda →',
+      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
+    });
+  }
+
+  // 4. Saldo negativo
+  if(sal<0){
+    acoes.push({ nivel:'urgente', icon:'💸', label:'Saldo negativo',
+      msg:`Mês de ${MESES_PT[mes]} no vermelho`,
+      sub:`Saldo atual: ${fmtR(sal)}. Revise despesas ou registre receitas pendentes.`,
+      acao:'Ver lançamentos →',
+      fn:`go('lanc',document.querySelectorAll('.nav-btn')[3])`
+    });
+  }
+
+  // 5. Projeção negativa
+  const diaAtual=hojeD.getDate(); const diasNoMes=new Date(ano,mes+1,0).getDate();
+  if(isMesAtual && sal>=0 && rec>0 && diaAtual<diasNoMes){
+    const projSal=(rec/diaAtual*diasNoMes)-(des/diaAtual*diasNoMes)-inv;
+    if(projSal<0) acoes.push({ nivel:'atencao', icon:'🔮', label:'Projeção de fechamento',
+      msg:`Projeção: ${fmtR(projSal)} ao fim do mês`,
+      sub:`No ritmo atual o mês vai fechar no negativo. Corte gastos ou busque receita extra.`,
+      acao:'Ver relatórios →',
+      fn:`go('rel',document.querySelectorAll('.nav-btn')[2])`
+    });
+  }
+
+  // 6. Orçamentos estourados
+  const metas=d.orcs.filter(o=>o.mes===mes&&o.tipo==='Despesa');
+  const catM2={};
+  d.lancs.filter(l=>l.status!=='cancelado'&&l.tipo==='Despesa'&&new Date(l.data+'T00:00:00').getMonth()===mes&&new Date(l.data+'T00:00:00').getFullYear()===ano).forEach(l=>{catM2[l.cat]=(catM2[l.cat]||0)+l.valor;});
+  const estouradas=metas.filter(m2=>(catM2[m2.cat]||0)>m2.val);
+  if(estouradas.length){
+    const pior=estouradas.sort((a,b)=>((catM2[b.cat]||0)/b.val)-((catM2[a.cat]||0)/a.val))[0];
+    const piorPct=Math.round((catM2[pior.cat]||0)/pior.val*100);
+    acoes.push({ nivel:'atencao', icon:'📊', label:'Orçamento estourado',
+      msg:`${estouradas.length} categoria${estouradas.length>1?'s':''} acima do limite`,
+      sub:`Pior: ${pior.cat} em ${piorPct}% do orçamento. Revise seus gastos.`,
+      acao:'Ver orçamento →',
+      fn:`go('orc',document.querySelectorAll('.nav-btn')[4])`
+    });
+  }
+
+  // 7. Tarefas Kanban atrasadas
+  const kbAtrasadas=(d.kanban||[]).filter(c=>c.col!=='done'&&c.due&&new Date(c.due+'T00:00:00')<hoje);
+  if(kbAtrasadas.length){
+    acoes.push({ nivel:'atencao', icon:'📋', label:'Tarefas atrasadas',
+      msg:`${kbAtrasadas.length} tarefa${kbAtrasadas.length>1?'s':''} do Kanban em atraso`,
+      sub:`"${kbAtrasadas[0].title}"${kbAtrasadas.length>1?` e mais ${kbAtrasadas.length-1} tarefa${kbAtrasadas.length>2?'s':''}`:''}.`,
+      acao:'Ir ao Kanban →',
+      fn:`go('kanban',document.querySelectorAll('.nav-btn')[9])`
+    });
+  }
+
+  // 8. Sem investimentos
+  if(isMesAtual && inv===0 && rec>0){
+    acoes.push({ nivel:'info', icon:'📈', label:'Dica financeira',
+      msg:`Nenhum investimento em ${MESES_PT[mes]}`,
+      sub:`Recomenda-se investir ao menos 10% da renda. Que tal registrar algo?`,
+      acao:'Novo lançamento →',
+      fn:`openM('m-lanc')`
+    });
+  }
+
+  // 9. Taxa de poupança baixa
+  if(isMesAtual && rec>0 && taxaPoup<10 && taxaPoup>=0 && inv>0){
+    acoes.push({ nivel:'info', icon:'🐷', label:'Taxa de poupança baixa',
+      msg:`Guardando apenas ${taxaPoup.toFixed(0)}% da renda`,
+      sub:`Meta recomendada: 20%. Identifique despesas para reduzir.`,
+      acao:'Ver relatório →',
+      fn:`go('rel',document.querySelectorAll('.nav-btn')[2])`
+    });
+  }
+
+  // Render
+  if(acoes.length===0){
+    wrap.innerHTML=`<div class="agora-tudo-ok">
+      <span style="font-size:32px">✅</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:3px">Tudo em ordem!</div>
+        <div style="font-size:12px;color:var(--t2)">Nenhuma ação pendente para hoje. Continue assim!</div>
+      </div></div>`;
+    return;
+  }
+
+  const temUrgente=acoes.some(a=>a.nivel==='urgente');
+  wrap.innerHTML=`
+    <div class="agora-header">
+      <div class="agora-title">
+        <span class="pulse ${temUrgente?'red':''}"></span>
+        O que fazer agora
+        <span style="font-size:10px;color:var(--t3);font-weight:400;margin-left:4px">${acoes.length} ação${acoes.length!==1?'ões':''} pendente${acoes.length!==1?'s':''}</span>
+      </div>
+    </div>
+    <div class="agora-grid">
+      ${acoes.map(a=>`
+        <div class="agora-card ${a.nivel}" onclick="${a.fn}">
+          <div class="agora-icon">${a.icon}</div>
+          <div class="agora-body">
+            <div class="agora-label">${a.label}</div>
+            <div class="agora-msg">${a.msg}</div>
+            <div class="agora-sub">${a.sub}</div>
+            <div class="agora-action">${a.acao}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ── RELATÓRIOS ──
