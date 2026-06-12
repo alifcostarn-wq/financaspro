@@ -3735,13 +3735,13 @@ function renderDREDiario(d, ativos) {
     const de = dl.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
     const i  = dl.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
 
-    // Movimentações bancárias do dia — exclui movs vinculados a lançamentos cancelados/excluídos
+    // Movimentações bancárias do dia — exclui movs que têm lançamento ativo vinculado (já contados acima)
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
       (b.movs || []).forEach(m => {
         if (m.data !== dataStr) return;
-        // Se o mov é originado de um lançamento, verificar se ele ainda está ativo
-        if (m.refLancId && !lancAtivosIds.has(m.refLancId)) return;
+        // Exclui movs com refLancId ativo — esse valor já entra via lançamento (evita dupla contagem)
+        if (m.refLancId) return;
         if (m.tipo === 'entrada' && !m.cat?.includes('Transferência')) bkEnt += m.val;
         if (m.tipo === 'saida'   && !m.cat?.includes('Transferência')) bkSai += m.val;
       });
