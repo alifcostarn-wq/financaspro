@@ -6173,6 +6173,25 @@ seedLancamentos();
   });
 })();
 updSbSaldo();
+
+// Limpeza de movimentações bancárias órfãs (vinculadas a lançamentos cancelados/excluídos)
+(function limparMovsOrfaos(){
+  try {
+    const d = gs();
+    const lancAtivosIds = new Set(d.lancs.filter(l => l.status !== 'cancelado').map(l => l.id));
+    let alterou = false;
+    (d.bancos || []).forEach(b => {
+      const antes = (b.movs || []).length;
+      b.movs = (b.movs || []).filter(m => {
+        if (m.refLancId && !lancAtivosIds.has(m.refLancId)) return false;
+        return true;
+      });
+      if (b.movs.length !== antes) alterou = true;
+    });
+    if (alterou) ss(d);
+  } catch(e) { console.warn('limparMovsOrfaos:', e); }
+})();
+
 renderDash();
 setTimeout(()=>{ try{ initLancAnoOpts(); }catch(_){} }, 200);
 
