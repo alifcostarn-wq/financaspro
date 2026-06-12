@@ -537,6 +537,16 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   padding:16px 20px;display:flex;align-items:center;gap:14px;
 }
 
+/* ── OFX CONCILIAÇÃO ── */
+#m-ofx .ofx-status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+#m-ofx .ofx-status-badge.novo{background:var(--green-dim);color:var(--green)}
+#m-ofx .ofx-status-badge.duplicado{background:var(--amber-dim);color:var(--amber)}
+#m-ofx .ofx-status-badge.conciliado{background:var(--blue-dim);color:var(--blue)}
+#m-ofx .ofx-row-dup td{opacity:.55}
+#m-ofx .ofx-kpi{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:12px;text-align:center}
+#m-ofx .ofx-kpi-val{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+#m-ofx .ofx-kpi-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+
 #page-kanban .kb-alert{
   display:flex;align-items:center;gap:12px;
   background:linear-gradient(135deg,var(--red-dim),transparent);
@@ -1676,6 +1686,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="">Todos</option><option value="entrada">Entradas</option><option value="saida">Saídas</option><option value="transferencia">Transferências</option>
           </select>
           <input id="bk-fil-busca" type="text" placeholder="Buscar…" oninput="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
+          <button class="btn btn-ghost btn-sm" onclick="openOfxImport()" title="Importar OFX / Conciliação Bancária" style="display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            OFX / Conciliação
+          </button>
         </div>
       </div>
       <div class="tbl-wrap">
@@ -1807,6 +1821,65 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-kanban')">Cancelar</button>
       <button class="btn btn-green" onclick="saveKbCard()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: OFX Conciliação Bancária -->
+<div class="overlay" id="m-ofx" style="display:none" onclick="cmoOut(event,'m-ofx')">
+  <div class="modal" style="max-width:860px;width:95vw" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h2 id="m-ofx-titulo">Conciliação Bancária — Importar OFX</h2>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-ofx')">✕</button>
+    </div>
+    <div class="modal-bd" style="max-height:70vh;overflow-y:auto">
+
+      <!-- Passo 1: Upload -->
+      <div id="ofx-step1">
+        <div style="background:var(--surface2);border:2px dashed var(--line2);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:.2s" id="ofx-dropzone" onclick="document.getElementById('ofx-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--green)'" ondragleave="this.style.borderColor='var(--line2)'" ondrop="ofxHandleDrop(event)">
+          <div style="font-size:36px;margin-bottom:10px">📂</div>
+          <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px">Arraste o arquivo OFX aqui ou clique para selecionar</div>
+          <div style="font-size:11px;color:var(--t3)">Formatos aceitos: .ofx, .qfx — gerados pelo internet banking da maioria dos bancos</div>
+          <input type="file" id="ofx-file-input" accept=".ofx,.qfx,.OFX,.QFX" style="display:none" onchange="ofxHandleFile(this.files[0])">
+        </div>
+        <div style="margin-top:12px;background:var(--surface2);border-radius:var(--r2);padding:12px 16px;font-size:11px;color:var(--t3)">
+          💡 <strong style="color:var(--t2)">Como exportar OFX:</strong> Acesse seu banco → Extrato → Exportar/Baixar → selecione formato OFX ou OFC. Disponível na maioria dos bancos brasileiros (Nubank, Itaú, Bradesco, Santander, BB, Caixa, Inter).
+        </div>
+      </div>
+
+      <!-- Passo 2: Resultado da leitura + conciliação -->
+      <div id="ofx-step2" style="display:none">
+        <!-- Header com resumo -->
+        <div id="ofx-resumo" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px"></div>
+
+        <!-- Seleção de conta destino -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;background:var(--surface2);border-radius:var(--r2);padding:12px 14px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <label style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap">Conta destino:</label>
+          <select id="ofx-conta-sel" style="flex:1;background:var(--surface3);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif"></select>
+        </div>
+
+        <!-- Tabela de transações -->
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px" id="ofx-info-line"></div>
+        <div class="tbl-wrap" style="max-height:340px;overflow-y:auto">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:32px"><input type="checkbox" id="ofx-check-all" onchange="ofxToggleAll(this.checked)" title="Selecionar todos"></th>
+                <th>Data</th><th>Descrição OFX</th><th>Valor</th><th>Status</th><th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="ofx-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft" id="ofx-footer" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="closeM('m-ofx')">Fechar</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" id="ofx-btn-voltar" onclick="ofxVoltarStep1()" style="display:none">← Voltar</button>
+        <button class="btn btn-green" id="ofx-btn-importar" onclick="ofxImportar()" style="display:none">✓ Importar Selecionados</button>
+      </div>
     </div>
   </div>
 </div>
@@ -6724,6 +6797,242 @@ function kbDrop(e,col){
   if(!_kbDragId) return;
   const cards=kbData(); const c=cards.find(x=>x.id===_kbDragId); if(c) c.col=col;
   kbSave(cards); renderKanban();
+}
+
+// ══════════════════════════════════════════════
+// OFX CONCILIAÇÃO BANCÁRIA
+// ══════════════════════════════════════════════
+
+let _ofxTransacoes = []; // transações lidas do arquivo
+let _ofxBancoId   = null;
+
+function openOfxImport(){
+  _ofxTransacoes = [];
+  _ofxBancoId = null;
+  ofxVoltarStep1();
+  // pré-seleciona conta ativa no dropdown
+  const d = gs();
+  const sel = document.getElementById('ofx-conta-sel');
+  if(sel){
+    sel.innerHTML = (d.bancos||[]).map(b=>`<option value="${b.id}">${b.nome} — ${b.banco}</option>`).join('');
+    if(_bkSel) sel.value=_bkSel;
+    _ofxBancoId = sel.value || (d.bancos[0]?.id||null);
+    sel.onchange = ()=>{ _ofxBancoId=sel.value; ofxRenderTabela(); };
+  }
+  document.getElementById('m-ofx').style.display='flex';
+}
+
+function ofxVoltarStep1(){
+  document.getElementById('ofx-step1').style.display='block';
+  document.getElementById('ofx-step2').style.display='none';
+  document.getElementById('ofx-btn-voltar').style.display='none';
+  document.getElementById('ofx-btn-importar').style.display='none';
+  const inp = document.getElementById('ofx-file-input');
+  if(inp) inp.value='';
+  const dz = document.getElementById('ofx-dropzone');
+  if(dz) dz.style.borderColor='var(--line2)';
+}
+
+function ofxHandleDrop(e){
+  e.preventDefault();
+  document.getElementById('ofx-dropzone').style.borderColor='var(--line2)';
+  const file = e.dataTransfer?.files?.[0];
+  if(file) ofxHandleFile(file);
+}
+
+function ofxHandleFile(file){
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(!['ofx','qfx'].includes(ext)){
+    alert('Formato inválido. Use arquivos .ofx ou .qfx.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      _ofxTransacoes = ofxParse(e.target.result);
+      if(!_ofxTransacoes.length){ alert('Nenhuma transação encontrada no arquivo OFX.'); return; }
+      document.getElementById('ofx-step1').style.display='none';
+      document.getElementById('ofx-step2').style.display='block';
+      document.getElementById('ofx-btn-voltar').style.display='inline-flex';
+      document.getElementById('ofx-btn-importar').style.display='inline-flex';
+      document.getElementById('m-ofx-titulo').textContent=`Conciliação Bancária — ${file.name}`;
+      const d = gs();
+      const sel = document.getElementById('ofx-conta-sel');
+      sel.innerHTML = (d.bancos||[]).map(b=>`<option value="${b.id}">${b.nome} — ${b.banco}</option>`).join('');
+      if(_bkSel) sel.value=_bkSel;
+      _ofxBancoId = sel.value || d.bancos[0]?.id||null;
+      sel.onchange = ()=>{ _ofxBancoId=sel.value; ofxRenderTabela(); };
+      ofxRenderTabela();
+    } catch(err){ alert('Erro ao ler o arquivo OFX: '+err.message); }
+  };
+  reader.readAsText(file, 'latin1');
+}
+
+// ── Parser OFX (suporta SGML e XML) ──
+function ofxParse(text){
+  const transacoes = [];
+
+  // Tenta encontrar bloco BANKTRANLIST
+  const blocoMatch = text.match(/<BANKTRANLIST[\s\S]*?<\/BANKTRANLIST>/i)
+    || text.match(/BANKTRANLIST([\s\S]*?)\/BANKTRANLIST/i);
+
+  let bloco = blocoMatch ? blocoMatch[0] : text;
+
+  // Extrai todas as transações STMTTRN
+  const stmtRe = /<STMTTRN>([\s\S]*?)<\/STMTTRN>/gi;
+  const stmtReOld = /STMTTRN([\s\S]*?)\/STMTTRN/gi;
+
+  let matches = [...bloco.matchAll(stmtRe)];
+  if(!matches.length) matches = [...bloco.matchAll(stmtReOld)];
+
+  for(const m of matches){
+    const body = m[1];
+    const get  = (tag) => {
+      const r = body.match(new RegExp(`<${tag}>([^<\r\n]+)`, 'i'))
+             || body.match(new RegExp(`${tag}:([^\r\n<]+)`, 'i'));
+      return r ? r[1].trim() : '';
+    };
+    const tipo  = get('TRNTYPE');
+    const dtRaw = get('DTPOSTED');
+    const val   = parseFloat((get('TRNAMT')||get('TRNVAL')||'0').replace(',','.'));
+    const memo  = get('MEMO') || get('NAME') || get('CHECKNUM') || 'Sem descrição';
+    const fitid = get('FITID');
+
+    // Formata data: YYYYMMDDHHMMSS → YYYY-MM-DD
+    let data = '';
+    if(dtRaw.length >= 8){
+      data = `${dtRaw.slice(0,4)}-${dtRaw.slice(4,6)}-${dtRaw.slice(6,8)}`;
+    }
+
+    if(!data || isNaN(val)) continue;
+    transacoes.push({ tipo, data, val: Math.abs(val), sinal: val, memo, fitid, _sel: true });
+  }
+
+  return transacoes.sort((a,b)=>a.data.localeCompare(b.data));
+}
+
+// ── Render tabela de conciliação ──
+function ofxRenderTabela(){
+  const d = gs();
+  const banco = (d.bancos||[]).find(b=>b.id===_ofxBancoId);
+  const movsExist = new Set((banco?.movs||[]).map(m=>`${m.data}|${Math.abs(m.val)}`));
+  const lancsExist = new Set(
+    d.lancs.filter(l=>l.status!=='cancelado').map(l=>`${l.data}|${Math.abs(l.valor)}`)
+  );
+
+  let novos=0, dup=0, conc=0;
+
+  const rows = _ofxTransacoes.map((t,i)=>{
+    // Detecta duplicata pelo par data+valor
+    const chave = `${t.data}|${t.val}`;
+    const isDup = movsExist.has(chave);
+    const isConc = !isDup && lancsExist.has(chave);
+
+    if(isDup) dup++;
+    else if(isConc) conc++;
+    else novos++;
+
+    const statusLabel = isDup
+      ? '<span class="ofx-status-badge duplicado">⚠ Já importado</span>'
+      : isConc
+        ? '<span class="ofx-status-badge conciliado">🔗 Lançamento existe</span>'
+        : '<span class="ofx-status-badge novo">✚ Novo</span>';
+
+    const tipo = t.sinal >= 0 ? 'entrada' : 'saida';
+    const cor  = tipo==='entrada' ? 'var(--green)' : 'var(--red)';
+    const sinal= tipo==='entrada' ? '+' : '-';
+    const rowCls = isDup ? 'ofx-row-dup' : '';
+
+    return `<tr class="${rowCls}" data-idx="${i}">
+      <td><input type="checkbox" ${t._sel&&!isDup?'checked':''} ${isDup?'disabled':''} onchange="_ofxTransacoes[${i}]._sel=this.checked"></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${t.data}</td>
+      <td style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(t.memo)}">${escH(t.memo)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:${cor};white-space:nowrap">${sinal}${fmtR(t.val)}</td>
+      <td>${statusLabel}</td>
+      <td style="font-size:10px;color:var(--t3)">${t.tipo||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('ofx-tbody').innerHTML = rows || '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Nenhuma transação</td></tr>';
+  document.getElementById('ofx-check-all').checked = true;
+
+  const total = _ofxTransacoes.length;
+  document.getElementById('ofx-info-line').textContent =
+    `${total} transações lidas · ${novos} novas · ${conc} conciliadas · ${dup} duplicadas`;
+
+  document.getElementById('ofx-resumo').innerHTML = `
+    <div class="ofx-kpi"><div class="ofx-kpi-val" style="color:var(--t1)">${total}</div><div class="ofx-kpi-label">Total OFX</div></div>
+    <div class="ofx-kpi"><div class="ofx-kpi-val" style="color:var(--green)">${novos}</div><div class="ofx-kpi-label">Novas</div></div>
+    <div class="ofx-kpi"><div class="ofx-kpi-val" style="color:var(--blue)">${conc}</div><div class="ofx-kpi-label">Conciliadas</div></div>
+    <div class="ofx-kpi"><div class="ofx-kpi-val" style="color:var(--amber)">${dup}</div><div class="ofx-kpi-label">Duplicadas</div></div>
+  `;
+}
+
+function ofxToggleAll(checked){
+  _ofxTransacoes.forEach((t,i)=>{
+    const row = document.querySelector(`#ofx-tbody tr[data-idx="${i}"]`);
+    const cb  = row?.querySelector('input[type=checkbox]');
+    if(cb && !cb.disabled){ cb.checked=checked; t._sel=checked; }
+  });
+}
+
+// ── Importar selecionados ──
+function ofxImportar(){
+  if(!_ofxBancoId){ alert('Selecione a conta destino.'); return; }
+  const d = gs();
+  const banco = (d.bancos||[]).find(b=>b.id===_ofxBancoId);
+  if(!banco){ alert('Conta não encontrada.'); return; }
+
+  const selecionadas = _ofxTransacoes.filter(t=>t._sel);
+  if(!selecionadas.length){ alert('Selecione ao menos uma transação.'); return; }
+
+  // Verifica duplicatas novamente antes de importar
+  const movsExist = new Set((banco.movs||[]).map(m=>`${m.data}|${Math.abs(m.val)}`));
+  let importadas = 0, ignoradas = 0;
+
+  selecionadas.forEach(t=>{
+    const chave = `${t.data}|${t.val}`;
+    if(movsExist.has(chave)){ ignoradas++; return; }
+
+    const tipo = t.sinal >= 0 ? 'entrada' : 'saida';
+    const cat  = tipo==='entrada' ? 'Receitas' : 'Outras Despesas';
+
+    // Cria movimento bancário
+    const mov = {
+      id: uid(), data: t.data, val: t.val,
+      desc: t.memo, cat, tipo,
+      forma: 'OFX', ts: Date.now(), fitid: t.fitid||''
+    };
+    banco.movs = banco.movs || [];
+    banco.movs.push(mov);
+
+    // Cria lançamento vinculado
+    const lanc = {
+      id: uid(), data: t.data,
+      tipo: tipo==='entrada' ? 'Receita' : 'Despesa',
+      cat, subcat: 'Importado OFX',
+      desc: t.memo.length > 60 ? t.memo.slice(0,60)+'…' : t.memo,
+      valor: t.val,
+      caixaId: banco.id, caixaNome: banco.nome,
+      pago: 'Pago', obs: `OFX FITID:${t.fitid||'—'}`,
+      ts: Date.now(), status: 'ativo', origem: 'ofx',
+      refMovId: mov.id
+    };
+    mov.refLancId = lanc.id;
+    d.lancs.push(lanc);
+    importadas++;
+    movsExist.add(chave); // evita dupla no mesmo lote
+  });
+
+  ss(d);
+  closeM('m-ofx');
+  refreshAll();
+
+  const msg = importadas > 0
+    ? `✅ ${importadas} transação(ões) importada(s) com sucesso!${ignoradas>0?`\n⚠ ${ignoradas} ignorada(s) por duplicidade.`:''}`
+    : `⚠ Nenhuma transação importada (${ignoradas} já existiam).`;
+  alert(msg);
 }
 
 </script>
