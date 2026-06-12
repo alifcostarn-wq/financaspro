@@ -3721,6 +3721,9 @@ function renderDREDiario(d, ativos) {
   const ml  = ativos.filter(l => getMes(l.data) === mes);
   document.getElementById('dre-d-titulo').textContent = `${MESES[mes]} ${ano} — Fluxo de Caixa Diário`;
 
+  // Índice rápido de lançamentos ativos (não cancelados) para filtrar movs bancários
+  const lancAtivosIds = new Set(d.lancs.filter(l => l.status !== 'cancelado').map(l => l.id));
+
   const diasNoMes = new Date(ano, mes + 1, 0).getDate();
   const dias = [];
   let acum = 0;
@@ -3732,11 +3735,13 @@ function renderDREDiario(d, ativos) {
     const de = dl.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
     const i  = dl.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
 
-    // Movimentações bancárias do dia
+    // Movimentações bancárias do dia — exclui movs vinculados a lançamentos cancelados/excluídos
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
       (b.movs || []).forEach(m => {
         if (m.data !== dataStr) return;
+        // Se o mov é originado de um lançamento, verificar se ele ainda está ativo
+        if (m.refLancId && !lancAtivosIds.has(m.refLancId)) return;
         if (m.tipo === 'entrada' && !m.cat?.includes('Transferência')) bkEnt += m.val;
         if (m.tipo === 'saida'   && !m.cat?.includes('Transferência')) bkSai += m.val;
       });
