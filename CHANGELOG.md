@@ -4,6 +4,92 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Contas a Pagar: recorrência funcional e módulo reconstruído
+
+### 🐛 Problema relatado
+
+As **funções de recorrência não funcionavam**. O campo "Recorrência" (Única / Mensal / Anual)
+era gravado na conta, mas **nada no sistema o utilizava**: nenhuma conta futura era criada.
+Na prática o campo era decorativo. Pior, quando a conta era parcelada o sistema sobrescrevia
+a escolha do usuário (`rec: parc>1 ? 'Mensal' : rec`), confundindo dois conceitos diferentes:
+
+- **Parcelamento** — um valor total dividido em N parcelas (R$ 1.200 em 12x de R$ 100);
+- **Recorrência** — a mesma despesa que se repete indefinidamente (aluguel de R$ 1.500/mês).
+
+### ✅ Corrigido
+
+**Recorrência de verdade**
+- Contas recorrentes agora **geram as próximas ocorrências automaticamente**, mantendo sempre
+  os **12 meses à frente** preenchidos. A geração roda ao abrir o sistema e ao entrar na aba.
+- Periodicidades: **Semanal, Quinzenal, Mensal, Bimestral, Trimestral, Semestral e Anual**.
+- **Término configurável**: sem data final, até uma data, ou após N ocorrências.
+- **Encerrar recorrência**: para de gerar novas e remove as futuras em aberto, preservando
+  todo o histórico já pago.
+- Ocorrências excluídas manualmente **não são recriadas**.
+- Editar uma ocorrência permite escolher o escopo: **somente esta** ou **esta e as próximas**
+  (as já pagas nunca são alteradas). Novas ocorrências herdam o valor atualizado.
+
+**Datas de vencimento (bug que afetava também os parcelamentos)**
+- A soma de meses estourava o fim do mês: **31/01 + 1 mês virava 03/03**, pulando fevereiro.
+  Um parcelamento em 3x a partir de 31/01 gerava 31/01, 03/03 e 31/03 — fevereiro sem parcela e
+  março com duas. Agora o dia é preservado e, quando não existe no mês de destino, usa o último
+  dia dele: **31/01 → 28/02 → 31/03**.
+
+**Status das contas**
+- Uma conta que vencia **hoje** era marcada como **Vencida** (a comparação usava a hora atual
+  contra a meia-noite do vencimento). A mesma linha exibia "Vence hoje" e o selo "Vencida".
+  Agora o status é derivado por data: vence hoje = **Pendente**.
+- A mesma correção foi aplicada aos alertas do Dashboard, ao painel "O que fazer agora" e às
+  parcelas de dívidas.
+
+**Pagamento**
+- Antes o botão "Pagar" quitava a conta com a data de hoje, valor cheio e **sem conta bancária**.
+  Agora abre um modal onde se informa **data do pagamento, valor pago e conta bancária**, com
+  aviso automático de **juros/multa ou desconto** quando o valor difere do previsto.
+- O lançamento gerado passa a usar o valor efetivamente pago, herda a **subcategoria** e fica
+  **vinculado à conta bancária** (antes ficava sem caixa, distorcendo o saldo por conta).
+- Novo botão **desfazer pagamento**: a conta volta a Pendente e o lançamento (com a
+  movimentação bancária) é removido.
+
+**Edição e exclusão**
+- Voltar uma conta de **Pago para Pendente deixava o lançamento de despesa ativo** — o dinheiro
+  continuava debitado. Agora o lançamento e a movimentação são removidos junto.
+- A exclusão usava dois `confirm()` encadeados **sem opção de cancelar**. Agora há um modal
+  com as opções corretas conforme o caso: somente esta conta, todo o parcelamento, ou encerrar
+  a recorrência.
+
+### ✨ Melhorado
+
+- **Modal reorganizado** com escolha explícita do tipo — Única / Parcelada / Recorrente — e
+  campos que mudam conforme a escolha (nada de campo que não se aplica).
+- **Prévia antes de salvar**: quantas contas serão criadas, de que valor, em que datas e o
+  total do compromisso.
+- **Validação inline** no lugar de `alert()`, apontando os campos que faltam.
+- **KPIs**: "Vencidas" passou a mostrar o **valor** em atraso (antes só a quantidade) e foi
+  adicionado **"Vence em 7 dias"**.
+- **Filtros** por categoria e **busca por texto**, somados aos de ano, mês e status.
+- **Tabela**: selo de recorrência com a periodicidade, destaque das contas de série, conta
+  bancária usada no pagamento e o valor previsto quando o pago foi diferente.
+- **Badge do menu lateral** passou a contar apenas o que exige ação (vencidas + a vencer em 7
+  dias). Com recorrências geradas para 12 meses, contar tudo inflava o número sem motivo.
+
+### 🧪 Verificação
+
+**37 verificações automatizadas** no app real cobrindo: datas de fim de mês, geração das
+ocorrências (mensal, semanal, com término por data e por quantidade), não duplicação ao rodar
+novamente, parcelamento com fechamento exato de centavos, status de contas que vencem hoje,
+pagamento com juros e vínculo bancário, desfazer pagamento, edição com escopo, encerramento de
+recorrência, exclusões por escopo, filtros e busca. As suítes anteriores (saldo, fluxo e
+invariante DRE) continuam passando: **19/19**, **10/10** e **24/24**.
+
+### ℹ️ Observações
+
+- Contas já cadastradas continuam funcionando normalmente. O campo "Recorrência" antigo não
+  gerava nada, então nenhuma conta existente passa a se multiplicar sozinha — para ativar,
+  basta cadastrar a conta como **Recorrente**.
+
+---
+
 ## [2026-09-18] Correção dos cálculos de saldo, DRE, faturas e parcelamentos
 
 ### 🐛 Problema relatado

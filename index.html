@@ -589,6 +589,19 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #m-kanban .kb-type-btn.t-note.active{color:var(--blue)}
 #m-kanban .kb-type-btn.t-reminder.active{color:var(--amber)}
 #m-kanban .kb-type-btn.t-todo.active{color:var(--green)}
+
+/* ── CONTAS A PAGAR ── */
+#m-conta .cp-tipo-row{display:flex;gap:8px;margin-bottom:16px}
+#m-conta .cp-tipo-btn{flex:1;padding:10px 8px;border:1px solid var(--line2);border-radius:var(--r2);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;text-align:center;line-height:1.35}
+#m-conta .cp-tipo-btn small{display:block;font-size:9px;font-weight:500;color:var(--t3);margin-top:2px}
+#m-conta .cp-tipo-btn:hover{border-color:var(--line2);color:var(--t1)}
+#m-conta .cp-tipo-btn.active{border-color:var(--green);background:var(--green-dim);color:var(--green)}
+#m-conta .cp-tipo-btn.active small{color:var(--green);opacity:.75}
+#m-conta .cp-escopo{display:flex;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:4px;margin-bottom:14px}
+#m-conta .cp-escopo button{flex:1;padding:6px;border:none;border-radius:5px;background:transparent;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+#m-conta .cp-escopo button.active{background:var(--surface4);color:var(--t1)}
+.cp-rec-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--cyan-dim);color:var(--cyan);border:1px solid #22d3ee33;white-space:nowrap}
+#page-contas .cp-serie-row td{background:linear-gradient(90deg,var(--cyan-dim),transparent 40%)}
 </style>
 </head>
 <body>
@@ -1378,11 +1391,12 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="topbar-left"><h1>Contas a Pagar</h1><p>Vencimentos, pagamentos e situação</p></div>
     <div class="topbar-right"><button class="btn btn-green" onclick="openM('m-conta')">+ Nova Conta</button></div>
   </div>
-  <div class="kpi-grid cols4">
-    <div class="kpi r"><div class="kpi-label">Total do Mês</div><div class="kpi-val r" id="ck-total">R$ 0</div></div>
-    <div class="kpi a"><div class="kpi-label">Pendente</div><div class="kpi-val a" id="ck-pend">R$ 0</div></div>
+  <div class="kpi-grid cols5">
+    <div class="kpi r"><div class="kpi-label">Total do Período</div><div class="kpi-val r" id="ck-total">R$ 0</div></div>
+    <div class="kpi a"><div class="kpi-label">Em Aberto</div><div class="kpi-val a" id="ck-pend">R$ 0</div></div>
     <div class="kpi g"><div class="kpi-label">Pago</div><div class="kpi-val g" id="ck-pago">R$ 0</div></div>
-    <div class="kpi r"><div class="kpi-label">Vencidas</div><div class="kpi-val r" id="ck-venc">0</div></div>
+    <div class="kpi r"><div class="kpi-label">Vencidas</div><div class="kpi-val r" id="ck-venc">R$ 0</div><div class="kpi-sub" id="ck-venc-sub">nenhuma em atraso</div></div>
+    <div class="kpi b"><div class="kpi-label">Vence em 7 dias</div><div class="kpi-val b" id="ck-7d">R$ 0</div><div class="kpi-sub" id="ck-7d-sub">nada a vencer</div></div>
   </div>
 
   <!-- KPI lembrete do dia -->
@@ -1427,6 +1441,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <select id="cp-fil-st" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os status</option><option>Pendente</option><option>Pago</option><option>Vencida</option>
         </select>
+        <select id="cp-fil-cat" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
+        <input id="cp-busca" type="text" placeholder="Buscar…" oninput="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
       </div>
     </div>
     <div class="tbl-wrap">
@@ -2174,12 +2190,35 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
 <!-- Modal: Conta a Pagar -->
 <div class="overlay" id="m-conta" style="display:none" onclick="cmoOut(event,'m-conta')">
-  <div class="modal" style="max-width:580px" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2 id="m-conta-titulo">Nova Conta a Pagar</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-conta')">✕</button></div>
+  <div class="modal" style="max-width:600px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <h2 id="m-conta-titulo">Nova Conta a Pagar</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="m-conta-sub">Conta única, parcelada ou recorrente</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-conta')">✕</button>
+    </div>
     <div class="modal-bd">
       <input type="hidden" id="cp-edit-id">
+      <input type="hidden" id="cp-tipo" value="unica">
+      <input type="hidden" id="cp-escopo" value="uma">
+      <div id="cp-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
+
+      <!-- Tipo de conta -->
+      <div class="cp-tipo-row" id="cp-tipo-row">
+        <button class="cp-tipo-btn active" id="cpt-unica" onclick="setCpTipo('unica')">📄 Única<small>um vencimento</small></button>
+        <button class="cp-tipo-btn" id="cpt-parcelada" onclick="setCpTipo('parcelada')">🧾 Parcelada<small>total dividido em N</small></button>
+        <button class="cp-tipo-btn" id="cpt-recorrente" onclick="setCpTipo('recorrente')">🔁 Recorrente<small>repete sempre</small></button>
+      </div>
+
+      <!-- Escopo da edição (só aparece ao editar uma ocorrência de série) -->
+      <div class="cp-escopo" id="cp-escopo-row" style="display:none">
+        <button id="cpe-uma" class="active" onclick="setCpEscopo('uma')">Somente esta conta</button>
+        <button id="cpe-futuras" onclick="setCpEscopo('futuras')">Esta e as próximas</button>
+      </div>
+
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Descrição *</label><input type="text" id="cp-desc" placeholder="Ex: Aluguel de junho"></div>
+        <div class="fg"><label>Descrição *</label><input type="text" id="cp-desc" placeholder="Ex: Aluguel"></div>
         <div class="fg"><label>Categoria</label>
           <select id="cp-cat" onchange="updCpSubcat()">
             <option>Moradia</option><option>Alimentação</option><option>Transporte</option><option>Saúde</option>
@@ -2192,11 +2231,16 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Subcategoria</label><select id="cp-subcat"></select></div>
         <div class="fg"><label>Observação</label><input type="text" id="cp-obs" placeholder="Opcional"></div>
       </div>
+
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Valor Total *</label><input type="number" id="cp-val" step="0.01" min="0" placeholder="0,00" oninput="calcParcelaConta()"></div>
-        <div class="fg"><label>Número de Parcelas</label>
-          <select id="cp-parc" onchange="calcParcelaConta()">
-            <option value="1">À vista (1x)</option>
+        <div class="fg">
+          <label id="cp-val-label">Valor *</label>
+          <input type="number" id="cp-val" step="0.01" min="0" placeholder="0,00" oninput="updCpPreview()">
+        </div>
+        <!-- Parcelada -->
+        <div class="fg" id="cp-parc-wrap" style="display:none">
+          <label>Número de Parcelas</label>
+          <select id="cp-parc" onchange="updCpPreview()">
             <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
             <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
             <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
@@ -2205,38 +2249,125 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="60">60x</option>
           </select>
         </div>
-      </div>
-      <!-- Preview de parcela -->
-      <div id="cp-parc-preview" style="display:none;background:var(--surface2);border-radius:var(--r2);padding:12px;margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-          <span style="font-size:12px;color:var(--t2)">Valor por parcela</span>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--green)" id="cp-val-parcela">R$ 0,00</span>
+        <!-- Recorrente -->
+        <div class="fg" id="cp-periodo-wrap" style="display:none">
+          <label>Periodicidade</label>
+          <select id="cp-periodicidade" onchange="updCpPreview()">
+            <option value="Semanal">Semanal</option>
+            <option value="Quinzenal">Quinzenal</option>
+            <option value="Mensal" selected>Mensal</option>
+            <option value="Bimestral">Bimestral</option>
+            <option value="Trimestral">Trimestral</option>
+            <option value="Semestral">Semestral</option>
+            <option value="Anual">Anual</option>
+          </select>
         </div>
       </div>
+
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>1º Vencimento *</label><input type="date" id="cp-venc" onchange="calcParcelaConta()"></div>
-        <div class="fg"><label>Recorrência</label>
-          <select id="cp-rec"><option>Única</option><option>Mensal</option><option>Anual</option></select>
+        <div class="fg"><label id="cp-venc-label">Vencimento *</label><input type="date" id="cp-venc" onchange="updCpPreview()"></div>
+        <div class="fg" id="cp-fim-wrap" style="display:none">
+          <label>Até quando repetir</label>
+          <select id="cp-fim-tipo" onchange="updCpFim();updCpPreview()">
+            <option value="nunca">Sem data de término</option>
+            <option value="ate">Até uma data</option>
+            <option value="qtd">Após N ocorrências</option>
+          </select>
         </div>
       </div>
+
+      <div class="form-grid cols2" id="cp-fim-campos" style="display:none;margin-bottom:12px">
+        <div class="fg" id="cp-fim-data-wrap" style="display:none"><label>Repetir até</label><input type="date" id="cp-fim-data" onchange="updCpPreview()"></div>
+        <div class="fg" id="cp-fim-qtd-wrap" style="display:none"><label>Nº de ocorrências</label><input type="number" id="cp-fim-qtd" min="1" step="1" placeholder="Ex: 12" oninput="updCpPreview()"></div>
+      </div>
+
+      <!-- Prévia do que será criado -->
+      <div id="cp-preview" style="background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prévia</div>
+        <div id="cp-preview-body" style="font-size:12px;color:var(--t2)">—</div>
+      </div>
+
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Data de Pagamento (1ª parcela)</label><input type="date" id="cp-data-pg"></div>
-        <div class="fg"><label>Status (1ª parcela)</label>
+        <div class="fg"><label id="cp-st-label">Status</label>
           <select id="cp-st" onchange="toggleCpCaixa()"><option>Pendente</option><option>Pago</option></select>
         </div>
+        <div class="fg" id="cp-data-pg-wrap" style="display:none"><label>Data de Pagamento</label><input type="date" id="cp-data-pg"></div>
       </div>
-      <!-- Campo conta bancária — aparece só quando Pago -->
+
       <div id="cp-caixa-wrap" style="display:none;margin-bottom:12px">
         <div class="fg"><label>Conta Bancária (débito)</label>
-          <select id="cp-caixa">
-            <option value="">— Sem vínculo de caixa —</option>
-          </select>
+          <select id="cp-caixa"><option value="">— Sem vínculo de caixa —</option></select>
         </div>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-conta')">Cancelar</button>
       <button class="btn btn-green" id="btn-salvar-conta" onclick="saveConta()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Registrar pagamento de conta -->
+<div class="overlay" id="m-pagar" style="display:none" onclick="cmoOut(event,'m-pagar')">
+  <div class="modal" style="max-width:460px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <h2>Registrar Pagamento</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="pg-sub">—</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-pagar')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="pg-conta-id">
+      <div style="background:var(--surface2);border-radius:var(--r2);padding:14px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;color:var(--t1)" id="pg-desc">—</div>
+        <div style="display:flex;gap:14px;margin-top:8px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--t3)">Vence em <span id="pg-venc" style="color:var(--t2)">—</span></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--amber)" id="pg-valor-orig">—</span>
+        </div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Data do pagamento *</label><input type="date" id="pg-data"></div>
+        <div class="fg"><label>Valor pago *</label><input type="number" id="pg-valor" step="0.01" min="0" oninput="updPgDif()"></div>
+      </div>
+      <div id="pg-dif" style="display:none;font-size:11px;margin-bottom:12px"></div>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="fg"><label>Conta bancária (débito)</label>
+          <select id="pg-caixa"><option value="">— Sem vínculo de caixa —</option></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fg"><label>Observação</label><input type="text" id="pg-obs" placeholder="Ex: pago com juros"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-pagar')">Cancelar</button>
+      <button class="btn btn-green" onclick="confirmarPagamento()">✓ Confirmar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Excluir conta (com opções de série/parcelamento) -->
+<div class="overlay" id="m-del-conta" style="display:none" onclick="cmoOut(event,'m-del-conta')">
+  <div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h2 style="color:var(--red)">Excluir Conta</h2>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-del-conta')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="del-conta-id">
+      <div style="background:var(--surface2);border-radius:var(--r2);padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--t1)" id="del-conta-desc">—</div>
+        <div style="display:flex;gap:14px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--t3)" id="del-conta-venc">—</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)" id="del-conta-valor">—</span>
+        </div>
+      </div>
+      <div id="del-conta-aviso" style="font-size:12px;color:var(--t2);margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px" id="del-conta-opcoes"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-del-conta')" style="flex:1;justify-content:center">Cancelar</button>
     </div>
   </div>
 </div>
@@ -2772,22 +2903,33 @@ function openM(id){
     if(errLanc) errLanc.style.display='none';
   }
   if(id==='m-conta'){
-    document.getElementById('cp-edit-id').value='';
-    document.getElementById('m-conta-titulo').textContent='Nova Conta a Pagar';
-    document.getElementById('btn-salvar-conta').textContent='Salvar';
-    document.getElementById('cp-venc').value=today();
-    document.getElementById('cp-val').value='';
-    document.getElementById('cp-desc').value='';
-    document.getElementById('cp-obs').value='';
-    document.getElementById('cp-parc').value='1';
-    document.getElementById('cp-st').value='Pendente';
-    document.getElementById('cp-data-pg').value='';
-    const caiWrap=document.getElementById('cp-caixa-wrap');
-    if(caiWrap) caiWrap.style.display='none';
+    const $ = x => document.getElementById(x);
+    $('cp-edit-id').value = '';
+    $('m-conta-titulo').textContent = 'Nova Conta a Pagar';
+    $('m-conta-sub').textContent    = 'Conta única, parcelada ou recorrente';
+    $('btn-salvar-conta').textContent = 'Salvar';
+    $('cp-tipo-row').style.display   = 'flex';
+    $('cp-escopo-row').style.display = 'none';
+    $('cp-venc').value = today();
+    $('cp-val').value  = '';
+    $('cp-desc').value = '';
+    $('cp-obs').value  = '';
+    $('cp-parc').value = '2';
+    $('cp-periodicidade').value = 'Mensal';
+    $('cp-fim-tipo').value = 'nunca';
+    $('cp-fim-data').value = '';
+    $('cp-fim-qtd').value  = '';
+    $('cp-st').value = 'Pendente';
+    $('cp-data-pg').value = '';
+    $('cp-cat').selectedIndex = 0;
+    const err = $('cp-err'); if(err) err.style.display = 'none';
     popCaixas('cp-caixa');
-    calcParcelaConta();
     updCpSubcat();
+    setCpTipo('unica');
+    setCpEscopo('uma');
+    toggleCpCaixa();
   }
+  if(id==='m-pagar'){ popCaixas('pg-caixa'); }
   if(id==='m-orc'){
     document.getElementById('o-mes').value=_orcMes;
     document.getElementById('o-edit-id').value='';
@@ -2811,10 +2953,18 @@ function updSbSaldo(){
   const d = gs();
   const saldo = calcSaldoAte(today(), { somentePagos:true });
   setC('sb-saldo-val', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
-  const pend = d.contas.filter(c => c.status !== 'Pago').length;
+  // Conta o que realmente exige ação: vencidas + a vencer nos próximos 7 dias
+  const pend = d.contas.filter(c => {
+    if(statusConta(c) === 'Pago') return false;
+    const dd = diasAte(c.venc);
+    return dd !== null && dd <= 7;
+  }).length;
   set('pill-contas', pend || '');
   const pill = document.getElementById('pill-contas');
-  if(pill) pill.style.display = pend ? 'inline' : 'none';
+  if(pill){
+    pill.style.display = pend ? 'inline' : 'none';
+    pill.title = 'Contas vencidas ou a vencer em at\u00e9 7 dias';
+  }
   // Badge da navegação inferior (mobile)
   const bnPill = document.getElementById('bn-pill-contas');
   if(bnPill){
@@ -2953,7 +3103,7 @@ function renderDash(){
   set('dk-sal-sub', salAnt ? `vs ${fmtR(salAnt)} mês ant.` : '');
 
   // ── Contas pendentes ──
-  const pend = d.contas.filter(c => noMesAno(c.venc, mes, ano) && c.status !== 'Pago');
+  const pend = d.contas.filter(c => noMesAno(c.venc, mes, ano) && statusConta(c) !== 'Pago');
   const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes, ano), 0);
   set('dk-pend', pend.length);
   set('dk-pend-v', fmtR(pend.reduce((a,c) => a+c.valor, 0)));
@@ -3182,8 +3332,8 @@ function renderDash(){
 
   // Contas vencendo
   const avencer = d.contas.filter(c => {
-    const dv = new Date(c.venc+'T00:00:00');
-    return dv >= hojeD && dv <= em7 && c.status !== 'Pago';
+    const dd = diasAte(c.venc);
+    return dd !== null && dd >= 0 && dd <= 7 && statusConta(c) !== 'Pago';
   });
   if (avencer.length) alertas.push({ tipo:'a', msg:`⏰ ${avencer.length} conta(s) vencem em 7 dias — ${fmtR(avencer.reduce((a,c)=>a+c.valor,0))}` });
 
@@ -3300,7 +3450,7 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   const acoes = [];
 
   // 1. Contas VENCIDAS
-  const vencidas = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv<hoje && c.status!=='Pago'; });
+  const vencidas = d.contas.filter(c=>statusConta(c)==='Vencida');
   if(vencidas.length){
     const total=vencidas.reduce((a,c)=>a+c.valor,0);
     acoes.push({ nivel:'urgente', icon:'🚨', label:'Ação imediata',
@@ -3312,7 +3462,7 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   }
 
   // 2. Vencendo em até 3 dias
-  const urgentes3 = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv>=hoje && dv<=em3 && c.status!=='Pago'; });
+  const urgentes3 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>=0 && dd<=3 && statusConta(c)!=='Pago'; });
   if(urgentes3.length){
     const total=urgentes3.reduce((a,c)=>a+c.valor,0);
     const nomes=urgentes3.slice(0,2).map(c=>c.desc.length>26?c.desc.slice(0,26)+'…':c.desc).join(', ');
@@ -3325,7 +3475,7 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   }
 
   // 3. Vencendo em 4–7 dias
-  const urgentes7 = d.contas.filter(c=>{ const dv=new Date(c.venc+'T00:00:00'); return dv>em3 && dv<=em7 && c.status!=='Pago'; });
+  const urgentes7 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>3 && dd<=7 && statusConta(c)!=='Pago'; });
   if(urgentes7.length){
     const total=urgentes7.reduce((a,c)=>a+c.valor,0);
     acoes.push({ nivel:'atencao', icon:'📅', label:'Vence esta semana',
@@ -4821,220 +4971,665 @@ document.getElementById('o-val')?.addEventListener('input', updOrcPreview);
 
 // ── CONTAS A PAGAR ──
 // ── Helpers de data para parcelas ──
+// ══════════════════════════════════════════════════════════════
+// ── CONTAS A PAGAR: DATAS, STATUS E RECORRÊNCIA ──
+// ══════════════════════════════════════════════════════════════
+
+// Soma meses preservando o dia; quando o dia não existe no mês de destino,
+// usa o último dia desse mês (31/01 + 1 mês = 28/02, e não 03/03).
 function addMeses(dateStr, n){
-  const d = new Date(dateStr+'T00:00:00');
-  d.setMonth(d.getMonth()+n);
-  return d.toISOString().split('T')[0];
+  const [a, m, dia] = dateStr.split('-').map(Number);
+  const alvo = new Date(a, (m - 1) + n, 1);
+  const ultimo = new Date(alvo.getFullYear(), alvo.getMonth() + 1, 0).getDate();
+  return `${alvo.getFullYear()}-${String(alvo.getMonth()+1).padStart(2,'0')}-${String(Math.min(dia, ultimo)).padStart(2,'0')}`;
+}
+// Soma dias em uma data ISO
+function addDias(dateStr, n){
+  const dt = new Date(dateStr + 'T00:00:00');
+  dt.setDate(dt.getDate() + n);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+// Dias entre hoje e a data (negativo = já passou, 0 = hoje)
+function diasAte(dateStr){
+  if(!dateStr) return null;
+  return Math.round((new Date(dateStr + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 864e5);
+}
+// Status derivado da conta (compara datas, nunca horas: o que vence hoje NÃO está vencido)
+function statusConta(c){
+  if(!c) return 'Pendente';
+  if(c.status === 'Pago' || c.dataPg) return 'Pago';
+  if(c.venc && c.venc < today()) return 'Vencida';
+  return 'Pendente';
 }
 
-function calcParcelaConta(){
-  const val  = parseFloat(document.getElementById('cp-val')?.value)||0;
-  const parc = parseInt(document.getElementById('cp-parc')?.value)||1;
-  const prev = document.getElementById('cp-parc-preview');
-  const elVP = document.getElementById('cp-val-parcela');
-  if(prev) prev.style.display = parc>1 ? 'block' : 'none';
-  if(elVP) elVP.textContent = fmtR(dividirParcelas(val, parc)[0]);
+// Periodicidades disponíveis para contas recorrentes
+const PERIODICIDADES = {
+  'Semanal':    { unidade:'dia', n:7,  label:'Semanal',    curto:'sem' },
+  'Quinzenal':  { unidade:'dia', n:14, label:'Quinzenal',  curto:'15d' },
+  'Mensal':     { unidade:'mes', n:1,  label:'Mensal',     curto:'mês' },
+  'Bimestral':  { unidade:'mes', n:2,  label:'Bimestral',  curto:'2m'  },
+  'Trimestral': { unidade:'mes', n:3,  label:'Trimestral', curto:'3m'  },
+  'Semestral':  { unidade:'mes', n:6,  label:'Semestral',  curto:'6m'  },
+  'Anual':      { unidade:'mes', n:12, label:'Anual',      curto:'ano' },
+};
+
+// Quantos meses de contas futuras o sistema mantém geradas à frente
+const HORIZONTE_REC_MESES = 12;
+
+// Data da n-ésima ocorrência de uma série, contada a partir da âncora
+function dataOcorrencia(ancora, periodicidade, indice){
+  const per = PERIODICIDADES[periodicidade];
+  if(!per) return ancora;
+  return per.unidade === 'mes'
+    ? addMeses(ancora, per.n * indice)
+    : addDias(ancora, per.n * indice);
+}
+
+/**
+ * Gera as próximas ocorrências das contas recorrentes ativas.
+ * Roda ao abrir o sistema e ao entrar na aba Contas a Pagar — mantém sempre
+ * os próximos 12 meses à frente, respeitando o término configurado.
+ * Ocorrências excluídas manualmente não são recriadas (a geração continua
+ * a partir da última ocorrência existente da série).
+ */
+function materializarRecorrencias(d, salvar){
+  d = d || gs();
+  const limite = addMeses(today(), HORIZONTE_REC_MESES);
+  const series = {};
+  (d.contas || []).forEach(c => {
+    if(c.serieId) (series[c.serieId] = series[c.serieId] || []).push(c);
+  });
+
+  let criadas = 0;
+  Object.keys(series).forEach(sid => {
+    const ocor = series[sid];
+    // referência = ocorrência de maior número já existente
+    const ref = ocor.reduce((a, b) => (a.serieNum || 1) >= (b.serieNum || 1) ? a : b);
+    if(ref.recAtiva === false) return;
+    const per = PERIODICIDADES[ref.rec];
+    if(!per) return;
+    const ancora = ref.recAncora || ocor.reduce((a,b)=> a.venc <= b.venc ? a : b).venc;
+    const regra  = ref.recFim || { tipo:'nunca' };
+
+    let indice = ref.serieNum || 1;   // índice 1 = âncora
+    let guarda = 0;
+    while(guarda++ < 400){
+      indice++;
+      if(regra.tipo === 'qtd' && regra.qtd && indice > regra.qtd) break;
+      const venc = dataOcorrencia(ancora, ref.rec, indice - 1);
+      if(regra.tipo === 'ate' && regra.ate && venc > regra.ate) break;
+      if(venc > limite) break;
+      if(ocor.some(c => c.serieNum === indice)) continue;
+      const nova = {
+        id: uid(), venc, valor: ref.valor, desc: ref.desc,
+        cat: ref.cat, subcat: ref.subcat, obs: ref.obs,
+        rec: ref.rec, recAncora: ancora, recFim: regra, recAtiva: true,
+        serieId: sid, serieNum: indice,
+        dataPg: '', status: 'Pendente',
+        parcela: 1, totalParcelas: 1, grupoId: '',
+        caixaId: '', caixaNome: '',
+        ts: Date.now() + criadas
+      };
+      d.contas.push(nova);
+      ocor.push(nova);
+      criadas++;
+    }
+  });
+
+  if(criadas && salvar !== false) ss(d);
+  return criadas;
+}
+
+// Encerra a recorrência: para de gerar novas e remove as futuras ainda não pagas
+function encerrarRecorrencia(serieId, removerFuturas){
+  const d = gs();
+  const hoje = today();
+  (d.contas || []).forEach(c => { if(c.serieId === serieId) c.recAtiva = false; });
+  if(removerFuturas){
+    d.contas = (d.contas || []).filter(c =>
+      !(c.serieId === serieId && statusConta(c) !== 'Pago' && c.venc > hoje));
+  }
+  ss(d);
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── CONTAS A PAGAR ──
+// ══════════════════════════════════════════════════════════════
+
+// ── Modal: tipo (única / parcelada / recorrente) ──
+function setCpTipo(t){
+  document.getElementById('cp-tipo').value = t;
+  ['unica','parcelada','recorrente'].forEach(x => {
+    const btn = document.getElementById('cpt-' + x);
+    if(btn) btn.classList.toggle('active', x === t);
+  });
+  const mostra = (id, ok) => { const e = document.getElementById(id); if(e) e.style.display = ok ? '' : 'none'; };
+  mostra('cp-parc-wrap',    t === 'parcelada');
+  mostra('cp-periodo-wrap', t === 'recorrente');
+  mostra('cp-fim-wrap',     t === 'recorrente');
+  const lblVal  = document.getElementById('cp-val-label');
+  const lblVenc = document.getElementById('cp-venc-label');
+  if(lblVal)  lblVal.textContent  = t === 'parcelada' ? 'Valor Total *' : t === 'recorrente' ? 'Valor de cada conta *' : 'Valor *';
+  if(lblVenc) lblVenc.textContent = t === 'unica' ? 'Vencimento *' : t === 'parcelada' ? '1º Vencimento *' : '1º Vencimento *';
+  const stLbl = document.getElementById('cp-st-label');
+  if(stLbl) stLbl.textContent = t === 'unica' ? 'Status' : 'Status (1ª conta)';
+  updCpFim();
+  updCpPreview();
+}
+
+function setCpEscopo(e){
+  document.getElementById('cp-escopo').value = e;
+  ['uma','futuras'].forEach(x => {
+    const btn = document.getElementById('cpe-' + x);
+    if(btn) btn.classList.toggle('active', x === e);
+  });
+}
+
+function updCpFim(){
+  const tipo = document.getElementById('cp-tipo')?.value;
+  const fim  = document.getElementById('cp-fim-tipo')?.value || 'nunca';
+  const campos = document.getElementById('cp-fim-campos');
+  const wData  = document.getElementById('cp-fim-data-wrap');
+  const wQtd   = document.getElementById('cp-fim-qtd-wrap');
+  const mostrar = tipo === 'recorrente' && fim !== 'nunca';
+  if(campos) campos.style.display = mostrar ? 'grid' : 'none';
+  if(wData)  wData.style.display  = (mostrar && fim === 'ate') ? '' : 'none';
+  if(wQtd)   wQtd.style.display   = (mostrar && fim === 'qtd') ? '' : 'none';
 }
 
 function toggleCpCaixa(){
   const st = document.getElementById('cp-st')?.value;
   const wrap = document.getElementById('cp-caixa-wrap');
-  if(wrap) wrap.style.display = st==='Pago' ? 'block' : 'none';
+  const wpg  = document.getElementById('cp-data-pg-wrap');
+  if(wrap) wrap.style.display = st === 'Pago' ? 'block' : 'none';
+  if(wpg)  wpg.style.display  = st === 'Pago' ? '' : 'none';
+  if(st === 'Pago'){
+    const dp = document.getElementById('cp-data-pg');
+    if(dp && !dp.value) dp.value = today();
+  }
 }
 
+// Prévia do que será criado (quantas contas, valores e datas)
+function updCpPreview(){
+  const el = document.getElementById('cp-preview-body');
+  if(!el) return;
+  const tipo = document.getElementById('cp-tipo')?.value || 'unica';
+  const val  = parseFloat(document.getElementById('cp-val')?.value) || 0;
+  const venc = document.getElementById('cp-venc')?.value || '';
+  const fmtBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
+
+  if(!val || !venc){ el.innerHTML = '<span style="color:var(--t3)">Informe valor e vencimento para ver a prévia.</span>'; return; }
+
+  if(tipo === 'unica'){
+    el.innerHTML = `<strong style="color:var(--t1)">1 conta</strong> de <strong style="color:var(--green)">${fmtR(val)}</strong> vencendo em <strong style="color:var(--t1)">${fmtBR(venc)}</strong>.`;
+    return;
+  }
+
+  if(tipo === 'parcelada'){
+    const n = parseInt(document.getElementById('cp-parc')?.value) || 2;
+    const vals = dividirParcelas(val, n);
+    const ult  = addMeses(venc, n - 1);
+    const dif  = vals[n-1] !== vals[0] ? ` (a última de ${fmtR(vals[n-1])} ajusta os centavos)` : '';
+    el.innerHTML = `<strong style="color:var(--t1)">${n} parcelas</strong> de <strong style="color:var(--green)">${fmtR(vals[0])}</strong>${dif},`
+      + ` de ${fmtBR(venc)} até <strong style="color:var(--t1)">${fmtBR(ult)}</strong>.`
+      + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Total: ${fmtR(val)} — cada parcela vira uma conta própria.</div>`;
+    return;
+  }
+
+  // recorrente
+  const per     = document.getElementById('cp-periodicidade')?.value || 'Mensal';
+  const fimTipo = document.getElementById('cp-fim-tipo')?.value || 'nunca';
+  const fimAte  = document.getElementById('cp-fim-data')?.value || '';
+  const fimQtd  = parseInt(document.getElementById('cp-fim-qtd')?.value) || 0;
+  const proximas = [];
+  for(let i = 0; i < 3; i++){
+    if(fimTipo === 'qtd' && fimQtd && i + 1 > fimQtd) break;
+    const dt = dataOcorrencia(venc, per, i);
+    if(fimTipo === 'ate' && fimAte && dt > fimAte) break;
+    proximas.push(fmtBR(dt));
+  }
+  const termino = fimTipo === 'ate'  && fimAte ? `até ${fmtBR(fimAte)}`
+                : fimTipo === 'qtd'  && fimQtd ? `por ${fimQtd} vezes`
+                : 'sem data de término';
+  const totalTxt = fimTipo === 'qtd' && fimQtd ? ` — total de ${fmtR(val * fimQtd)}` : '';
+  el.innerHTML = `<strong style="color:var(--cyan)">🔁 ${PERIODICIDADES[per].label}</strong> de <strong style="color:var(--green)">${fmtR(val)}</strong>, ${termino}${totalTxt}.`
+    + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Próximas: ${proximas.join(' · ')}${proximas.length===3?' …':''}</div>`
+    + `<div style="font-size:11px;color:var(--t3);margin-top:2px">O sistema mantém geradas as contas dos próximos ${HORIZONTE_REC_MESES} meses.</div>`;
+}
+
+// Compatibilidade com chamadas antigas
+function calcParcelaConta(){ updCpPreview(); }
+
+// ── Preencher o modal para edição ──
 function editConta(id){
   const d = gs();
-  const c = d.contas.find(x=>x.id===id);
+  const c = d.contas.find(x => x.id === id);
   if(!c) return;
   popCaixas('cp-caixa');
-  updCpSubcat();
+
   document.getElementById('cp-edit-id').value = c.id;
   document.getElementById('m-conta-titulo').textContent = 'Editar Conta a Pagar';
   document.getElementById('btn-salvar-conta').textContent = 'Salvar Alterações';
-  document.getElementById('cp-desc').value = c.totalParcelas>1
-    ? c.desc.replace(/ \(\d+\/\d+\)$/,'') : c.desc;
-  document.getElementById('cp-cat').value = c.cat||'Outras Despesas';
+  const err = document.getElementById('cp-err'); if(err) err.style.display = 'none';
+
+  // Descrição sem o sufixo de parcela
+  document.getElementById('cp-desc').value = c.totalParcelas > 1
+    ? (c.desc || '').replace(/ \(\d+\/\d+\)$/, '') : (c.desc || '');
+  document.getElementById('cp-cat').value = c.cat || 'Outras Despesas';
   updCpSubcat();
-  setTimeout(()=>{
-    const sc = document.getElementById('cp-subcat'); if(sc) sc.value = c.subcat||'';
-  },60);
-  document.getElementById('cp-obs').value = c.obs||'';
-  document.getElementById('cp-val').value = c.valor;
-  document.getElementById('cp-parc').value = '1'; // edição é por parcela
+  const sc = document.getElementById('cp-subcat'); if(sc) sc.value = c.subcat || '';
+  document.getElementById('cp-obs').value  = c.obs || '';
+  document.getElementById('cp-val').value  = c.valor;
   document.getElementById('cp-venc').value = c.venc;
-  document.getElementById('cp-rec').value = c.rec||'Única';
-  document.getElementById('cp-data-pg').value = c.dataPg||'';
-  document.getElementById('cp-st').value = c.status==='Pago'?'Pago':'Pendente';
-  const wrap = document.getElementById('cp-caixa-wrap');
-  if(wrap) wrap.style.display = c.status==='Pago' ? 'block' : 'none';
-  if(c.caixaId){
-    setTimeout(()=>{
-      const cx=document.getElementById('cp-caixa'); if(cx) cx.value=c.caixaId;
-    },80);
+  document.getElementById('cp-st').value   = statusConta(c) === 'Pago' ? 'Pago' : 'Pendente';
+  document.getElementById('cp-data-pg').value = c.dataPg || '';
+
+  // Na edição sempre se mexe em UMA conta (ou na série a partir dela)
+  const ehSerie = !!c.serieId;
+  document.getElementById('cp-tipo-row').style.display = 'none';
+  document.getElementById('cp-escopo-row').style.display = (ehSerie || (c.grupoId && c.totalParcelas > 1)) ? 'flex' : 'none';
+  setCpEscopo('uma');
+  setCpTipo(ehSerie ? 'recorrente' : 'unica');
+  if(ehSerie){
+    document.getElementById('cp-periodicidade').value = c.rec || 'Mensal';
+    const rf = c.recFim || { tipo:'nunca' };
+    document.getElementById('cp-fim-tipo').value = rf.tipo || 'nunca';
+    document.getElementById('cp-fim-data').value = rf.ate || '';
+    document.getElementById('cp-fim-qtd').value  = rf.qtd || '';
+    document.getElementById('cp-periodo-wrap').style.display = 'none'; // periodicidade não muda no meio da série
+    document.getElementById('cp-fim-wrap').style.display = 'none';
+    document.getElementById('m-conta-sub').textContent =
+      `Ocorrência ${c.serieNum || 1} de uma conta ${(PERIODICIDADES[c.rec]||{}).label || 'recorrente'}`;
+  } else if(c.totalParcelas > 1){
+    document.getElementById('m-conta-sub').textContent = `Parcela ${c.parcela} de ${c.totalParcelas}`;
+  } else {
+    document.getElementById('m-conta-sub').textContent = 'Conta única';
   }
-  calcParcelaConta();
-  document.getElementById('m-conta').style.display='flex';
+
+  toggleCpCaixa();
+  if(c.caixaId){ const cx = document.getElementById('cp-caixa'); if(cx) cx.value = c.caixaId; }
+  updCpPreview();
+  document.getElementById('m-conta').style.display = 'flex';
 }
 
+// ── Salvar (criação e edição) ──
 function saveConta(){
-  const editId = document.getElementById('cp-edit-id')?.value||'';
-  const venc  = document.getElementById('cp-venc')?.value;
-  const val   = parseFloat(document.getElementById('cp-val')?.value)||0;
-  const desc   = document.getElementById('cp-desc')?.value?.trim();
-  const cat    = document.getElementById('cp-cat')?.value;
-  const subcat = document.getElementById('cp-subcat')?.value||'';
-  const obs    = document.getElementById('cp-obs')?.value?.trim()||'';
-  const rec   = document.getElementById('cp-rec')?.value;
-  const parc  = parseInt(document.getElementById('cp-parc')?.value)||1;
-  const dataPg= document.getElementById('cp-data-pg')?.value;
-  const st    = document.getElementById('cp-st')?.value||'Pendente';
-  const caixaId = document.getElementById('cp-caixa')?.value||'';
-  if(!venc||!val||!desc){alert('Preencha os campos obrigatórios.');return;}
+  const $ = id => document.getElementById(id);
+  const editId = $('cp-edit-id')?.value || '';
+  const tipo   = $('cp-tipo')?.value || 'unica';
+  const escopo = $('cp-escopo')?.value || 'uma';
+  const desc   = $('cp-desc')?.value?.trim();
+  const cat    = $('cp-cat')?.value;
+  const subcat = $('cp-subcat')?.value || '';
+  const obs    = $('cp-obs')?.value?.trim() || '';
+  const val    = parseFloat($('cp-val')?.value) || 0;
+  const venc   = $('cp-venc')?.value;
+  const st     = $('cp-st')?.value || 'Pendente';
+  const dataPg = $('cp-data-pg')?.value;
+  const caixaId= $('cp-caixa')?.value || '';
+
+  const err = $('cp-err');
+  const falha = msg => { if(err){ err.textContent = '⚠️ ' + msg; err.style.display = 'block'; } };
+  if(err) err.style.display = 'none';
+
+  const faltando = [];
+  if(!desc) faltando.push('Descrição');
+  if(!val)  faltando.push('Valor');
+  if(!venc) faltando.push('Vencimento');
+  if(faltando.length) return falha('Preencha: ' + faltando.join(', ') + '.');
+
+  const per     = $('cp-periodicidade')?.value || 'Mensal';
+  const fimTipo = $('cp-fim-tipo')?.value || 'nunca';
+  const fimAte  = $('cp-fim-data')?.value || '';
+  const fimQtd  = parseInt($('cp-fim-qtd')?.value) || 0;
+  if(tipo === 'recorrente' && !editId){
+    if(fimTipo === 'ate' && !fimAte)   return falha('Informe a data final da recorrência.');
+    if(fimTipo === 'ate' && fimAte < venc) return falha('A data final deve ser depois do 1º vencimento.');
+    if(fimTipo === 'qtd' && fimQtd < 1) return falha('Informe quantas ocorrências a conta deve ter.');
+  }
 
   const d = gs();
+  const nomeCaixa = id => id ? ((d.bancos||[]).find(b => b.id === id)?.nome || '') : '';
 
-  // ── MODO EDIÇÃO ──
+  // ───────────── EDIÇÃO ─────────────
   if(editId){
-    const c = d.contas.find(x=>x.id===editId);
+    const c = d.contas.find(x => x.id === editId);
     if(!c) return;
-    const temIrmaos = c.grupoId && d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==editId).length>0;
-    let replicar = false;
-    if(temIrmaos){
-      replicar = confirm(`Esta conta tem ${d.contas.filter(x=>x.grupoId===c.grupoId).length} parcelas no total.\n\nDeseja replicar as alterações (descrição, categoria, subcategoria, observação) para TODAS as parcelas do grupo?`);
+    const eraPago = statusConta(c) === 'Pago';
+
+    const aplicar = (alvo, primeira) => {
+      const nl = alvo.totalParcelas > 1 ? ` (${alvo.parcela}/${alvo.totalParcelas})` : '';
+      alvo.desc = desc + nl;
+      alvo.cat = cat; alvo.subcat = subcat; alvo.obs = obs;
+      alvo.valor = val;
+      if(primeira){ alvo.venc = venc; }
+    };
+    aplicar(c, true);
+
+    // Escopo "esta e as próximas": replica nas ocorrências futuras ainda não pagas
+    if(escopo === 'futuras'){
+      const irmas = (d.contas || []).filter(x =>
+        x.id !== c.id && statusConta(x) !== 'Pago' &&
+        ((c.serieId && x.serieId === c.serieId && (x.serieNum||0) > (c.serieNum||0)) ||
+         (!c.serieId && c.grupoId && x.grupoId === c.grupoId && (x.parcela||0) > (c.parcela||0))));
+      irmas.forEach(x => aplicar(x, false));
     }
-    // Aplica na parcela atual
-    const descBase = desc;
-    const numLabel = c.totalParcelas>1 ? ` (${c.parcela}/${c.totalParcelas})` : '';
-    c.desc = descBase + numLabel;
-    c.cat = cat; c.subcat = subcat; c.obs = obs;
-    c.venc = venc; c.rec = rec;
-    c.valor = val;
-    c.dataPg = dataPg||'';
-    c.status = st==='Pago' ? 'Pago' : (new Date(venc+'T00:00:00')<new Date() ? 'Vencida' : 'Pendente');
-    c.caixaId = caixaId;
-    // Gera lançamento se passou a Pago
-    if(st==='Pago'){
-      // Remove lançamento anterior desta parcela se existir
-      d.lancs = d.lancs.filter(l=>l.refContaId!==c.id || l.status==='cancelado');
-      c.caixaNome = caixaId ? (d.bancos||[]).find(b=>b.id===caixaId)?.nome||'' : '';
+
+    // Status
+    if(st === 'Pago'){
+      c.status = 'Pago';
+      c.dataPg = dataPg || today();
+      c.caixaId = caixaId;
+      c.caixaNome = nomeCaixa(caixaId);
+      removerLancDaConta(c, d);
       gerarLancDaConta(c, d);
-      // Espelha no extrato bancário se tiver conta
-      if(caixaId){
-        const lancGerado = d.lancs.find(l=>l.refContaId===c.id&&l.status!=='cancelado');
-        if(lancGerado){ lancGerado.caixaId=caixaId; lancGerado.caixaNome=c.caixaNome; lancToCaixa(lancGerado,d); }
-      }
+    } else {
+      // Voltar para pendente precisa desfazer o lançamento gerado
+      c.status = 'Pendente';
+      c.dataPg = '';
+      c.valorPago = null;
+      c.caixaId = ''; c.caixaNome = '';
+      removerLancDaConta(c, d);
     }
-    // Replica campos textuais/categorias nas irmãs
-    if(replicar){
-      d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==editId).forEach(irma=>{
-        const nl = irma.totalParcelas>1 ? ` (${irma.parcela}/${irma.totalParcelas})` : '';
-        irma.desc = descBase + nl;
-        irma.cat = cat; irma.subcat = subcat; irma.obs = obs;
-      });
-    }
+
     ss(d); closeM('m-conta'); refreshAll();
     return;
   }
 
-  // ── MODO CRIAÇÃO ──
-  // A soma das parcelas fecha exatamente com o valor total (o resto de centavos vai na última)
-  const parcelasVal = dividirParcelas(val, parc);
-  const grupoId = uid();
-  for(let i=0;i<parc;i++){
-    const valParcela = parcelasVal[i];
-    const vencParcela = addMeses(venc, i);
-    const numLabel = parc>1 ? ` (${i+1}/${parc})` : '';
-    const stParcela = (i===0 && st==='Pago') ? 'Pago' : 'Pendente';
-    const dataPgParcela = (i===0 && st==='Pago') ? (dataPg||today()) : '';
-    const caixaIdParcela = (i===0 && st==='Pago') ? caixaId : '';
-    const caixaNome = caixaIdParcela ? (d.bancos||[]).find(b=>b.id===caixaIdParcela)?.nome||'' : '';
-    const id = uid();
+  // ───────────── CRIAÇÃO ─────────────
+  const marcarPaga = (conta, i) => {
+    if(i !== 0 || st !== 'Pago') return;
+    conta.status = 'Pago';
+    conta.dataPg = dataPg || today();
+    conta.caixaId = caixaId;
+    conta.caixaNome = nomeCaixa(caixaId);
+    gerarLancDaConta(conta, d);
+  };
+
+  if(tipo === 'parcelada'){
+    const n = Math.max(2, parseInt($('cp-parc')?.value) || 2);
+    const vals = dividirParcelas(val, n);
+    const grupoId = uid();
+    for(let i = 0; i < n; i++){
+      const conta = {
+        id: uid(), venc: addMeses(venc, i), valor: vals[i],
+        desc: `${desc} (${i+1}/${n})`, cat, subcat, obs,
+        rec: 'Única', dataPg: '', status: 'Pendente',
+        parcela: i+1, totalParcelas: n, grupoId,
+        caixaId: '', caixaNome: '', ts: Date.now() + i
+      };
+      d.contas.push(conta);
+      marcarPaga(conta, i);
+    }
+  } else if(tipo === 'recorrente'){
+    const serieId = uid();
+    const recFim = { tipo: fimTipo, ate: fimAte, qtd: fimQtd };
+    const ancora = {
+      id: uid(), venc, valor: val, desc, cat, subcat, obs,
+      rec: per, recAncora: venc, recFim, recAtiva: true,
+      serieId, serieNum: 1,
+      dataPg: '', status: 'Pendente',
+      parcela: 1, totalParcelas: 1, grupoId: '',
+      caixaId: '', caixaNome: '', ts: Date.now()
+    };
+    d.contas.push(ancora);
+    marcarPaga(ancora, 0);
+    materializarRecorrencias(d, false);   // já gera as próximas ocorrências
+  } else {
     const conta = {
-      id, venc:vencParcela, valor:valParcela, desc:desc+numLabel,
-      cat, subcat, obs, rec: parc>1 ? 'Mensal' : rec,
-      dataPg:dataPgParcela, status:stParcela,
-      parcela:i+1, totalParcelas:parc, grupoId,
-      caixaId:caixaIdParcela, caixaNome,
-      ts:Date.now()+i
+      id: uid(), venc, valor: val, desc, cat, subcat, obs,
+      rec: 'Única', dataPg: '', status: 'Pendente',
+      parcela: 1, totalParcelas: 1, grupoId: '',
+      caixaId: '', caixaNome: '', ts: Date.now()
     };
     d.contas.push(conta);
-    if(stParcela==='Pago'){
-      gerarLancDaConta(conta, d);
-      if(caixaIdParcela){
-        const lancGerado = d.lancs.find(l=>l.refContaId===conta.id&&l.status!=='cancelado');
-        if(lancGerado){ lancGerado.caixaId=caixaIdParcela; lancGerado.caixaNome=caixaNome; lancToCaixa(lancGerado,d); }
-      }
-    }
+    marcarPaga(conta, 0);
   }
+
   ss(d); closeM('m-conta'); refreshAll();
 }
 
+// ── Lançamento espelho da conta paga ──
 function gerarLancDaConta(c, d){
-  const jaExiste = d.lancs.some(l=>l.refContaId===c.id && l.status!=='cancelado');
-  if(jaExiste) return;
-  d.lancs.push({
-    id:uid(), data:c.dataPg||c.venc, tipo:'Despesa',
-    cat:c.cat||'Outras Despesas', subcat:'', desc:c.desc,
-    valor:c.valor, caixaId:'', caixaNome:'', pago:'Pago',
-    obs:'Gerado de Contas a Pagar'+(c.totalParcelas>1?` (parcela ${c.parcela}/${c.totalParcelas})`:''),
-    ts:Date.now(), status:'ativo', origem:'conta', refContaId:c.id
-  });
+  if(d.lancs.some(l => l.refContaId === c.id && l.status !== 'cancelado')) return;
+  const valor = c.valorPago != null ? c.valorPago : c.valor;
+  const lanc = {
+    id: uid(), data: c.dataPg || c.venc, tipo: 'Despesa',
+    cat: c.cat || 'Outras Despesas', subcat: c.subcat || '',
+    desc: c.desc, valor,
+    caixaId: c.caixaId || '', caixaNome: c.caixaNome || '',
+    pago: 'Pago',
+    obs: ['Gerado de Contas a Pagar',
+          c.totalParcelas > 1 ? `parcela ${c.parcela}/${c.totalParcelas}` : '',
+          c.serieId ? `recorrência ${(PERIODICIDADES[c.rec]||{}).label || c.rec}` : '',
+          c.obsPagamento || ''].filter(Boolean).join(' · '),
+    ts: Date.now(), status: 'ativo', origem: 'conta', refContaId: c.id
+  };
+  d.lancs.push(lanc);
+  if(lanc.caixaId) lancToCaixa(lanc, d);
 }
 
+// Remove o lançamento (e a movimentação bancária) gerado por uma conta
+function removerLancDaConta(c, d){
+  const alvos = d.lancs.filter(l => l.refContaId === c.id);
+  alvos.forEach(l => {
+    (d.bancos || []).forEach(b => { b.movs = (b.movs || []).filter(m => m.refLancId !== l.id); });
+  });
+  d.lancs = d.lancs.filter(l => l.refContaId !== c.id);
+}
+
+// ── Pagamento: abre o modal com data, valor e conta ──
+function pagarConta(id){
+  const d = gs();
+  const c = d.contas.find(x => x.id === id);
+  if(!c) return;
+  popCaixas('pg-caixa');
+  document.getElementById('pg-conta-id').value = c.id;
+  document.getElementById('pg-desc').textContent = c.desc;
+  document.getElementById('pg-venc').textContent = (c.venc || '').split('-').reverse().join('/');
+  document.getElementById('pg-valor-orig').textContent = fmtR(c.valor);
+  document.getElementById('pg-data').value  = today();
+  document.getElementById('pg-valor').value = c.valor;
+  document.getElementById('pg-obs').value   = '';
+  const sub = document.getElementById('pg-sub');
+  if(sub) sub.textContent = c.serieId
+    ? `Ocorrência ${c.serieNum} · ${(PERIODICIDADES[c.rec]||{}).label || 'recorrente'}`
+    : c.totalParcelas > 1 ? `Parcela ${c.parcela} de ${c.totalParcelas}` : 'Conta única';
+  if(c.caixaId){ const cx = document.getElementById('pg-caixa'); if(cx) cx.value = c.caixaId; }
+  updPgDif();
+  document.getElementById('m-pagar').style.display = 'flex';
+}
+
+// Mostra juros/multa ou desconto quando o valor pago difere do previsto
+function updPgDif(){
+  const d = gs();
+  const c = d.contas.find(x => x.id === document.getElementById('pg-conta-id')?.value);
+  const el = document.getElementById('pg-dif');
+  if(!c || !el) return;
+  const pago = parseFloat(document.getElementById('pg-valor')?.value) || 0;
+  const dif  = +(pago - c.valor).toFixed(2);
+  if(Math.abs(dif) < 0.005){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = dif > 0
+    ? `<span style="color:var(--amber)">↑ ${fmtR(dif)} a mais que o previsto (juros/multa)</span>`
+    : `<span style="color:var(--green)">↓ ${fmtR(-dif)} de desconto</span>`;
+}
+
+function confirmarPagamento(){
+  const d = gs();
+  const c = d.contas.find(x => x.id === document.getElementById('pg-conta-id')?.value);
+  if(!c) return;
+  const data  = document.getElementById('pg-data')?.value || today();
+  const valor = parseFloat(document.getElementById('pg-valor')?.value);
+  const caixa = document.getElementById('pg-caixa')?.value || '';
+  const obs   = document.getElementById('pg-obs')?.value?.trim() || '';
+  if(!valor || valor <= 0){ alert('Informe o valor pago.'); return; }
+
+  c.status    = 'Pago';
+  c.dataPg    = data;
+  c.valorPago = +valor.toFixed(2);
+  c.caixaId   = caixa;
+  c.caixaNome = caixa ? ((d.bancos||[]).find(b => b.id === caixa)?.nome || '') : '';
+  c.obsPagamento = obs;
+  removerLancDaConta(c, d);
+  gerarLancDaConta(c, d);
+  ss(d);
+  closeM('m-pagar');
+  refreshAll();
+}
+
+// Desfaz o pagamento: a conta volta a pendente e o lançamento é removido
+function desfazerPagamento(id){
+  const d = gs();
+  const c = d.contas.find(x => x.id === id);
+  if(!c) return;
+  removerLancDaConta(c, d);
+  c.status = 'Pendente';
+  c.dataPg = '';
+  c.valorPago = null;
+  c.obsPagamento = '';
+  c.caixaId = ''; c.caixaNome = '';
+  ss(d); refreshAll();
+}
+
+// ── Exclusão com escopo (conta única, parcelamento ou série recorrente) ──
+function delConta(id){
+  const d = gs();
+  const c = d.contas.find(x => x.id === id);
+  if(!c) return;
+  document.getElementById('del-conta-id').value = c.id;
+  document.getElementById('del-conta-desc').textContent  = c.desc;
+  document.getElementById('del-conta-venc').textContent  = 'Vence em ' + (c.venc || '').split('-').reverse().join('/');
+  document.getElementById('del-conta-valor').textContent = fmtR(c.valor);
+
+  const aviso = document.getElementById('del-conta-aviso');
+  const opts  = document.getElementById('del-conta-opcoes');
+  const botao = (cls, titulo, sub, acao) => `
+    <button class="btn ${cls}" style="justify-content:flex-start;gap:12px;padding:12px 16px;width:100%;text-align:left" onclick="${acao}">
+      <div>
+        <div style="font-size:13px;font-weight:600">${titulo}</div>
+        <div style="font-size:11px;opacity:.75;font-weight:400">${sub}</div>
+      </div>
+    </button>`;
+
+  if(c.serieId){
+    const serie   = d.contas.filter(x => x.serieId === c.serieId);
+    const futuras = serie.filter(x => x.venc > c.venc && statusConta(x) !== 'Pago').length;
+    aviso.innerHTML = `Esta conta faz parte de uma <strong style="color:var(--cyan)">recorrência ${(PERIODICIDADES[c.rec]||{}).label || ''}</strong>`
+      + ` com ${serie.length} ocorrência(s) geradas${futuras ? `, sendo ${futuras} futura(s) em aberto` : ''}.`;
+    opts.innerHTML =
+      botao('btn-ghost', 'Excluir somente esta conta', 'As outras ocorrências continuam', `execDelConta('uma')`) +
+      botao('btn-red',   'Encerrar a recorrência',     'Remove as futuras em aberto e para de gerar novas', `execDelConta('serie')`);
+  } else if(c.grupoId && c.totalParcelas > 1){
+    const grupo = d.contas.filter(x => x.grupoId === c.grupoId);
+    aviso.innerHTML = `Esta é a parcela <strong>${c.parcela} de ${c.totalParcelas}</strong> de um parcelamento com ${grupo.length} parcela(s) cadastrada(s).`;
+    opts.innerHTML =
+      botao('btn-ghost', 'Excluir somente esta parcela', 'As demais parcelas continuam', `execDelConta('uma')`) +
+      botao('btn-red',   'Excluir todo o parcelamento',  'Remove todas as parcelas do grupo', `execDelConta('grupo')`);
+  } else {
+    aviso.innerHTML = 'Esta ação não pode ser desfeita. O lançamento gerado por ela (se houver) também será removido.';
+    opts.innerHTML = botao('btn-red', 'Excluir conta', 'Remove definitivamente', `execDelConta('uma')`);
+  }
+  document.getElementById('m-del-conta').style.display = 'flex';
+}
+
+function execDelConta(escopo){
+  const d = gs();
+  const c = d.contas.find(x => x.id === document.getElementById('del-conta-id')?.value);
+  if(!c) return;
+  let alvos = [c];
+  if(escopo === 'grupo' && c.grupoId)  alvos = d.contas.filter(x => x.grupoId === c.grupoId);
+  if(escopo === 'serie' && c.serieId){
+    // remove esta e as futuras em aberto; mantém o histórico já pago
+    alvos = d.contas.filter(x => x.serieId === c.serieId && x.venc >= c.venc && statusConta(x) !== 'Pago');
+    d.contas.forEach(x => { if(x.serieId === c.serieId) x.recAtiva = false; });
+  }
+  const ids = new Set(alvos.map(x => x.id));
+  alvos.forEach(x => removerLancDaConta(x, d));
+  d.contas = d.contas.filter(x => !ids.has(x.id));
+  ss(d);
+  closeM('m-del-conta');
+  refreshAll();
+}
+
+// ── Filtros da listagem ──
 function initContasAnoOpts(){
   const d = gs();
   const el = document.getElementById('cp-fil-ano');
-  if(!el) return;
-  const anos = new Set();
-  (d.contas||[]).forEach(c => { if(c.venc) anos.add(c.venc.slice(0,4)); });
-  anos.add(String(anoRef()));
-  const lista = [...anos].sort();
-  const atual = el.dataset.init ? el.value : String(anoRef());
-  el.innerHTML = '<option value="">Todos os anos</option>'
-    + lista.map(a => `<option value="${a}">${a}</option>`).join('');
-  el.value = atual;
-  el.dataset.init = '1';
+  if(el){
+    const anos = new Set();
+    (d.contas||[]).forEach(c => { if(c.venc) anos.add(c.venc.slice(0,4)); });
+    anos.add(String(anoRef()));
+    const atual = el.dataset.init ? el.value : String(anoRef());
+    el.innerHTML = '<option value="">Todos os anos</option>'
+      + [...anos].sort().map(a => `<option value="${a}">${a}</option>`).join('');
+    el.value = atual;
+    el.dataset.init = '1';
+  }
+  const cel = document.getElementById('cp-fil-cat');
+  if(cel){
+    const cats = [...new Set((d.contas||[]).map(c => c.cat).filter(Boolean))].sort();
+    const atual = cel.value;
+    cel.innerHTML = '<option value="">Todas as categorias</option>'
+      + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    cel.value = atual;
+  }
 }
 
 function renderContas(){
-  const d    = gs();
+  const d = gs();
+  materializarRecorrencias(d);          // mantém as próximas contas recorrentes sempre geradas
   initContasAnoOpts();
-  const anoF = document.getElementById('cp-fil-ano')?.value;
-  const mesF = document.getElementById('cp-fil-mes')?.value;
-  const stF  = document.getElementById('cp-fil-st')?.value;
-  const hoje = new Date();
-  let items  = [...d.contas].sort((a,b)=>a.venc.localeCompare(b.venc));
-  items.forEach(c=>{ if(c.status==='Pendente'&&new Date(c.venc+'T00:00:00')<hoje) c.status='Vencida'; });
-  if(anoF)                        items=items.filter(c=>getAno(c.venc)===parseInt(anoF));
-  if(mesF!==''&&mesF!==undefined) items=items.filter(c=>noMesAno(c.venc,parseInt(mesF),anoF||anoRef()));
-  if(stF) items=items.filter(c=>c.status===stF);
 
-  const total = items.reduce((a,c)=>a+c.valor,0);
-  const pago  = items.filter(c=>c.status==='Pago').reduce((a,c)=>a+c.valor,0);
-  const pendV = items.filter(c=>c.status!=='Pago').reduce((a,c)=>a+c.valor,0);
-  const vencN = items.filter(c=>c.status==='Vencida').length;
-  set('ck-total',fmtR(total)); set('ck-pend',fmtR(pendV));
-  set('ck-pago',fmtR(pago));   set('ck-venc',vencN+' conta'+(vencN!==1?'s':''));
+  const anoF  = document.getElementById('cp-fil-ano')?.value;
+  const mesF  = document.getElementById('cp-fil-mes')?.value;
+  const stF   = document.getElementById('cp-fil-st')?.value;
+  const catF  = document.getElementById('cp-fil-cat')?.value;
+  const busca = (document.getElementById('cp-busca')?.value || '').toLowerCase();
 
-  // ── LEMBRETE DO DIA ──
-  const hojeStr = today(); // "YYYY-MM-DD"
-  const contasHoje = d.contas.filter(c => c.venc === hojeStr && c.status !== 'Pago');
+  let items = [...(d.contas||[])].sort((a,b) => (a.venc||'').localeCompare(b.venc||''));
+  if(anoF)                          items = items.filter(c => getAno(c.venc) === parseInt(anoF));
+  if(mesF !== '' && mesF !== undefined) items = items.filter(c => noMesAno(c.venc, parseInt(mesF), anoF || anoRef()));
+  if(stF)                           items = items.filter(c => statusConta(c) === stF);
+  if(catF)                          items = items.filter(c => c.cat === catF);
+  if(busca)                         items = items.filter(c => (c.desc||'').toLowerCase().includes(busca)
+                                                           || (c.cat||'').toLowerCase().includes(busca)
+                                                           || (c.subcat||'').toLowerCase().includes(busca));
+
+  // ── KPIs ──
+  const valorDe = c => (statusConta(c) === 'Pago' && c.valorPago != null) ? c.valorPago : c.valor;
+  const total = items.reduce((a,c) => a + valorDe(c), 0);
+  const pagas = items.filter(c => statusConta(c) === 'Pago');
+  const abertas = items.filter(c => statusConta(c) !== 'Pago');
+  const vencidas = items.filter(c => statusConta(c) === 'Vencida');
+  const em7 = abertas.filter(c => { const dd = diasAte(c.venc); return dd !== null && dd >= 0 && dd <= 7; });
+  set('ck-total', fmtR(total));
+  set('ck-pend',  fmtR(abertas.reduce((a,c) => a + c.valor, 0)));
+  set('ck-pago',  fmtR(pagas.reduce((a,c) => a + valorDe(c), 0)));
+  setC('ck-venc', fmtR(vencidas.reduce((a,c) => a + c.valor, 0)), vencidas.length ? 'var(--red)' : '');
+  set('ck-venc-sub', vencidas.length ? `${vencidas.length} conta${vencidas.length>1?'s':''} em atraso` : 'nenhuma em atraso');
+  set('ck-7d', fmtR(em7.reduce((a,c) => a + c.valor, 0)));
+  set('ck-7d-sub', em7.length ? `${em7.length} conta${em7.length>1?'s':''} a vencer` : 'nada a vencer');
+
+  // ── Lembrete do dia ──
+  const contasHoje = (d.contas||[]).filter(c => c.venc === today() && statusConta(c) !== 'Pago');
   const wrapHoje = document.getElementById('ck-hoje-wrap');
   if(wrapHoje){
     if(contasHoje.length){
-      const totalHoje = contasHoje.reduce((a,c)=>a+c.valor,0);
-      const nomes = contasHoje.map(c=>c.desc).join(', ');
+      const totalHoje = contasHoje.reduce((a,c) => a + c.valor, 0);
+      const nomes = contasHoje.map(c => c.desc).join(', ');
       set('ck-hoje-qtd', contasHoje.length);
       set('ck-hoje-total', fmtRs(totalHoje));
       set('ck-hoje-sub', `${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${nomes.length>60?nomes.slice(0,60)+'…':nomes}`);
       const listEl = document.getElementById('ck-hoje-list');
-      if(listEl) listEl.innerHTML = contasHoje.map(c=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;background:#ffd43b0d;border:1px solid #ffd43b33;border-radius:var(--r2);padding:9px 14px;gap:12px">
+      if(listEl) listEl.innerHTML = contasHoje.map(c => `
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--amber-dim);border:1px solid #ffd43b33;border-radius:var(--r2);padding:9px 14px;gap:12px">
           <div style="display:flex;align-items:center;gap:10px;min-width:0">
             <span style="font-size:14px;flex-shrink:0">📄</span>
             <div style="min-width:0">
               <div style="font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.desc}</div>
-              <div style="font-size:10px;color:var(--t3);margin-top:1px">${c.cat||'—'}${c.totalParcelas>1?' · Parcela '+c.parcela+'/'+c.totalParcelas:''}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:1px">${c.cat||'—'}${c.totalParcelas>1?' · Parcela '+c.parcela+'/'+c.totalParcelas:''}${c.serieId?' · 🔁 '+((PERIODICIDADES[c.rec]||{}).label||''):''}</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
@@ -5048,83 +5643,64 @@ function renderContas(){
     }
   }
 
+  // ── Tabela ──
   const tbody = document.getElementById('cp-tbody');
   const empty = document.getElementById('cp-empty');
   if(!tbody) return;
-  if(!items.length){ tbody.innerHTML=''; if(empty)empty.style.display='block'; return; }
-  if(empty) empty.style.display='none';
+  if(!items.length){
+    tbody.innerHTML = '';
+    if(empty){
+      empty.style.display = 'block';
+      empty.textContent = (d.contas||[]).length
+        ? 'Nenhuma conta encontrada com esses filtros.'
+        : 'Nenhuma conta cadastrada. Clique em "+ Nova Conta".';
+    }
+    return;
+  }
+  if(empty) empty.style.display = 'none';
 
-  const stBdg = {Pago:'bdg-green',Pendente:'bdg-amber',Vencida:'bdg-red'};
-  tbody.innerHTML = items.map(c=>{
-    const parcLabel = c.totalParcelas>1
-      ? `<span class="badge bdg-blue" style="font-size:9px;margin-left:4px">${c.parcela}/${c.totalParcelas}</span>`
+  const stBdg = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red' };
+  tbody.innerHTML = items.map(c => {
+    const st   = statusConta(c);
+    const dias = st !== 'Pago' ? diasAte(c.venc) : null;
+    const diasLabel = dias === null ? ''
+      : dias < 0  ? `<div style="font-size:9px;color:var(--red)">Venceu há ${Math.abs(dias)}d</div>`
+      : dias === 0? `<div style="font-size:9px;color:var(--amber)">Vence hoje</div>`
+      : dias <= 7 ? `<div style="font-size:9px;color:var(--amber)">Vence em ${dias}d</div>`
       : '';
-    const diasVenc = c.status!=='Pago'
-      ? Math.ceil((new Date(c.venc+'T00:00:00')-new Date())/864e5)
-      : null;
-    const diasLabel = diasVenc!==null
-      ? diasVenc<0
-        ? `<div style="font-size:9px;color:var(--red)">Venceu há ${Math.abs(diasVenc)}d</div>`
-        : diasVenc===0
-          ? `<div style="font-size:9px;color:var(--amber)">Vence hoje</div>`
-          : diasVenc<=7
-            ? `<div style="font-size:9px;color:var(--amber)">Vence em ${diasVenc}d</div>`
-            : ''
-      : '';
-    return `<tr>
+    const parcLabel = c.totalParcelas > 1
+      ? `<span class="badge bdg-blue" style="font-size:9px">${c.parcela}/${c.totalParcelas}</span>` : '';
+    const recLabel = c.serieId
+      ? `<span class="cp-rec-badge" title="Conta recorrente${c.recAtiva===false?' (encerrada)':''}">🔁 ${(PERIODICIDADES[c.rec]||{}).curto || ''}${c.recAtiva===false?' (fim)':''}</span>` : '';
+    const valorMostrado = st === 'Pago' && c.valorPago != null ? c.valorPago : c.valor;
+    const difPg = st === 'Pago' && c.valorPago != null && Math.abs(c.valorPago - c.valor) > 0.005
+      ? `<div style="font-size:9px;color:${c.valorPago > c.valor ? 'var(--amber)' : 'var(--green)'}">previsto ${fmtR(c.valor)}</div>` : '';
+    return `<tr${c.serieId ? ' class="cp-serie-row"' : ''}>
       <td>
-        <div class="mono" style="color:${c.status==='Vencida'?'var(--red)':'var(--t2)'}">${c.venc}</div>
+        <div class="mono" style="color:${st==='Vencida'?'var(--red)':'var(--t2)'}">${c.venc}</div>
         ${diasLabel}
       </td>
       <td style="color:var(--t1)">
-        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-          ${c.desc}${parcLabel}
-        </div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">${c.desc}${parcLabel}${recLabel}</div>
+        ${c.obs ? `<div style="font-size:9px;color:var(--t3);margin-top:2px">${c.obs}</div>` : ''}
       </td>
       <td><span class="cat-tag" style="font-size:9px">${c.cat||'—'}</span></td>
       <td style="color:var(--t3);font-size:10px">${c.subcat||'—'}</td>
-      <td class="mono" style="color:var(--t1);font-weight:600">${fmtR(c.valor)}</td>
-      <td class="mono" style="color:var(--t3)">${c.dataPg||'—'}</td>
-      <td><span class="badge ${stBdg[c.status]||'bdg-gray'}">${c.status}</span></td>
+      <td class="mono" style="color:var(--t1);font-weight:600">${fmtR(valorMostrado)}${difPg}</td>
+      <td class="mono" style="color:var(--t3)">
+        ${c.dataPg||'—'}
+        ${c.caixaNome ? `<div style="font-size:9px;color:var(--t3)">🏦 ${c.caixaNome}</div>` : ''}
+      </td>
+      <td><span class="badge ${stBdg[st]||'bdg-gray'}">${st}</span></td>
       <td class="tbl-actions">
-        ${c.status!=='Pago'?`<button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>`:''}
+        ${st !== 'Pago'
+          ? `<button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>`
+          : `<button class="btn btn-ghost btn-xs" onclick="desfazerPagamento('${c.id}')" title="Desfazer pagamento">↩</button>`}
         <button class="btn btn-ghost btn-xs" onclick="editConta('${c.id}')" title="Editar">✎</button>
-        <button class="btn btn-red btn-xs" onclick="delConta('${c.id}')">✕</button>
+        <button class="btn btn-red btn-xs" onclick="delConta('${c.id}')" title="Excluir">✕</button>
       </td>
     </tr>`;
   }).join('');
-}
-
-function pagarConta(id){
-  const d = gs();
-  const c = d.contas.find(c=>c.id===id);
-  if(!c) return;
-  c.status = 'Pago';
-  c.dataPg = today();
-  gerarLancDaConta(c, d);
-  ss(d); refreshAll();
-}
-
-function delConta(id){
-  const d = gs();
-  const c = d.contas.find(x=>x.id===id);
-  if(!c) return;
-  const irmaos = c.grupoId ? d.contas.filter(x=>x.grupoId===c.grupoId&&x.id!==id) : [];
-  let excluirTodas = false;
-  if(irmaos.length>0){
-    const total = irmaos.length+1;
-    const resp = confirm(`Esta conta faz parte de um grupo de ${total} parcelas.\n\nClique OK para excluir TODAS as parcelas do grupo.\nClique Cancelar para excluir somente esta parcela.`);
-    excluirTodas = resp;
-  }
-  if(excluirTodas){
-    const idsGrupo = d.contas.filter(x=>x.grupoId===c.grupoId).map(x=>x.id);
-    idsGrupo.forEach(gid=>{ d.lancs.filter(l=>l.refContaId===gid).forEach(l=>{ l.status='cancelado'; }); });
-    d.contas = d.contas.filter(x=>x.grupoId!==c.grupoId);
-  } else {
-    d.lancs.filter(l=>l.refContaId===id).forEach(l=>{ l.status='cancelado'; });
-    d.contas = d.contas.filter(x=>x.id!==id);
-  }
-  ss(d); refreshAll();
 }
 
 function calcParcelaDiv(){
@@ -5282,7 +5858,7 @@ function renderDividas(){
               ${(dv.parcelas||[]).map(pc=>`
                 <tr>
                   <td class="mono" style="color:var(--t3)">${pc.num}/${nparc}</td>
-                  <td class="mono" style="color:${pc.status==='Vencida'||new Date(pc.venc+'T00:00:00')<new Date()&&pc.status!=='Pago'?'var(--red)':'var(--t2)'}">${pc.venc}</td>
+                  <td class="mono" style="color:${pc.status!=='Pago'&&pc.venc<today()?'var(--red)':'var(--t2)'}">${pc.venc}</td>
                   <td class="mono" style="font-weight:600">${fmtR(pc.valor)}</td>
                   <td><span class="badge ${pc.status==='Pago'?'bdg-green':pc.status==='Vencida'?'bdg-red':'bdg-amber'}" style="font-size:9px">${pc.status}</span></td>
                   <td class="mono" style="color:var(--t3)">${pc.dataPg||'—'}</td>
@@ -6396,6 +6972,11 @@ function seedLancamentos() {
 }
 
 seedLancamentos();
+
+// ── Contas recorrentes: mantém as próximas ocorrências sempre geradas ──
+(function gerarRecorrentesNoInicio(){
+  try { materializarRecorrencias(); } catch(e) { console.warn('materializarRecorrencias:', e); }
+})();
 
 // ── MIGRAÇÃO ──
 // Lançamentos importados podiam ficar vinculados à conta errada quando um nome era prefixo
