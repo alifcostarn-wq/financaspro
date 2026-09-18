@@ -1416,6 +1416,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="card-header">
       <span class="card-title">Contas</span>
       <div style="display:flex;gap:8px">
+        <select id="cp-fil-ano" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
         <select id="cp-fil-mes" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os meses</option>
           <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
@@ -2619,6 +2620,104 @@ const curMes=()=>new Date().getMonth();
 const getMes=(d)=>d?new Date(d+'T00:00:00').getMonth():-1;
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
 const setC=(id,v,c)=>{const e=document.getElementById(id);if(e){e.textContent=v;e.style.color=c||''}};
+
+// ══════════════════════════════════════════════════════════════
+// ── MOTOR DE SALDO (fonte única de verdade dos cálculos) ──
+// Regras de negócio:
+//  • Transferência entre contas NÃO altera o saldo consolidado (o dinheiro só muda de lugar).
+//  • Lançamento pago com conta vinculada é espelhado como movimentação bancária
+//    (mov.refLancId) — deve ser contado uma única vez.
+//  • O saldo é contínuo no tempo: NÃO reinicia a cada ano (o resultado de dezembro
+//    é o saldo de abertura de janeiro do ano seguinte).
+//  • Base do saldo = soma dos saldos iniciais das contas bancárias; quando não há
+//    contas cadastradas, usa o "Saldo Inicial em Conta" das Configurações.
+// ══════════════════════════════════════════════════════════════
+
+// Ano de referência das visões mensais (Dashboard, Relatórios, Orçamento, Cartões…)
+const anoRef   = () => { const a = parseInt(gs().cfg && gs().cfg.ano); return a || new Date().getFullYear(); };
+const getAno   = (dt) => dt ? parseInt(dt.slice(0,4)) : -1;
+// O registro pertence ao mês/ano informado?
+const noMesAno = (dt, mes, ano) => !!dt && getMes(dt) === parseInt(mes) && getAno(dt) === parseInt(ano);
+// Último dia do mês em ISO (YYYY-MM-DD)
+const fimDoMes = (ano, mes) => {
+  const ult = new Date(ano, mes + 1, 0).getDate();
+  return `${ano}-${String(mes + 1).padStart(2,'0')}-${String(ult).padStart(2,'0')}`;
+};
+const mesAnterior = (ano, mes) => mes > 0 ? { ano:parseInt(ano), mes:mes - 1 } : { ano:parseInt(ano) - 1, mes:11 };
+
+// Divide um valor em N parcelas sem perder centavos (o resíduo vai para a última)
+function dividirParcelas(total, n){
+  n = Math.max(1, parseInt(n) || 1);
+  const cent = Math.round((total || 0) * 100);
+  const base = Math.floor(cent / n) / 100;
+  const arr  = Array(n).fill(+base.toFixed(2));
+  arr[n - 1] = +(arr[n - 1] + (cent / 100 - base * n)).toFixed(2);
+  return arr;
+}
+
+// Movimentação bancária de transferência interna (não altera o saldo consolidado)
+function isTransfMov(m){
+  return !!m.transfGrupo || (m.cat || '').includes('Transferência');
+}
+// Efeito de um lançamento sobre o caixa
+function efeitoLanc(l){
+  if(!l || l.status === 'cancelado' || l.tipo === 'Transferência') return 0;
+  if(l.tipo === 'Receita') return l.valor || 0;
+  if(l.tipo === 'Despesa' || l.tipo === 'Investimento') return -(l.valor || 0);
+  return 0;
+}
+// Efeito de uma movimentação bancária sobre o caixa consolidado
+function efeitoMovBanco(m){
+  if(!m || isTransfMov(m)) return 0;
+  return m.tipo === 'entrada' ? (m.val || 0) : m.tipo === 'saida' ? -(m.val || 0) : 0;
+}
+// Soma dos saldos iniciais (contas bancárias ou configuração)
+function saldoInicialGlobal(d){
+  d = d || gs();
+  return (d.bancos && d.bancos.length)
+    ? d.bancos.reduce((a, b) => a + (b.saldoInicial || 0), 0)
+    : ((d.cfg && d.cfg.si) || 0);
+}
+// Linha do tempo única de eventos de caixa (lançamentos + movimentações não espelhadas)
+function timelineCaixa(d){
+  d = d || gs();
+  const ev = [];
+  (d.lancs || []).filter(l => l.status !== 'cancelado').forEach(l => {
+    ev.push({ data:l.data, ts:l.ts || 0, delta:efeitoLanc(l), lancId:l.id, efetivado: !l.pago || l.pago === 'Pago' });
+  });
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if(m.refLancId) return;                    // já representado pelo lançamento de origem
+    ev.push({ data:m.data, ts:m.ts || 0, delta:efeitoMovBanco(m), movId:m.id, efetivado:true });
+  }));
+  return ev.sort((a, b) => (a.data || '').localeCompare(b.data || '') || (a.ts - b.ts));
+}
+/**
+ * Saldo de caixa consolidado até a data informada (inclusive).
+ * @param {string} dataISO limite YYYY-MM-DD (vazio = todo o histórico)
+ * @param {object} opts    { somentePagos:true } → considera apenas o que já foi efetivado
+ */
+function calcSaldoAte(dataISO, opts){
+  const o = opts || {};
+  const d = gs();
+  let saldo = saldoInicialGlobal(d);
+  timelineCaixa(d).forEach(e => {
+    if(!e.data || (dataISO && e.data > dataISO)) return;
+    if(o.somentePagos && !e.efetivado) return;
+    saldo += e.delta;
+  });
+  return +saldo.toFixed(2);
+}
+// Mapa: id do lançamento → saldo consolidado logo após ele (coluna "Saldo Caixa")
+function mapaSaldoPorLancamento(d){
+  d = d || gs();
+  let saldo = saldoInicialGlobal(d);
+  const mapa = {};
+  timelineCaixa(d).forEach(e => {
+    saldo += e.delta;
+    if(e.lancId) mapa[e.lancId] = +saldo.toFixed(2);
+  });
+  return mapa;
+}
 // ── Chart base: theme-aware colors ──
 function getChartBase(){
   const isLight = document.body.classList.contains('theme-light');
@@ -2706,17 +2805,22 @@ function closeM(id){document.getElementById(id).style.display='none';}
 function cmoOut(e,id){if(e.target===document.getElementById(id))closeM(id);}
 
 // ── SIDEBAR SALDO ──
+// Implementação única: "Saldo atual" = caixa consolidado (contas bancárias + lançamentos)
+// já efetivado até hoje. Transferências não alteram o total e nada é contado em dobro.
 function updSbSaldo(){
-  const d=gs(); const si=d.cfg.si||0;
-  // Excluir cancelados do cálculo do saldo
-  const ativos=d.lancs.filter(l=>l.status!=='cancelado');
-  const total=ativos.reduce((a,l)=>a+(l.tipo==='Receita'?l.valor:-(l.valor)),0);
-  const saldo=si+total;
-  setC('sb-saldo-val',fmtR(saldo),saldo>=0?'var(--green)':'var(--red)');
-  const pend=d.contas.filter(c=>c.status!=='Pago').length;
-  set('pill-contas',pend||'');
-  const pill=document.getElementById('pill-contas');
-  if(pill) pill.style.display=pend?'inline':'none';
+  const d = gs();
+  const saldo = calcSaldoAte(today(), { somentePagos:true });
+  setC('sb-saldo-val', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
+  const pend = d.contas.filter(c => c.status !== 'Pago').length;
+  set('pill-contas', pend || '');
+  const pill = document.getElementById('pill-contas');
+  if(pill) pill.style.display = pend ? 'inline' : 'none';
+  // Badge da navegação inferior (mobile)
+  const bnPill = document.getElementById('bn-pill-contas');
+  if(bnPill){
+    bnPill.textContent = pend || '';
+    bnPill.style.display = pend ? 'inline' : 'none';
+  }
 }
 
 // ── CATEGORIES ──
@@ -2804,15 +2908,16 @@ function renderDash(){
 
   const ativosBase = d.lancs.filter(l => l.status !== 'cancelado');
   const ativos = filtrarPorView(ativosBase, _dashView);
-  const ml  = ativos.filter(l => getMes(l.data) === mes);
+  const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
   const rec = ml.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
   const des = ml.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
   const inv = ml.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
   const sal = rec - des - inv;
 
-  // Mês anterior para tendências
-  const mesAnt = mes > 0 ? mes - 1 : 11;
-  const mlAnt  = ativos.filter(l => getMes(l.data) === mesAnt);
+  // Mês anterior para tendências (respeita a virada de ano)
+  const refAnt = mesAnterior(ano, mes);
+  const mesAnt = refAnt.mes;
+  const mlAnt  = ativos.filter(l => noMesAno(l.data, refAnt.mes, refAnt.ano));
   const recAnt = mlAnt.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
   const desAnt = mlAnt.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
   const invAnt = mlAnt.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
@@ -2848,8 +2953,8 @@ function renderDash(){
   set('dk-sal-sub', salAnt ? `vs ${fmtR(salAnt)} mês ant.` : '');
 
   // ── Contas pendentes ──
-  const pend = d.contas.filter(c => getMes(c.venc) === mes && c.status !== 'Pago');
-  const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes), 0);
+  const pend = d.contas.filter(c => noMesAno(c.venc, mes, ano) && c.status !== 'Pago');
+  const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes, ano), 0);
   set('dk-pend', pend.length);
   set('dk-pend-v', fmtR(pend.reduce((a,c) => a+c.valor, 0)));
   set('dk-cc-mini', fatCC > 0 ? `💳 ${fmtR(fatCC)}` : '');
@@ -2882,37 +2987,33 @@ function renderDash(){
   if (scoreLbl)  scoreLbl.textContent = scoreNota;
 
   // ── Patrimônio Líquido ──
-  const saldoBancos = (d.bancos || []).reduce((a, b) => {
-    const si = b.saldoInicial || 0;
-    const movs = (b.movs || []).filter(m => !m.cat?.includes('Transferência'));
-    const ent = movs.filter(m => m.tipo === 'entrada').reduce((a, m) => a+m.val, 0);
-    const sai = movs.filter(m => m.tipo === 'saida').reduce((a, m) => a+m.val, 0);
-    return a + si + ent - sai;
-  }, 0);
-  const saldoLancs = d.cfg.si || 0;
-  const totalInv   = ativos.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
-  const totalDiv   = d.divs.reduce((a, dv) => a + (dv.saldo || dv.total || 0), 0);
-  const patrimonioBase = saldoBancos || saldoLancs;
-  const patrimonio = patrimonioBase + totalInv - totalDiv;
+  // Caixa consolidado no fim do mês exibido (motor único) + investimentos − dívidas.
+  // No modo "Realizado" considera apenas o que já foi efetivado; no "Previsto", tudo.
+  const fimMesDash = fimDoMes(ano, mes);
+  const caixa      = calcSaldoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
+  const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash)
+                           .reduce((a,l) => a+l.valor, 0);
+  const totalDiv   = d.divs.reduce((a, dv) => a + (dv.saldo != null ? dv.saldo : (dv.total || 0)), 0);
+  const patrimonio = caixa + totalInv - totalDiv;
 
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
   const detPat = [];
-  if (saldoBancos > 0) detPat.push(`Saldo contas: ${fmtR(saldoBancos)}`);
+  detPat.push(`Caixa: ${fmtR(caixa)}`);
   if (totalInv > 0)    detPat.push(`Investimentos: ${fmtR(totalInv)}`);
   if (totalDiv > 0)    detPat.push(`Dívidas: −${fmtR(totalDiv)}`);
-  set('dk-patrimonio-sub', detPat.join(' · ') || 'Sem dados suficientes');
+  set('dk-patrimonio-sub', detPat.join(' · '));
 
   // Detalhe patrimônio
   const patDetalhe = document.getElementById('dk-patrimonio-detalhe');
   if (patDetalhe) {
     patDetalhe.innerHTML = [
-      { l: '🏦 Contas', v: saldoBancos || saldoLancs, c: 'var(--green)' },
-      { l: '📈 Invest.', v: totalInv, c: 'var(--blue)' },
-      { l: '💳 Dívidas', v: -totalDiv, c: totalDiv > 0 ? 'var(--red)' : 'var(--t3)' },
+      { l: '🏦 Caixa',    txt: fmtR(caixa),           c: caixa >= 0 ? 'var(--green)' : 'var(--red)' },
+      { l: '📈 Invest.',  txt: fmtR(totalInv),        c: 'var(--blue)' },
+      { l: '💳 Dívidas', txt: (totalDiv>0?'−':'') + fmtR(totalDiv), c: totalDiv > 0 ? 'var(--red)' : 'var(--t3)' },
     ].map(x => `
       <div style="flex:1;min-width:80px;background:var(--surface2);border-radius:var(--r2);padding:8px 10px;text-align:center">
         <div style="font-size:10px;color:var(--t3);margin-bottom:2px">${x.l}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${x.c}">${fmtR(Math.abs(x.v))}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${x.c}">${x.txt}</div>
       </div>`).join('');
   }
 
@@ -2939,7 +3040,7 @@ function renderDash(){
   // ── Gráfico 12 meses com linha de saldo ──
   const recArr=[], desArr=[], salArr=[];
   for (let m = 0; m < 12; m++) {
-    const ml2 = ativos.filter(l => getMes(l.data) === m);
+    const ml2 = ativos.filter(l => noMesAno(l.data, m, ano));
     const r = ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
     const de= ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
     const iv= ml2.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
@@ -2968,15 +3069,14 @@ function renderDash(){
   });
 
   // ── Gráfico evolução patrimônio ──
-  let patAcum = d.cfg.si || 0;
+  // Patrimônio de cada mês = caixa consolidado no fim do mês + investimentos acumulados − dívidas
   const patArr = [];
   for (let m = 0; m < 12; m++) {
-    const ml2 = ativos.filter(l => getMes(l.data) === m);
-    const r  = ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-    const de = ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-    const iv = ml2.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-    patAcum += r - de;
-    patArr.push(patAcum + iv);
+    const fimM = fimDoMes(ano, m);
+    const caixaM = calcSaldoAte(fimM, { somentePagos: _dashView === 'realizado' });
+    const invM   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimM)
+                         .reduce((a,l) => a+l.valor, 0);
+    patArr.push(+(caixaM + invM - totalDiv).toFixed(2));
   }
   mkCh('ch-dash-patrimonio', {
     type:'line',
@@ -3122,7 +3222,7 @@ function renderDash(){
   document.getElementById('dash-ultimos').innerHTML = ult.length ? ult.map(l => {
     const c = l.tipo==='Receita'?'var(--green)':l.tipo==='Investimento'?'var(--blue)':'var(--red)';
     const s = l.tipo==='Receita'?'+':'-';
-    const isCurrent = getMes(l.data) === mes;
+    const isCurrent = noMesAno(l.data, mes, ano);
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);${!isCurrent?'opacity:.5':''}">
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.desc}</div>
@@ -3363,8 +3463,9 @@ function tglRel(v,el){
 
 function renderRel(){
   const d=gs();
+  const ano=anoRef();
   const ativosBase=d.lancs.filter(l=>l.status!=='cancelado');
-  const ativos=filtrarPorView(ativosBase, _relFilterView);
+  const ativos=filtrarPorView(ativosBase, _relFilterView).filter(l=>getAno(l.data)===ano);
   const mData=MESES.map((_,m)=>({
     r :ativos.filter(l=>l.tipo==='Receita'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
     de:ativos.filter(l=>l.tipo==='Despesa'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
@@ -3421,8 +3522,9 @@ function renderRel(){
 
   // ── Fluxo de Caixa ──
   if(_relView==='fluxo'){
-    let acum=d.cfg.si||0;
-    const fluxo=mData.map(m=>{acum+=m.r-m.de-m.i;return acum;});
+    // Abertura = saldo consolidado no fim do ano anterior (não reinicia do zero)
+    let acum=calcSaldoAte(fimDoMes(ano-1,11), { somentePagos:_relFilterView==='realizado' });
+    const fluxo=mData.map(m=>{acum+=m.r-m.de-m.i;return +acum.toFixed(2);});
     mkCh('ch-rel-fluxo',{type:'line',data:{labels:MESES3,datasets:[{
       label:'Saldo Acumulado',data:fluxo,borderColor:'#4dabf7',backgroundColor:'#4dabf715',
       borderWidth:2,fill:true,tension:.35,pointBackgroundColor:'#4dabf7',pointRadius:3,
@@ -3450,7 +3552,7 @@ function dreRow(label, valor, style='', indent=0){
   const pad = indent*20;
   return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px ${pad?0:0}px 8px ${pad}px;border-bottom:1px solid var(--line);${style}">
     <span style="font-size:${indent?11:12}px;color:${indent?'var(--t2)':'var(--t1)'};${indent?'':'font-weight:500'}">${indent?'↳ ':''} ${label}</span>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:${indent?11:13}px;font-weight:${indent?400:600};color:${indent?'var(--t2)':cor}">${fmtR(Math.abs(valor))}${valor<0?' ▼':valor>0?' ▲':''}</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:${indent?11:13}px;font-weight:${indent?400:600};color:${indent?'var(--t2)':cor}">${fmtR(valor)}</span>
   </div>`;
 }
 
@@ -3463,30 +3565,32 @@ function dreTotal(label, valor, destaque=false){
   const bg  = valor>=0?'var(--green-dim,#00d97e22)':'var(--red-dim,#ff4d6d22)';
   return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${bg};border-radius:var(--r2);margin:8px 0;${destaque?'border:1px solid '+cor:''}">
     <span style="font-size:${destaque?14:13}px;font-weight:700;color:${destaque?cor:'var(--t1)'}">${label}</span>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:${destaque?18:15}px;font-weight:700;color:${cor}">${fmtR(Math.abs(valor))}</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:${destaque?18:15}px;font-weight:700;color:${cor}">${fmtR(valor)}</span>
   </div>`;
 }
 
-// ── Helpers de fluxo de caixa (inclui movimentações bancárias) ──
+// ── Helpers de fluxo de caixa (lançamentos + movimentações bancárias, sem dupla contagem) ──
 function getCashFlowForMonth(d, mes, ativosParam) {
-  const ano = d.cfg.ano || new Date().getFullYear();
+  const ano = anoRef();
   const ativos = ativosParam || filtrarPorView(d.lancs.filter(l => l.status !== 'cancelado'), _relFilterView);
-  const ml = ativos.filter(l => getMes(l.data) === mes);
+  const ml = ativos.filter(l => noMesAno(l.data, mes, ano));
 
   // Fluxo de lançamentos
   const lancRec = ml.filter(l => l.tipo === 'Receita').reduce((a, l) => a + l.valor, 0);
   const lancDes = ml.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
   const lancInv = ml.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
 
-  // Fluxo das contas bancárias (movimentações diretas)
-  let bkEnt = 0, bkSai = 0;
-  (d.bancos || []).forEach(b => {
-    (b.movs || []).forEach(m => {
-      if (getMes(m.data) !== mes) return;
-      if (m.tipo === 'entrada' && !m.cat?.includes('Transferência')) bkEnt += m.val;
-      if (m.tipo === 'saida'   && !m.cat?.includes('Transferência')) bkSai += m.val;
-    });
-  });
+  // Movimentações bancárias do mês que NÃO vieram de um lançamento (mov.refLancId),
+  // para o mesmo dinheiro não ser contado duas vezes, e sem transferências internas.
+  const movsMes = [];
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if (!noMesAno(m.data, mes, ano)) return;
+    if (m.refLancId) return;
+    if (isTransfMov(m)) return;
+    movsMes.push(m);
+  }));
+  const bkEnt = movsMes.filter(m => m.tipo === 'entrada').reduce((a, m) => a + m.val, 0);
+  const bkSai = movsMes.filter(m => m.tipo === 'saida').reduce((a, m) => a + m.val, 0);
 
   // Receitas totais (lançamentos + bancário não duplicado)
   const recCats = {}, desCats = {}, invCats = {};
@@ -3494,32 +3598,16 @@ function getCashFlowForMonth(d, mes, ativosParam) {
   ml.filter(l => l.tipo === 'Despesa').forEach(l => { desCats[l.cat] = (desCats[l.cat] || 0) + l.valor; });
   ml.filter(l => l.tipo === 'Investimento').forEach(l => { invCats[l.cat] = (invCats[l.cat] || 0) + l.valor; });
 
-  // Contas bancárias: agrupar entradas/saídas por categoria para o DRE
+  // Movimentações bancárias avulsas agrupadas por categoria para o DRE
   const bkEntCats = {}, bkSaiCats = {};
-  (d.bancos || []).forEach(b => {
-    (b.movs || []).forEach(m => {
-      if (getMes(m.data) !== mes) return;
-      const cat = m.cat || 'Outras Movimentações';
-      if (m.tipo === 'entrada' && !cat.includes('Transferência')) {
-        bkEntCats[cat] = (bkEntCats[cat] || 0) + m.val;
-      }
-      if (m.tipo === 'saida' && !cat.includes('Transferência')) {
-        bkSaiCats[cat] = (bkSaiCats[cat] || 0) + m.val;
-      }
-    });
+  movsMes.forEach(m => {
+    const cat = m.cat || 'Outras Movimentações';
+    if (m.tipo === 'entrada') bkEntCats[cat] = (bkEntCats[cat] || 0) + m.val;
+    if (m.tipo === 'saida')   bkSaiCats[cat] = (bkSaiCats[cat] || 0) + m.val;
   });
 
-  // Saldo bancário total
-  const saldoBancos = (d.bancos || []).reduce((a, b) => {
-    const si = b.saldoInicial || 0;
-    const movs = (b.movs || []).filter(m => {
-      const d2 = new Date(m.data + 'T00:00:00');
-      return d2.getMonth() <= mes;
-    });
-    const ent = movs.filter(m => m.tipo === 'entrada').reduce((s, m) => s + m.val, 0);
-    const sai = movs.filter(m => m.tipo === 'saida').reduce((s, m) => s + m.val, 0);
-    return a + si + ent - sai;
-  }, 0);
+  // Saldo consolidado no fim do mês (motor único de saldo)
+  const saldoBancos = calcSaldoAte(fimDoMes(ano, mes), { somentePagos: _relFilterView === 'realizado' });
 
   return { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos };
 }
@@ -3531,24 +3619,22 @@ function renderDREMensal(d, ativos) {
 
   const { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos } = getCashFlowForMonth(d, mes, ativos);
 
-  // Mesclar receitas de lançamentos + bancário
+  // Mescla lançamentos + movimentações bancárias avulsas (as espelhadas já foram excluídas)
   const allRecCats = { ...recCats };
-  Object.entries(bkEntCats).forEach(([cat, val]) => {
-    if (!allRecCats[cat]) allRecCats[cat] = val;
-  });
+  Object.entries(bkEntCats).forEach(([cat, val]) => { allRecCats[cat] = (allRecCats[cat] || 0) + val; });
   const allDesCats = { ...desCats };
-  Object.entries(bkSaiCats).forEach(([cat, val]) => {
-    if (!allDesCats[cat]) allDesCats[cat] = val;
-  });
+  Object.entries(bkSaiCats).forEach(([cat, val]) => { allDesCats[cat] = (allDesCats[cat] || 0) + val; });
 
-  const totRec = Object.values(allRecCats).reduce((a, v) => a + v, 0) || lancRec;
-  const totDes = Object.values(allDesCats).reduce((a, v) => a + v, 0) || lancDes;
+  const totRec = lancRec + bkEnt;
+  const totDes = lancDes + bkSai;
   const totInv = lancInv;
   const lucroOp = totRec - totDes;
   const result  = lucroOp - totInv;
   const margem  = totRec > 0 ? lucroOp / totRec * 100 : 0;
-  const saldoAnterior = d.cfg.si || 0;
-  const fluxoLiquido  = lancRec - lancDes - lancInv;
+  // Saldo de abertura = saldo consolidado no fim do mês anterior
+  const refAntDre     = mesAnterior(ano, mes);
+  const saldoAnterior = calcSaldoAte(fimDoMes(refAntDre.ano, refAntDre.mes), { somentePagos: _relFilterView === 'realizado' });
+  const fluxoLiquido  = totRec - totDes - totInv;
 
   let html = '';
 
@@ -3593,7 +3679,8 @@ function renderDREMensal(d, ativos) {
   // Adicionar bancário
   Object.entries(bkSaiCats).forEach(([cat, val]) => {
     if (!desBySubcat[cat]) desBySubcat[cat] = { total: 0, subcats: {} };
-    if (!desCats[cat]) { desBySubcat[cat].total += val; desBySubcat[cat].subcats['Movimentação Bancária'] = (desBySubcat[cat].subcats['Movimentação Bancária'] || 0) + val; }
+    desBySubcat[cat].total += val;
+    desBySubcat[cat].subcats['Movimentação Bancária'] = (desBySubcat[cat].subcats['Movimentação Bancária'] || 0) + val;
   });
 
   const desEntries = Object.entries(desBySubcat).sort((a, b) => b[1].total - a[1].total);
@@ -3642,14 +3729,15 @@ function renderDREMensal(d, ativos) {
 
   // ── 4. Fluxo de Caixa (Demonstrativo) ──
   html += dreSeparator('4. Demonstrativo de Fluxo de Caixa');
-  html += dreRow('Saldo Inicial (Configuração)', saldoAnterior);
+  html += dreRow(`Saldo Inicial (fim de ${MESES[refAntDre.mes]}${refAntDre.ano !== ano ? '/' + refAntDre.ano : ''})`, saldoAnterior);
   html += dreRow('(+) Entradas do Período', totRec);
   html += dreRow('(-) Saídas do Período', -totDes);
   if (totInv > 0) html += dreRow('(-) Investimentos', -totInv);
   html += dreTotal('(=) Fluxo Líquido do Período', fluxoLiquido);
+  html += dreTotal(`(=) Saldo Final (fim de ${MESES[mes]})`, saldoAnterior + fluxoLiquido, true);
   if ((d.bancos || []).length > 0) {
     html += `<div style="padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:12px;color:var(--cyan)">🏦 Saldo Total nas Contas Bancárias</span>
+      <span style="font-size:12px;color:var(--cyan)">🏦 Saldo consolidado no fim do mês</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--cyan)">${fmtR(saldoBancos)}</span>
     </div>`;
   }
@@ -3658,15 +3746,15 @@ function renderDREMensal(d, ativos) {
 
   // ── Gráficos ──
   const recKeys = Object.keys(allRecCats), recVals = Object.values(allRecCats);
-  const desKeys = Object.keys(desCats), desVals = Object.values(desCats);
+  const desKeys = Object.keys(allDesCats), desVals = Object.values(allDesCats);
   if (recKeys.length) mkCh('ch-dre-m-rec', { type: 'doughnut', data: { labels: recKeys, datasets: [{ data: recVals, backgroundColor: CORES_CAT, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { color: '#8fa3bf', font: { size: 10 }, boxWidth: 10 } } } } });
   if (desKeys.length) mkCh('ch-dre-m-des', { type: 'doughnut', data: { labels: desKeys, datasets: [{ data: desVals, backgroundColor: CORES_CAT.slice().reverse(), borderWidth: 0 } ] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { color: '#8fa3bf', font: { size: 10 }, boxWidth: 10 } } } } });
 }
 
 function renderDRESemanal(d, ativos) {
   const mes = getMesSel();
-  const ano = d.cfg.ano || new Date().getFullYear();
-  const ml  = ativos.filter(l => getMes(l.data) === mes);
+  const ano = anoRef();
+  const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
   document.getElementById('dre-s-titulo').textContent = `${MESES[mes]} ${ano} — Fluxo de Caixa por Semana`;
 
   const diasNoMes = new Date(ano, mes + 1, 0).getDate();
@@ -3684,15 +3772,17 @@ function renderDRESemanal(d, ativos) {
     const de = semLancs.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
     const i  = semLancs.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
 
-    // Movimentações bancárias da semana
+    // Movimentações bancárias avulsas da semana
+    // (ignora as espelhadas de lançamentos e as transferências entre contas)
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
       (b.movs || []).forEach(m => {
-        if (getMes(m.data) !== mes) return;
+        if (!noMesAno(m.data, mes, ano)) return;
+        if (m.refLancId || isTransfMov(m)) return;
         const dd = parseInt(m.data.split('-')[2]);
         if (dd < s.ini || dd > s.fim) return;
-        if (m.tipo === 'entrada' && !m.cat?.includes('Transferência')) bkEnt += m.val;
-        if (m.tipo === 'saida'   && !m.cat?.includes('Transferência')) bkSai += m.val;
+        if (m.tipo === 'entrada') bkEnt += m.val;
+        if (m.tipo === 'saida')   bkSai += m.val;
       });
     });
 
@@ -3704,7 +3794,7 @@ function renderDRESemanal(d, ativos) {
     });
 
     const totalEnt = r + bkEnt;
-    const totalSai = de + bkSai;
+    const totalSai = de + bkSai + i;   // investimento também sai do caixa
     return { ...s, r, de, i, bkEnt, bkSai, totalEnt, totalSai, res: r - de, resTotal: totalEnt - totalSai, desSubcats };
   });
 
@@ -3790,16 +3880,16 @@ function renderDRESemanal(d, ativos) {
 
 function renderDREDiario(d, ativos) {
   const mes = getMesSel();
-  const ano = d.cfg.ano || new Date().getFullYear();
-  const ml  = ativos.filter(l => getMes(l.data) === mes);
+  const ano = anoRef();
+  const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
   document.getElementById('dre-d-titulo').textContent = `${MESES[mes]} ${ano} — Fluxo de Caixa Diário`;
-
-  // Índice rápido de lançamentos ativos (não cancelados) para filtrar movs bancários
-  const lancAtivosIds = new Set(d.lancs.filter(l => l.status !== 'cancelado').map(l => l.id));
 
   const diasNoMes = new Date(ano, mes + 1, 0).getDate();
   const dias = [];
-  let acum = 0;
+  // Abertura do mês = saldo consolidado no fim do mês anterior (não começa do zero)
+  const refAntDia   = mesAnterior(ano, mes);
+  const saldoInicio = calcSaldoAte(fimDoMes(refAntDia.ano, refAntDia.mes), { somentePagos: _relFilterView === 'realizado' });
+  let acum = saldoInicio;
 
   for (let d2 = 1; d2 <= diasNoMes; d2++) {
     const dataStr = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(d2).padStart(2, '0')}`;
@@ -3813,10 +3903,10 @@ function renderDREDiario(d, ativos) {
     (d.bancos || []).forEach(b => {
       (b.movs || []).forEach(m => {
         if (m.data !== dataStr) return;
-        // Exclui movs com refLancId ativo — esse valor já entra via lançamento (evita dupla contagem)
-        if (m.refLancId) return;
-        if (m.tipo === 'entrada' && !m.cat?.includes('Transferência')) bkEnt += m.val;
-        if (m.tipo === 'saida'   && !m.cat?.includes('Transferência')) bkSai += m.val;
+        // Exclui movs espelhadas de lançamento (já contadas) e transferências entre contas
+        if (m.refLancId || isTransfMov(m)) return;
+        if (m.tipo === 'entrada') bkEnt += m.val;
+        if (m.tipo === 'saida')   bkSai += m.val;
       });
     });
 
@@ -4134,9 +4224,12 @@ function initLancAnoOpts(){
   const anos = [...anosSet].sort().reverse();
   const el = document.getElementById('l-fil-ano');
   if(!el) return;
-  const prev = el.value || anoAtual;
+  // Preserva a escolha do usuário, inclusive "Todos os anos" (valor vazio)
+  const prev = el.dataset.init ? el.value : anoAtual;
   el.innerHTML = '<option value="">Todos os anos</option>' +
-    anos.map(a => `<option value="${a}" ${a===prev?'selected':''}>${a}</option>`).join('');
+    anos.map(a => `<option value="${a}">${a}</option>`).join('');
+  el.value = prev;
+  el.dataset.init = '1';
 }
 
 function renderLanc(){
@@ -4185,24 +4278,28 @@ function renderLanc(){
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
 
-  // Saldo Acumulado
-  const si = d.cfg.si || 0;
-  let acum = si;
-  for(let m = 0; m <= kpiMes; m++){
-    const ml = d.lancs.filter(l=>getMes(l.data)===m && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno);
-    const mr = ml.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-    const md = ml.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-    const mi = ml.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-    acum += mr - md - mi;
-  }
+  // ── Saldo Acumulado (motor único de saldo) ──
+  // Consolida contas bancárias + lançamentos, de forma contínua no tempo:
+  // o saldo NÃO reinicia a cada ano — dezembro fecha e janeiro seguinte abre com esse valor.
+  const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const fimMesAtual = fimDoMes(kpiAno, kpiMes);
+  const mAnt        = mesAnterior(kpiAno, kpiMes);
+  const acum        = calcSaldoAte(fimMesAtual);
+  const saldoAntes  = calcSaldoAte(fimDoMes(mAnt.ano, mAnt.mes));
+  const realizado   = calcSaldoAte(fimMesAtual, { somentePagos:true });
   setC('lk-acum', fmtR(acum), acum>=0?'var(--cyan)':'var(--red)');
   const acumSubEl = document.getElementById('lk-acum-sub');
   if(acumSubEl){
-    const MESES_ABREV=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const saldoAntes = acum - (rec - des - inv);
-    acumSubEl.textContent = kpiMes > 0
-      ? `Acum. até ${MESES_ABREV[kpiMes]} · anterior: ${fmtRs(saldoAntes)}`
-      : `Início do ano · S.I.: ${fmtRs(si)}`;
+    const rotuloAnt = MESES_ABREV[mAnt.mes] + (mAnt.ano !== parseInt(kpiAno) ? '/' + mAnt.ano : '');
+    acumSubEl.innerHTML =
+      `Anterior (${rotuloAnt}): <b style="color:${saldoAntes>=0?'var(--green)':'var(--red)'}">${fmtR(saldoAntes)}</b>`
+      + (realizado !== acum
+          ? ` · realizado: <b style="color:${realizado>=0?'var(--t2)':'var(--red)'}">${fmtR(realizado)}</b>`
+          : '');
+    acumSubEl.title =
+      'Saldo consolidado (contas banc\u00e1rias + lan\u00e7amentos), acumulado desde o in\u00edcio do hist\u00f3rico.\n'
+      + '• Anterior: saldo no fim de ' + rotuloAnt + '\n'
+      + '• Realizado: considera apenas lan\u00e7amentos j\u00e1 efetivados (Pago)';
   }
 
   const tbody = document.getElementById('l-tbody');
@@ -4225,23 +4322,11 @@ function renderLanc(){
     return '<span class="badge bdg-green" style="font-size:9px">✓ Pago</span>';
   };
 
-  // ── Saldo acumulado por linha ──
-  // Pega TODOS os lançamentos ativos (não cancelados) ordenados por data asc para calcular running balance
-  const todosAtivos = d.lancs
-    .filter(l => l.status !== 'cancelado')
-    .sort((a,b) => a.data.localeCompare(b.data) || a.ts - b.ts);
-
-  // Monta mapa: id → saldo acumulado até aquele lançamento (reutiliza si já declarado acima)
-  let runSaldo = si;
-  const saldoMap = {};
-  todosAtivos.forEach(l => {
-    const isTransf = l.tipo === 'Transferência';
-    if(!isTransf){
-      if(l.tipo === 'Receita')                           runSaldo += l.valor;
-      else if(l.tipo === 'Despesa' || l.tipo === 'Investimento') runSaldo -= l.valor;
-    }
-    saldoMap[l.id] = runSaldo;
-  });
+  // ── Saldo consolidado por linha ──
+  // Usa exatamente o mesmo motor do KPI "Saldo Acumulado": parte dos saldos iniciais
+  // das contas bancárias, inclui movimentações bancárias, ignora transferências
+  // (dinheiro apenas muda de conta) e nunca conta duas vezes um lançamento espelhado.
+  const saldoMap = mapaSaldoPorLancamento(d);
 
   tbody.innerHTML = items.map(l => {
     const isCanceled  = l.status==='cancelado';
@@ -4414,8 +4499,9 @@ function renderOrc(){
   let metas = d.orcs.filter(o=>o.mes===_orcMes);
   if(tipoFil) metas = metas.filter(m=>m.tipo===tipoFil);
 
-  // Lançamentos ativos do mês
-  const lancs = d.lancs.filter(l=>getMes(l.data)===_orcMes && l.status!=='cancelado');
+  // Lançamentos ativos do mês (dentro do ano de referência configurado)
+  const anoOrc = anoRef();
+  const lancs = d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado');
 
   // ── KPIs ──
   const metaDes   = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa').reduce((a,o)=>a+o.val,0);
@@ -4747,7 +4833,7 @@ function calcParcelaConta(){
   const prev = document.getElementById('cp-parc-preview');
   const elVP = document.getElementById('cp-val-parcela');
   if(prev) prev.style.display = parc>1 ? 'block' : 'none';
-  if(elVP) elVP.textContent = fmtR(val/parc);
+  if(elVP) elVP.textContent = fmtR(dividirParcelas(val, parc)[0]);
 }
 
 function toggleCpCaixa(){
@@ -4851,9 +4937,11 @@ function saveConta(){
   }
 
   // ── MODO CRIAÇÃO ──
-  const valParcela = +(val/parc).toFixed(2);
+  // A soma das parcelas fecha exatamente com o valor total (o resto de centavos vai na última)
+  const parcelasVal = dividirParcelas(val, parc);
   const grupoId = uid();
   for(let i=0;i<parc;i++){
+    const valParcela = parcelasVal[i];
     const vencParcela = addMeses(venc, i);
     const numLabel = parc>1 ? ` (${i+1}/${parc})` : '';
     const stParcela = (i===0 && st==='Pago') ? 'Pago' : 'Pendente';
@@ -4893,14 +4981,32 @@ function gerarLancDaConta(c, d){
   });
 }
 
+function initContasAnoOpts(){
+  const d = gs();
+  const el = document.getElementById('cp-fil-ano');
+  if(!el) return;
+  const anos = new Set();
+  (d.contas||[]).forEach(c => { if(c.venc) anos.add(c.venc.slice(0,4)); });
+  anos.add(String(anoRef()));
+  const lista = [...anos].sort();
+  const atual = el.dataset.init ? el.value : String(anoRef());
+  el.innerHTML = '<option value="">Todos os anos</option>'
+    + lista.map(a => `<option value="${a}">${a}</option>`).join('');
+  el.value = atual;
+  el.dataset.init = '1';
+}
+
 function renderContas(){
   const d    = gs();
+  initContasAnoOpts();
+  const anoF = document.getElementById('cp-fil-ano')?.value;
   const mesF = document.getElementById('cp-fil-mes')?.value;
   const stF  = document.getElementById('cp-fil-st')?.value;
   const hoje = new Date();
   let items  = [...d.contas].sort((a,b)=>a.venc.localeCompare(b.venc));
   items.forEach(c=>{ if(c.status==='Pendente'&&new Date(c.venc+'T00:00:00')<hoje) c.status='Vencida'; });
-  if(mesF!==''&&mesF!==undefined) items=items.filter(c=>getMes(c.venc)===parseInt(mesF));
+  if(anoF)                        items=items.filter(c=>getAno(c.venc)===parseInt(anoF));
+  if(mesF!==''&&mesF!==undefined) items=items.filter(c=>noMesAno(c.venc,parseInt(mesF),anoF||anoRef()));
   if(stF) items=items.filter(c=>c.status===stF);
 
   const total = items.reduce((a,c)=>a+c.valor,0);
@@ -5026,7 +5132,7 @@ function calcParcelaDiv(){
   const nparc = parseInt(document.getElementById('d-nparc')?.value)||1;
   const pagas = parseInt(document.getElementById('d-pagas')?.value)||0;
   const el    = document.getElementById('d-val-parcela');
-  if(el) el.textContent = fmtR(total/nparc);
+  if(el) el.textContent = fmtR(dividirParcelas(total, nparc)[0]);
 }
 
 // ── DÍVIDAS ──
@@ -5042,18 +5148,20 @@ function saveDiv(){
   const saldoInput = parseFloat(document.getElementById('d-saldo')?.value);
   if(!nome||!total){alert('Preencha os campos obrigatórios.');return;}
 
-  const valParcela = +(total/nparc).toFixed(2);
-  const saldo = isNaN(saldoInput) ? total - (valParcela*pagas) : saldoInput;
-  const mensal = valParcela;
+  // A soma das parcelas fecha exatamente com o valor total da dívida
+  const parcelasVal = dividirParcelas(total, nparc);
+  const pagoAteAgora = parcelasVal.slice(0, Math.min(pagas, nparc)).reduce((a,v)=>a+v, 0);
+  const saldo  = isNaN(saldoInput) ? +(total - pagoAteAgora).toFixed(2) : saldoInput;
+  const mensal = parcelasVal[0];
 
   // Gerar array de parcelas
   const parcelas = [];
   for(let i=0;i<nparc;i++){
     const venc = addMeses(data1, i);
     parcelas.push({
-      id:uid(), num:i+1, total:nparc, venc, valor:valParcela,
+      id:uid(), num:i+1, total:nparc, venc, valor:parcelasVal[i],
       status: i<pagas ? 'Pago' : 'Pendente',
-      dataPg: i<pagas ? '' : ''
+      dataPg: ''
     });
   }
 
@@ -5190,8 +5298,9 @@ function renderDividas(){
   // Chart evolução de pagamentos
   const allPags = d.divs.flatMap(dv=>(dv.pags||[]));
   if(allPags.length){
+    const anoDv = anoRef();
     const byMes = Array(12).fill(0);
-    allPags.forEach(p=>{ const m=getMes(p.data); if(m>=0) byMes[m]+=p.val; });
+    allPags.forEach(p=>{ if(getAno(p.data)===anoDv){ const m=getMes(p.data); if(m>=0) byMes[m]+=p.val; } });
     mkCh('ch-div',{type:'bar',data:{labels:MESES3,datasets:[{data:byMes,backgroundColor:'#00d97e40',borderColor:'#00d97e',borderWidth:1.5,borderRadius:4}]},
     options:{...chartBase,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
   }
@@ -5244,14 +5353,47 @@ function delDiv(id){
 
 // ── CARTÕES ──
 let _ccSel=null;
-function getFatAberta(c,mes=curMes()){
-  return (c.gastos||[]).filter(g=>getMes(g.data)===mes&&!g.fechado).reduce((a,g)=>a+g.val/g.parc,0);
+// Valor da parcela de um gasto que cai no mês/ano informado (0 se não há parcela nesse mês).
+// Uma compra em 10x lançada em março pesa nas faturas de março até dezembro — e não só na de março.
+function parcelaNoMes(g, mes, ano){
+  if(!g || !g.data) return 0;
+  const n    = Math.max(1, parseInt(g.parc) || 1);
+  const diff = (parseInt(ano) - getAno(g.data)) * 12 + (parseInt(mes) - getMes(g.data));
+  if(diff < 0 || diff >= n) return 0;
+  return dividirParcelas(g.val || 0, n)[diff];
 }
-function getFatMes(c,mes){
-  const f=(c.faturas||[]).find(f=>f.mes===mes);
-  if(f)return f;
-  const gastos=(c.gastos||[]).filter(g=>getMes(g.data)===mes);
-  return {mes,valor:gastos.reduce((a,g)=>a+g.val/g.parc,0)};
+// Total da fatura de um mês: soma de todas as parcelas que caem nele
+function getFaturaMes(c, mes, ano){
+  ano = ano != null ? ano : new Date().getFullYear();
+  return +((c.gastos || []).reduce((a, g) => a + parcelaNoMes(g, mes, ano), 0)).toFixed(2);
+}
+// A fatura daquele mês já foi paga? (faturas antigas não guardavam o ano — compatível)
+function faturaPaga(c, mes, ano){
+  return (c.faturas || []).some(f => f.mes === parseInt(mes)
+    && (f.ano == null || f.ano === parseInt(ano)) && f.status === 'Pago');
+}
+// Fatura em aberto do mês (zero quando já paga)
+function getFatAberta(c, mes = curMes(), ano){
+  ano = ano != null ? ano : new Date().getFullYear();
+  return faturaPaga(c, mes, ano) ? 0 : getFaturaMes(c, mes, ano);
+}
+// Limite comprometido = todas as parcelas cujas faturas ainda não foram pagas
+function limiteUsado(c){
+  let total = 0;
+  (c.gastos || []).forEach(g => {
+    const n = Math.max(1, parseInt(g.parc) || 1);
+    const gm = getMes(g.data), ga = getAno(g.data);
+    dividirParcelas(g.val || 0, n).forEach((v, i) => {
+      const abs = ga * 12 + gm + i;
+      if(!faturaPaga(c, abs % 12, Math.floor(abs / 12))) total += v;
+    });
+  });
+  return +total.toFixed(2);
+}
+function getFatMes(c, mes, ano){
+  ano = ano != null ? ano : new Date().getFullYear();
+  const f = (c.faturas || []).find(f => f.mes === parseInt(mes) && (f.ano == null || f.ano === parseInt(ano)));
+  return f || { mes, ano, valor:getFaturaMes(c, mes, ano) };
 }
 function saveCC(){
   const nome=document.getElementById('cc-nome')?.value?.trim();
@@ -5268,9 +5410,11 @@ function saveCC(){
 function renderCartoes(){
   const d=gs();
   const mes=curMes();
-  const totalFat=d.ccs.reduce((a,c)=>a+getFatAberta(c,mes),0);
+  const anoCC=new Date().getFullYear();
+  const totalFat=d.ccs.reduce((a,c)=>a+getFatAberta(c,mes,anoCC),0);
   const totalLim=d.ccs.reduce((a,c)=>a+c.lim,0);
-  const totalUsado=d.ccs.reduce((a,c)=>a+getFatAberta(c,mes),0);
+  // Limite usado considera também as parcelas futuras ainda não quitadas
+  const totalUsado=d.ccs.reduce((a,c)=>a+limiteUsado(c),0);
   const disp=Math.max(0,totalLim-totalUsado);
   const pctUso=totalLim>0?totalUsado/totalLim*100:0;
 
@@ -5301,8 +5445,8 @@ function renderCartoes(){
   if(emptyS)emptyS.style.display='none';
 
   grid.innerHTML=d.ccs.map(c=>{
-    const fat=getFatAberta(c,mes);
-    const pctU=c.lim>0?Math.min(100,fat/c.lim*100):0;
+    const fat=getFatAberta(c,mes,anoCC);
+    const pctU=c.lim>0?Math.min(100,limiteUsado(c)/c.lim*100):0;
     return `<div class="cc-visual${_ccSel===c.id?' selected':''}" style="background:${c.grad}" onclick="selectCC('${c.id}')">
       <div>
         <div class="cc-chip"></div>
@@ -5337,9 +5481,11 @@ function selectCC(id){
   set('cc-det-info',`${c.band} · Fechamento dia ${c.fech} · Vencimento dia ${c.venc}`);
 
   const mes=curMes();
-  const fat=getFatAberta(c,mes);
-  const disp=Math.max(0,c.lim-fat);
-  const pctU=c.lim>0?Math.min(100,fat/c.lim*100):0;
+  const anoCC=new Date().getFullYear();
+  const fat=getFatAberta(c,mes,anoCC);
+  const usado=limiteUsado(c);
+  const disp=Math.max(0,c.lim-usado);
+  const pctU=c.lim>0?Math.min(100,usado/c.lim*100):0;
   set('cc-d-lim',fmtR(c.lim));set('cc-d-disp',fmtR(disp));set('cc-d-fat',fmtR(fat));
   const hoje=new Date();const dv=new Date();dv.setDate(c.venc);
   if(dv<hoje)dv.setMonth(dv.getMonth()+1);
@@ -5351,7 +5497,7 @@ function selectCC(id){
 
   // Gráfico categorias mês
   const catMap={};
-  (c.gastos||[]).filter(g=>getMes(g.data)===mes&&!g.fechado).forEach(g=>{catMap[g.cat]=(catMap[g.cat]||0)+g.val/g.parc;});
+  (c.gastos||[]).forEach(g=>{const v=parcelaNoMes(g,mes,anoCC);if(v>0)catMap[g.cat]=(catMap[g.cat]||0)+v;});
   const cKeys=Object.keys(catMap);
   if(cKeys.length){
     mkCh('ch-cc-cat',{type:'doughnut',data:{labels:cKeys,datasets:[{data:Object.values(catMap),backgroundColor:CORES_CAT,borderWidth:0,hoverOffset:4}]},
@@ -5362,14 +5508,14 @@ function selectCC(id){
     if(CH['ch-cc-cat']){CH['ch-cc-cat'].destroy();delete CH['ch-cc-cat'];}
   }
 
-  // Histórico de faturas — últimos 6 meses com gastos calculados
+  // Histórico de faturas — últimos 6 meses corridos (com as parcelas que caem em cada mês)
   const last6=[],last6Vals=[];
   for(let i=5;i>=0;i--){
-    const m=(mes-i+12)%12;
-    last6.push(MESES3[m]);
-    const fmObj=(c.faturas||[]).find(f=>f.mes===m);
-    if(fmObj){last6Vals.push(fmObj.valor);}
-    else{last6Vals.push((c.gastos||[]).filter(g=>getMes(g.data)===m).reduce((a,g)=>a+g.val/g.parc,0));}
+    const abs=anoCC*12+mes-i;
+    const m=abs%12, a=Math.floor(abs/12);
+    last6.push(MESES3[m]+(a!==anoCC?'/'+String(a).slice(2):''));
+    const fmObj=(c.faturas||[]).find(f=>f.mes===m&&(f.ano==null||f.ano===a)&&f.status==='Pago');
+    last6Vals.push(fmObj?fmObj.valor:getFaturaMes(c,m,a));
   }
   mkCh('ch-cc-fat-hist',{type:'line',data:{labels:last6,datasets:[{
     data:last6Vals,borderColor:'#cc5de8',backgroundColor:'#cc5de820',borderWidth:2,fill:true,tension:.35,
@@ -5389,8 +5535,8 @@ function selectCC(id){
   if(ftbody){
     const faturas=c.faturas||[];
     const stBdg2={Pago:'bdg-green',Aberta:'bdg-purple',Vencida:'bdg-red'};
-    ftbody.innerHTML=faturas.length?faturas.sort((a,b)=>b.mes-a.mes).map(f=>`<tr>
-      <td style="color:var(--t1)">${MESES[f.mes]}</td>
+    ftbody.innerHTML=faturas.length?faturas.slice().sort((a,b)=>((b.ano||anoCC)*12+b.mes)-((a.ano||anoCC)*12+a.mes)).map(f=>`<tr>
+      <td style="color:var(--t1)">${MESES[f.mes]}${f.ano?'/'+f.ano:''}</td>
       <td class="mono" style="color:var(--t3)">${f.dataFech||'—'}</td>
       <td class="mono" style="color:var(--t3)">${f.dataVenc||`dia ${c.venc}`}</td>
       <td class="mono" style="color:var(--purple)">${fmtR(f.valor)}</td>
@@ -5411,7 +5557,7 @@ function selectCC(id){
       <td><span class="cat-tag" style="font-size:9px">${g.cat}</span></td>
       <td style="color:var(--t3)">${g.parc>1?`${g.parc}x`:'À vista'}</td>
       <td class="mono" style="color:var(--t1)">${fmtR(g.val)}</td>
-      <td class="mono" style="color:var(--purple)">${fmtR(g.val/g.parc)}</td>
+      <td class="mono" style="color:var(--purple)">${fmtR(dividirParcelas(g.val,g.parc)[0])}</td>
       <td><button class="btn btn-red btn-xs" onclick="delGasto('${c.id}','${g.id}')">✕</button></td>
     </tr>`).join('')
     :`<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhum gasto registrado.</td></tr>`;
@@ -5442,19 +5588,17 @@ function saveGasto(){
 function savePagFat(){
   const mes=parseInt(document.getElementById('pf-mes')?.value);
   const dataPg=document.getElementById('pf-data')?.value||today();
+  const ano=getAno(dataPg)>0?getAno(dataPg):new Date().getFullYear();
   const val=parseFloat(document.getElementById('pf-val')?.value)||0;
   if(!val){alert('Informe o valor pago.');return;}
   if(!_ccSel)return;
   const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
   if(!c)return;
-  const exists=c.faturas.find(f=>f.mes===mes);
-  if(exists){exists.status='Pago';exists.dataPg=dataPg;exists.valor=val;}
+  const exists=c.faturas.find(f=>f.mes===mes&&(f.ano==null||f.ano===ano));
+  if(exists){exists.status='Pago';exists.dataPg=dataPg;exists.valor=val;exists.ano=ano;}
   else{
-    const gastosMes=(c.gastos||[]).filter(g=>getMes(g.data)===mes).reduce((a,g)=>a+g.val/g.parc,0);
-    c.faturas.push({id:uid(),mes,valor:val||gastosMes,status:'Pago',dataPg,dataVenc:`dia ${c.venc}`});
+    c.faturas.push({id:uid(),mes,ano,valor:val||getFaturaMes(c,mes,ano),status:'Pago',dataPg,dataVenc:`dia ${c.venc}`});
   }
-  // Fecha gastos deste mês
-  (c.gastos||[]).filter(g=>getMes(g.data)===mes).forEach(g=>g.fechado=true);
   ss(d);closeM('m-pag-fat');selectCC(_ccSel);renderCartoes();
 }
 
@@ -5575,12 +5719,34 @@ let _bkMovTipo = 'entrada'; // 'entrada' | 'saida'
 const BK_CATS_ENT = ['Salário','Freelance','Transferência Recebida','Rendimento','Dividendos','Vendas','Reembolso','Outros'];
 const BK_CATS_SAI = ['Alimentação','Moradia','Transporte','Saúde','Educação','Lazer','Vestuário','Serviços','Transferência Enviada','Impostos','Investimento','Outros'];
 
-// ── Calcular saldo atual de uma conta ──
-function calcSaldoConta(c) {
-  const si = c.saldoInicial || 0;
-  const entradas = (c.movs || []).filter(m => m.tipo === 'entrada').reduce((a, m) => a + m.val, 0);
-  const saidas   = (c.movs || []).filter(m => m.tipo === 'saida').reduce((a, m) => a + m.val, 0);
-  return si + entradas - saidas;
+// ── Movimentações de uma conta ──
+// Junta as movimentações próprias com os lançamentos efetivados vinculados à conta
+// (campo "Caixa/Conta") que ainda não têm movimentação espelhada — sem contar duas vezes.
+function movimentacoesDaConta(c, d) {
+  d = d || gs();
+  const proprias = (c.movs || []).map(m => ({ ...m, origemLanc:false }));
+  const espelhados = new Set(proprias.filter(m => m.refLancId).map(m => m.refLancId));
+  const doLanc = (d.lancs || [])
+    .filter(l => l.caixaId === c.id
+              && l.status !== 'cancelado'
+              && l.tipo !== 'Transferência'   // transferências vivem como movimentação espelhada
+              && (!l.pago || l.pago === 'Pago')
+              && !espelhados.has(l.id))
+    .map(l => ({
+      id: 'lnc-' + l.id, data: l.data, val: l.valor, desc: l.desc,
+      cat: l.cat || '—', forma: 'Lançamento', ts: l.ts || 0,
+      tipo: l.tipo === 'Receita' ? 'entrada' : 'saida',
+      origemLanc: true, refLancId: l.id
+    }));
+  return proprias.concat(doLanc);
+}
+
+// ── Saldo atual de uma conta ──
+function calcSaldoConta(c, d) {
+  const movs = movimentacoesDaConta(c, d);
+  const entradas = movs.filter(m => m.tipo === 'entrada').reduce((a, m) => a + m.val, 0);
+  const saidas   = movs.filter(m => m.tipo === 'saida').reduce((a, m) => a + m.val, 0);
+  return +((c.saldoInicial || 0) + entradas - saidas).toFixed(2);
 }
 
 // ── Render principal da página ──
@@ -5589,9 +5755,11 @@ function renderBancos() {
   const mes = curMes();
 
   // KPIs globais
-  const saldoTotal = d.bancos.reduce((a, c) => a + calcSaldoConta(c), 0);
-  const entMes = d.bancos.reduce((a, c) => a + (c.movs||[]).filter(m => m.tipo==='entrada' && getMes(m.data)===mes).reduce((x,m)=>x+m.val,0), 0);
-  const saiMes = d.bancos.reduce((a, c) => a + (c.movs||[]).filter(m => m.tipo==='saida'   && getMes(m.data)===mes).reduce((x,m)=>x+m.val,0), 0);
+  const anoBk = new Date().getFullYear();
+  const saldoTotal = d.bancos.reduce((a, c) => a + calcSaldoConta(c, d), 0);
+  // Transferências entre contas não são entrada nem saída no consolidado
+  const entMes = d.bancos.reduce((a, c) => a + movimentacoesDaConta(c, d).filter(m => m.tipo==='entrada' && !isTransfMov(m) && noMesAno(m.data,mes,anoBk)).reduce((x,m)=>x+m.val,0), 0);
+  const saiMes = d.bancos.reduce((a, c) => a + movimentacoesDaConta(c, d).filter(m => m.tipo==='saida'   && !isTransfMov(m) && noMesAno(m.data,mes,anoBk)).reduce((x,m)=>x+m.val,0), 0);
 
   setC('bk-total', fmtR(saldoTotal), saldoTotal >= 0 ? 'var(--green)' : 'var(--red)');
   set('bk-ent',   fmtR(entMes));
@@ -5618,9 +5786,10 @@ function renderBancos() {
   if (btnT)  btnT.style.display  = d.bancos.length >= 2 ? 'inline-flex' : 'none';
 
   grid.innerHTML = d.bancos.map(c => {
-    const saldo = calcSaldoConta(c);
-    const entC  = (c.movs||[]).filter(m=>m.tipo==='entrada'&&getMes(m.data)===mes).reduce((a,m)=>a+m.val,0);
-    const saiC  = (c.movs||[]).filter(m=>m.tipo==='saida'  &&getMes(m.data)===mes).reduce((a,m)=>a+m.val,0);
+    const movsC = movimentacoesDaConta(c, d);
+    const saldo = calcSaldoConta(c, d);
+    const entC  = movsC.filter(m=>m.tipo==='entrada'&&noMesAno(m.data,mes,anoBk)).reduce((a,m)=>a+m.val,0);
+    const saiC  = movsC.filter(m=>m.tipo==='saida'  &&noMesAno(m.data,mes,anoBk)).reduce((a,m)=>a+m.val,0);
     const isSelected = _bkSel === c.id;
     return `
     <div onclick="selectBanco('${c.id}')" style="
@@ -5693,11 +5862,12 @@ function selectBanco(id) {
   const det = document.getElementById('bk-detalhe');
   if (det) det.style.display = 'block';
 
-  const saldo = calcSaldoConta(c);
+  const saldo = calcSaldoConta(c, d);
   const mes   = curMes();
-  const movs  = c.movs || [];
-  const entMes = movs.filter(m => m.tipo==='entrada' && getMes(m.data)===mes).reduce((a,m)=>a+m.val,0);
-  const saiMes = movs.filter(m => m.tipo==='saida'   && getMes(m.data)===mes).reduce((a,m)=>a+m.val,0);
+  const movs  = movimentacoesDaConta(c, d);
+  const anoBk  = new Date().getFullYear();
+  const entMes = movs.filter(m => m.tipo==='entrada' && noMesAno(m.data,mes,anoBk)).reduce((a,m)=>a+m.val,0);
+  const saiMes = movs.filter(m => m.tipo==='saida'   && noMesAno(m.data,mes,anoBk)).reduce((a,m)=>a+m.val,0);
 
   set('bk-det-nome', c.nome);
   set('bk-det-info', `${c.banco} · ${c.tipo}${c.agencia ? ' · Ag. '+c.agencia : ''}`);
@@ -5712,13 +5882,15 @@ function selectBanco(id) {
   const grad = document.getElementById('bk-det-grad');
   if (grad) { grad.style.background = c.cor; }
 
-  // ── Gráfico evolução do saldo (12 meses) ──
-  let saldoCurr = c.saldoInicial || 0;
-  // reconstruir mês a mês em ordem
+  // ── Gráfico evolução do saldo (12 meses do ano exibido) ──
+  // Abre com o saldo inicial + tudo que ocorreu antes de janeiro do ano exibido
+  const iniAno = `${anoBk}-01-01`;
+  let saldoCurr = (c.saldoInicial || 0)
+    + movs.filter(mv => mv.data < iniAno).reduce((a,mv) => a + (mv.tipo==='entrada' ? mv.val : -mv.val), 0);
   const saldoMes = [];
   for (let m = 0; m < 12; m++) {
-    const ent = movs.filter(mv => mv.tipo==='entrada' && getMes(mv.data)===m).reduce((a,mv)=>a+mv.val,0);
-    const sai = movs.filter(mv => mv.tipo==='saida'   && getMes(mv.data)===m).reduce((a,mv)=>a+mv.val,0);
+    const ent = movs.filter(mv => mv.tipo==='entrada' && noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0);
+    const sai = movs.filter(mv => mv.tipo==='saida'   && noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0);
     saldoCurr += ent - sai;
     saldoMes.push(+saldoCurr.toFixed(2));
   }
@@ -5734,8 +5906,8 @@ function selectBanco(id) {
   // ── Gráfico barras entradas vs saídas ──
   const entArr = [], saiArr = [];
   for (let m = 0; m < 12; m++) {
-    entArr.push(movs.filter(mv=>mv.tipo==='entrada'&&getMes(mv.data)===m).reduce((a,mv)=>a+mv.val,0));
-    saiArr.push(movs.filter(mv=>mv.tipo==='saida'  &&getMes(mv.data)===m).reduce((a,mv)=>a+mv.val,0));
+    entArr.push(movs.filter(mv=>mv.tipo==='entrada'&&noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0));
+    saiArr.push(movs.filter(mv=>mv.tipo==='saida'  &&noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0));
   }
   mkCh('ch-bk-barras', {
     type: 'bar',
@@ -5748,7 +5920,7 @@ function selectBanco(id) {
 
   // ── Gráfico categorias de saída ──
   const catMap = {};
-  movs.filter(m => m.tipo === 'saida').forEach(m => { catMap[m.cat] = (catMap[m.cat]||0) + m.val; });
+  movs.filter(m => m.tipo === 'saida' && !isTransfMov(m)).forEach(m => { catMap[m.cat] = (catMap[m.cat]||0) + m.val; });
   const catKeys = Object.keys(catMap);
   if (catKeys.length) {
     mkCh('ch-bk-cats', {
@@ -5790,7 +5962,8 @@ function renderExtratoDetalhe() {
   const tipoF = document.getElementById('bk-fil-tipo')?.value;
   const busca = (document.getElementById('bk-fil-busca')?.value || '').toLowerCase();
 
-  let movs = [...(c.movs || [])].sort((a,b) => b.data.localeCompare(a.data) || b.ts - a.ts);
+  const todasMovs = movimentacoesDaConta(c, d);
+  let movs = [...todasMovs].sort((a,b) => b.data.localeCompare(a.data) || b.ts - a.ts);
   if (mesF !== '' && mesF !== undefined) movs = movs.filter(m => getMes(m.data) === parseInt(mesF));
   if (tipoF) movs = movs.filter(m => m.tipo === tipoF);
   if (busca) movs = movs.filter(m => (m.desc||'').toLowerCase().includes(busca) || (m.cat||'').toLowerCase().includes(busca));
@@ -5808,8 +5981,8 @@ function renderExtratoDetalhe() {
 
   // Calcular saldo acumulado correndo (do mais recente para o mais antigo)
   // Reconstruir saldo na data de cada mov
-  let saldoAcc = calcSaldoConta(c);
-  const allMovsOrdenados = [...(c.movs||[])].sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts);
+  let saldoAcc = calcSaldoConta(c, d);
+  const allMovsOrdenados = [...todasMovs].sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts);
   const saldoMap = {};
   allMovsOrdenados.forEach(m => {
     saldoMap[m.id] = +saldoAcc.toFixed(2);
@@ -5829,12 +6002,16 @@ function renderExtratoDetalhe() {
     const saldoRow = saldoMap[m.id] ?? 0;
     return `<tr>
       <td class="mono" style="color:var(--t3)">${m.data}</td>
-      <td style="color:var(--t1);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.desc}</td>
+      <td style="color:var(--t1);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${m.desc}${m.origemLanc?' <span class="badge bdg-gray" style="font-size:8px">lançamento</span>':''}
+      </td>
       <td><span class="cat-tag" style="font-size:9px">${m.cat||'—'}</span></td>
       <td>${tipoBdg[m.tipo] || ''}</td>
       <td class="mono" style="color:${cor};font-weight:600">${sinal}${fmtRs(m.val)}</td>
       <td class="mono" style="color:${saldoRow>=0?'var(--green)':'var(--red)'}">${fmtR(saldoRow)}</td>
-      <td><button class="btn btn-red btn-xs" onclick="delMov('${c.id}','${m.id}')">✕</button></td>
+      <td>${m.origemLanc
+        ? `<button class="btn btn-ghost btn-xs" title="Vem da aba Lançamentos" onclick="openLancOps('${m.refLancId}')">⋯</button>`
+        : `<button class="btn btn-red btn-xs" onclick="delMov('${c.id}','${m.id}')">✕</button>`}</td>
     </tr>`;
   }).join('');
 }
@@ -5966,24 +6143,7 @@ window.gs = function() {
   return d;
 };
 
-// ── Patch: updSbSaldo — usa contas bancárias se existirem, senão lançamentos ──
-const _origUpdSb = updSbSaldo;
-window.updSbSaldo = function() {
-  const d = gs();
-  let saldo;
-  if (d.bancos && d.bancos.length) {
-    saldo = d.bancos.reduce((a, c) => a + calcSaldoConta(c), 0);
-  } else {
-    const si = d.cfg.si||0;
-    const ativos = d.lancs.filter(l=>l.status!=='cancelado');
-    saldo = si + ativos.reduce((a,l)=>a+(l.tipo==='Receita'?l.valor:-l.valor),0);
-  }
-  setC('sb-saldo-val', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
-  const pend = d.contas.filter(c => c.status !== 'Pago').length;
-  set('pill-contas', pend || '');
-  const pill = document.getElementById('pill-contas');
-  if (pill) pill.style.display = pend ? 'inline' : 'none';
-};
+// (O saldo da sidebar usa o motor único `calcSaldoAte` — ver função updSbSaldo acima.)
 
 // ════════════════════════════════════════════
 // TRANSFERÊNCIA BANCÁRIA — LANÇAMENTOS
@@ -6206,11 +6366,13 @@ function seedLancamentos() {
 
   function resolverBanco(nome) {
     if (!nome) return '';
-    const n = nome.toLowerCase();
-    for (const k in bancoMap) {
-      if (k.includes(n) || n.includes(k)) return bancoMap[k];
-    }
-    return '';
+    const n = nome.trim().toLowerCase();
+    if (bancoMap[n]) return bancoMap[n];                       // 1) nome exato
+    const chaves = Object.keys(bancoMap).sort((a, b) => b.length - a.length);
+    const iguala = chaves.find(k => k === n);                  // 2) redundância defensiva
+    if (iguala) return bancoMap[iguala];
+    const contem = chaves.find(k => n.includes(k) || k.includes(n)); // 3) mais específico primeiro
+    return contem ? bancoMap[contem] : '';
   }
 
   // Chave de deduplicação
@@ -6234,6 +6396,38 @@ function seedLancamentos() {
 }
 
 seedLancamentos();
+
+// ── MIGRAÇÃO ──
+// Lançamentos importados podiam ficar vinculados à conta errada quando um nome era prefixo
+// de outro ("Conta Nubank" × "Conta Nubank Poliana"). Reatribui pelo nome exato, uma única vez.
+(function corrigirVinculoDeCaixa(){
+  try {
+    const d = gs();
+    if (d._caixaRelinked) return;
+    const porNome = {};
+    (d.bancos || []).forEach(b => { porNome[b.nome.trim().toLowerCase()] = b.id; });
+    let ajustes = 0;
+    (d.lancs || []).forEach(l => {
+      if (!l.caixaNome) return;
+      const idCerto = porNome[l.caixaNome.trim().toLowerCase()];
+      if (!idCerto || idCerto === l.caixaId) return;
+      // leva junto a movimentação espelhada, se existir
+      (d.bancos || []).forEach(b => {
+        const i = (b.movs || []).findIndex(m => m.refLancId === l.id);
+        if (i >= 0 && b.id !== idCerto) {
+          const mov = b.movs.splice(i, 1)[0];
+          const destino = d.bancos.find(x => x.id === idCerto);
+          if (destino) { destino.movs = destino.movs || []; destino.movs.push(mov); }
+        }
+      });
+      l.caixaId = idCerto;
+      ajustes++;
+    });
+    d._caixaRelinked = true;
+    ss(d);
+    if (ajustes) console.log('%c✓ ' + ajustes + ' lançamento(s) revinculado(s) à conta bancária correta.', 'color:#00d97e');
+  } catch(e) { console.warn('corrigirVinculoDeCaixa:', e); }
+})();
 
 // ── INIT ──
 // ── Define mês atual como padrão em todos os filtros de mês ──
@@ -6345,31 +6539,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   });
 });
 
-// ── Sync pill counts to bottom nav ──
-const origUpdSbSaldo = updSbSaldo;
-function updSbSaldo(){
-  const d = gs();
-  const si = d.cfg.si||0;
-  const ativos = d.lancs.filter(l=>l.status!=='cancelado');
-  const total  = ativos.reduce((a,l)=>a+(l.tipo==='Receita'?l.valor:-(l.valor)),0);
-  const saldo  = si + total;
-  setC('sb-saldo-val', fmtR(saldo), saldo>=0?'var(--green)':'var(--red)');
-  const pend = d.contas.filter(c=>c.status!=='Pago').length;
-  set('pill-contas', pend||'');
-  const pill = document.getElementById('pill-contas');
-  if(pill) pill.style.display = pend?'inline':'none';
-  // Sync bottom nav pill
-  const bnPill = document.getElementById('bn-pill-contas');
-  if(bnPill){
-    bnPill.textContent = pend||'';
-    bnPill.style.display = pend?'inline':'none';
-  }
-  // Update mob topbar title if needed
-  const mobTopbar = document.getElementById('mob-topbar');
-  if(mobTopbar){
-    const pageNames = {dash:'Dashboard',rel:'Relatórios',lanc:'Lançamentos',orc:'Orçamento',contas:'Contas a Pagar',dividas:'Dívidas',cartoes:'Cartões',bancos:'Contas Bancárias',cfg:'Configurações'};
-  }
-}
+// (A sincronização do badge da navegação inferior foi unificada dentro de updSbSaldo.)
 
 // ── Show/hide sidebar close button based on screen size ──
 function handleResize(){
