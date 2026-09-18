@@ -257,10 +257,24 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .cc-chip{width:34px;height:26px;border-radius:5px;background:linear-gradient(135deg,#d4a843,#f0d080);position:relative;z-index:1}
 .cc-chip::after{content:'';position:absolute;inset:0;border-radius:5px;background:repeating-linear-gradient(90deg,transparent,transparent 30%,rgba(0,0,0,.15) 30%,rgba(0,0,0,.15) 32%)}
 .cc-num{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;margin:10px 0 4px;opacity:.75;position:relative;z-index:1}
-.cc-bot{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
+.cc-bot{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;position:relative;z-index:1}
+.cc-bot>div:last-child{flex-shrink:0}
 .cc-name-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
 .cc-fatura-label{font-size:10px;opacity:.6;margin-bottom:1px}
-.cc-fatura-val{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.cc-fatura-val{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.cc-acts{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3;opacity:0;transition:opacity .15s}
+.cc-visual:hover .cc-acts,.cc-visual.selected .cc-acts{opacity:1}
+.cc-act{width:24px;height:24px;border-radius:6px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.28);
+  color:#fff;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cc-act:hover{background:rgba(0,0,0,.55)}
+.fatdet-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+  background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px}
+.fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
+/* Blocos auxiliares de formulário (erro inline e prévia) */
+.form-err{padding:10px 14px;border-radius:var(--r2);font-size:12px;border-left:3px solid var(--red);
+  background:var(--red-dim);color:var(--red);margin-bottom:12px}
+.cp-preview{background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);
+  padding:11px 14px;font-size:12px;color:var(--t2);line-height:1.6}
 
 /* ── SUM ROWS ── */
 .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
@@ -1085,6 +1099,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   <div class="toggle-row">
     <div class="tgl active" onclick="tglRel('anual',this)">Visão Anual</div>
     <div class="tgl" onclick="tglRel('cat',this)">Por Categoria</div>
+    <div class="tgl" onclick="tglRel('despesas',this)">Despesas Pessoais</div>
     <div class="tgl" onclick="tglRel('fluxo',this)">Fluxo de Caixa</div>
     <div class="tgl" onclick="tglRel('dre-mensal',this)">DRE Mensal</div>
     <div class="tgl" onclick="tglRel('dre-semanal',this)">DRE Semanal</div>
@@ -1117,6 +1132,85 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="card-header"><span class="card-title">Ranking de Gastos</span></div>
         <div id="rel-ranking"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Análise de Despesas Pessoais -->
+  <div id="rel-despesas" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div>
+          <span class="card-title">Análise de Despesas Pessoais</span>
+          <div class="card-sub" id="dp-periodo-lbl">—</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="dp-periodo" onchange="renderRel()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+            <option value="1">Mês selecionado</option>
+            <option value="3" selected>Últimos 3 meses</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+          </select>
+          <select id="dp-fonte" onchange="renderRel()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+            <option value="lanc">Somente lançamentos</option>
+            <option value="cartao">Lançamentos + cartão</option>
+          </select>
+        </div>
+      </div>
+      <div class="kpi-grid cols6">
+        <div class="kpi r"><div class="kpi-label">Total de Despesas</div><div class="kpi-val r" id="dp-k-total">R$ 0</div><div class="kpi-sub" id="dp-k-var">—</div></div>
+        <div class="kpi a"><div class="kpi-label">Média Mensal</div><div class="kpi-val a" id="dp-k-media">R$ 0</div></div>
+        <div class="kpi"><div class="kpi-label">Média Diária</div><div class="kpi-val" id="dp-k-dia">R$ 0</div></div>
+        <div class="kpi p"><div class="kpi-label">Maior Despesa</div><div class="kpi-val p" id="dp-k-maior" style="font-size:15px">—</div></div>
+        <div class="kpi b"><div class="kpi-label">Nº de Despesas</div><div class="kpi-val b" id="dp-k-qtd">0</div></div>
+        <div class="kpi g"><div class="kpi-label">% da Renda</div><div class="kpi-val g" id="dp-k-renda">0%</div></div>
+      </div>
+      <div id="dp-aviso" style="font-size:10px;color:var(--t3);margin-top:10px"></div>
+    </div>
+
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Evolução Mensal das Despesas</span></div>
+        <div class="chart-box" style="height:250px"><canvas id="ch-dp-evol"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Essenciais × Escolhas</span></div>
+        <div class="chart-box" style="height:180px"><canvas id="ch-dp-classe"></canvas></div>
+        <div class="div"></div>
+        <div id="dp-classe-list"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><span class="card-title">Despesas por Categoria — comparativo com o período anterior</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Categoria</th><th>Classe</th><th>Total</th><th>% do total</th><th>Média/mês</th><th>Nº</th><th>Maior</th><th>Período anterior</th><th>Variação</th></tr></thead>
+        <tbody id="dp-cat-tbody"></tbody>
+        <tfoot id="dp-cat-tfoot"></tfoot>
+      </table></div>
+    </div>
+
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Onde o dinheiro escorre — subcategorias</span></div>
+        <div id="dp-sub-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Gasto por Dia da Semana</span></div>
+        <div class="chart-box" style="height:200px"><canvas id="ch-dp-semana"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><span class="card-title">Maiores Despesas do Período</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Subcategoria</th><th>Origem</th><th>Valor</th><th>% do total</th></tr></thead>
+        <tbody id="dp-top-tbody"></tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Leitura do Período</span></div>
+      <div id="dp-insights"></div>
     </div>
   </div>
 
@@ -1521,8 +1615,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- ───── CARTÕES ───── -->
 <div class="page" id="page-cartoes">
   <div class="topbar">
-    <div class="topbar-left"><h1>Cartões de Crédito</h1><p>Faturas, limites e análise de despesas</p></div>
-    <div class="topbar-right">
+    <div class="topbar-left"><h1>Cartões de Crédito</h1><p id="cc-comp-lbl">Faturas, limites e análise de despesas</p></div>
+    <div class="topbar-right" style="flex-wrap:wrap;gap:8px">
+      <select id="cc-mes" onchange="renderCartoes()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif"></select>
+      <select id="cc-ano" onchange="renderCartoes()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif"></select>
       <button class="btn btn-ghost" onclick="openM('m-gasto')" id="btn-add-gasto" style="display:none">+ Gasto</button>
       <button class="btn btn-ghost" onclick="openM('m-pag-fat')" id="btn-pag-fat" style="display:none">Pagar Fatura</button>
       <button class="btn btn-green" onclick="openM('m-cc')">+ Novo Cartão</button>
@@ -1530,7 +1626,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 
   <div class="kpi-grid cols6">
-    <div class="kpi p"><div class="kpi-label">Faturas Abertas</div><div class="kpi-val p" id="cc-k-fat">R$ 0</div></div>
+    <div class="kpi p"><div class="kpi-label">Faturas da Competência</div><div class="kpi-val p" id="cc-k-fat">R$ 0</div></div>
     <div class="kpi b"><div class="kpi-label">Limite Total</div><div class="kpi-val b" id="cc-k-lim">R$ 0</div></div>
     <div class="kpi g"><div class="kpi-label">Disponível</div><div class="kpi-val g" id="cc-k-disp">R$ 0</div></div>
     <div class="kpi a"><div class="kpi-label">% Limite Usado</div><div class="kpi-val a" id="cc-k-pct">0%</div></div>
@@ -1564,7 +1660,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         </div>
         <div class="prog-track lg"><div class="prog-fill" id="cc-d-bar" style="width:0%"></div></div>
         <div class="div"></div>
-        <div class="card-title" style="margin-bottom:12px">Gastos por Categoria (mês atual)</div>
+        <div class="card-title" id="cc-cat-titulo" style="margin-bottom:12px">Gastos por Categoria</div>
         <div class="chart-box" style="height:160px"><canvas id="ch-cc-cat"></canvas></div>
       </div>
       <div class="card">
@@ -1580,19 +1676,39 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div class="card-header">
         <span class="card-title" id="cc-det-tab-title">Faturas & Gastos</span>
         <div class="toggle-row" style="margin-bottom:0">
-          <div class="tgl active" onclick="tglCC('faturas',this)">Faturas</div>
-          <div class="tgl" onclick="tglCC('gastos',this)">Gastos</div>
+          <div class="tgl active" onclick="tglCC('faturas',this)">Faturas do Ano</div>
+          <div class="tgl" onclick="tglCC('fatura',this)">Fatura Detalhada</div>
+          <div class="tgl" onclick="tglCC('gastos',this)">Compras</div>
         </div>
       </div>
-      <div id="cc-fat-view">
+      <div id="cc-faturas-view">
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Mês</th><th>Fechamento</th><th>Vencimento</th><th>Valor</th><th>Pago em</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th>Competência</th><th>Fechamento</th><th>Vencimento</th><th>Valor</th><th>Pago em</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="cc-fat-tbody"></tbody>
         </table></div>
+        <div style="font-size:10px;color:var(--t3);margin-top:8px">💡 A competência é o mês de vencimento da fatura. Compras feitas depois do fechamento entram na fatura seguinte.</div>
       </div>
-      <div id="cc-gas-view" style="display:none">
+      <div id="cc-fatura-view" style="display:none">
+        <div class="fatdet-hd">
+          <div>
+            <div class="card-title" id="cc-fatdet-titulo">Fatura</div>
+            <div class="card-sub" id="cc-fatdet-sub">—</div>
+          </div>
+          <div class="fatdet-nums">
+            <div><div class="kpi-label">Total da fatura</div><div class="mono" id="cc-fatdet-total" style="color:var(--purple);font-size:18px;font-weight:700">R$ 0</div></div>
+            <div><div class="kpi-label">Pagamento</div><div class="mono" id="cc-fatdet-pago" style="color:var(--t2);font-size:12px">—</div></div>
+            <div><span class="badge bdg-gray" id="cc-fatdet-st">—</span></div>
+          </div>
+        </div>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Parcelas</th><th>Valor Total</th><th>Valor/Mês</th><th></th></tr></thead>
+          <thead><tr><th>Compra em</th><th>Descrição</th><th>Categoria</th><th>Parcela</th><th>Valor da Compra</th><th>Nesta Fatura</th></tr></thead>
+          <tbody id="cc-fatdet-tbody"></tbody>
+          <tfoot id="cc-fatdet-tfoot"></tfoot>
+        </table></div>
+      </div>
+      <div id="cc-gastos-view" style="display:none">
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Parcelas</th><th>1ª Fatura</th><th>Valor Total</th><th>Valor/Parcela</th><th>Ações</th></tr></thead>
           <tbody id="cc-gas-tbody"></tbody>
         </table></div>
       </div>
@@ -2518,8 +2634,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Novo Cartão -->
 <div class="overlay" id="m-cc" style="display:none" onclick="cmoOut(event,'m-cc')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Novo Cartão de Crédito</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-cc')">✕</button></div>
+    <div class="modal-hd"><h2 id="m-cc-titulo">Novo Cartão de Crédito</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-cc')">✕</button></div>
     <div class="modal-bd">
+      <input type="hidden" id="cc-edit-id">
+      <div id="cc-err" class="form-err" style="display:none"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Nome do Cartão *</label><input type="text" id="cc-nome" placeholder="Ex: Nubank Ultravioleta"></div>
         <div class="fg"><label>Bandeira</label>
@@ -2531,7 +2649,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Dia de Vencimento da Fatura</label><input type="number" id="cc-venc" min="1" max="31" placeholder="Ex: 10"></div>
       </div>
       <div class="form-grid cols2">
-        <div class="fg"><label>Dia de Fechamento da Fatura</label><input type="number" id="cc-fech" min="1" max="31" placeholder="Ex: 3"></div>
+        <div class="fg"><label>Dia de Fechamento da Fatura</label><input type="number" id="cc-fech" min="1" max="31" placeholder="Ex: 3">
+          <div style="font-size:10px;color:var(--t3);margin-top:4px">Compras feitas depois desse dia entram na fatura seguinte.</div>
+        </div>
         <div class="fg"><label>Tema do Cartão</label>
           <select id="cc-grad">
             <option value="linear-gradient(135deg,#7c3aed,#4f46e5)">Roxo Profundo</option>
@@ -2548,7 +2668,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-cc')">Cancelar</button>
-      <button class="btn btn-green" onclick="saveCC()">Salvar Cartão</button>
+      <button class="btn btn-green" id="btn-salvar-cc" onclick="saveCC()">Salvar Cartão</button>
     </div>
   </div>
 </div>
@@ -2556,25 +2676,24 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Gasto no Cartão -->
 <div class="overlay" id="m-gasto" style="display:none" onclick="cmoOut(event,'m-gasto')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Registrar Gasto no Cartão</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-gasto')">✕</button></div>
+    <div class="modal-hd"><h2 id="m-gasto-titulo">Registrar Gasto no Cartão</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-gasto')">✕</button></div>
     <div class="modal-bd">
+      <input type="hidden" id="g-edit-id">
+      <div id="g-err" class="form-err" style="display:none"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Data *</label><input type="date" id="g-data"></div>
-        <div class="fg"><label>Valor Total *</label><input type="number" id="g-val" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="fg"><label>Data da Compra *</label><input type="date" id="g-data" onchange="updGastoPreview()"></div>
+        <div class="fg"><label>Valor Total *</label><input type="number" id="g-val" step="0.01" min="0" placeholder="0,00" oninput="updGastoPreview()"></div>
       </div>
       <div class="form-grid" style="margin-bottom:12px">
         <div class="fg"><label>Descrição *</label><input type="text" id="g-desc" placeholder="Ex: Mercado Extra"></div>
       </div>
-      <div class="form-grid cols2">
-        <div class="fg"><label>Categoria</label>
-          <select id="g-cat">
-            <option>Alimentação</option><option>Transporte</option><option>Saúde</option><option>Lazer</option>
-            <option>Educação</option><option>Vestuário</option><option>Moradia</option><option>Assinaturas</option>
-            <option>Viagens</option><option>Eletrônicos</option><option>Outros</option>
-          </select>
-        </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Categoria</label><select id="g-cat" onchange="updGastoSubcat()"></select></div>
+        <div class="fg"><label>Subcategoria</label><select id="g-subcat"><option value="">—</option></select></div>
+      </div>
+      <div class="form-grid">
         <div class="fg"><label>Parcelas</label>
-          <select id="g-parc">
+          <select id="g-parc" onchange="updGastoPreview()">
             <option value="1">À vista (1x)</option><option value="2">2x</option><option value="3">3x</option>
             <option value="4">4x</option><option value="5">5x</option><option value="6">6x</option>
             <option value="7">7x</option><option value="8">8x</option><option value="9">9x</option>
@@ -2582,10 +2701,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           </select>
         </div>
       </div>
+      <div id="g-preview" class="cp-preview" style="margin-top:12px"></div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-gasto')">Cancelar</button>
-      <button class="btn btn-green" onclick="saveGasto()">Registrar Gasto</button>
+      <button class="btn btn-green" id="btn-salvar-gasto" onclick="saveGasto()">Registrar Gasto</button>
     </div>
   </div>
 </div>
@@ -2593,22 +2713,42 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Pagar Fatura -->
 <div class="overlay" id="m-pag-fat" style="display:none" onclick="cmoOut(event,'m-pag-fat')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Pagar Fatura</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-pag-fat')">✕</button></div>
+    <div class="modal-hd">
+      <div>
+        <h2>Pagar Fatura</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">O pagamento é o que entra no fluxo de caixa — a compra no cartão, não.</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-pag-fat')">✕</button>
+    </div>
     <div class="modal-bd">
-      <div class="form-grid cols2" style="margin-bottom:12px">
+      <div id="pf-err" class="form-err" style="display:none"></div>
+      <div class="form-grid cols3" style="margin-bottom:12px">
         <div class="fg"><label>Mês da Fatura</label>
-          <select id="pf-mes">
+          <select id="pf-mes" onchange="updPagFatPreview()">
             <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
             <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
             <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
             <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
           </select>
         </div>
+        <div class="fg"><label>Ano</label><select id="pf-ano" onchange="updPagFatPreview()"></select></div>
         <div class="fg"><label>Data do Pagamento</label><input type="date" id="pf-data"></div>
       </div>
-      <div class="form-grid">
-        <div class="fg"><label>Valor Pago (R$)</label><input type="number" id="pf-val" step="0.01" min="0" placeholder="0,00"></div>
+      <div id="pf-info" class="cp-preview" style="margin-bottom:12px"></div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Valor Pago (R$)</label><input type="number" id="pf-val" step="0.01" min="0" placeholder="0,00" oninput="this.dataset.tocado=1"></div>
+        <div class="fg"><label>Conta de Débito</label><select id="pf-caixa"><option value="">— Sem vínculo de caixa —</option></select></div>
       </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Categoria do Lançamento</label><select id="pf-cat"></select></div>
+        <div class="fg" style="display:flex;align-items:flex-end">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t2);margin:0 0 8px">
+            <input type="checkbox" id="pf-gerar" checked style="width:16px;height:16px;accent-color:var(--green)">
+            Gerar lançamento de despesa
+          </label>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--t3)">O lançamento entra no DRE, nos relatórios e — se você escolher uma conta — no extrato bancário.</div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-pag-fat')">Cancelar</button>
@@ -3111,8 +3251,27 @@ function openM(id){
     updOrcCats();
     updOrcPreview();
   }
-  if(id==='m-gasto'){document.getElementById('g-data').value=today();}
-  if(id==='m-pag-fat'){document.getElementById('pf-data').value=today();document.getElementById('pf-mes').value=curMes();}
+  if(id==='m-cc'){ resetModalCC(); }
+  if(id==='m-gasto'){ resetModalGasto(); }
+  if(id==='m-pag-fat'){
+    const $ = x => document.getElementById(x);
+    $('pf-data').value = today();
+    $('pf-mes').value  = ccMes();
+    const selA = $('pf-ano');
+    if(selA){
+      const anos = new Set([ccAno(), new Date().getFullYear(), anoRef()]);
+      selA.innerHTML = [...anos].sort((a,b)=>b-a).map(a=>`<option value="${a}">${a}</option>`).join('');
+      selA.value = ccAno();
+    }
+    const cat = $('pf-cat');
+    if(cat){ cat.innerHTML = allCats('Despesa').map(c=>`<option>${c}</option>`).join('');
+             if(allCats('Despesa').includes('Serviços & Financeiro')) cat.value='Serviços & Financeiro'; }
+    const v = $('pf-val'); if(v){ v.value=''; delete v.dataset.tocado; }
+    const g = $('pf-gerar'); if(g) g.checked = true;
+    const err = $('pf-err'); if(err) err.style.display='none';
+    popCaixas('pf-caixa');
+    updPagFatPreview();
+  }
   if(id==='m-pg-div'){document.getElementById('pgd-data').value=today();}
 }
 function closeM(id){document.getElementById(id).style.display='none';}
@@ -3783,14 +3942,14 @@ function tglRel(v,el){
   _relView=v;
   document.querySelectorAll('#page-rel .tgl').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  const allViews=['anual','cat','fluxo','dre-mensal','dre-semanal','dre-diario'];
+  const allViews=['anual','cat','despesas','fluxo','dre-mensal','dre-semanal','dre-diario'];
   allViews.forEach(x=>{
     const e=document.getElementById('rel-'+x);
     if(e) e.style.display=x===v?'block':'none';
   });
   // Mostrar seletor de mês nas visões DRE
   const selMes=document.getElementById('rel-dre-selmes');
-  if(selMes) selMes.style.display=v.startsWith('dre')?'flex':'none';
+  if(selMes) selMes.style.display=(v.startsWith('dre')||v==='despesas')?'flex':'none';
   // Sincronizar mês do seletor com o mês atual
   const selEl=document.getElementById('rel-dre-mes');
   if(selEl && !selEl.value) selEl.value=curMes();
@@ -3872,10 +4031,299 @@ function renderRel(){
       </div>`).join('');
   }
 
+  // ── Análise de Despesas Pessoais ──
+  if(_relView==='despesas') renderDespesasPessoais(d);
+
   // ── DRE MENSAL ──
   if(_relView==='dre-mensal') renderDREMensal(d, ativos);
   if(_relView==='dre-semanal') renderDRESemanal(d, ativos);
   if(_relView==='dre-diario') renderDREDiario(d, ativos);
+}
+
+// ── RELATÓRIO: ANÁLISE DE DESPESAS PESSOAIS ──
+// Classificação por grupo de categoria: separa o que é compromisso do que é escolha
+// sem exigir que cada lançamento seja reclassificado à mão.
+const CLASSE_DESPESA = {
+  'Moradia':'Essencial', 'Alimentação':'Essencial', 'Transporte':'Essencial',
+  'Saúde':'Essencial',   'Educação':'Essencial',    'Vestuário':'Essencial',
+  'Lazer':'Escolha',     'Salão de Beleza':'Escolha','Festas/Datas':'Escolha', 'Esporte':'Escolha',
+  'Serviços & Financeiro':'Financeiro', 'Outras Despesas':'Outros',
+};
+const CORES_CLASSE = { Essencial:'#4dabf7', Escolha:'#cc5de8', Financeiro:'#ffd43b', Outros:'#8fa3bf' };
+const classeDespesa = cat => CLASSE_DESPESA[cat] || 'Outros';
+const DIA_SEM_LONGO = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+const dpPeriodo = () => Math.max(1, parseInt(document.getElementById('dp-periodo')?.value) || 3);
+const dpFonte   = () => document.getElementById('dp-fonte')?.value || 'lanc';
+
+// Janela de N meses terminando no mês âncora
+function janelaDespesas(nMeses, mesAnc, anoAnc){
+  const fimAbs = parseInt(anoAnc)*12 + parseInt(mesAnc);
+  const iniAbs = fimAbs - (nMeses - 1);
+  return {
+    iniAbs, fimAbs, meses:nMeses,
+    de : `${Math.floor(iniAbs/12)}-${String(iniAbs%12 + 1).padStart(2,'0')}-01`,
+    ate: fimDoMes(Math.floor(fimAbs/12), fimAbs%12),
+  };
+}
+const rotuloJanela = jan => jan.meses === 1
+  ? `${MESES[jan.fimAbs%12]} de ${Math.floor(jan.fimAbs/12)}`
+  : `${MESES3[jan.iniAbs%12]}/${String(Math.floor(jan.iniAbs/12)).slice(2)} — ${MESES3[jan.fimAbs%12]}/${String(Math.floor(jan.fimAbs/12)).slice(2)} (${jan.meses} meses)`;
+
+// Despesas do período. Com o cartão incluído, as parcelas entram no lugar dos
+// pagamentos de fatura já lançados — assim nada é contado duas vezes.
+function despesasDoPeriodo(d, jan, incluirCartao){
+  const base = d.lancs.filter(l => l.status !== 'cancelado' && l.tipo === 'Despesa');
+  const list = semReservas(filtrarPorView(base, _relFilterView), d)
+    .filter(l => l.data >= jan.de && l.data <= jan.ate)
+    .filter(l => !(incluirCartao && l.origem === 'fatura'))
+    .map(l => ({ data:l.data, cat:l.cat || 'Outras Despesas', sub:l.subcat || '',
+                 desc:l.desc, valor:l.valor || 0, fonte:'Lançamento' }));
+  if(incluirCartao){
+    (d.ccs || []).forEach(c => {
+      for(let abs = jan.iniAbs; abs <= jan.fimAbs; abs++){
+        const m = abs % 12, a = Math.floor(abs / 12);
+        parcelasDaFatura(c, m, a).forEach(pp => {
+          list.push({ data:dataVencFatura(c, m, a), cat:pp.g.cat || 'Outras Despesas', sub:pp.g.subcat || '',
+            desc:pp.g.desc + (pp.total > 1 ? ` (${pp.num}/${pp.total})` : ''),
+            valor:pp.valor, fonte:'Cartão · ' + c.nome });
+        });
+      }
+    });
+  }
+  return list.sort((a,b) => (a.data||'').localeCompare(b.data||''));
+}
+function receitasDoPeriodo(d, jan){
+  const base = d.lancs.filter(l => l.status !== 'cancelado' && l.tipo === 'Receita');
+  return semReservas(filtrarPorView(base, _relFilterView), d)
+    .filter(l => l.data >= jan.de && l.data <= jan.ate)
+    .reduce((a,l) => a + (l.valor || 0), 0);
+}
+// Agrupa por uma chave e devolve total, quantidade e maior valor
+function agruparDespesas(list, chave){
+  const mapa = {};
+  list.forEach(x => {
+    const k = chave(x) || '—';
+    const g = mapa[k] || (mapa[k] = { total:0, qtd:0, maior:0 });
+    g.total += x.valor; g.qtd++; if(x.valor > g.maior) g.maior = x.valor;
+  });
+  Object.values(mapa).forEach(g => g.total = +g.total.toFixed(2));
+  return mapa;
+}
+// Variação percentual formatada (—, ↑, ↓)
+function varPct(atual, anterior){
+  if(!anterior) return { txt: atual > 0 ? 'novo' : '—', cor:'var(--t3)', v:null };
+  const v = (atual - anterior) / anterior * 100;
+  if(Math.abs(v) < 0.05) return { txt:'estável', cor:'var(--t3)', v:0 };
+  return { txt:`${v > 0 ? '▲' : '▼'} ${pct(Math.abs(v))}`, cor: v > 0 ? 'var(--red)' : 'var(--green)', v };
+}
+
+function renderDespesasPessoais(d){
+  const nMeses = dpPeriodo();
+  const incluiCartao = dpFonte() === 'cartao';
+  const jan  = janelaDespesas(nMeses, getMesSel(), anoRef());
+  const fimAnt = jan.iniAbs - 1;
+  const prev = janelaDespesas(nMeses, fimAnt % 12, Math.floor(fimAnt / 12));
+
+  const desp     = despesasDoPeriodo(d, jan,  incluiCartao);
+  const despPrev = despesasDoPeriodo(d, prev, incluiCartao);
+  const total     = +desp.reduce((a,x) => a + x.valor, 0).toFixed(2);
+  const totalPrev = +despPrev.reduce((a,x) => a + x.valor, 0).toFixed(2);
+  const receita   = receitasDoPeriodo(d, jan);
+  const dias      = Math.max(1, diasEntreISO(jan.de, jan.ate) + 1);
+  const maior     = desp.reduce((m,x) => x.valor > (m?.valor || 0) ? x : m, null);
+
+  set('dp-periodo-lbl', `${rotuloJanela(jan)} · ${_relFilterView === 'realizado' ? 'somente pagos' : 'previsto (todos)'} · ${incluiCartao ? 'com parcelas de cartão' : 'somente lançamentos'}`);
+  set('dp-k-total', fmtR(total));
+  set('dp-k-media', fmtR(total / nMeses));
+  set('dp-k-dia',   fmtR(total / dias));
+  set('dp-k-maior', maior ? `${fmtR(maior.valor)}` : '—');
+  set('dp-k-qtd',   desp.length);
+  set('dp-k-renda', receita > 0 ? pct(total / receita * 100) : '—');
+
+  const vTot = varPct(total, totalPrev);
+  const elVar = document.getElementById('dp-k-var');
+  if(elVar){
+    elVar.innerHTML = totalPrev
+      ? `<span style="color:${vTot.cor}">${vTot.txt}</span> vs ${fmtR(totalPrev)} no período anterior`
+      : 'sem período anterior para comparar';
+  }
+  const aviso = document.getElementById('dp-aviso');
+  if(aviso) aviso.innerHTML = incluiCartao
+    ? '💡 As parcelas do cartão entram na data de vencimento da fatura. Para não contar duas vezes, os lançamentos gerados por pagamento de fatura são substituídos pelas parcelas que os compõem.'
+    : '💡 Gastos no cartão aparecem aqui apenas quando a fatura é paga e gera lançamento. Troque a fonte para "Lançamentos + cartão" para ver a despesa por categoria de consumo.';
+
+  // ── Evolução mensal ──
+  const labels = [], vals = [];
+  for(let abs = jan.iniAbs; abs <= jan.fimAbs; abs++){
+    const m = abs % 12, a = Math.floor(abs / 12);
+    labels.push(MESES3[m] + '/' + String(a).slice(2));
+    const de = `${a}-${String(m+1).padStart(2,'0')}-01`, ate = fimDoMes(a, m);
+    vals.push(+desp.filter(x => x.data >= de && x.data <= ate).reduce((s,x) => s + x.valor, 0).toFixed(2));
+  }
+  const mediaMes = total / nMeses;
+  mkCh('ch-dp-evol', { data:{ labels, datasets:[
+      { type:'bar', label:'Despesas', data:vals, backgroundColor:'#ff4d6d30', borderColor:'#ff4d6d', borderWidth:1.5, borderRadius:4 },
+      { type:'line', label:'Média do período', data:labels.map(() => +mediaMes.toFixed(2)),
+        borderColor:'#ffd43b', borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false },
+    ]},
+    options:{ ...chartBase, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:12 } } } } });
+
+  // ── Essenciais × Escolhas ──
+  const porClasse = agruparDespesas(desp, x => classeDespesa(x.cat));
+  const clKeys = ['Essencial','Escolha','Financeiro','Outros'].filter(k => porClasse[k]);
+  if(clKeys.length){
+    mkCh('ch-dp-classe', { type:'doughnut', data:{ labels:clKeys,
+      datasets:[{ data:clKeys.map(k => porClasse[k].total), backgroundColor:clKeys.map(k => CORES_CLASSE[k]), borderWidth:0, hoverOffset:4 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins:{ legend:{ position:'bottom', labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:9, padding:8 } } } } });
+  } else if(CH['ch-dp-classe']){ CH['ch-dp-classe'].destroy(); delete CH['ch-dp-classe']; }
+
+  const clList = document.getElementById('dp-classe-list');
+  if(clList) clList.innerHTML = clKeys.length ? clKeys.map(k => {
+    const g = porClasse[k];
+    return `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${CORES_CLASSE[k]}"></span>
+          <span style="color:var(--t2)">${k}</span>
+        </span>
+        <span class="mono" style="color:var(--t1)">${fmtR(g.total)}
+          <span style="color:var(--t3)">${total > 0 ? pct(g.total/total*100) : '0%'}${receita > 0 ? ` · ${pct(g.total/receita*100)} da renda` : ''}</span></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${total>0?g.total/total*100:0}%;background:${CORES_CLASSE[k]}"></div></div>
+    </div>`; }).join('')
+    : '<div style="color:var(--t3);font-size:12px;padding:12px 0">Sem despesas no período.</div>';
+
+  // ── Tabela por categoria com comparativo ──
+  const porCat     = agruparDespesas(desp, x => x.cat);
+  const porCatPrev = agruparDespesas(despPrev, x => x.cat);
+  const cats = [...new Set([...Object.keys(porCat), ...Object.keys(porCatPrev)])]
+    .sort((a,b) => (porCat[b]?.total || 0) - (porCat[a]?.total || 0));
+  const tb = document.getElementById('dp-cat-tbody');
+  if(tb) tb.innerHTML = cats.length ? cats.map((cat,i) => {
+    const g = porCat[cat] || { total:0, qtd:0, maior:0 };
+    const gp = porCatPrev[cat] || { total:0 };
+    const v = varPct(g.total, gp.total);
+    const cl = classeDespesa(cat);
+    return `<tr>
+      <td><span class="cat-tag"><span class="cat-dot" style="background:${CORES_CAT[i%CORES_CAT.length]}"></span>${cat}</span></td>
+      <td><span style="font-size:10px;color:${CORES_CLASSE[cl]}">${cl}</span></td>
+      <td class="mono" style="color:var(--red)">${fmtR(g.total)}</td>
+      <td class="mono" style="color:var(--t3)">${total > 0 ? pct(g.total/total*100) : '0%'}</td>
+      <td class="mono" style="color:var(--t2)">${fmtR(g.total/nMeses)}</td>
+      <td class="mono" style="color:var(--t3)">${g.qtd}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(g.maior)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(gp.total)}</td>
+      <td class="mono" style="color:${v.cor}">${v.txt}</td>
+    </tr>`; }).join('')
+    : `<tr><td colspan="9" style="text-align:center;color:var(--t3);padding:20px">Nenhuma despesa no período selecionado.</td></tr>`;
+  const tf = document.getElementById('dp-cat-tfoot');
+  if(tf) tf.innerHTML = cats.length ? `<tr>
+      <td colspan="2" style="color:var(--t2);font-weight:600">Total</td>
+      <td class="mono" style="color:var(--red);font-weight:700">${fmtR(total)}</td>
+      <td class="mono" style="color:var(--t3)">100%</td>
+      <td class="mono" style="color:var(--t2);font-weight:600">${fmtR(total/nMeses)}</td>
+      <td class="mono" style="color:var(--t3)">${desp.length}</td>
+      <td></td>
+      <td class="mono" style="color:var(--t3)">${fmtR(totalPrev)}</td>
+      <td class="mono" style="color:${vTot.cor};font-weight:600">${vTot.txt}</td>
+    </tr>` : '';
+
+  // ── Subcategorias ──
+  const porSub = agruparDespesas(desp.filter(x => x.sub), x => x.sub);
+  const subs = Object.entries(porSub).sort((a,b) => b[1].total - a[1].total).slice(0, 10);
+  const subEl = document.getElementById('dp-sub-list');
+  if(subEl) subEl.innerHTML = subs.length ? subs.map(([sub,g],i) => `
+    <div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+        <span style="color:var(--t2)">${sub} <span style="color:var(--t3)">· ${g.qtd}x</span></span>
+        <span class="mono" style="color:var(--t1)">${fmtR(g.total)} <span style="color:var(--t3)">${total>0?pct(g.total/total*100):'0%'}</span></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${total>0?g.total/total*100:0}%;background:${CORES_CAT[i%CORES_CAT.length]}"></div></div>
+    </div>`).join('')
+    : '<div style="color:var(--t3);font-size:12px;padding:12px 0">Os lançamentos do período não têm subcategoria preenchida.</div>';
+
+  // ── Dia da semana ──
+  const semana = [0,0,0,0,0,0,0];
+  desp.forEach(x => { const dt = new Date(x.data + 'T00:00:00'); if(!isNaN(dt)) semana[dt.getDay()] += x.valor; });
+  mkCh('ch-dp-semana', { type:'bar', data:{ labels:DIA_SEM_LONGO.map(s => s.slice(0,3)),
+    datasets:[{ data:semana.map(v => +v.toFixed(2)), backgroundColor:'#cc5de830', borderColor:'#cc5de8', borderWidth:1.5, borderRadius:4 }] },
+    options:{ ...chartBase, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+
+  // ── Maiores despesas ──
+  const top = [...desp].sort((a,b) => b.valor - a.valor).slice(0, 10);
+  const tt = document.getElementById('dp-top-tbody');
+  if(tt) tt.innerHTML = top.length ? top.map(x => `<tr>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(x.data)}</td>
+      <td style="color:var(--t1)">${x.desc || '—'}</td>
+      <td><span class="cat-tag" style="font-size:9px">${x.cat}</span></td>
+      <td style="color:var(--t3);font-size:11px">${x.sub || '—'}</td>
+      <td style="color:var(--t3);font-size:11px">${x.fonte}</td>
+      <td class="mono" style="color:var(--red)">${fmtR(x.valor)}</td>
+      <td class="mono" style="color:var(--t3)">${total > 0 ? pct(x.valor/total*100) : '0%'}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhuma despesa no período.</td></tr>`;
+
+  // ── Leitura do período ──
+  const ins = [];
+  const push = (ico, cor, txt) => ins.push(`<div class="sum-row" style="align-items:flex-start;gap:10px">
+    <span style="font-size:15px;line-height:1.3">${ico}</span>
+    <span style="font-size:12px;color:var(--t2);line-height:1.6;flex:1;border:0">${txt}</span>
+    <span style="width:4px;align-self:stretch;border-radius:2px;background:${cor}"></span></div>`);
+
+  if(!desp.length){
+    push('🔍','var(--t3)','Não há despesas registradas no período selecionado. Ajuste o mês, o intervalo ou o modo Previsto/Realizado.');
+  } else {
+    if(totalPrev > 0 && vTot.v !== null){
+      push(vTot.v > 0 ? '📈' : '📉', vTot.cor,
+        `Suas despesas <b style="color:${vTot.cor}">${vTot.v >= 0 ? 'subiram' : 'caíram'} ${pct(Math.abs(vTot.v))}</b> em relação ao período anterior — de ${fmtR(totalPrev)} para <b style="color:var(--t1)">${fmtR(total)}</b>.`);
+    }
+    if(receita > 0){
+      const cr = total / receita * 100;
+      push(cr > 100 ? '🚨' : cr > 80 ? '⚠️' : '✅', cr > 100 ? 'var(--red)' : cr > 80 ? 'var(--amber)' : 'var(--green)',
+        `As despesas consumiram <b style="color:var(--t1)">${pct(cr)}</b> da renda do período (${fmtR(receita)}), sobrando <b style="color:${receita-total >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtR(receita - total)}</b>.`);
+    }
+    const ess = porClasse['Essencial']?.total || 0, esc = porClasse['Escolha']?.total || 0;
+    if(ess + esc > 0){
+      push('⚖️','var(--blue)',
+        `<b style="color:var(--blue)">${pct(ess/total*100)}</b> do que você gastou é essencial (moradia, alimentação, transporte, saúde, educação e vestuário) e <b style="color:var(--purple)">${pct(esc/total*100)}</b> são escolhas — a parte que dá para cortar sem mudar de vida.`);
+    }
+    const maiorCat = cats[0];
+    if(maiorCat && porCat[maiorCat]){
+      const g = porCat[maiorCat];
+      push('🏷️','var(--amber)',
+        `<b style="color:var(--t1)">${maiorCat}</b> é a maior categoria do período: ${fmtR(g.total)} em ${g.qtd} lançamento(s), ${pct(g.total/total*100)} de tudo e ${fmtR(g.total/nMeses)} por mês.`);
+    }
+    const altas = cats.map(c => ({ c, at:porCat[c]?.total || 0, an:porCatPrev[c]?.total || 0 }))
+      .filter(x => x.an > 0 && x.at > x.an)
+      .map(x => ({ ...x, delta:x.at - x.an, pc:(x.at - x.an)/x.an*100 }))
+      .sort((a,b) => b.delta - a.delta);
+    if(altas.length){
+      const a = altas[0];
+      push('🔺','var(--red)',
+        `A maior alta foi em <b style="color:var(--t1)">${a.c}</b>: ${fmtR(a.an)} → ${fmtR(a.at)} (<b style="color:var(--red)">+${fmtR(a.delta)}</b>, ${pct(a.pc)}).`);
+    }
+    const quedas = cats.map(c => ({ c, at:porCat[c]?.total || 0, an:porCatPrev[c]?.total || 0 }))
+      .filter(x => x.an > 0 && x.at < x.an)
+      .map(x => ({ ...x, delta:x.an - x.at }))
+      .sort((a,b) => b.delta - a.delta);
+    if(quedas.length){
+      const q = quedas[0];
+      push('🔻','var(--green)',
+        `A maior economia foi em <b style="color:var(--t1)">${q.c}</b>: ${fmtR(q.an)} → ${fmtR(q.at)} (<b style="color:var(--green)">−${fmtR(q.delta)}</b>).`);
+    }
+    const iDia = semana.indexOf(Math.max(...semana));
+    if(semana[iDia] > 0){
+      push('📅','var(--purple)',
+        `<b style="color:var(--t1)">${DIA_SEM_LONGO[iDia]}</b> é o dia em que você mais gasta: ${fmtR(semana[iDia])} no período, ${pct(semana[iDia]/total*100)} do total.`);
+    }
+    push('📊','var(--t3)',
+      `Média de <b style="color:var(--t1)">${fmtR(total/dias)}</b> por dia e <b style="color:var(--t1)">${fmtR(total/nMeses)}</b> por mês, em ${desp.length} despesa(s) ao longo de ${dias} dias.`);
+  }
+  const insEl = document.getElementById('dp-insights');
+  if(insEl) insEl.innerHTML = ins.join('');
 }
 
 // ── Helpers DRE ──
@@ -6170,20 +6618,70 @@ function delDiv(id){
 }
 
 // ── CARTÕES ──
-let _ccSel=null;
-// Valor da parcela de um gasto que cai no mês/ano informado (0 se não há parcela nesse mês).
+let _ccSel  = null;
+let _ccView = 'faturas';   // 'faturas' | 'fatura' | 'gastos'
+
+// Competência (mês/ano) da fatura em análise — controlada pelos seletores do topo da aba
+function ccMes(){ const e=document.getElementById('cc-mes'); const v=e?parseInt(e.value):NaN; return isNaN(v)?curMes():v; }
+function ccAno(){ const e=document.getElementById('cc-ano'); const v=e?parseInt(e.value):NaN; return isNaN(v)?new Date().getFullYear():v; }
+
+// Data ISO com o dia limitado ao último dia do mês (dia 31 em fevereiro vira 28/29)
+function diaSeguroISO(ano, mes, dia){
+  let a=parseInt(ano), m=parseInt(mes);
+  while(m<0){ m+=12; a-=1; }
+  while(m>11){ m-=12; a+=1; }
+  const ult=new Date(a, m+1, 0).getDate();
+  const dd=Math.min(Math.max(1, parseInt(dia)||1), ult);
+  return `${a}-${String(m+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+}
+const diasEntreISO=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+
+// Vencimento da fatura de uma competência
+function dataVencFatura(c, mes, ano){ return diaSeguroISO(ano, mes, (c&&c.venc)||10); }
+// Fechamento da fatura: quando o dia de fechamento é igual ou posterior ao de vencimento,
+// a fatura daquele mês fecha ainda no mês anterior.
+function dataFechFatura(c, mes, ano){
+  const fech=parseInt(c&&c.fech)||0;
+  if(!fech) return '';
+  const venc=parseInt(c&&c.venc)||31;
+  return diaSeguroISO(ano, fech>=venc ? parseInt(mes)-1 : parseInt(mes), fech);
+}
+// Competência da 1ª parcela de uma compra: a primeira fatura que ainda não havia fechado
+// na data da compra. Compra feita depois do fechamento entra na fatura seguinte.
+function competenciaGasto(g, c){
+  const base={mes:getMes(g.data), ano:getAno(g.data)};
+  if(!c || !parseInt(c.fech) || !g.data) return base;
+  for(let i=0;i<3;i++){
+    const abs=base.ano*12+base.mes+i, m=abs%12, a=Math.floor(abs/12);
+    const df=dataFechFatura(c,m,a);
+    if(df && df>=g.data) return {mes:m, ano:a};
+  }
+  return base;
+}
+// Valor da parcela de um gasto que cai na fatura do mês/ano informado (0 se não há parcela nele).
 // Uma compra em 10x lançada em março pesa nas faturas de março até dezembro — e não só na de março.
-function parcelaNoMes(g, mes, ano){
+function parcelaNoMes(g, mes, ano, c){
   if(!g || !g.data) return 0;
   const n    = Math.max(1, parseInt(g.parc) || 1);
-  const diff = (parseInt(ano) - getAno(g.data)) * 12 + (parseInt(mes) - getMes(g.data));
+  const comp = competenciaGasto(g, c);
+  const diff = (parseInt(ano)-comp.ano)*12 + (parseInt(mes)-comp.mes);
   if(diff < 0 || diff >= n) return 0;
   return dividirParcelas(g.val || 0, n)[diff];
 }
+// Parcelas que compõem a fatura de uma competência, em ordem de compra
+function parcelasDaFatura(c, mes, ano){
+  return (c.gastos||[]).map(g=>{
+    const n    = Math.max(1, parseInt(g.parc)||1);
+    const comp = competenciaGasto(g, c);
+    const i    = (parseInt(ano)-comp.ano)*12 + (parseInt(mes)-comp.mes);
+    if(i<0 || i>=n) return null;
+    return { g, valor:dividirParcelas(g.val||0,n)[i], num:i+1, total:n };
+  }).filter(Boolean).sort((a,b)=>(a.g.data||'').localeCompare(b.g.data||''));
+}
 // Total da fatura de um mês: soma de todas as parcelas que caem nele
 function getFaturaMes(c, mes, ano){
-  ano = ano != null ? ano : new Date().getFullYear();
-  return +((c.gastos || []).reduce((a, g) => a + parcelaNoMes(g, mes, ano), 0)).toFixed(2);
+  ano = ano != null ? ano : ccAno();
+  return +((c.gastos || []).reduce((a, g) => a + parcelaNoMes(g, mes, ano, c), 0)).toFixed(2);
 }
 // A fatura daquele mês já foi paga? (faturas antigas não guardavam o ano — compatível)
 function faturaPaga(c, mes, ano){
@@ -6192,7 +6690,7 @@ function faturaPaga(c, mes, ano){
 }
 // Fatura em aberto do mês (zero quando já paga)
 function getFatAberta(c, mes = curMes(), ano){
-  ano = ano != null ? ano : new Date().getFullYear();
+  ano = ano != null ? ano : ccAno();
   return faturaPaga(c, mes, ano) ? 0 : getFaturaMes(c, mes, ano);
 }
 // Limite comprometido = todas as parcelas cujas faturas ainda não foram pagas
@@ -6200,37 +6698,143 @@ function limiteUsado(c){
   let total = 0;
   (c.gastos || []).forEach(g => {
     const n = Math.max(1, parseInt(g.parc) || 1);
-    const gm = getMes(g.data), ga = getAno(g.data);
+    const comp = competenciaGasto(g, c);
     dividirParcelas(g.val || 0, n).forEach((v, i) => {
-      const abs = ga * 12 + gm + i;
+      const abs = comp.ano * 12 + comp.mes + i;
       if(!faturaPaga(c, abs % 12, Math.floor(abs / 12))) total += v;
     });
   });
   return +total.toFixed(2);
 }
 function getFatMes(c, mes, ano){
-  ano = ano != null ? ano : new Date().getFullYear();
+  ano = ano != null ? ano : ccAno();
   const f = (c.faturas || []).find(f => f.mes === parseInt(mes) && (f.ano == null || f.ano === parseInt(ano)));
   return f || { mes, ano, valor:getFaturaMes(c, mes, ano) };
 }
-function saveCC(){
-  const nome=document.getElementById('cc-nome')?.value?.trim();
-  const band=document.getElementById('cc-band')?.value;
-  const lim=parseFloat(document.getElementById('cc-lim')?.value)||0;
-  const venc=parseInt(document.getElementById('cc-venc')?.value)||10;
-  const fech=parseInt(document.getElementById('cc-fech')?.value)||3;
-  const grad=document.getElementById('cc-grad')?.value;
-  if(!nome||!lim){alert('Preencha nome e limite.');return;}
-  const d=gs();
-  d.ccs.push({id:uid(),nome,band,lim,venc,fech,grad,gastos:[],faturas:[],ts:Date.now()});
-  ss(d);closeM('m-cc');renderCartoes();
+// Situação da fatura de uma competência
+function statusFatura(c, mes, ano){
+  if(faturaPaga(c, mes, ano)) return 'Pago';
+  const val  = getFaturaMes(c, mes, ano);
+  if(val <= 0) return 'Sem movimento';
+  const hj   = today();
+  const venc = dataVencFatura(c, mes, ano);
+  const fech = dataFechFatura(c, mes, ano);
+  if(venc < hj) return 'Vencida';
+  if(fech && fech < hj) return 'Fechada';
+  return 'Aberta';
 }
+// Próximo vencimento (a partir de hoje), sem estourar o dia em meses curtos
+function proxVencFatura(c){
+  const hj=today(), hoje=new Date();
+  const base=hoje.getFullYear()*12+hoje.getMonth();
+  for(let i=0;i<14;i++){
+    const abs=base+i, dv=dataVencFatura(c, abs%12, Math.floor(abs/12));
+    if(dv>=hj) return dv;
+  }
+  return dataVencFatura(c, hoje.getMonth(), hoje.getFullYear());
+}
+
+// ── Cartão: criação / edição / exclusão ──
+function resetModalCC(){
+  const $=x=>document.getElementById(x);
+  if($('cc-edit-id')) $('cc-edit-id').value='';
+  if($('m-cc-titulo')) $('m-cc-titulo').textContent='Novo Cartão de Crédito';
+  if($('btn-salvar-cc')) $('btn-salvar-cc').textContent='Salvar Cartão';
+  ['cc-nome','cc-lim','cc-venc','cc-fech'].forEach(id=>{ if($(id)) $(id).value=''; });
+  if($('cc-band')) $('cc-band').selectedIndex=0;
+  if($('cc-grad')) $('cc-grad').selectedIndex=0;
+  const err=$('cc-err'); if(err) err.style.display='none';
+}
+function editCC(id){
+  const d=gs(); const c=d.ccs.find(x=>x.id===id);
+  if(!c) return;
+  const $=x=>document.getElementById(x);
+  openM('m-cc');
+  $('cc-edit-id').value=c.id;
+  $('m-cc-titulo').textContent='Editar Cartão';
+  $('btn-salvar-cc').textContent='Salvar Alterações';
+  $('cc-nome').value=c.nome||'';
+  $('cc-band').value=c.band||'Visa';
+  $('cc-lim').value=c.lim||'';
+  $('cc-venc').value=c.venc||'';
+  $('cc-fech').value=c.fech||'';
+  if(c.grad) $('cc-grad').value=c.grad;
+}
+function saveCC(){
+  const $=x=>document.getElementById(x);
+  const editId=$('cc-edit-id')?.value||'';
+  const nome=$('cc-nome')?.value?.trim();
+  const band=$('cc-band')?.value;
+  const lim=parseFloat($('cc-lim')?.value)||0;
+  const vencRaw=parseInt($('cc-venc')?.value);
+  const fechRaw=parseInt($('cc-fech')?.value);
+  const grad=$('cc-grad')?.value;
+  const err=$('cc-err');
+  const falha=(msg)=>{ if(err){err.textContent='⚠️ '+msg;err.style.display='block';} else alert(msg); };
+  if(!nome)          return falha('Informe o nome do cartão.');
+  if(!lim || lim<=0) return falha('Informe um limite maior que zero.');
+  if(vencRaw && (vencRaw<1||vencRaw>31)) return falha('O dia de vencimento deve estar entre 1 e 31.');
+  if(fechRaw && (fechRaw<1||fechRaw>31)) return falha('O dia de fechamento deve estar entre 1 e 31.');
+  if(err) err.style.display='none';
+  const venc=vencRaw||10, fech=fechRaw||3;
+  const d=gs();
+  if(editId){
+    const c=d.ccs.find(x=>x.id===editId);
+    if(c) Object.assign(c,{nome,band,lim,venc,fech,grad,editadoEm:new Date().toISOString()});
+  } else {
+    const novo={id:uid(),nome,band,lim,venc,fech,grad,gastos:[],faturas:[],ts:Date.now()};
+    d.ccs.push(novo);
+    _ccSel=novo.id;
+  }
+  ss(d); closeM('m-cc'); renderCartoes();
+}
+function delCC(id){
+  const d=gs(); const c=d.ccs.find(x=>x.id===id);
+  if(!c) return;
+  const ng=(c.gastos||[]).length, nf=(c.faturas||[]).length;
+  const vinc=d.lancs.filter(l=>l.refCcId===c.id).length;
+  const msg=`Excluir o cartão "${c.nome}"?\n\n`
+    +`• ${ng} gasto(s) registrado(s)\n`
+    +`• ${nf} fatura(s) no histórico\n`
+    +(vinc?`• ${vinc} lançamento(s) de pagamento de fatura também serão removidos\n`:'')
+    +`\nEsta ação não pode ser desfeita.`;
+  if(!confirm(msg)) return;
+  (c.faturas||[]).forEach(f=>removerLancDaFatura(f, d));
+  d.ccs=d.ccs.filter(x=>x.id!==id);
+  if(_ccSel===id) _ccSel=null;
+  ss(d); renderCartoes(); refreshAll();
+}
+
+// ── Lançamento gerado pelo pagamento da fatura ──
+// O gasto no cartão não vira lançamento (senão contaria duas vezes): quem entra no
+// DRE / fluxo de caixa é o pagamento da fatura, na data em que o dinheiro sai da conta.
+function removerLancDaFatura(f, d){
+  const alvos=d.lancs.filter(l=>l.refFaturaId===f.id);
+  alvos.forEach(l=>(d.bancos||[]).forEach(b=>{ b.movs=(b.movs||[]).filter(m=>m.refLancId!==l.id); }));
+  d.lancs=d.lancs.filter(l=>l.refFaturaId!==f.id);
+}
+function gerarLancDaFatura(c, f, d){
+  removerLancDaFatura(f, d);
+  if(!f.gerarLanc) return;
+  const lanc={
+    id:uid(), data:f.dataPg||dataVencFatura(c,f.mes,f.ano), tipo:'Despesa',
+    cat:f.cat||'Serviços & Financeiro', subcat:f.subcat||'',
+    desc:`Fatura ${c.nome} — ${MESES[f.mes]}/${f.ano}`, valor:f.valor,
+    caixaId:f.caixaId||'', caixaNome:f.caixaNome||'', pago:'Pago',
+    obs:'Gerado do pagamento de fatura de cartão de crédito',
+    ts:Date.now(), status:'ativo', origem:'fatura', refFaturaId:f.id, refCcId:c.id
+  };
+  d.lancs.push(lanc);
+  if(lanc.caixaId) lancToCaixa(lanc, d);
+}
+
 function renderCartoes(){
   const d=gs();
-  const mes=curMes();
-  const anoCC=new Date().getFullYear();
+  initCcMesAnoOpts(d);
+  const mes=ccMes();
+  const anoCC=ccAno();
   const totalFat=d.ccs.reduce((a,c)=>a+getFatAberta(c,mes,anoCC),0);
-  const totalLim=d.ccs.reduce((a,c)=>a+c.lim,0);
+  const totalLim=d.ccs.reduce((a,c)=>a+(c.lim||0),0);
   // Limite usado considera também as parcelas futuras ainda não quitadas
   const totalUsado=d.ccs.reduce((a,c)=>a+limiteUsado(c),0);
   const disp=Math.max(0,totalLim-totalUsado);
@@ -6238,18 +6842,19 @@ function renderCartoes(){
 
   set('cc-k-fat',fmtR(totalFat));set('cc-k-lim',fmtR(totalLim));
   set('cc-k-disp',fmtR(disp));set('cc-k-pct',pct(pctUso));set('cc-k-count',d.ccs.length);
+  set('cc-comp-lbl',`Competência: ${MESES[mes]} / ${anoCC}`);
 
   // Próximo vencimento
+  set('cc-k-prox','—');
   if(d.ccs.length){
-    const hoje=new Date();
-    let minDiff=9999,proxTxt='—';
+    const hj=today();
+    let melhor=null;
     d.ccs.forEach(c=>{
-      const dv=new Date();dv.setDate(c.venc);
-      if(dv<hoje)dv.setMonth(dv.getMonth()+1);
-      const diff=Math.ceil((dv-hoje)/864e5);
-      if(diff<minDiff){minDiff=diff;proxTxt=`${c.nome} (${diff}d)`;}
+      const dv=proxVencFatura(c);
+      const diff=diasEntreISO(hj,dv);
+      if(!melhor||diff<melhor.diff) melhor={diff,txt:`${c.nome} (${diff}d)`};
     });
-    set('cc-k-prox',proxTxt);
+    if(melhor) set('cc-k-prox',melhor.txt);
   }
 
   const grid=document.getElementById('cc-grid');
@@ -6264,17 +6869,21 @@ function renderCartoes(){
 
   grid.innerHTML=d.ccs.map(c=>{
     const fat=getFatAberta(c,mes,anoCC);
-    const pctU=c.lim>0?Math.min(100,limiteUsado(c)/c.lim*100):0;
-    return `<div class="cc-visual${_ccSel===c.id?' selected':''}" style="background:${c.grad}" onclick="selectCC('${c.id}')">
+    const st=statusFatura(c,mes,anoCC);
+    return `<div class="cc-visual${_ccSel===c.id?' selected':''}" style="background:${c.grad}" data-cc="${c.id}" onclick="selectCC('${c.id}')">
+      <div class="cc-acts">
+        <button class="cc-act" title="Editar cartão" onclick="event.stopPropagation();editCC('${c.id}')">✎</button>
+        <button class="cc-act" title="Excluir cartão" onclick="event.stopPropagation();delCC('${c.id}')">✕</button>
+      </div>
       <div>
         <div class="cc-chip"></div>
         <div class="cc-num">•••• •••• •••• ${Math.floor(1000+c.ts%9000)}</div>
-        <div style="font-size:9px;opacity:.6;position:relative;z-index:1">${c.band} · Vence dia ${c.venc}</div>
+        <div style="font-size:9px;opacity:.6;position:relative;z-index:1">${c.band} · Fecha dia ${c.fech||'—'} · Vence dia ${c.venc}</div>
       </div>
       <div class="cc-bot">
         <div><div class="cc-name-text">${c.nome}</div><div style="font-size:10px;opacity:.5;margin-top:2px">Limite: ${fmtR(c.lim)}</div></div>
         <div style="text-align:right">
-          <div class="cc-fatura-label">Fatura aberta</div>
+          <div class="cc-fatura-label">${MESES3[mes]}/${String(anoCC).slice(2)} · ${st}</div>
           <div class="cc-fatura-val">${fmtR(fat)}</div>
         </div>
       </div>
@@ -6284,10 +6893,36 @@ function renderCartoes(){
   else if(d.ccs.length)selectCC(d.ccs[0].id);
 }
 
+// Popula os seletores de competência da aba (anos com movimento + ano corrente)
+function initCcMesAnoOpts(d){
+  const selM=document.getElementById('cc-mes'), selA=document.getElementById('cc-ano');
+  if(selM && !selM.options.length){
+    selM.innerHTML=MESES.map((m,i)=>`<option value="${i}">${m}</option>`).join('');
+    selM.value=curMes();
+  }
+  if(!selA) return;
+  const anos=new Set([new Date().getFullYear(), anoRef()]);
+  (d.ccs||[]).forEach(c=>{
+    (c.gastos||[]).forEach(g=>{
+      const comp=competenciaGasto(g,c);
+      const n=Math.max(1,parseInt(g.parc)||1);
+      for(let i=0;i<n;i++) anos.add(Math.floor((comp.ano*12+comp.mes+i)/12));
+    });
+    (c.faturas||[]).forEach(f=>{ if(f.ano) anos.add(parseInt(f.ano)); });
+  });
+  const lista=[...anos].filter(a=>a>1900).sort((a,b)=>b-a);
+  const atual=selA.value;
+  const novo=lista.map(a=>`<option value="${a}">${a}</option>`).join('');
+  if(selA.innerHTML!==novo){
+    selA.innerHTML=novo;
+    selA.value=lista.includes(parseInt(atual))?atual:String(new Date().getFullYear());
+  }
+}
+
 function selectCC(id){
   _ccSel=id;
   document.querySelectorAll('.cc-visual').forEach(v=>v.classList.remove('selected'));
-  document.querySelector(`.cc-visual[onclick="selectCC('${id}')"]`)?.classList.add('selected');
+  document.querySelector(`.cc-visual[data-cc="${id}"]`)?.classList.add('selected');
   const d=gs();const c=d.ccs.find(cc=>cc.id===id);
   if(!c)return;
 
@@ -6295,28 +6930,29 @@ function selectCC(id){
   if(det)det.style.display='block';
   ['btn-add-gasto','btn-pag-fat'].forEach(id2=>{const e=document.getElementById(id2);if(e)e.style.display='inline-flex';});
 
+  const mes=ccMes();
+  const anoCC=ccAno();
   set('cc-det-nome',c.nome);
-  set('cc-det-info',`${c.band} · Fechamento dia ${c.fech} · Vencimento dia ${c.venc}`);
+  set('cc-det-info',`${c.band} · Fechamento dia ${c.fech||'—'} · Vencimento dia ${c.venc}`);
 
-  const mes=curMes();
-  const anoCC=new Date().getFullYear();
   const fat=getFatAberta(c,mes,anoCC);
   const usado=limiteUsado(c);
   const disp=Math.max(0,c.lim-usado);
   const pctU=c.lim>0?Math.min(100,usado/c.lim*100):0;
   set('cc-d-lim',fmtR(c.lim));set('cc-d-disp',fmtR(disp));set('cc-d-fat',fmtR(fat));
-  const hoje=new Date();const dv=new Date();dv.setDate(c.venc);
-  if(dv<hoje)dv.setMonth(dv.getMonth()+1);
-  const diff=Math.ceil((dv-hoje)/864e5);
-  set('cc-d-venc',`dia ${c.venc} (${diff}d)`);
+  const dv=dataVencFatura(c,mes,anoCC);
+  const diff=diasEntreISO(today(),dv);
+  set('cc-d-venc',`${dv.slice(8)}/${dv.slice(5,7)} · ${diff===0?'hoje':diff>0?'em '+diff+'d':Math.abs(diff)+'d atrás'}`);
   set('cc-d-pct-lbl',pct(pctU));
   const bar=document.getElementById('cc-d-bar');
   if(bar){bar.style.width=pctU+'%';bar.style.background=pctU>80?'var(--red)':pctU>60?'var(--amber)':'var(--green)';}
 
-  // Gráfico categorias mês
+  // Gráfico categorias da fatura em análise
   const catMap={};
-  (c.gastos||[]).forEach(g=>{const v=parcelaNoMes(g,mes,anoCC);if(v>0)catMap[g.cat]=(catMap[g.cat]||0)+v;});
+  parcelasDaFatura(c,mes,anoCC).forEach(p=>{catMap[p.g.cat||'Outros']=(catMap[p.g.cat||'Outros']||0)+p.valor;});
   const cKeys=Object.keys(catMap);
+  const ttlCat=document.getElementById('cc-cat-titulo');
+  if(ttlCat) ttlCat.textContent=`Gastos por Categoria — fatura de ${MESES[mes]}/${anoCC}`;
   if(cKeys.length){
     mkCh('ch-cc-cat',{type:'doughnut',data:{labels:cKeys,datasets:[{data:Object.values(catMap),backgroundColor:CORES_CAT,borderWidth:0,hoverOffset:4}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#8fa3bf',font:{size:9},boxWidth:8,padding:6}}}}});
@@ -6326,12 +6962,12 @@ function selectCC(id){
     if(CH['ch-cc-cat']){CH['ch-cc-cat'].destroy();delete CH['ch-cc-cat'];}
   }
 
-  // Histórico de faturas — últimos 6 meses corridos (com as parcelas que caem em cada mês)
+  // Histórico de faturas — 6 competências até a selecionada
   const last6=[],last6Vals=[];
   for(let i=5;i>=0;i--){
     const abs=anoCC*12+mes-i;
     const m=abs%12, a=Math.floor(abs/12);
-    last6.push(MESES3[m]+(a!==anoCC?'/'+String(a).slice(2):''));
+    last6.push(MESES3[m]+'/'+String(a).slice(2));
     const fmObj=(c.faturas||[]).find(f=>f.mes===m&&(f.ano==null||f.ano===a)&&f.status==='Pago');
     last6Vals.push(fmObj?fmObj.valor:getFaturaMes(c,m,a));
   }
@@ -6341,94 +6977,305 @@ function selectCC(id){
   }]},options:{...chartBase,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
 
   // Summary faturas
+  const media6=last6Vals.reduce((a,v)=>a+v,0)/6;
   const sumEl=document.getElementById('cc-fat-summary');
   if(sumEl)sumEl.innerHTML=last6.map((m,i)=>`
     <div class="sum-row">
       <span class="sum-lbl">${m}</span>
       <span class="sum-val" style="color:var(--purple)">${fmtR(last6Vals[i])}</span>
-    </div>`).join('');
+    </div>`).join('')
+    +`<div class="sum-row" style="border-top:1px solid var(--line2);margin-top:4px;padding-top:8px">
+        <span class="sum-lbl" style="font-weight:600">Média</span>
+        <span class="sum-val" style="color:var(--t1);font-weight:600">${fmtR(media6)}</span>
+      </div>`;
 
-  // Tabela faturas
+  renderTabelaFaturas(c, anoCC);
+  renderFaturaDetalhe(c, mes, anoCC);
+  renderTabelaGastos(c);
+}
+
+// Faturas do ano: as 12 competências, com o que foi calculado e o que foi pago
+function renderTabelaFaturas(c, anoCC){
   const ftbody=document.getElementById('cc-fat-tbody');
-  if(ftbody){
-    const faturas=c.faturas||[];
-    const stBdg2={Pago:'bdg-green',Aberta:'bdg-purple',Vencida:'bdg-red'};
-    ftbody.innerHTML=faturas.length?faturas.slice().sort((a,b)=>((b.ano||anoCC)*12+b.mes)-((a.ano||anoCC)*12+a.mes)).map(f=>`<tr>
-      <td style="color:var(--t1)">${MESES[f.mes]}${f.ano?'/'+f.ano:''}</td>
-      <td class="mono" style="color:var(--t3)">${f.dataFech||'—'}</td>
-      <td class="mono" style="color:var(--t3)">${f.dataVenc||`dia ${c.venc}`}</td>
-      <td class="mono" style="color:var(--purple)">${fmtR(f.valor)}</td>
-      <td class="mono" style="color:var(--t3)">${f.dataPg||'—'}</td>
-      <td><span class="badge ${stBdg2[f.status]||'bdg-gray'}">${f.status||'Aberta'}</span></td>
-      <td><button class="btn btn-red btn-xs" onclick="delFat('${c.id}','${f.id}')">✕</button></td>
-    </tr>`).join('')
-    :`<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhuma fatura registrada.</td></tr>`;
+  if(!ftbody) return;
+  const stBdg={Pago:'bdg-green','Aberta':'bdg-purple','Fechada':'bdg-blue','Vencida':'bdg-red','Sem movimento':'bdg-gray'};
+  const linhas=[];
+  for(let m=0;m<12;m++){
+    const valor=getFaturaMes(c,m,anoCC);
+    const f=(c.faturas||[]).find(x=>x.mes===m&&(x.ano==null||x.ano===anoCC));
+    if(valor<=0 && !f) continue;
+    const st=statusFatura(c,m,anoCC);
+    const pago=f&&f.status==='Pago';
+    linhas.push(`<tr${m===ccMes()?' style="background:var(--surface2)"':''}>
+      <td style="color:var(--t1)">${MESES[m]}/${anoCC}</td>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(dataFechFatura(c,m,anoCC))}</td>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(dataVencFatura(c,m,anoCC))}</td>
+      <td class="mono" style="color:var(--purple)">${fmtR(pago?f.valor:valor)}</td>
+      <td class="mono" style="color:var(--t3)">${pago?fmtDataBR(f.dataPg):'—'}</td>
+      <td><span class="badge ${stBdg[st]||'bdg-gray'}">${st}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-xs" title="Ver compras da fatura" onclick="verFatura(${m},${anoCC})">👁</button>
+        ${pago
+          ? `<button class="btn btn-ghost btn-xs" title="Desfazer pagamento" onclick="desfazerPagFat('${c.id}','${f.id}')">↺</button>
+             <button class="btn btn-red btn-xs" title="Excluir registro de pagamento" onclick="delFat('${c.id}','${f.id}')">✕</button>`
+          : (valor>0?`<button class="btn btn-green btn-xs" title="Pagar fatura" onclick="pagarFatura('${c.id}',${m},${anoCC})">Pagar</button>`:'')}
+      </td>
+    </tr>`);
   }
+  ftbody.innerHTML=linhas.length?linhas.join('')
+    :`<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhuma fatura em ${anoCC}.</td></tr>`;
+}
 
-  // Tabela gastos
-  const gtbody=document.getElementById('cc-gas-tbody');
-  if(gtbody){
-    const gastos=[...(c.gastos||[])].sort((a,b)=>b.data.localeCompare(a.data));
-    gtbody.innerHTML=gastos.length?gastos.map(g=>`<tr>
-      <td class="mono" style="color:var(--t3)">${g.data}</td>
-      <td style="color:var(--t1)">${g.desc}</td>
-      <td><span class="cat-tag" style="font-size:9px">${g.cat}</span></td>
-      <td style="color:var(--t3)">${g.parc>1?`${g.parc}x`:'À vista'}</td>
-      <td class="mono" style="color:var(--t1)">${fmtR(g.val)}</td>
-      <td class="mono" style="color:var(--purple)">${fmtR(dividirParcelas(g.val,g.parc)[0])}</td>
-      <td><button class="btn btn-red btn-xs" onclick="delGasto('${c.id}','${g.id}')">✕</button></td>
-    </tr>`).join('')
-    :`<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhum gasto registrado.</td></tr>`;
+// Compras que compõem a fatura da competência selecionada
+function renderFaturaDetalhe(c, mes, anoCC){
+  const tb=document.getElementById('cc-fatdet-tbody');
+  const parcelas=parcelasDaFatura(c,mes,anoCC);
+  const total=parcelas.reduce((a,p)=>a+p.valor,0);
+  const st=statusFatura(c,mes,anoCC);
+  const f=(c.faturas||[]).find(x=>x.mes===mes&&(x.ano==null||x.ano===anoCC)&&x.status==='Pago');
+  set('cc-fatdet-titulo',`Fatura de ${MESES[mes]}/${anoCC}`);
+  set('cc-fatdet-sub',`Fecha em ${fmtDataBR(dataFechFatura(c,mes,anoCC))} · Vence em ${fmtDataBR(dataVencFatura(c,mes,anoCC))} · ${parcelas.length} item(ns)`);
+  set('cc-fatdet-total',fmtR(total));
+  set('cc-fatdet-pago',f?`${fmtR(f.valor)} em ${fmtDataBR(f.dataPg)}`:'—');
+  const bdg=document.getElementById('cc-fatdet-st');
+  if(bdg){
+    const cls={Pago:'bdg-green','Aberta':'bdg-purple','Fechada':'bdg-blue','Vencida':'bdg-red','Sem movimento':'bdg-gray'};
+    bdg.className='badge '+(cls[st]||'bdg-gray'); bdg.textContent=st;
   }
+  if(!tb) return;
+  tb.innerHTML=parcelas.length?parcelas.map(p=>`<tr>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(p.g.data)}</td>
+      <td style="color:var(--t1)">${p.g.desc}</td>
+      <td><span class="cat-tag" style="font-size:9px">${p.g.cat||'—'}</span></td>
+      <td style="color:var(--t3)">${p.total>1?`${p.num}/${p.total}`:'À vista'}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(p.g.val)}</td>
+      <td class="mono" style="color:var(--purple)">${fmtR(p.valor)}</td>
+    </tr>`).join('')
+   :`<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhuma compra nesta fatura.</td></tr>`;
+  const tf=document.getElementById('cc-fatdet-tfoot');
+  if(tf) tf.innerHTML=parcelas.length?`<tr>
+      <td colspan="5" style="text-align:right;color:var(--t2);font-weight:600">Total da fatura</td>
+      <td class="mono" style="color:var(--purple);font-weight:700">${fmtR(total)}</td>
+    </tr>`:'';
+}
+
+function renderTabelaGastos(c){
+  const gtbody=document.getElementById('cc-gas-tbody');
+  if(!gtbody) return;
+  const gastos=[...(c.gastos||[])].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  gtbody.innerHTML=gastos.length?gastos.map(g=>{
+    const n=Math.max(1,parseInt(g.parc)||1);
+    const comp=competenciaGasto(g,c);
+    return `<tr>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(g.data)}</td>
+      <td style="color:var(--t1)">${g.desc}</td>
+      <td><span class="cat-tag" style="font-size:9px">${g.cat||'—'}</span></td>
+      <td style="color:var(--t3)">${n>1?`${n}x`:'À vista'}</td>
+      <td class="mono" style="color:var(--t3)">${MESES3[comp.mes]}/${String(comp.ano).slice(2)}</td>
+      <td class="mono" style="color:var(--t1)">${fmtR(g.val)}</td>
+      <td class="mono" style="color:var(--purple)">${fmtR(dividirParcelas(g.val||0,n)[0])}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-xs" title="Editar" onclick="editGasto('${c.id}','${g.id}')">✎</button>
+        <button class="btn btn-red btn-xs" title="Excluir" onclick="delGasto('${c.id}','${g.id}')">✕</button>
+      </td>
+    </tr>`;}).join('')
+    :`<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:20px">Nenhum gasto registrado.</td></tr>`;
+}
+
+function verFatura(mes, ano){
+  const selM=document.getElementById('cc-mes'), selA=document.getElementById('cc-ano');
+  if(selM) selM.value=mes;
+  if(selA && [...selA.options].some(o=>o.value===String(ano))) selA.value=ano;
+  const tgl=[...document.querySelectorAll('#page-cartoes .tgl')].find(t=>t.textContent.trim()==='Fatura Detalhada');
+  renderCartoes();
+  if(tgl) tglCC('fatura',tgl);
 }
 
 function tglCC(v,el){
+  _ccView=v;
   document.querySelectorAll('#page-cartoes .tgl').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('cc-fat-view').style.display=v==='faturas'?'block':'none';
-  document.getElementById('cc-gas-view').style.display=v==='gastos'?'block':'none';
+  if(el) el.classList.add('active');
+  ['faturas','fatura','gastos'].forEach(x=>{
+    const e=document.getElementById('cc-'+x+'-view');
+    if(e) e.style.display=x===v?'block':'none';
+  });
 }
 
-function saveGasto(){
-  const data=document.getElementById('g-data')?.value||today();
-  const val=parseFloat(document.getElementById('g-val')?.value)||0;
-  const desc=document.getElementById('g-desc')?.value?.trim();
-  const cat=document.getElementById('g-cat')?.value;
-  const parc=parseInt(document.getElementById('g-parc')?.value)||1;
-  if(!val||!desc){alert('Preencha os campos obrigatórios.');return;}
-  if(!_ccSel){alert('Selecione um cartão.');return;}
-  const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
-  if(!c)return;
-  c.gastos.push({id:uid(),data,val,desc,cat,parc,ts:Date.now()});
-  ss(d);closeM('m-gasto');selectCC(_ccSel);renderCartoes();
+// ── Gasto no cartão ──
+function resetModalGasto(){
+  const $=x=>document.getElementById(x);
+  if($('g-edit-id')) $('g-edit-id').value='';
+  if($('m-gasto-titulo')) $('m-gasto-titulo').textContent='Registrar Gasto no Cartão';
+  if($('btn-salvar-gasto')) $('btn-salvar-gasto').textContent='Registrar Gasto';
+  if($('g-data')) $('g-data').value=today();
+  if($('g-val')) $('g-val').value='';
+  if($('g-desc')) $('g-desc').value='';
+  if($('g-parc')) $('g-parc').value='1';
+  updGastoCats();
+  const err=$('g-err'); if(err) err.style.display='none';
+  updGastoPreview();
 }
-
-function savePagFat(){
-  const mes=parseInt(document.getElementById('pf-mes')?.value);
-  const dataPg=document.getElementById('pf-data')?.value||today();
-  const ano=getAno(dataPg)>0?getAno(dataPg):new Date().getFullYear();
-  const val=parseFloat(document.getElementById('pf-val')?.value)||0;
-  if(!val){alert('Informe o valor pago.');return;}
-  if(!_ccSel)return;
-  const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
-  if(!c)return;
-  const exists=c.faturas.find(f=>f.mes===mes&&(f.ano==null||f.ano===ano));
-  if(exists){exists.status='Pago';exists.dataPg=dataPg;exists.valor=val;exists.ano=ano;}
-  else{
-    c.faturas.push({id:uid(),mes,ano,valor:val||getFaturaMes(c,mes,ano),status:'Pago',dataPg,dataVenc:`dia ${c.venc}`});
+// Categorias do gasto usam a mesma árvore do resto do sistema
+function updGastoCats(){
+  const el=document.getElementById('g-cat');
+  if(el){
+    const atual=el.value;
+    el.innerHTML=allCats('Despesa').map(c=>`<option>${c}</option>`).join('');
+    if(atual && allCats('Despesa').includes(atual)) el.value=atual;
   }
-  ss(d);closeM('m-pag-fat');selectCC(_ccSel);renderCartoes();
+  updGastoSubcat();
 }
-
-function delFat(ccId,fatId){
-  const d=gs();const c=d.ccs.find(cc=>cc.id===ccId);
-  if(c)c.faturas=c.faturas.filter(f=>f.id!==fatId);
-  ss(d);selectCC(ccId);
+function updGastoSubcat(){
+  const cat=document.getElementById('g-cat')?.value||'';
+  const el=document.getElementById('g-subcat');
+  if(!el) return;
+  const subs=subcats('Despesa',cat);
+  el.innerHTML='<option value="">—</option>'+subs.map(s=>`<option>${s}</option>`).join('');
+}
+// Prévia: em qual fatura a compra cai e qual o valor de cada parcela
+function updGastoPreview(){
+  const el=document.getElementById('g-preview');
+  if(!el) return;
+  const d=gs(); const c=d.ccs.find(cc=>cc.id===_ccSel);
+  const data=document.getElementById('g-data')?.value||'';
+  const val=parseFloat(document.getElementById('g-val')?.value)||0;
+  const parc=Math.max(1,parseInt(document.getElementById('g-parc')?.value)||1);
+  if(!c||!data||!val){ el.innerHTML='<span style="color:var(--t3)">Informe data e valor para ver em qual fatura a compra entra.</span>'; return; }
+  const comp=competenciaGasto({data,parc},c);
+  const vals=dividirParcelas(val,parc);
+  const ultAbs=comp.ano*12+comp.mes+parc-1;
+  el.innerHTML=`<b style="color:var(--t1)">${parc>1?`${parc}x de ${fmtR(vals[0])}`:fmtR(val)}</b>
+    · entra na fatura de <b style="color:var(--purple)">${MESES[comp.mes]}/${comp.ano}</b>
+    (vence ${fmtDataBR(dataVencFatura(c,comp.mes,comp.ano))})
+    ${parc>1?` · última parcela em <b style="color:var(--purple)">${MESES[ultAbs%12]}/${Math.floor(ultAbs/12)}</b>`:''}`;
+}
+function editGasto(ccId,gId){
+  const d=gs(); const c=d.ccs.find(x=>x.id===ccId);
+  const g=c&&(c.gastos||[]).find(x=>x.id===gId);
+  if(!g) return;
+  _ccSel=ccId;
+  openM('m-gasto');
+  const $=x=>document.getElementById(x);
+  $('g-edit-id').value=g.id;
+  $('m-gasto-titulo').textContent='Editar Gasto do Cartão';
+  $('btn-salvar-gasto').textContent='Salvar Alterações';
+  $('g-data').value=g.data||today();
+  $('g-val').value=g.val||'';
+  $('g-desc').value=g.desc||'';
+  updGastoCats();
+  if(g.cat) $('g-cat').value=g.cat;
+  updGastoSubcat();
+  if(g.subcat) $('g-subcat').value=g.subcat;
+  $('g-parc').value=String(Math.max(1,parseInt(g.parc)||1));
+  updGastoPreview();
+}
+function saveGasto(){
+  const $=x=>document.getElementById(x);
+  const editId=$('g-edit-id')?.value||'';
+  const data=$('g-data')?.value||today();
+  const val=parseFloat($('g-val')?.value)||0;
+  const desc=$('g-desc')?.value?.trim();
+  const cat=$('g-cat')?.value;
+  const subcat=$('g-subcat')?.value||'';
+  const parc=Math.max(1,parseInt($('g-parc')?.value)||1);
+  const err=$('g-err');
+  const falha=(m)=>{ if(err){err.textContent='⚠️ '+m;err.style.display='block';} else alert(m); };
+  if(!_ccSel) return falha('Selecione um cartão.');
+  if(!desc)   return falha('Informe a descrição da compra.');
+  if(!val||val<=0) return falha('Informe um valor maior que zero.');
+  if(err) err.style.display='none';
+  const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
+  if(!c)return;
+  c.gastos=c.gastos||[];
+  if(editId){
+    const g=c.gastos.find(x=>x.id===editId);
+    if(g) Object.assign(g,{data,val,desc,cat,subcat,parc,editadoEm:new Date().toISOString()});
+  } else {
+    c.gastos.push({id:uid(),data,val,desc,cat,subcat,parc,ts:Date.now()});
+  }
+  ss(d);closeM('m-gasto');renderCartoes();refreshAll();
 }
 function delGasto(ccId,gId){
   const d=gs();const c=d.ccs.find(cc=>cc.id===ccId);
-  if(c)c.gastos=c.gastos.filter(g=>g.id!==gId);
-  ss(d);selectCC(ccId);renderCartoes();
+  const g=c&&(c.gastos||[]).find(x=>x.id===gId);
+  if(!g) return;
+  const n=Math.max(1,parseInt(g.parc)||1);
+  if(!confirm(`Excluir a compra "${g.desc}" de ${fmtR(g.val)}${n>1?` (${n}x)`:''}?\n\nAs parcelas serão removidas das faturas.`)) return;
+  c.gastos=c.gastos.filter(x=>x.id!==gId);
+  ss(d);renderCartoes();refreshAll();
+}
+
+// ── Pagamento de fatura ──
+function pagarFatura(ccId, mes, ano){
+  _ccSel=ccId;
+  openM('m-pag-fat');
+  const $=x=>document.getElementById(x);
+  if(mes!=null) $('pf-mes').value=mes;
+  if(ano!=null && $('pf-ano')) $('pf-ano').value=ano;
+  updPagFatPreview();
+}
+function updPagFatPreview(){
+  const $=x=>document.getElementById(x);
+  const d=gs(); const c=d.ccs.find(cc=>cc.id===_ccSel);
+  if(!c) return;
+  const mes=parseInt($('pf-mes')?.value);
+  const ano=parseInt($('pf-ano')?.value)||ccAno();
+  const total=getFaturaMes(c,mes,ano);
+  const f=(c.faturas||[]).find(x=>x.mes===mes&&(x.ano==null||x.ano===ano));
+  const info=$('pf-info');
+  if(info) info.innerHTML=`Fatura de <b style="color:var(--t1)">${MESES[mes]}/${ano}</b> ·
+    fecha ${fmtDataBR(dataFechFatura(c,mes,ano))} · vence <b style="color:var(--t1)">${fmtDataBR(dataVencFatura(c,mes,ano))}</b>
+    · total calculado <b style="color:var(--purple)">${fmtR(total)}</b>
+    ${f&&f.status==='Pago'?' · <span style="color:var(--amber)">já registrada como paga (será atualizada)</span>':''}`;
+  const valEl=$('pf-val');
+  if(valEl && !valEl.dataset.tocado) valEl.value=(f&&f.status==='Pago'?f.valor:total)||'';
+}
+function savePagFat(){
+  const $=x=>document.getElementById(x);
+  const mes=parseInt($('pf-mes')?.value);
+  const dataPg=$('pf-data')?.value||today();
+  const ano=parseInt($('pf-ano')?.value)||(getAno(dataPg)>0?getAno(dataPg):ccAno());
+  const val=parseFloat($('pf-val')?.value)||0;
+  const caixaId=$('pf-caixa')?.value||'';
+  const gerarLanc=!!$('pf-gerar')?.checked;
+  const cat=$('pf-cat')?.value||'Serviços & Financeiro';
+  const err=$('pf-err');
+  const falha=(m)=>{ if(err){err.textContent='⚠️ '+m;err.style.display='block';} else alert(m); };
+  if(!_ccSel) return falha('Selecione um cartão.');
+  if(!val||val<=0) return falha('Informe o valor pago.');
+  if(err) err.style.display='none';
+  const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
+  if(!c)return;
+  c.faturas=c.faturas||[];
+  const caixaNome=caixaId?((d.bancos||[]).find(b=>b.id===caixaId)?.nome||''):'';
+  let f=c.faturas.find(x=>x.mes===mes&&(x.ano==null||x.ano===ano));
+  if(!f){ f={id:uid(),mes,ano}; c.faturas.push(f); }
+  Object.assign(f,{
+    mes, ano, valor:+val.toFixed(2), status:'Pago', dataPg,
+    dataFech:dataFechFatura(c,mes,ano), dataVenc:dataVencFatura(c,mes,ano),
+    caixaId, caixaNome, gerarLanc, cat
+  });
+  gerarLancDaFatura(c, f, d);
+  ss(d);closeM('m-pag-fat');renderCartoes();refreshAll();
+}
+// Desfaz o pagamento: a fatura volta a ficar em aberto e o lançamento gerado é removido
+function desfazerPagFat(ccId, fatId){
+  const d=gs();const c=d.ccs.find(cc=>cc.id===ccId);
+  const f=c&&(c.faturas||[]).find(x=>x.id===fatId);
+  if(!f) return;
+  if(!confirm(`Desfazer o pagamento da fatura de ${MESES[f.mes]}/${f.ano||''}?\n\nO lançamento gerado (se houver) será removido e a fatura volta a ficar em aberto.`)) return;
+  removerLancDaFatura(f, d);
+  c.faturas=c.faturas.filter(x=>x.id!==fatId);
+  ss(d);renderCartoes();refreshAll();
+}
+function delFat(ccId,fatId){
+  const d=gs();const c=d.ccs.find(cc=>cc.id===ccId);
+  const f=c&&(c.faturas||[]).find(x=>x.id===fatId);
+  if(!f) return;
+  if(!confirm(`Excluir o registro da fatura de ${MESES[f.mes]}/${f.ano||''}?\n\nO lançamento gerado (se houver) também será removido.`)) return;
+  removerLancDaFatura(f, d);
+  c.faturas=c.faturas.filter(x=>x.id!==fatId);
+  ss(d);renderCartoes();refreshAll();
 }
 
 // ── CONFIG ──

@@ -4,6 +4,148 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Cartão de crédito corrigido e relatório de despesas pessoais
+
+### 🎯 O que foi pedido
+
+Acrescentar **relatórios para análise de despesas pessoais** e analisar, melhorar e
+**corrigir os problemas da aba Cartão de Crédito**.
+
+---
+
+## Parte 1 — Cartão de Crédito
+
+### 🐛 O que estava errado
+
+- **O dia de fechamento era ignorado.** O campo existia no cadastro, mas nenhum cálculo
+  o usava: uma compra feita no dia 25, com fechamento no dia 20, caía na fatura do próprio
+  mês em vez da seguinte. Todas as faturas ficavam um mês adiantadas.
+- **Não dava para editar nem excluir um cartão.** Errou o limite ou o dia de vencimento?
+  Só apagando todos os dados.
+- **Não dava para editar um gasto** — só excluir e lançar de novo, perdendo o histórico.
+- **Pagar a fatura não gerava lançamento nem debitava conta nenhuma.** O gasto do cartão
+  era invisível para o DRE, para o fluxo de caixa e para o extrato bancário: o dinheiro
+  saía da conta e o sistema não registrava.
+- **Não havia como ver quais compras compunham uma fatura** — só o total.
+- **A aba mostrava sempre o mês corrente do ano corrente.** Não havia como olhar a fatura
+  de outubro, nem a de dezembro do ano passado.
+- **O "próximo vencimento" estourava a data** em meses curtos: vencimento dia 31 em
+  fevereiro virava 3 de março (`setDate(31)`).
+- **As categorias do gasto eram uma lista própria** ("Assinaturas", "Viagens",
+  "Eletrônicos"…), desconectada das categorias do resto do sistema — o que impedia
+  qualquer análise cruzada.
+- **Excluir gasto ou fatura não pedia confirmação.** Um clique errado e o dado sumia.
+- A tabela de faturas só listava faturas **já pagas**; as em aberto não existiam ali.
+
+### ✅ Corrigido e melhorado
+
+**Fechamento e competência (a correção central)**
+- Nova noção de **competência**: o mês de vencimento da fatura. Cada compra é associada à
+  primeira fatura que **ainda não havia fechado** na data da compra.
+- Quando o dia de fechamento é igual ou posterior ao de vencimento, a fatura do mês fecha
+  no **mês anterior** (ex.: fecha dia 20, vence dia 5 → a fatura de maio fecha em 20/abril).
+- Parcelas seguem a competência da primeira: compra em 3x na fatura de maio pesa em maio,
+  junho e julho — inclusive **virando o ano** corretamente.
+- O **limite comprometido** passou a considerar a competência de cada parcela.
+- Datas de fechamento e vencimento **nunca estouram o mês**: dia 31 em fevereiro vira 28
+  (ou 29 em ano bissexto).
+
+**Navegação por competência**
+- Seletores de **mês e ano** no topo da aba. Todos os números — KPIs, gráficos, faturas e
+  detalhe — seguem a competência escolhida.
+- O seletor de ano se popula sozinho com os anos que têm movimento (incluindo os anos
+  futuros alcançados por parcelamentos longos).
+
+**Fatura detalhada (nova aba)**
+- Mostra **quais compras compõem a fatura** da competência: data da compra, descrição,
+  categoria, parcela *x de n*, valor total da compra e quanto pesa naquela fatura.
+- Cabeçalho com total, datas de fechamento e vencimento, situação e o pagamento registrado.
+- Rodapé fechando com o total da fatura.
+
+**Faturas do ano**
+- A tabela agora lista **as 12 competências do ano** (as que têm valor ou registro), não só
+  as pagas, cada uma com sua situação: *Aberta*, *Fechada*, *Vencida*, *Paga* ou
+  *Sem movimento*.
+- Ações por linha: **ver as compras**, **pagar**, **desfazer o pagamento** e **excluir**.
+
+**Pagamento da fatura integrado ao caixa**
+- O pagamento agora **gera um lançamento de despesa** (opcional, marcado por padrão) e
+  pode **debitar uma conta bancária**, aparecendo no DRE, nos relatórios e no extrato.
+- Modal com mês, ano, data, valor pré-preenchido com o total calculado, conta de débito e
+  categoria do lançamento — além de uma prévia com fechamento, vencimento e total.
+- **Desfazer o pagamento** remove o lançamento e a movimentação bancária gerados e reabre
+  a fatura.
+- Excluir cartão ou fatura também limpa os lançamentos vinculados — sem sobras órfãs.
+
+**Cadastro e edição**
+- **Editar e excluir cartão** (botões no próprio cartão), com confirmação que informa
+  quantos gastos, faturas e lançamentos serão afetados.
+- **Editar gasto**, com validação inline (nada de `alert`) para nome, limite, dia de
+  vencimento e dia de fechamento fora da faixa 1–31.
+- Gastos passaram a usar as **categorias e subcategorias do sistema**.
+- **Prévia no cadastro do gasto**: "3x de R$ 300,00 · entra na fatura de Julho/2026
+  (vence 05/07/2026) · última parcela em Setembro/2026".
+- Confirmação antes de excluir gasto e fatura.
+
+---
+
+## Parte 2 — Relatório de Análise de Despesas Pessoais
+
+Nova aba em **Relatórios & DRE → Despesas Pessoais**.
+
+### ✅ O que foi implementado
+
+**Período e fonte**
+- Janela de análise de **1, 3, 6 ou 12 meses**, ancorada no mês selecionado.
+- Comparação automática com o **período anterior de mesmo tamanho**.
+- Fonte alternável: **somente lançamentos** ou **lançamentos + parcelas de cartão**.
+- No modo com cartão, as parcelas entram na data de vencimento da fatura e **substituem**
+  os lançamentos gerados por pagamento de fatura — nada é contado duas vezes.
+- Respeita os modos **Previsto / Realizado** e mantém as contas de reserva fora do resultado.
+
+**Indicadores**
+- Total do período, média mensal, média diária, maior despesa, número de despesas e
+  **percentual da renda** comprometido, com a variação frente ao período anterior.
+
+**Análises**
+- **Evolução mensal** das despesas com a linha da média do período.
+- **Essenciais × Escolhas**: classificação por grupo de categoria (moradia, alimentação,
+  transporte, saúde, educação e vestuário são essenciais; lazer, beleza, festas e esporte
+  são escolhas), com o peso de cada classe sobre o total e sobre a renda.
+- **Tabela por categoria** com total, % do total, média mensal, número de lançamentos,
+  maior gasto, valor do período anterior e **variação** (▲/▼, "novo", "estável").
+- **Subcategorias** — onde o dinheiro realmente escorre, com a contagem de ocorrências.
+- **Gasto por dia da semana**.
+- **Maiores despesas do período**, com categoria, subcategoria e origem (lançamento ou
+  qual cartão).
+
+**Leitura do período**
+- Texto gerado a partir dos números: variação total, quanto da renda foi consumido e
+  quanto sobrou, proporção entre essencial e escolha, maior categoria, **maior alta**,
+  **maior economia** e o dia da semana mais caro.
+
+### 🧪 Testes
+
+- `test-cc.js` — **53 verificações**: competência com fechamento (antes, depois e virada de
+  ano), datas de fechamento/vencimento, totais por fatura, limite comprometido, dia seguro
+  em meses curtos, composição da fatura, navegação por competência, pagamento gerando
+  lançamento e movimento bancário, desfazer pagamento, edição de cartão e de gasto, validação.
+- `test-despesas.js` — **39 verificações**: janelas de 1/3/12 meses, comparativo com o
+  período anterior, classificação essencial/escolha, tabela por categoria, subcategorias,
+  maiores despesas, evolução mensal e ausência de dupla contagem no modo com cartão.
+- Suítes existentes seguem passando: `test-full` (21), `test-fluxo` (10), `test-contas2` (37),
+  `test-reserva` (22), `test-lanc-reserva` (23), `test-extrato` (24) e `test-invariante`
+  (24 cenários DRE × motor de saldo).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado é migrado ou apagado. Como o **dia de fechamento passou a ser respeitado**,
+compras feitas após o fechamento agora aparecem na fatura do mês seguinte — que é o
+comportamento correto. Se algum cartão estiver com o dia de fechamento errado no cadastro,
+basta editá-lo: os valores se reorganizam sozinhos.
+
+---
+
 ## [2026-09-18] Extrato bancário: ordem cronológica e análise do período
 
 ### 🎯 O que foi pedido
