@@ -833,6 +833,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="sidebar-footer-info" id="sb-saldo">
       Saldo atual<br><strong id="sb-saldo-val" style="color:var(--green);font-family:'JetBrains Mono',monospace">R$ 0,00</strong>
+      <div id="sb-reservas" style="display:none;font-size:9px;color:var(--t3);margin-top:3px"></div>
     </div>
   </div>
 </nav>
@@ -1632,8 +1633,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 
   <!-- KPIs globais -->
-  <div class="kpi-grid cols4" id="bk-kpis">
+  <div class="kpi-grid cols5" id="bk-kpis">
     <div class="kpi g"><div class="kpi-label">Saldo Total</div><div class="kpi-val g" id="bk-total">R$ 0</div><div class="kpi-sub">todas as contas</div></div>
+    <div class="kpi c"><div class="kpi-label">Em Reservas</div><div class="kpi-val c" id="bk-reservas">R$ 0</div><div class="kpi-sub">fora do resultado</div></div>
     <div class="kpi b"><div class="kpi-label">Total Entradas (mês)</div><div class="kpi-val b" id="bk-ent">R$ 0</div></div>
     <div class="kpi r"><div class="kpi-label">Total Saídas (mês)</div><div class="kpi-val r" id="bk-sai">R$ 0</div></div>
     <div class="kpi"><div class="kpi-label">Contas Ativas</div><div class="kpi-val" id="bk-count">0</div></div>
@@ -1658,6 +1660,14 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <div style="display:flex;gap:6px">
             <button class="btn btn-green btn-sm" onclick="openMBkMov('entrada')">+ Entrada</button>
             <button class="btn btn-red btn-sm" onclick="openMBkMov('saida')">− Saída</button>
+          </div>
+        </div>
+
+        <div id="bk-det-reserva" style="display:none;align-items:center;gap:10px;background:var(--cyan-dim);border:1px solid #22d3ee33;border-radius:var(--r2);padding:10px 14px;margin-bottom:14px">
+          <span style="font-size:16px">🔒</span>
+          <div style="font-size:11px;color:var(--cyan);line-height:1.45">
+            <strong>Conta de reserva.</strong> O que entra e sai daqui não aparece no DRE, nos relatórios mensais
+            nem no orçamento — mas o saldo continua somando no seu patrimônio.
           </div>
         </div>
 
@@ -2547,8 +2557,15 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Nova Conta Bancária -->
 <div class="overlay" id="m-banco" style="display:none" onclick="cmoOut(event,'m-banco')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Nova Conta Bancária</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-banco')">✕</button></div>
+    <div class="modal-hd">
+      <div>
+        <h2 id="m-banco-titulo">Nova Conta Bancária</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="m-banco-sub">Corrente, poupança ou reserva</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-banco')">✕</button>
+    </div>
     <div class="modal-bd">
+      <input type="hidden" id="bn-edit-id">
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Nome da Conta *</label><input type="text" id="bn-nome" placeholder="Ex: Nubank Conta Corrente"></div>
         <div class="fg"><label>Banco / Instituição *</label>
@@ -2562,9 +2579,13 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Tipo de Conta</label>
-          <select id="bn-tipo">
-            <option>Conta Corrente</option><option>Conta Poupança</option><option>Conta Salário</option>
-            <option>Conta Digital</option><option>Conta Investimento</option>
+          <select id="bn-tipo" onchange="updBnTipo()">
+            <option>Conta Corrente</option>
+            <option>Conta Poupança</option>
+            <option>Conta Salário</option>
+            <option>Conta Digital</option>
+            <option>Conta Investimento</option>
+            <option>Carteira / Dinheiro</option>
           </select>
         </div>
         <div class="fg"><label>Saldo Inicial (R$)</label><input type="number" id="bn-si" step="0.01" placeholder="0,00" value="0"></div>
@@ -2573,6 +2594,20 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Agência</label><input type="text" id="bn-agencia" placeholder="Ex: 0001"></div>
         <div class="fg"><label>Conta (últimos 4 dígitos)</label><input type="text" id="bn-conta" placeholder="Ex: 1234" maxlength="10"></div>
       </div>
+      <!-- Conta de reserva: fica fora do resultado -->
+      <div style="background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin:0">
+          <input type="checkbox" id="bn-fora" onchange="updBnForaHint()" style="width:16px;height:16px;margin-top:1px;cursor:pointer;accent-color:var(--cyan);flex-shrink:0">
+          <span>
+            <span style="font-size:12px;font-weight:600;color:var(--t1);display:block">🔒 Conta de reserva — fora do resultado</span>
+            <span style="font-size:11px;color:var(--t3);display:block;margin-top:3px" id="bn-fora-hint">
+              O que entra e sai desta conta NÃO aparece no DRE, nos relatórios mensais nem no orçamento.
+              O saldo continua somando no patrimônio. Ideal para poupança e reserva de emergência.
+            </span>
+          </span>
+        </label>
+      </div>
+
       <div class="form-grid">
         <div class="fg"><label>Cor / Tema</label>
           <select id="bn-cor">
@@ -2590,7 +2625,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-banco')">Cancelar</button>
-      <button class="btn btn-green" onclick="saveBanco()">Salvar Conta</button>
+      <button class="btn btn-green" id="btn-salvar-banco" onclick="saveBanco()">Salvar Conta</button>
     </div>
   </div>
 </div>
@@ -2786,6 +2821,48 @@ function dividirParcelas(total, n){
   return arr;
 }
 
+// ── CONTAS DE RESERVA (poupança etc.) ──
+// Uma conta marcada como reserva guarda dinheiro, mas o que entra e sai dela não é
+// resultado do mês: fica fora do DRE, dos relatórios mensais e do orçamento.
+// O saldo continua contando no patrimônio — o dinheiro não some, só não vira receita/despesa.
+const TIPOS_RESERVA_PADRAO = ['Conta Poupança', 'Conta Investimento'];
+
+function contaEhReserva(c){
+  if(!c) return false;
+  if(c.foraResultado != null) return !!c.foraResultado;      // escolha explícita do usuário
+  return TIPOS_RESERVA_PADRAO.includes(c.tipo);              // padrão pelo tipo da conta
+}
+// Ids das contas de reserva
+function idsReserva(d){
+  d = d || gs();
+  return new Set((d.bancos || []).filter(contaEhReserva).map(b => b.id));
+}
+// O lançamento pertence a uma conta de reserva?
+function lancEhReserva(l, ids){
+  return !!l && !!l.caixaId && (ids || idsReserva()).has(l.caixaId);
+}
+// Remove de uma lista de lançamentos tudo que é de conta de reserva
+function semReservas(lancs, d){
+  const ids = idsReserva(d);
+  if(!ids.size) return lancs;
+  return lancs.filter(l => !lancEhReserva(l, ids));
+}
+// Saldo guardado em contas de reserva até a data
+function calcReservasAte(dataISO){
+  const d = gs();
+  const reservas = (d.bancos || []).filter(contaEhReserva);
+  if(!reservas.length) return 0;
+  let total = 0;
+  reservas.forEach(b => {
+    total += (b.saldoInicial || 0);
+    movimentacoesDaConta(b, d).forEach(m => {
+      if(!m.data || (dataISO && m.data > dataISO)) return;
+      total += m.tipo === 'entrada' ? m.val : -m.val;
+    });
+  });
+  return +total.toFixed(2);
+}
+
 // Movimentação bancária de transferência interna (não altera o saldo consolidado)
 function isTransfMov(m){
   return !!m.transfGrupo || (m.cat || '').includes('Transferência');
@@ -2953,6 +3030,15 @@ function updSbSaldo(){
   const d = gs();
   const saldo = calcSaldoAte(today(), { somentePagos:true });
   setC('sb-saldo-val', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
+  // Parte do saldo que está guardada em contas de reserva (fora do resultado)
+  const reservas = calcReservasAte(today());
+  const elRes = document.getElementById('sb-reservas');
+  if(elRes){
+    elRes.style.display = reservas ? 'block' : 'none';
+    elRes.innerHTML = reservas ? `\u{1F512} ${fmtR(reservas)} em reservas` : '';
+    elRes.title = reservas
+      ? `Dispon\u00edvel fora das reservas: ${fmtR(+(saldo - reservas).toFixed(2))}` : '';
+  }
   // Conta o que realmente exige ação: vencidas + a vencer nos próximos 7 dias
   const pend = d.contas.filter(c => {
     if(statusConta(c) === 'Pago') return false;
@@ -3057,7 +3143,8 @@ function renderDash(){
   document.getElementById('dash-sub').textContent = `${MESES[mes]} ${ano}${modoLabel}`;
 
   const ativosBase = d.lancs.filter(l => l.status !== 'cancelado');
-  const ativos = filtrarPorView(ativosBase, _dashView);
+  // Contas de reserva (poupança) ficam fora do resultado
+  const ativos = semReservas(filtrarPorView(ativosBase, _dashView), d);
   const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
   const rec = ml.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
   const des = ml.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
@@ -3141,6 +3228,8 @@ function renderDash(){
   // No modo "Realizado" considera apenas o que já foi efetivado; no "Previsto", tudo.
   const fimMesDash = fimDoMes(ano, mes);
   const caixa      = calcSaldoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
+  const reservas   = calcReservasAte(fimMesDash);
+  const caixaLivre = +(caixa - reservas).toFixed(2);
   const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash)
                            .reduce((a,l) => a+l.valor, 0);
   const totalDiv   = d.divs.reduce((a, dv) => a + (dv.saldo != null ? dv.saldo : (dv.total || 0)), 0);
@@ -3148,7 +3237,8 @@ function renderDash(){
 
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
   const detPat = [];
-  detPat.push(`Caixa: ${fmtR(caixa)}`);
+  detPat.push(`Caixa: ${fmtR(caixaLivre)}`);
+  if (reservas !== 0)  detPat.push(`Reservas: ${fmtR(reservas)}`);
   if (totalInv > 0)    detPat.push(`Investimentos: ${fmtR(totalInv)}`);
   if (totalDiv > 0)    detPat.push(`Dívidas: −${fmtR(totalDiv)}`);
   set('dk-patrimonio-sub', detPat.join(' · '));
@@ -3157,7 +3247,8 @@ function renderDash(){
   const patDetalhe = document.getElementById('dk-patrimonio-detalhe');
   if (patDetalhe) {
     patDetalhe.innerHTML = [
-      { l: '🏦 Caixa',    txt: fmtR(caixa),           c: caixa >= 0 ? 'var(--green)' : 'var(--red)' },
+      { l: '🏦 Caixa',    txt: fmtR(caixaLivre),      c: caixaLivre >= 0 ? 'var(--green)' : 'var(--red)' },
+      ...(reservas !== 0 ? [{ l: '🔒 Reservas', txt: fmtR(reservas), c: 'var(--cyan)' }] : []),
       { l: '📈 Invest.',  txt: fmtR(totalInv),        c: 'var(--blue)' },
       { l: '💳 Dívidas', txt: (totalDiv>0?'−':'') + fmtR(totalDiv), c: totalDiv > 0 ? 'var(--red)' : 'var(--t3)' },
     ].map(x => `
@@ -3615,7 +3706,7 @@ function renderRel(){
   const d=gs();
   const ano=anoRef();
   const ativosBase=d.lancs.filter(l=>l.status!=='cancelado');
-  const ativos=filtrarPorView(ativosBase, _relFilterView).filter(l=>getAno(l.data)===ano);
+  const ativos=semReservas(filtrarPorView(ativosBase, _relFilterView), d).filter(l=>getAno(l.data)===ano);
   const mData=MESES.map((_,m)=>({
     r :ativos.filter(l=>l.tipo==='Receita'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
     de:ativos.filter(l=>l.tipo==='Despesa'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
@@ -3722,7 +3813,7 @@ function dreTotal(label, valor, destaque=false){
 // ── Helpers de fluxo de caixa (lançamentos + movimentações bancárias, sem dupla contagem) ──
 function getCashFlowForMonth(d, mes, ativosParam) {
   const ano = anoRef();
-  const ativos = ativosParam || filtrarPorView(d.lancs.filter(l => l.status !== 'cancelado'), _relFilterView);
+  const ativos = ativosParam || semReservas(filtrarPorView(d.lancs.filter(l => l.status !== 'cancelado'), _relFilterView), d);
   const ml = ativos.filter(l => noMesAno(l.data, mes, ano));
 
   // Fluxo de lançamentos
@@ -3733,12 +3824,15 @@ function getCashFlowForMonth(d, mes, ativosParam) {
   // Movimentações bancárias do mês que NÃO vieram de um lançamento (mov.refLancId),
   // para o mesmo dinheiro não ser contado duas vezes, e sem transferências internas.
   const movsMes = [];
-  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+  (d.bancos || []).forEach(b => {
+    if (contaEhReserva(b)) return;          // conta de reserva não entra no resultado
+    (b.movs || []).forEach(m => {
     if (!noMesAno(m.data, mes, ano)) return;
     if (m.refLancId) return;
     if (isTransfMov(m)) return;
     movsMes.push(m);
-  }));
+    });
+  });
   const bkEnt = movsMes.filter(m => m.tipo === 'entrada').reduce((a, m) => a + m.val, 0);
   const bkSai = movsMes.filter(m => m.tipo === 'saida').reduce((a, m) => a + m.val, 0);
 
@@ -3926,6 +4020,7 @@ function renderDRESemanal(d, ativos) {
     // (ignora as espelhadas de lançamentos e as transferências entre contas)
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
+      if (contaEhReserva(b)) return;        // conta de reserva não entra no resultado
       (b.movs || []).forEach(m => {
         if (!noMesAno(m.data, mes, ano)) return;
         if (m.refLancId || isTransfMov(m)) return;
@@ -4051,6 +4146,7 @@ function renderDREDiario(d, ativos) {
     // Movimentações bancárias do dia — exclui movs que têm lançamento ativo vinculado (já contados acima)
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
+      if (contaEhReserva(b)) return;        // conta de reserva não entra no resultado
       (b.movs || []).forEach(m => {
         if (m.data !== dataStr) return;
         // Exclui movs espelhadas de lançamento (já contadas) e transferências entre contas
@@ -4421,7 +4517,8 @@ function renderLanc(){
   const kpiAno = diaISO ? diaISO.slice(0,4) : (anoF || String(new Date().getFullYear()));
   const kpiMes = diaISO ? new Date(diaISO+'T00:00:00').getMonth()
                         : (mesF!==''&&mesF!==undefined ? parseInt(mesF) : curMes());
-  const ativos = d.lancs.filter(l=>getMes(l.data)===kpiMes && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno);
+  // KPIs do mês usam o mesmo critério do DRE: contas de reserva ficam fora do resultado
+  const ativos = semReservas(d.lancs.filter(l=>getMes(l.data)===kpiMes && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno), d);
   const rec = ativos.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
   const des = ativos.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
   const inv = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
@@ -4460,6 +4557,7 @@ function renderLanc(){
 
   const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Transferência:'var(--cyan)'};
   const bdgTipo= {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Transferência:'bdg-cyan'};
+  const idsRes = idsReserva(d);   // contas de reserva: marcadas na lista, mas fora dos KPIs
 
   const stBadge = l => {
     if(l.status==='cancelado') return '<span class="badge" style="background:var(--surface3);color:var(--t3);border-color:var(--line);font-size:9px">🚫 Cancelado</span>';
@@ -4508,7 +4606,9 @@ function renderLanc(){
       </td>
       <td><span class="cat-tag"><span class="cat-dot" style="background:${isTransf?'var(--cyan)':(CORES_CAT[allCatsFlat().indexOf(l.cat)%CORES_CAT.length]||'#888')}"></span>${l.cat||'—'}</span></td>
       <td style="color:var(--t3);font-size:10px">${l.subcat||'—'}</td>
-      <td style="font-size:11px">${l.caixaNome?`<span style="color:var(--t2)">🏦 ${l.caixaNome}</span>`:'<span style="color:var(--t3)">—</span>'}</td>
+      <td style="font-size:11px">${l.caixaNome
+        ? `<span style="color:var(--t2)">🏦 ${l.caixaNome}</span>${idsRes.has(l.caixaId)?'<div style="font-size:8px;color:var(--cyan);margin-top:1px" title="Fora do DRE e dos relatórios">🔒 reserva</div>':''}`
+        : '<span style="color:var(--t3)">—</span>'}</td>
       <td><span class="badge ${bdgTipo[l.tipo]||'bdg-gray'}" style="font-size:9px">${l.tipo}</span></td>
       <td>${stBadge(l)}</td>
       <td class="mono" style="${isCanceled?'text-decoration:line-through;color:var(--t3)':'color:'+valorColor+';font-weight:600'}">${valorPrefix}${fmtRs(l.valor)}</td>
@@ -4651,7 +4751,7 @@ function renderOrc(){
 
   // Lançamentos ativos do mês (dentro do ano de referência configurado)
   const anoOrc = anoRef();
-  const lancs = d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado');
+  const lancs = semReservas(d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado'), d);
 
   // ── KPIs ──
   const metaDes   = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa').reduce((a,o)=>a+o.val,0);
@@ -6338,6 +6438,7 @@ function renderBancos() {
   const saiMes = d.bancos.reduce((a, c) => a + movimentacoesDaConta(c, d).filter(m => m.tipo==='saida'   && !isTransfMov(m) && noMesAno(m.data,mes,anoBk)).reduce((x,m)=>x+m.val,0), 0);
 
   setC('bk-total', fmtR(saldoTotal), saldoTotal >= 0 ? 'var(--green)' : 'var(--red)');
+  set('bk-reservas', fmtR(calcReservasAte('')));
   set('bk-ent',   fmtR(entMes));
   set('bk-sai',   fmtR(saiMes));
   set('bk-count', d.bancos.length);
@@ -6381,7 +6482,10 @@ function renderBancos() {
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;position:relative">
         <div>
-          <div style="font-size:14px;font-weight:700;margin-bottom:2px">${c.nome}</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            ${c.nome}
+            ${contaEhReserva(c) ? '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.18);letter-spacing:.04em" title="Fora do DRE e dos relatórios">🔒 RESERVA</span>' : ''}
+          </div>
           <div style="font-size:10px;opacity:.65;text-transform:uppercase;letter-spacing:.06em">${c.banco} · ${c.tipo}</div>
         </div>
         <div style="display:flex;gap:4px">
@@ -6447,6 +6551,8 @@ function selectBanco(id) {
 
   set('bk-det-nome', c.nome);
   set('bk-det-info', `${c.banco} · ${c.tipo}${c.agencia ? ' · Ag. '+c.agencia : ''}`);
+  const avisoRes = document.getElementById('bk-det-reserva');
+  if(avisoRes) avisoRes.style.display = contaEhReserva(c) ? 'flex' : 'none';
   setC('bk-det-saldo', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
   set('bk-det-saldo-sub', `Saldo inicial: ${fmtR(c.saldoInicial||0)}`);
   set('bk-d-ent',  fmtR(entMes));
@@ -6592,33 +6698,90 @@ function renderExtratoDetalhe() {
   }).join('');
 }
 
-// ── Salvar nova conta bancária ──
+// ── Modal de conta bancária ──
+// Ao escolher poupança/investimento a conta já vem marcada como reserva (o usuário pode mudar)
+function updBnTipo(){
+  const tipo = document.getElementById('bn-tipo')?.value;
+  const chk  = document.getElementById('bn-fora');
+  if(chk && !chk.dataset.tocado){
+    chk.checked = TIPOS_RESERVA_PADRAO.includes(tipo);
+    pintarHintReserva();
+  }
+}
+function pintarHintReserva(){
+  const chk  = document.getElementById('bn-fora');
+  const hint = document.getElementById('bn-fora-hint');
+  if(!hint || !chk) return;
+  hint.innerHTML = chk.checked
+    ? 'Entradas e sa\u00eddas desta conta <strong style="color:var(--cyan)">n\u00e3o entram</strong> no DRE, nos relat\u00f3rios mensais nem no or\u00e7amento. O saldo continua somando no patrim\u00f4nio.'
+    : 'Esta conta participa normalmente do DRE, dos relat\u00f3rios mensais e do or\u00e7amento.';
+}
+function updBnForaHint(){
+  const chk = document.getElementById('bn-fora');
+  if(chk) chk.dataset.tocado = '1';   // a partir daqui a escolha é do usuário
+  pintarHintReserva();
+}
+
+function resetModalBanco(){
+  const $ = id => document.getElementById(id);
+  $('bn-edit-id').value = '';
+  $('m-banco-titulo').textContent = 'Nova Conta Bancária';
+  $('m-banco-sub').textContent = 'Corrente, poupança ou reserva';
+  $('btn-salvar-banco').textContent = 'Salvar Conta';
+  $('bn-nome').value = ''; $('bn-si').value = '0';
+  $('bn-agencia').value = ''; $('bn-conta').value = '';
+  $('bn-banco').selectedIndex = 0; $('bn-tipo').selectedIndex = 0; $('bn-cor').selectedIndex = 0;
+  const chk = $('bn-fora');
+  if(chk){ chk.checked = false; delete chk.dataset.tocado; }
+  pintarHintReserva();
+}
+
+// ── Salvar conta bancária (criação e edição) ──
 function saveBanco() {
-  const nome  = document.getElementById('bn-nome')?.value?.trim();
-  const banco = document.getElementById('bn-banco')?.value;
-  const tipo  = document.getElementById('bn-tipo')?.value;
-  const si    = parseFloat(document.getElementById('bn-si')?.value) || 0;
-  const ag    = document.getElementById('bn-agencia')?.value?.trim();
-  const cc    = document.getElementById('bn-conta')?.value?.trim();
-  const cor   = document.getElementById('bn-cor')?.value;
+  const $ = id => document.getElementById(id);
+  const editId = $('bn-edit-id')?.value || '';
+  const nome  = $('bn-nome')?.value?.trim();
+  const banco = $('bn-banco')?.value;
+  const tipo  = $('bn-tipo')?.value;
+  const si    = parseFloat($('bn-si')?.value) || 0;
+  const ag    = $('bn-agencia')?.value?.trim();
+  const cc    = $('bn-conta')?.value?.trim();
+  const cor   = $('bn-cor')?.value;
+  const fora  = !!$('bn-fora')?.checked;
   if (!nome || !banco) { alert('Preencha nome e banco.'); return; }
   const d = gs();
   if (!d.bancos) d.bancos = [];
-  d.bancos.push({ id: uid(), nome, banco, tipo, saldoInicial: si, agencia: ag, conta: cc, cor, movs: [], ts: Date.now() });
-  ss(d); closeM('m-banco'); renderBancos();
+  if(editId){
+    const c = d.bancos.find(b => b.id === editId);
+    if(c) Object.assign(c, { nome, banco, tipo, saldoInicial: si, agencia: ag, conta: cc, cor, foraResultado: fora });
+  } else {
+    d.bancos.push({ id: uid(), nome, banco, tipo, saldoInicial: si, agencia: ag, conta: cc, cor,
+                    foraResultado: fora, movs: [], ts: Date.now() });
+  }
+  ss(d); closeM('m-banco'); refreshAll(); renderBancos();
 }
 
-// ── Editar conta ──
+// ── Editar conta (abre o modal completo) ──
 function editBanco(id) {
   const d = gs();
   const c = d.bancos.find(b => b.id === id);
   if (!c) return;
-  const novoSaldo = prompt(`Ajustar saldo inicial de "${c.nome}" (atual: R$ ${fmtRs(c.saldoInicial||0)}):`, c.saldoInicial||0);
-  if (novoSaldo === null) return;
-  const val = parseFloat(novoSaldo);
-  if (isNaN(val)) { alert('Valor inválido.'); return; }
-  c.saldoInicial = val;
-  ss(d); renderBancos();
+  const $ = x => document.getElementById(x);
+  $('bn-edit-id').value = c.id;
+  $('m-banco-titulo').textContent = 'Editar Conta Bancária';
+  $('m-banco-sub').textContent = c.nome;
+  $('btn-salvar-banco').textContent = 'Salvar Alterações';
+  $('bn-nome').value    = c.nome || '';
+  $('bn-banco').value   = c.banco || 'Outro';
+  $('bn-tipo').value    = c.tipo || 'Conta Corrente';
+  $('bn-si').value      = c.saldoInicial || 0;
+  $('bn-agencia').value = c.agencia || '';
+  $('bn-conta').value   = c.conta || '';
+  $('bn-cor').value     = c.cor || $('bn-cor').options[0].value;
+  const chk = $('bn-fora');
+  if(chk){ chk.checked = contaEhReserva(c); chk.dataset.tocado = '1'; }
+  pintarHintReserva();
+  $('m-banco').style.display = 'flex';
 }
 
 // ── Deletar conta ──
@@ -6709,6 +6872,7 @@ const _origOpenM = openM;
 window.openM = function(id) {
   _origOpenM(id);
   if (id === 'm-transf') openM_transf_setup();
+  if (id === 'm-banco')  resetModalBanco();
 };
 
 // ── Patch: gs() para garantir campo bancos ──

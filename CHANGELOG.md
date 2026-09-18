@@ -4,6 +4,68 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Contas de reserva: poupança fora do resultado
+
+### 🎯 O que foi pedido
+
+Ter contas **corrente** e **poupança**, e uma forma de as movimentações da poupança **não
+entrarem na contabilidade do sistema** (DRE, relatórios financeiros mensais e afins).
+
+### ✨ Implementado
+
+**Tipo de conta**
+- O cadastro de contas bancárias já oferecia Corrente e Poupança; a lista foi reorganizada
+  (Corrente e Poupança primeiro) e ganhou **Carteira / Dinheiro**.
+
+**Conta de reserva (o pedido principal)**
+- Nova opção **🔒 Conta de reserva — fora do resultado** no cadastro da conta.
+- Ao escolher **Conta Poupança** ou **Conta Investimento**, a opção já vem marcada
+  automaticamente — e pode ser desmarcada. Qualquer conta pode ser marcada como reserva.
+- O que entra e sai de uma conta de reserva **não aparece em**:
+  - DRE (mensal, semanal e diário);
+  - Relatórios (visão anual, por categoria e fluxo de caixa);
+  - Dashboard (receitas, despesas, investimentos, gráficos, score e saúde financeira);
+  - Orçamento (realizado por categoria);
+  - KPIs de Receitas/Despesas/Saldo Líquido da aba Lançamentos.
+- O **saldo continua contando no patrimônio** — o dinheiro não some do sistema, apenas deixa
+  de ser tratado como receita ou despesa do mês.
+- Vale tanto para **lançamentos vinculados à conta** quanto para **movimentações lançadas
+  direto nela** (incluindo importação OFX).
+- Transferência entre a conta corrente e a poupança continua **neutra**: sai de um lado, entra
+  no outro, sem virar receita nem despesa em lugar nenhum.
+
+**Onde isso aparece na tela**
+- **Sidebar**: abaixo do saldo, quanto está guardado em reservas (o disponível fica no tooltip).
+- **Dashboard**: o detalhamento do patrimônio passou a separar **Caixa** e **🔒 Reservas**.
+- **Contas Bancárias**: novo KPI **"Em Reservas"**, selo **🔒 RESERVA** no card da conta e um
+  aviso no detalhe explicando a regra.
+- **Lançamentos**: as linhas de conta de reserva ganham a marca **🔒 reserva** — continuam
+  visíveis no extrato, mas não entram nos totais do mês.
+
+### ✅ Corrigido de quebra
+
+- **Editar conta bancária** abria apenas um `prompt()` que mexia no saldo inicial e nada mais.
+  Agora abre o cadastro completo (nome, banco, tipo, saldo inicial, agência, conta, cor e a
+  marcação de reserva) — necessário, entre outras coisas, para marcar uma conta já existente
+  como reserva.
+
+### 🧪 Verificação
+
+**22 verificações automatizadas** cobrindo: marcação automática por tipo, exclusão do DRE, dos
+relatórios, do orçamento, do dashboard e dos KPIs de lançamentos, permanência do saldo no
+patrimônio, transferências entre corrente e poupança, movimentações avulsas na reserva,
+marcar/desmarcar contas manualmente e preservação dos dados na edição. As suítes anteriores
+seguem passando: **19/19** (saldo), **10/10** (fluxo), **37/37** (contas a pagar) e **24/24**
+(invariante DRE × motor de saldo).
+
+### ℹ️ Observações
+
+- Contas de poupança **já cadastradas** passam a ser tratadas como reserva automaticamente.
+  Se você preferir que alguma delas continue entrando no resultado, basta editá-la e
+  desmarcar a opção.
+
+---
+
 ## [2026-09-18] Contas a Pagar: recorrência funcional e módulo reconstruído
 
 ### 🐛 Problema relatado
