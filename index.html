@@ -275,6 +275,13 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   background:var(--red-dim);color:var(--red);margin-bottom:12px}
 .cp-preview{background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);
   padding:11px 14px;font-size:12px;color:var(--t2);line-height:1.6}
+/* Fluxo de caixa: linhas clicáveis, abertura e período corrente */
+#fx-tbody .fx-row{cursor:pointer;transition:background .12s}
+#fx-tbody .fx-row:hover{background:var(--surface2)}
+#fx-tbody .fx-sel{background:var(--blue-dim)}
+#fx-tbody .fx-hoje td:first-child{box-shadow:inset 3px 0 0 var(--green)}
+#fx-tbody .fx-abertura td{background:var(--surface2);border-bottom:2px solid var(--line2)}
+#rel-fluxo tfoot td{border-top:2px solid var(--line2)}
 
 /* ── SUM ROWS ── */
 .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
@@ -1216,13 +1223,68 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
   <!-- Fluxo de Caixa -->
   <div id="rel-fluxo" style="display:none">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Saldo Acumulado ao Longo do Ano</span></div>
-      <div class="chart-box" style="height:280px"><canvas id="ch-rel-fluxo"></canvas></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div>
+          <span class="card-title">Fluxo de Caixa</span>
+          <div class="card-sub" id="fx-periodo-lbl">—</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="toggle-row" style="margin-bottom:0">
+            <div class="tgl active" onclick="setFxGran('mensal',this)">Mensal</div>
+            <div class="tgl" onclick="setFxGran('semanal',this)">Semanal</div>
+            <div class="tgl" onclick="setFxGran('diario',this)">Diário</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="exportarFluxoCSV()">⬇ CSV</button>
+        </div>
+      </div>
+      <div class="kpi-grid cols6">
+        <div class="kpi"><div class="kpi-label">Saldo de Abertura</div><div class="kpi-val" id="fx-k-abert">R$ 0</div><div class="kpi-sub" id="fx-k-abert-qd">—</div></div>
+        <div class="kpi g"><div class="kpi-label">Entradas</div><div class="kpi-val g" id="fx-k-ent">R$ 0</div></div>
+        <div class="kpi r"><div class="kpi-label">Saídas</div><div class="kpi-val r" id="fx-k-sai">R$ 0</div></div>
+        <div class="kpi b"><div class="kpi-label">Resultado</div><div class="kpi-val b" id="fx-k-res">R$ 0</div><div class="kpi-sub" id="fx-k-res-med">—</div></div>
+        <div class="kpi p"><div class="kpi-label">Saldo Final</div><div class="kpi-val p" id="fx-k-fim">R$ 0</div><div class="kpi-sub" id="fx-k-disp">—</div></div>
+        <div class="kpi a"><div class="kpi-label">Menor Saldo</div><div class="kpi-val a" id="fx-k-min" style="font-size:15px">—</div><div class="kpi-sub" id="fx-k-min-qd">—</div></div>
+      </div>
+      <div id="fx-aviso" style="font-size:10px;color:var(--t3);margin-top:10px"></div>
     </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Projeção Mensal</span></div>
-      <div id="rel-projecao"></div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><span class="card-title" id="fx-ch-titulo">Entradas, Saídas e Saldo Acumulado</span></div>
+      <div class="chart-box" style="height:300px"><canvas id="ch-rel-fluxo"></canvas></div>
+    </div>
+
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Caixa Total × Disponível</span></div>
+        <div class="chart-box" style="height:230px"><canvas id="ch-fx-disp"></canvas></div>
+        <div style="font-size:10px;color:var(--t3);margin-top:8px">O disponível desconta o que está guardado em contas de reserva (poupança/investimento).</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Leitura do Caixa</span></div>
+        <div id="fx-alertas"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><span class="card-title">Movimento do Caixa, período a período</span></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Período</th><th>Saldo Inicial</th><th>Entradas</th><th>Saídas</th><th>Resultado</th><th>Saldo Final</th><th>Reservado</th><th>Disponível</th></tr></thead>
+        <tbody id="fx-tbody"></tbody>
+        <tfoot id="fx-tfoot"></tfoot>
+      </table></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:8px">💡 Clique em um período para abrir as movimentações que o compõem.</div>
+    </div>
+
+    <div class="card" id="fx-detalhe-card" style="display:none">
+      <div class="card-header">
+        <div><span class="card-title" id="fx-det-titulo">Movimentações do período</span><div class="card-sub" id="fx-det-sub">—</div></div>
+        <button class="btn btn-ghost btn-xs" onclick="fecharDetalheFluxo()">✕ Fechar</button>
+      </div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Origem</th><th>Situação</th><th>Entrada</th><th>Saída</th><th>Saldo</th></tr></thead>
+        <tbody id="fx-det-tbody"></tbody>
+      </table></div>
     </div>
   </div>
 
@@ -3098,12 +3160,20 @@ function timelineCaixa(d){
   (d.lancs || []).filter(l => l.status !== 'cancelado').forEach(l => {
     ev.push({ data:l.data, ts:l.ts || 0, delta:efeitoLanc(l), lancId:l.id,
               efetivado: !l.pago || l.pago === 'Pago',
-              reserva: !!l.caixaId && ids.has(l.caixaId) });
+              reserva: !!l.caixaId && ids.has(l.caixaId),
+              deltaReserva: (!!l.caixaId && ids.has(l.caixaId)) ? efeitoLanc(l) : 0,
+              desc:l.desc || '—', cat:l.cat || '—', conta:l.caixaNome || '',
+              origem: l.origem === 'conta' ? 'Conta a pagar'
+                    : l.origem === 'fatura' ? 'Fatura de cartão' : 'Lançamento' });
   });
   (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
     if(m.refLancId) return;                    // já representado pelo lançamento de origem
     ev.push({ data:m.data, ts:m.ts || 0, delta:efeitoMovBanco(m), movId:m.id,
-              efetivado:true, reserva: contaEhReserva(b) });
+              efetivado:true, reserva: contaEhReserva(b),
+              // transferência não muda o total, mas muda o quanto está reservado
+              deltaReserva: contaEhReserva(b) ? (m.tipo === 'entrada' ? (m.val||0) : -(m.val||0)) : 0,
+              desc:m.desc || '—', cat:m.cat || '—', conta:b.nome || '',
+              origem: m.forma === 'OFX' ? 'Importação OFX' : 'Movimentação bancária' });
   }));
   return ev.sort((a, b) => (a.data || '').localeCompare(b.data || '') || (a.ts - b.ts));
 }
@@ -3156,8 +3226,12 @@ function mapaSaldosSeparados(d){
     : ((d.cfg && d.cfg.si) || 0);
   const mapa = {};
   timelineCaixa(d).forEach(e => {
-    if(e.reserva){ saldoRes  += e.delta; if(e.lancId) mapa[e.lancId] = { v:+saldoRes.toFixed(2),  reserva:true  }; }
-    else         { saldoDisp += e.delta; if(e.lancId) mapa[e.lancId] = { v:+saldoDisp.toFixed(2), reserva:false }; }
+    // o efeito total se decompõe em "parte que foi para a reserva" e "o resto"
+    saldoRes  += e.deltaReserva;
+    saldoDisp += e.delta - e.deltaReserva;
+    if(e.lancId) mapa[e.lancId] = e.reserva
+      ? { v:+saldoRes.toFixed(2),  reserva:true  }
+      : { v:+saldoDisp.toFixed(2), reserva:false };
   });
   return mapa;
 }
@@ -3949,7 +4023,7 @@ function tglRel(v,el){
   });
   // Mostrar seletor de mês nas visões DRE
   const selMes=document.getElementById('rel-dre-selmes');
-  if(selMes) selMes.style.display=(v.startsWith('dre')||v==='despesas')?'flex':'none';
+  if(selMes) selMes.style.display=(v.startsWith('dre')||v==='despesas'||v==='fluxo')?'flex':'none';
   // Sincronizar mês do seletor com o mês atual
   const selEl=document.getElementById('rel-dre-mes');
   if(selEl && !selEl.value) selEl.value=curMes();
@@ -4016,20 +4090,7 @@ function renderRel(){
   }
 
   // ── Fluxo de Caixa ──
-  if(_relView==='fluxo'){
-    // Abertura = saldo consolidado no fim do ano anterior (não reinicia do zero)
-    let acum=calcSaldoAte(fimDoMes(ano-1,11), { somentePagos:_relFilterView==='realizado' });
-    const fluxo=mData.map(m=>{acum+=m.r-m.de-m.i;return +acum.toFixed(2);});
-    mkCh('ch-rel-fluxo',{type:'line',data:{labels:MESES3,datasets:[{
-      label:'Saldo Acumulado',data:fluxo,borderColor:'#4dabf7',backgroundColor:'#4dabf715',
-      borderWidth:2,fill:true,tension:.35,pointBackgroundColor:'#4dabf7',pointRadius:3,
-    }]},options:{...chartBase,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-    document.getElementById('rel-projecao').innerHTML=fluxo.map((v,i)=>`
-      <div class="sum-row">
-        <span class="sum-lbl">${MESES[i]}</span>
-        <span class="sum-val" style="color:${v>=0?'var(--green)':'var(--red)'}">${fmtR(v)}</span>
-      </div>`).join('');
-  }
+  if(_relView==='fluxo') renderFluxoCaixa(d);
 
   // ── Análise de Despesas Pessoais ──
   if(_relView==='despesas') renderDespesasPessoais(d);
@@ -4038,6 +4099,333 @@ function renderRel(){
   if(_relView==='dre-mensal') renderDREMensal(d, ativos);
   if(_relView==='dre-semanal') renderDRESemanal(d, ativos);
   if(_relView==='dre-diario') renderDREDiario(d, ativos);
+}
+
+// ── FLUXO DE CAIXA ──
+// Tudo aqui sai de timelineCaixa(), a mesma linha do tempo que alimenta o saldo do
+// sistema. Antes a abertura vinha do motor e os incrementos vinham só dos lançamentos:
+// movimentação bancária avulsa e dinheiro que ia para a poupança não mexiam na curva,
+// e o saldo final da projeção não batia com o saldo real.
+let _fxGran = 'mensal';   // 'mensal' | 'semanal' | 'diario'
+let _fxDet  = null;       // índice do período aberto no detalhamento
+let _fxCache = null;      // último cálculo, para o detalhamento e o CSV
+
+function setFxGran(g, el){
+  _fxGran = g;
+  document.querySelectorAll('#rel-fluxo .toggle-row .tgl').forEach(b => b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  _fxDet = null;
+  renderRel();
+}
+
+// Períodos analisados conforme a granularidade escolhida
+function bucketsFluxo(gran, mes, ano){
+  if(gran === 'diario'){
+    const n = new Date(ano, mes + 1, 0).getDate();
+    return Array.from({length:n}, (_, i) => {
+      const dia = diaSeguroISO(ano, mes, i + 1);
+      const ds  = new Date(dia + 'T00:00:00');
+      return { de:dia, ate:dia,
+               label:`${String(i+1).padStart(2,'0')}/${String(mes+1).padStart(2,'0')}`,
+               sub:DIA_SEM_LONGO[ds.getDay()].slice(0,3) };
+    });
+  }
+  if(gran === 'semanal'){
+    const n = new Date(ano, mes + 1, 0).getDate();
+    const out = []; let dia = 1, sem = 1;
+    while(dia <= n){
+      const fim = Math.min(dia + 6, n);
+      out.push({ de:diaSeguroISO(ano, mes, dia), ate:diaSeguroISO(ano, mes, fim),
+                 label:`Semana ${sem}`,
+                 sub:`${String(dia).padStart(2,'0')}–${String(fim).padStart(2,'0')}/${String(mes+1).padStart(2,'0')}` });
+      dia += 7; sem++;
+    }
+    return out;
+  }
+  return MESES.map((m, i) => ({ de:`${ano}-${String(i+1).padStart(2,'0')}-01`,
+                                ate:fimDoMes(ano, i), label:MESES3[i], sub:String(ano) }));
+}
+
+/**
+ * Movimento do caixa período a período, a partir da linha do tempo consolidada.
+ * O saldo é contínuo: a abertura de cada período é o fechamento do anterior, e a
+ * abertura do primeiro traz todo o histórico anterior a ele.
+ */
+function calcularFluxo(d, buckets, somentePagos){
+  const ev = timelineCaixa(d).filter(e => e.data && (!somentePagos || e.efetivado));
+  const temBancos  = d.bancos && d.bancos.length;
+  const iniReserva = temBancos ? d.bancos.filter(contaEhReserva).reduce((a,b) => a + (b.saldoInicial||0), 0) : 0;
+  let saldo = saldoInicialGlobal(d), reserva = iniReserva;
+
+  const de0 = buckets[0].de;
+  ev.forEach(e => { if(e.data < de0){ saldo += e.delta; reserva += e.deltaReserva; } });
+  const abertura = { saldo:+saldo.toFixed(2), reserva:+reserva.toFixed(2),
+                     disp:+(saldo - reserva).toFixed(2) };
+
+  const linhas = buckets.map(b => {
+    const dentro = ev.filter(e => e.data >= b.de && e.data <= b.ate)
+                     .sort((x,y) => (x.data||'').localeCompare(y.data||'') || (x.ts - y.ts));
+    const ent = dentro.filter(e => e.delta > 0).reduce((a,e) => a + e.delta, 0);
+    const sai = dentro.filter(e => e.delta < 0).reduce((a,e) => a - e.delta, 0);
+    const ini = saldo;
+    dentro.forEach(e => { saldo += e.delta; reserva += e.deltaReserva; });
+    return { ...b, ini:+ini.toFixed(2), ent:+ent.toFixed(2), sai:+sai.toFixed(2),
+             res:+(ent - sai).toFixed(2), fim:+saldo.toFixed(2),
+             reserva:+reserva.toFixed(2), disp:+(saldo - reserva).toFixed(2),
+             qtd:dentro.length, evs:dentro };
+  });
+  return { abertura, linhas };
+}
+
+function renderFluxoCaixa(d){
+  const somentePagos = _relFilterView === 'realizado';
+  const mes = getMesSel(), ano = anoRef();
+  const buckets = bucketsFluxo(_fxGran, mes, ano);
+  const { abertura, linhas } = calcularFluxo(d, buckets, somentePagos);
+  _fxCache = { abertura, linhas, gran:_fxGran, mes, ano };
+
+  const escopo = _fxGran === 'mensal' ? `Ano de ${ano}`
+               : _fxGran === 'semanal' ? `Semanas de ${MESES[mes]} de ${ano}`
+               : `Dias de ${MESES[mes]} de ${ano}`;
+  const modo = somentePagos ? 'realizado (somente o que já foi pago)' : 'previsto (inclui o que ainda não foi pago)';
+  set('fx-periodo-lbl', `${escopo} · ${modo}`);
+
+  const ult = linhas[linhas.length - 1] || { fim:abertura.saldo, disp:abertura.disp, reserva:abertura.reserva };
+  const totEnt = +linhas.reduce((a,l) => a + l.ent, 0).toFixed(2);
+  const totSai = +linhas.reduce((a,l) => a + l.sai, 0).toFixed(2);
+  const totRes = +(totEnt - totSai).toFixed(2);
+  const menor  = linhas.reduce((m,l) => (m === null || l.fim < m.fim) ? l : m, null);
+
+  setC('fx-k-abert', fmtR(abertura.saldo), abertura.saldo >= 0 ? '' : 'var(--red)');
+  set('fx-k-abert-qd', `até ${fmtDataBR(linhas[0] ? linhas[0].de : '')}`);
+  set('fx-k-ent', fmtR(totEnt));
+  set('fx-k-sai', fmtR(totSai));
+  setC('fx-k-res', fmtR(totRes), totRes >= 0 ? 'var(--green)' : 'var(--red)');
+  set('fx-k-res-med', `média de ${fmtR(totRes / Math.max(1, linhas.length))} por ${_fxGran === 'mensal' ? 'mês' : _fxGran === 'semanal' ? 'semana' : 'dia'}`);
+  setC('fx-k-fim', fmtR(ult.fim), ult.fim >= 0 ? 'var(--purple)' : 'var(--red)');
+  set('fx-k-disp', ult.reserva ? `${fmtR(ult.disp)} disponível · ${fmtR(ult.reserva)} reservado` : 'sem reservas');
+  setC('fx-k-min', menor ? fmtR(menor.fim) : '—', menor && menor.fim < 0 ? 'var(--red)' : '');
+  set('fx-k-min-qd', menor ? `${menor.label}${menor.sub && _fxGran !== 'mensal' ? ' · ' + menor.sub : ''}` : '—');
+
+  const aviso = document.getElementById('fx-aviso');
+  if(aviso) aviso.innerHTML = somentePagos
+    ? '💡 Modo <b>Realizado</b>: só entram lançamentos já pagos e movimentações bancárias. Troque para <b>Previsto</b> no topo para projetar o caixa com o que ainda está por pagar.'
+    : '💡 Modo <b>Previsto</b>: inclui lançamentos ainda não pagos. O saldo final é uma projeção, não o dinheiro que existe hoje.';
+
+  // ── Entradas, saídas e saldo acumulado ──
+  set('fx-ch-titulo', `Entradas, Saídas e Saldo Acumulado — ${escopo}`);
+  const base = getChartBase();
+  const tick = base.scales.y.ticks.color, grid = base.scales.y.grid.color;
+  const moeda = v => 'R$' + Number(v).toLocaleString('pt-BR');
+  mkCh('ch-rel-fluxo', { data:{ labels:linhas.map(l => l.label), datasets:[
+      { type:'bar',  label:'Entradas', data:linhas.map(l => l.ent),  backgroundColor:'#00d97e35', borderColor:'#00d97e', borderWidth:1.5, borderRadius:4, order:3 },
+      { type:'bar',  label:'Saídas',   data:linhas.map(l => -l.sai), backgroundColor:'#ff4d6d35', borderColor:'#ff4d6d', borderWidth:1.5, borderRadius:4, order:3 },
+      { type:'line', label:'Saldo acumulado', data:linhas.map(l => l.fim), borderColor:'#4dabf7',
+        backgroundColor:'#4dabf715', borderWidth:2.5, tension:.3, pointRadius:3,
+        pointBackgroundColor:linhas.map(l => l.fim >= 0 ? '#4dabf7' : '#ff4d6d'), fill:false, yAxisID:'y1', order:1 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:true, labels:{ color:'#8fa3bf', font:{size:11}, boxWidth:12 } } },
+      scales:{
+        x : { ticks:{ color:tick, font:{size:10} }, grid:{ color:grid } },
+        y : { position:'left',  ticks:{ color:tick, font:{size:10}, callback:moeda }, grid:{ color:grid },
+              title:{ display:true, text:'Movimento', color:tick, font:{size:9} } },
+        y1: { position:'right', ticks:{ color:'#4dabf7', font:{size:10}, callback:moeda },
+              grid:{ display:false }, title:{ display:true, text:'Saldo', color:'#4dabf7', font:{size:9} } },
+      } } });
+
+  // ── Caixa total × disponível ──
+  const temReserva = linhas.some(l => l.reserva !== 0) || abertura.reserva !== 0;
+  mkCh('ch-fx-disp', { type:'line', data:{ labels:linhas.map(l => l.label), datasets:[
+      { label:'Caixa total', data:linhas.map(l => l.fim), borderColor:'#4dabf7', backgroundColor:'#4dabf715',
+        borderWidth:2, tension:.3, pointRadius:2, fill:true },
+      { label:'Disponível', data:linhas.map(l => l.disp), borderColor:'#00d97e', backgroundColor:'#00d97e12',
+        borderWidth:2, tension:.3, pointRadius:2, fill:true, borderDash:temReserva ? [] : [5,4] },
+    ]},
+    options:{ ...base, maintainAspectRatio:false,
+      plugins:{ legend:{ display:true, labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:12 } } } } });
+
+  renderTabelaFluxo(linhas, abertura);
+  renderAlertasFluxo(linhas, abertura, { totEnt, totSai, totRes, menor, ult, somentePagos, escopo });
+  if(_fxDet != null && linhas[_fxDet]) renderDetalheFluxo(_fxDet); else fecharDetalheFluxo();
+}
+
+function renderTabelaFluxo(linhas, abertura){
+  const tb = document.getElementById('fx-tbody');
+  if(!tb) return;
+  const hj = today();
+  const cor = v => v > 0 ? 'var(--green)' : v < 0 ? 'var(--red)' : 'var(--t3)';
+  tb.innerHTML = `<tr class="fx-abertura">
+      <td style="color:var(--t2);font-weight:600">Saldo anterior ao período</td>
+      <td colspan="4" style="color:var(--t3);font-size:11px">tudo o que aconteceu antes de ${fmtDataBR(linhas[0] ? linhas[0].de : '')}</td>
+      <td class="mono" style="color:${abertura.saldo >= 0 ? 'var(--t1)' : 'var(--red)'};font-weight:600">${fmtR(abertura.saldo)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(abertura.reserva)}</td>
+      <td class="mono" style="color:var(--t2)">${fmtR(abertura.disp)}</td>
+    </tr>` +
+    linhas.map((l, i) => {
+      const futuro = l.de > hj;
+      const atual  = l.de <= hj && l.ate >= hj;
+      return `<tr class="fx-row${_fxDet === i ? ' fx-sel' : ''}${atual ? ' fx-hoje' : ''}" onclick="abrirDetalheFluxo(${i})">
+      <td style="color:var(--t1)">
+        ${l.label}
+        <span style="color:var(--t3);font-size:10px">${l.sub && _fxGran !== 'mensal' ? l.sub : ''}</span>
+        ${atual ? '<span class="badge bdg-green" style="font-size:8px;margin-left:6px">agora</span>'
+                : futuro ? '<span class="badge bdg-gray" style="font-size:8px;margin-left:6px">projeção</span>' : ''}
+        ${l.qtd ? `<span style="color:var(--t3);font-size:10px;margin-left:6px">${l.qtd} mov.</span>` : ''}
+      </td>
+      <td class="mono" style="color:var(--t3)">${fmtR(l.ini)}</td>
+      <td class="mono" style="color:${l.ent ? 'var(--green)' : 'var(--t3)'}">${fmtR(l.ent)}</td>
+      <td class="mono" style="color:${l.sai ? 'var(--red)' : 'var(--t3)'}">${fmtR(l.sai)}</td>
+      <td class="mono" style="color:${cor(l.res)};font-weight:600">${fmtR(l.res)}</td>
+      <td class="mono" style="color:${l.fim >= 0 ? 'var(--blue)' : 'var(--red)'};font-weight:600">${fmtR(l.fim)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(l.reserva)}</td>
+      <td class="mono" style="color:${l.disp >= 0 ? 'var(--t2)' : 'var(--red)'}">${fmtR(l.disp)}</td>
+    </tr>`; }).join('');
+
+  const ult = linhas[linhas.length - 1] || { fim:abertura.saldo, reserva:abertura.reserva, disp:abertura.disp };
+  const totEnt = +linhas.reduce((a,l) => a + l.ent, 0).toFixed(2);
+  const totSai = +linhas.reduce((a,l) => a + l.sai, 0).toFixed(2);
+  const totRes = +(totEnt - totSai).toFixed(2);
+  const tf = document.getElementById('fx-tfoot');
+  if(tf) tf.innerHTML = `<tr>
+      <td style="color:var(--t2);font-weight:600">Total do período</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(abertura.saldo)}</td>
+      <td class="mono" style="color:var(--green);font-weight:700">${fmtR(totEnt)}</td>
+      <td class="mono" style="color:var(--red);font-weight:700">${fmtR(totSai)}</td>
+      <td class="mono" style="color:${totRes >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:700">${fmtR(totRes)}</td>
+      <td class="mono" style="color:${ult.fim >= 0 ? 'var(--blue)' : 'var(--red)'};font-weight:700">${fmtR(ult.fim)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(ult.reserva)}</td>
+      <td class="mono" style="color:var(--t2);font-weight:600">${fmtR(ult.disp)}</td>
+    </tr>`;
+}
+
+function abrirDetalheFluxo(i){
+  _fxDet = (_fxDet === i) ? null : i;
+  if(_fxDet == null){ fecharDetalheFluxo(); renderRel(); return; }
+  renderRel();
+  document.getElementById('fx-detalhe-card')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function fecharDetalheFluxo(){
+  const card = document.getElementById('fx-detalhe-card');
+  if(card) card.style.display = 'none';
+}
+function renderDetalheFluxo(i){
+  const l = _fxCache && _fxCache.linhas[i];
+  const card = document.getElementById('fx-detalhe-card');
+  if(!l || !card) return;
+  card.style.display = 'block';
+  set('fx-det-titulo', `Movimentações de ${l.label}${l.sub && _fxCache.gran !== 'mensal' ? ' · ' + l.sub : ''}`);
+  set('fx-det-sub', `${fmtDataBR(l.de)} a ${fmtDataBR(l.ate)} · saldo de ${fmtR(l.ini)} para ${fmtR(l.fim)} · ${l.qtd} movimentação(ões)`);
+  const tb = document.getElementById('fx-det-tbody');
+  if(!tb) return;
+  let saldo = l.ini;
+  tb.innerHTML = l.evs.length ? l.evs.map(e => {
+    saldo += e.delta;
+    return `<tr>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(e.data)}</td>
+      <td style="color:var(--t1)">${e.desc}</td>
+      <td><span class="cat-tag" style="font-size:9px">${e.cat}</span></td>
+      <td style="color:var(--t3);font-size:11px">${e.origem}${e.conta ? ' · ' + e.conta : ''}</td>
+      <td>${e.efetivado ? '<span class="badge bdg-green" style="font-size:9px">Efetivado</span>'
+                        : '<span class="badge bdg-amber" style="font-size:9px">A pagar</span>'}
+          ${e.reserva ? '<span class="badge bdg-blue" style="font-size:9px;margin-left:4px">Reserva</span>' : ''}</td>
+      <td class="mono" style="color:${e.delta > 0 ? 'var(--green)' : 'var(--t3)'}">${e.delta > 0 ? fmtR(e.delta) : '—'}</td>
+      <td class="mono" style="color:${e.delta < 0 ? 'var(--red)' : 'var(--t3)'}">${e.delta < 0 ? fmtR(-e.delta) : '—'}</td>
+      <td class="mono" style="color:${saldo >= 0 ? 'var(--blue)' : 'var(--red)'}">${fmtR(saldo)}</td>
+    </tr>`; }).join('')
+   : `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:20px">Nenhuma movimentação neste período — o saldo ficou parado em ${fmtR(l.ini)}.</td></tr>`;
+}
+
+function renderAlertasFluxo(linhas, abertura, ctx){
+  const el = document.getElementById('fx-alertas');
+  if(!el) return;
+  const out = [];
+  const push = (ico, cor, txt) => out.push(`<div class="sum-row" style="align-items:flex-start;gap:10px">
+    <span style="font-size:15px;line-height:1.3">${ico}</span>
+    <span style="font-size:12px;color:var(--t2);line-height:1.6;flex:1;border:0">${txt}</span>
+    <span style="width:4px;align-self:stretch;border-radius:2px;background:${cor}"></span></div>`);
+
+  const unidade = _fxGran === 'mensal' ? 'mês' : _fxGran === 'semanal' ? 'semana' : 'dia';
+  const plural  = _fxGran === 'mensal' ? 'meses' : _fxGran === 'semanal' ? 'semanas' : 'dias';
+  const fem     = _fxGran === 'semanal';          // "semana" é feminino: concorda o texto
+  const nenhum  = fem ? 'nenhuma' : 'nenhum';
+  const oMelhor = fem ? 'A melhor' : 'O melhor';
+  const comMov  = linhas.filter(l => l.qtd > 0);
+
+  if(!comMov.length){
+    push('🔍', 'var(--t3)', `Não há movimentação de caixa em ${ctx.escopo.toLowerCase()}. Ajuste o mês, a granularidade ou o modo Previsto/Realizado.`);
+    el.innerHTML = out.join(''); return;
+  }
+
+  const negativos = linhas.filter(l => l.fim < 0);
+  if(negativos.length){
+    push('🚨', 'var(--red)',
+      `O caixa fica <b style="color:var(--red)">negativo em ${negativos.length} ${negativos.length > 1 ? plural : unidade}</b>, começando em <b style="color:var(--t1)">${negativos[0].label}</b> com ${fmtR(negativos[0].fim)}. O pior ponto é ${fmtR(ctx.menor.fim)} em ${ctx.menor.label}.`);
+  } else {
+    push('✅', 'var(--green)',
+      `O caixa <b style="color:var(--green)">não fica negativo</b> em ${nenhum} ${unidade} do período. O ponto mais apertado é <b style="color:var(--t1)">${ctx.menor.label}</b>, com ${fmtR(ctx.menor.fim)}.`);
+  }
+
+  const deficit = comMov.filter(l => l.res < 0).sort((a,b) => a.res - b.res);
+  const melhor  = comMov.slice().sort((a,b) => b.res - a.res)[0];
+  if(deficit.length){
+    push('🔻', 'var(--amber)',
+      `Em <b style="color:var(--t1)">${deficit.length} de ${comMov.length}</b> ${plural} com movimento você gastou mais do que entrou. O maior déficit foi em <b style="color:var(--t1)">${deficit[0].label}</b>: ${fmtR(deficit[0].res)}.`);
+  }
+  if(melhor && melhor.res > 0){
+    push('🔺', 'var(--green)',
+      `${oMelhor} ${unidade} foi <b style="color:var(--t1)">${melhor.label}</b>, com sobra de <b style="color:var(--green)">${fmtR(melhor.res)}</b> (${fmtR(melhor.ent)} de entradas contra ${fmtR(melhor.sai)} de saídas).`);
+  }
+
+  const mediaRes = ctx.totRes / comMov.length;
+  if(mediaRes < 0 && ctx.ult.fim > 0){
+    const restam = Math.floor(ctx.ult.fim / Math.abs(mediaRes));
+    push('⏳', 'var(--red)',
+      `No ritmo do período você queima <b style="color:var(--red)">${fmtR(Math.abs(mediaRes))}</b> por ${unidade}. Com ${fmtR(ctx.ult.fim)} em caixa, o dinheiro dura cerca de <b style="color:var(--t1)">${restam} ${restam === 1 ? unidade : plural}</b>.`);
+  } else if(mediaRes > 0){
+    push('📈', 'var(--green)',
+      `Você guarda em média <b style="color:var(--green)">${fmtR(mediaRes)}</b> por ${unidade}. Mantendo o ritmo, o caixa cresce ${fmtR(mediaRes * 12)} nos próximos 12 ${plural}.`);
+  }
+
+  if(ctx.totEnt > 0){
+    const queima = ctx.totSai / ctx.totEnt * 100;
+    push(queima > 100 ? '⚠️' : '⚖️', queima > 100 ? 'var(--red)' : queima > 85 ? 'var(--amber)' : 'var(--blue)',
+      `Para cada R$ 100,00 que entraram, <b style="color:var(--t1)">${fmtR(queima)}</b> saíram — ${queima > 100 ? 'você gastou mais do que recebeu no período' : `sobraram ${fmtR(100 - queima)} de cada R$ 100,00`}.`);
+  }
+
+  if(ctx.ult.reserva){
+    push('🏦', 'var(--blue)',
+      `Do saldo de ${fmtR(ctx.ult.fim)}, <b style="color:var(--blue)">${fmtR(ctx.ult.reserva)}</b> estão em contas de reserva. O caixa realmente disponível é de <b style="color:var(--t1)">${fmtR(ctx.ult.disp)}</b>.`);
+  }
+
+  const variacao = ctx.ult.fim - abertura.saldo;
+  push(variacao >= 0 ? '💰' : '📉', variacao >= 0 ? 'var(--green)' : 'var(--red)',
+    `No período o caixa ${variacao >= 0 ? 'cresceu' : 'encolheu'} <b style="color:${variacao >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtR(Math.abs(variacao))}</b> — de ${fmtR(abertura.saldo)} para ${fmtR(ctx.ult.fim)}.`);
+
+  if(!ctx.somentePagos){
+    const aPagar = linhas.reduce((a,l) => a + l.evs.filter(e => !e.efetivado).length, 0);
+    if(aPagar) push('📋', 'var(--amber)',
+      `A projeção inclui <b style="color:var(--amber)">${aPagar} lançamento(s) ainda não pagos</b>. No modo Realizado o saldo final seria outro.`);
+  }
+  el.innerHTML = out.join('');
+}
+
+function exportarFluxoCSV(){
+  if(!_fxCache || !_fxCache.linhas.length){ alert('Não há fluxo de caixa para exportar.'); return; }
+  const { linhas, abertura, gran, mes, ano } = _fxCache;
+  const n = v => String((v || 0).toFixed(2)).replace('.', ',');
+  const csv = [['Período','Início','Fim','Saldo Inicial','Entradas','Saídas','Resultado','Saldo Final','Reservado','Disponível','Movimentações'].join(';')];
+  csv.push(['Saldo anterior ao período','','','','','','', n(abertura.saldo), n(abertura.reserva), n(abertura.disp), ''].join(';'));
+  linhas.forEach(l => csv.push([
+    `"${l.label}${l.sub && gran !== 'mensal' ? ' ' + l.sub : ''}"`, l.de, l.ate,
+    n(l.ini), n(l.ent), n(l.sai), n(l.res), n(l.fim), n(l.reserva), n(l.disp), l.qtd,
+  ].join(';')));
+  const blob = new Blob(['﻿' + csv.join('\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fluxo-de-caixa-${gran}-${gran === 'mensal' ? ano : `${ano}-${String(mes+1).padStart(2,'0')}`}.csv`;
+  a.click();
 }
 
 // ── RELATÓRIO: ANÁLISE DE DESPESAS PESSOAIS ──

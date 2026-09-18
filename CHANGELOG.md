@@ -4,6 +4,97 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Fluxo de Caixa: detalhamento, granularidade e correção do motor
+
+### 🎯 O que foi pedido
+
+Melhorar e detalhar a parte de **Fluxo de Caixa**.
+
+### 🐛 O que estava errado
+
+A aba tinha apenas um gráfico de linha e uma lista de 12 valores — e a curva **não batia
+com o saldo real do sistema**. O motivo era uma mistura de duas fontes:
+
+- O **saldo de abertura** vinha do motor de saldo (lançamentos + contas bancárias), mas os
+  **incrementos mês a mês** vinham só dos lançamentos. Resultado:
+  - **movimentação bancária avulsa não mexia na curva** — um reembolso importado por OFX ou
+    uma tarifa lançada direto no extrato mudavam o saldo real e não apareciam na projeção;
+  - dinheiro que ia para uma **conta de reserva** saía da conta corrente mas a linha não caía;
+  - o valor final da projeção **divergia do saldo exibido na barra lateral**.
+- **Transferência para a poupança não movia os trilhos.** A transferência é (corretamente)
+  neutra no caixa consolidado, mas o dinheiro muda de lugar: o disponível deveria cair e o
+  reservado subir. Nenhum dos dois acontecia — nem no fluxo, nem na coluna de saldo da aba
+  Lançamentos.
+- Só existia visão **anual/mensal**: não dava para olhar o caixa por semana nem por dia.
+- Não havia entradas e saídas separadas, saldo de abertura, totais, nem como saber **quais
+  movimentações** formavam o resultado de um período.
+
+### ✅ Corrigido e melhorado
+
+**Correção do motor (a parte que muda números)**
+- O fluxo de caixa passou a ser calculado **inteiramente a partir de `timelineCaixa()`**, a
+  mesma linha do tempo que alimenta o saldo do sistema. Abertura e incrementos vêm da mesma
+  fonte, então a curva fecha com o saldo real.
+- Cada evento do caixa agora carrega um **`deltaReserva`**: quanto do seu efeito recai sobre
+  contas de reserva. Com isso a transferência para a poupança passa a ser neutra no total e a
+  **mover corretamente o disponível e o reservado** — no fluxo e também na coluna de saldo da
+  aba Lançamentos, que usava a mesma decomposição incompleta.
+- Invariantes garantidas por teste: o fechamento de todo período é igual a
+  `calcSaldoAte(data)`, o reservado é igual a `calcReservasAte(data)`, o fim de um período é
+  o início do seguinte, e abertura + soma dos resultados = saldo final.
+
+**Granularidade**
+- Três visões: **Mensal** (os 12 meses do ano), **Semanal** (semanas do mês selecionado) e
+  **Diário** (dias do mês selecionado).
+- O seletor de mês do topo passou a valer também para o Fluxo de Caixa.
+
+**Indicadores**
+- Saldo de abertura, entradas, saídas, resultado (com a média por período), saldo final
+  (separando disponível e reservado) e **menor saldo do período**, com o período em que ocorre.
+
+**Gráficos**
+- Gráfico combinado: **barras de entradas e saídas** com a **linha do saldo acumulado** em
+  eixo próprio — dá para ver o movimento e o acumulado na mesma leitura.
+- Segundo gráfico **Caixa Total × Disponível**, mostrando o quanto do saldo está preso em
+  reservas ao longo do tempo.
+
+**Tabela período a período**
+- Linha de abertura ("saldo anterior ao período"), e para cada período: saldo inicial,
+  entradas, saídas, resultado, saldo final, reservado e disponível.
+- Selo **"agora"** no período corrente e **"projeção"** nos períodos futuros.
+- Rodapé com o total do período.
+- **Clicar em um período abre o detalhamento** com todas as movimentações que o compõem:
+  data, descrição, categoria, origem (lançamento, conta a pagar, fatura de cartão,
+  movimentação bancária ou importação OFX), situação (efetivado / a pagar / reserva),
+  entrada, saída e o saldo corrido.
+
+**Leitura do Caixa**
+- Texto gerado a partir dos números: se e quando o caixa fica negativo, em quantos períodos
+  você gastou mais do que entrou, maior déficit e melhor período, **taxa de queima**
+  (quanto saiu para cada R$ 100,00 que entrou), quanto o dinheiro ainda dura no ritmo atual,
+  quanto está preso em reservas e quanto o caixa cresceu ou encolheu no período.
+
+**Exportação**
+- Botão **CSV** com o fluxo do período na granularidade escolhida.
+
+### 🧪 Testes
+
+- `test-fluxo-caixa.js` — **52 verificações**: abertura com histórico anterior, movimentação
+  bancária avulsa entrando na curva, transferência neutra no total movendo os trilhos,
+  invariantes contra o motor de saldo nas três granularidades, encadeamento dos períodos,
+  KPIs, tabela, rodapé, detalhamento (abrir e fechar) e modo Previsto × Realizado.
+- Suítes existentes seguem passando: `test-full` (21), `test-fluxo` (10), `test-contas2` (37),
+  `test-reserva` (22), `test-lanc-reserva` (23), `test-extrato` (24), `test-cc` (53),
+  `test-despesas` (39) e `test-invariante` (24 cenários).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado é migrado ou apagado. Os **valores exibidos mudam** onde antes estavam errados:
+o fluxo passa a incluir movimentações bancárias avulsas e o efeito das reservas, e a coluna
+de saldo da aba Lançamentos passa a refletir transferências para contas de reserva.
+
+---
+
 ## [2026-09-18] Cartão de crédito corrigido e relatório de despesas pessoais
 
 ### 🎯 O que foi pedido
