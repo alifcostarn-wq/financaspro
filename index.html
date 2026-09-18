@@ -590,6 +590,17 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #m-kanban .kb-type-btn.t-reminder.active{color:var(--amber)}
 #m-kanban .kb-type-btn.t-todo.active{color:var(--green)}
 
+/* ── EXTRATO BANCÁRIO ── */
+#bk-extrato-tbl thead th{position:sticky;top:0;z-index:2}
+#bk-extrato-tbl .bk-mes-row td{background:var(--surface2);border-top:1px solid var(--line2);padding-top:8px;padding-bottom:8px}
+#bk-extrato-tbl tbody tr:hover td{background:var(--surface2)}
+#bk-extrato-tbl .bk-mes-row:hover td{background:var(--surface3)}
+#bk-extrato-tbl tfoot td{border-top:2px solid var(--line2)}
+@media(max-width:768px){
+  #bk-extrato-resumo{grid-template-columns:1fr 1fr!important}
+  #bk-extrato-tbl{min-width:640px}
+}
+
 /* ── CONTAS A PAGAR ── */
 #m-conta .cp-tipo-row{display:flex;gap:8px;margin-bottom:16px}
 #m-conta .cp-tipo-btn{flex:1;padding:10px 8px;border:1px solid var(--line2);border-radius:var(--r2);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;text-align:center;line-height:1.35}
@@ -1713,10 +1724,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </div>
 
       <div class="card">
-        <div class="card-header"><span class="card-title">Evolução do Saldo (12 meses)</span></div>
+        <div class="card-header"><span class="card-title" id="bk-evo-titulo">Evolução do Saldo</span></div>
         <div class="chart-box" style="height:200px"><canvas id="ch-bk-evolucao"></canvas></div>
         <div class="div"></div>
-        <div class="card-header" style="margin-bottom:10px"><span class="card-title">Entradas vs Saídas (mês a mês)</span></div>
+        <div class="card-header" style="margin-bottom:10px"><span class="card-title" id="bk-bar-titulo">Entradas vs Saídas</span></div>
         <div class="chart-box" style="height:140px"><canvas id="ch-bk-barras"></canvas></div>
       </div>
     </div>
@@ -1724,8 +1735,12 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <!-- Extrato -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Extrato da Conta</span>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div>
+          <span class="card-title">Extrato da Conta</span>
+          <div class="card-sub" id="bk-extrato-periodo">—</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="bk-fil-ano" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
           <select id="bk-fil-mes" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
             <option value="">Todos os meses</option>
             <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
@@ -1737,16 +1752,31 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="">Todos</option><option value="entrada">Entradas</option><option value="saida">Saídas</option><option value="transferencia">Transferências</option>
           </select>
           <input id="bk-fil-busca" type="text" placeholder="Buscar…" oninput="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
+          <button id="bk-btn-ordem" class="btn btn-ghost btn-sm" onclick="toggleOrdemExtrato()" title="Inverter a ordem das datas">↑ Mais antiga primeiro</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportarExtratoCSV()" title="Baixar o extrato filtrado em CSV">⬇ CSV</button>
           <button class="btn btn-ghost btn-sm" onclick="openOfxImport()" title="Importar OFX / Conciliação Bancária" style="display:flex;align-items:center;gap:6px">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            OFX / Conciliação
+            OFX
           </button>
         </div>
       </div>
+
+      <!-- Resumo do período: saldo anterior → movimentações → saldo final -->
+      <div id="bk-extrato-resumo" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px"></div>
+
       <div class="tbl-wrap">
-        <table class="tbl">
-          <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th><th>Saldo</th><th></th></tr></thead>
+        <table class="tbl" id="bk-extrato-tbl">
+          <thead><tr>
+            <th style="width:104px">Data</th>
+            <th>Descrição</th>
+            <th style="width:120px">Categoria</th>
+            <th style="width:104px;text-align:right">Entrada</th>
+            <th style="width:104px;text-align:right">Saída</th>
+            <th style="width:112px;text-align:right">Saldo</th>
+            <th style="width:36px"></th>
+          </tr></thead>
           <tbody id="bk-extrato-tbody"></tbody>
+          <tfoot id="bk-extrato-tfoot"></tfoot>
         </table>
       </div>
       <div id="bk-extrato-empty" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma movimentação registrada.</div>
@@ -1755,11 +1785,21 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <!-- Análise de gastos por categoria -->
     <div class="g2">
       <div class="card">
-        <div class="card-header"><span class="card-title">Saídas por Categoria</span></div>
+        <div class="card-header">
+          <div>
+            <span class="card-title">Saídas por Categoria</span>
+            <div class="card-sub" id="bk-cats-sub">no período filtrado</div>
+          </div>
+        </div>
         <div class="chart-box" style="height:220px"><canvas id="ch-bk-cats"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Top Categorias de Saída</span></div>
+        <div class="card-header">
+          <div>
+            <span class="card-title">Maiores Movimentações</span>
+            <div class="card-sub" id="bk-top-sub">no período filtrado</div>
+          </div>
+        </div>
         <div id="bk-top-cats"></div>
       </div>
     </div>
@@ -6666,33 +6706,253 @@ function selectBanco(id) {
   const grad = document.getElementById('bk-det-grad');
   if (grad) { grad.style.background = c.cor; }
 
-  // ── Gráfico evolução do saldo (12 meses do ano exibido) ──
-  // Abre com o saldo inicial + tudo que ocorreu antes de janeiro do ano exibido
-  const iniAno = `${anoBk}-01-01`;
+  // Os gráficos anuais da conta seguem o ano escolhido no extrato — ver renderGraficosConta().
+  // A análise por categoria e as maiores movimentações acompanham o período
+  // filtrado no extrato — ver renderAnaliseExtrato().
+  renderExtratoDetalhe();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── EXTRATO DA CONTA ──
+// Ordem cronológica (mais antiga → mais atual, como um extrato bancário),
+// com saldo corrido a partir do saldo anterior ao período.
+// ══════════════════════════════════════════════════════════════
+
+let _bkOrdem = 'asc';   // 'asc' = mais antiga primeiro (padrão)
+
+function toggleOrdemExtrato(){
+  _bkOrdem = _bkOrdem === 'asc' ? 'desc' : 'asc';
+  const btn = document.getElementById('bk-btn-ordem');
+  if(btn) btn.textContent = _bkOrdem === 'asc' ? '↑ Mais antiga primeiro' : '↓ Mais recente primeiro';
+  renderExtratoDetalhe();
+}
+
+// Anos disponíveis no extrato da conta selecionada
+function initBkAnoOpts(movs){
+  const el = document.getElementById('bk-fil-ano');
+  if(!el) return;
+  const anos = new Set(movs.map(m => (m.data||'').slice(0,4)).filter(Boolean));
+  anos.add(String(new Date().getFullYear()));
+  const atual = el.dataset.init ? el.value : '';
+  el.innerHTML = '<option value="">Todos os anos</option>'
+    + [...anos].sort().map(a => `<option value="${a}">${a}</option>`).join('');
+  el.value = atual;
+  el.dataset.init = '1';
+}
+
+const DIA_SEM = ['dom','seg','ter','qua','qui','sex','sáb'];
+const fmtDataBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
+
+// ── Extrato com filtros ──
+function renderExtratoDetalhe() {
+  const d = gs();
+  const c = d.bancos.find(b => b.id === _bkSel);
+  if (!c) return;
+
+  const todas = movimentacoesDaConta(c, d)
+    .slice()
+    .sort((a,b) => (a.data||'').localeCompare(b.data||'') || (a.ts||0) - (b.ts||0));
+
+  initBkAnoOpts(todas);
+
+  const anoF  = document.getElementById('bk-fil-ano')?.value;
+  const mesF  = document.getElementById('bk-fil-mes')?.value;
+  const tipoF = document.getElementById('bk-fil-tipo')?.value;
+  const busca = (document.getElementById('bk-fil-busca')?.value || '').toLowerCase();
+
+  // ── Saldo corrido sobre TODAS as movimentações, em ordem cronológica ──
+  let run = c.saldoInicial || 0;
+  const saldoMap = {};
+  todas.forEach(m => {
+    run += m.tipo === 'entrada' ? m.val : -m.val;
+    saldoMap[m.id] = +run.toFixed(2);
+  });
+
+  // ── Recorte do período (ano/mês) ──
+  const temAno = !!anoF;
+  const temMes = mesF !== '' && mesF !== undefined;
+  const noPeriodo = m => {
+    if(temAno && getAno(m.data) !== parseInt(anoF)) return false;
+    if(temMes && getMes(m.data) !== parseInt(mesF))  return false;
+    return true;
+  };
+  const doPeriodo = todas.filter(noPeriodo);
+
+  // Saldo imediatamente antes do período
+  const idsPeriodo = new Set(doPeriodo.map(m => m.id));
+  const anteriores = todas.filter(m => !idsPeriodo.has(m.id) &&
+      (!doPeriodo.length || (m.data || '') < (doPeriodo[0].data || '')));
+  const saldoAnterior = anteriores.length
+    ? saldoMap[anteriores[anteriores.length - 1].id]
+    : (c.saldoInicial || 0);
+
+  const entPer = doPeriodo.filter(m => m.tipo === 'entrada').reduce((a,m) => a + m.val, 0);
+  const saiPer = doPeriodo.filter(m => m.tipo === 'saida').reduce((a,m) => a + m.val, 0);
+  const saldoFinal = doPeriodo.length ? saldoMap[doPeriodo[doPeriodo.length - 1].id] : saldoAnterior;
+
+  // ── Filtros de exibição (tipo e busca) sobre o período ──
+  let movs = doPeriodo;
+  if (tipoF) movs = movs.filter(m => m.tipo === tipoF);
+  if (busca) movs = movs.filter(m => (m.desc||'').toLowerCase().includes(busca)
+                                  || (m.cat||'').toLowerCase().includes(busca));
+
+  // ── Rótulo do período ──
+  const lblPeriodo = document.getElementById('bk-extrato-periodo');
+  if(lblPeriodo){
+    const nome = temMes ? `${MESES[parseInt(mesF)]}${temAno ? ' de ' + anoF : ''}`
+               : temAno ? `Ano de ${anoF}`
+               : (todas.length ? `${fmtDataBR(todas[0].data)} até ${fmtDataBR(todas[todas.length-1].data)}` : 'sem movimentações');
+    const filtrado = movs.length !== doPeriodo.length ? ` · ${movs.length} de ${doPeriodo.length} exibidas` : '';
+    lblPeriodo.textContent = `${nome} · ${doPeriodo.length} movimentação${doPeriodo.length===1?'':'ões'}${filtrado}`;
+  }
+
+  // ── Resumo do período ──
+  const resumo = document.getElementById('bk-extrato-resumo');
+  if(resumo){
+    const resultado = +(entPer - saiPer).toFixed(2);
+    resumo.innerHTML = [
+      ['Saldo anterior', fmtR(saldoAnterior), saldoAnterior>=0?'var(--t1)':'var(--red)'],
+      ['Entradas',       fmtR(entPer),        'var(--green)'],
+      ['Saídas',         fmtR(saiPer),        'var(--red)'],
+      ['Resultado',      (resultado>=0?'+':'') + fmtR(resultado), resultado>=0?'var(--green)':'var(--red)'],
+      ['Saldo final',    fmtR(saldoFinal),    saldoFinal>=0?'var(--cyan)':'var(--red)'],
+    ].map(([l,v,cor]) => `
+      <div style="background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:10px 12px">
+        <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${l}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:${cor}">${v}</div>
+      </div>`).join('');
+  }
+
+  const tbody = document.getElementById('bk-extrato-tbody');
+  const tfoot = document.getElementById('bk-extrato-tfoot');
+  const empty = document.getElementById('bk-extrato-empty');
+  if (!tbody) return;
+
+  if (!movs.length) {
+    tbody.innerHTML = '';
+    if (tfoot) tfoot.innerHTML = '';
+    if (empty) {
+      empty.style.display = 'block';
+      empty.textContent = todas.length
+        ? 'Nenhuma movimentação encontrada com esses filtros.'
+        : 'Nenhuma movimentação registrada nesta conta.';
+    }
+    renderAnaliseExtrato(movs, c);
+    renderGraficosConta(c, temAno ? parseInt(anoF) : new Date().getFullYear(), todas);
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // ── Linhas, em ordem cronológica ──
+  const lista = _bkOrdem === 'asc' ? movs : movs.slice().reverse();
+  const hoje = today();
+  const mostrarMes = !temMes;                  // separadores de mês quando o filtro é amplo
+  let mesAtual = '';
+  const linhas = [];
+
+  // Linha de abertura com o saldo anterior (só na ordem cronológica)
+  if (_bkOrdem === 'asc') {
+    linhas.push(`<tr style="background:var(--surface0)">
+      <td class="mono" style="color:var(--t3)">${anteriores.length ? fmtDataBR(anteriores[anteriores.length-1].data) : '—'}</td>
+      <td colspan="4" style="color:var(--t3);font-size:11px;font-style:italic">Saldo anterior ao período</td>
+      <td class="mono" style="text-align:right;color:${saldoAnterior>=0?'var(--t2)':'var(--red)'};font-weight:600">${fmtR(saldoAnterior)}</td>
+      <td></td>
+    </tr>`);
+  }
+
+  lista.forEach(m => {
+    const chaveMes = (m.data||'').slice(0,7);
+    if (mostrarMes && chaveMes !== mesAtual) {
+      mesAtual = chaveMes;
+      const [aa, mm] = chaveMes.split('-');
+      const doMes = doPeriodo.filter(x => (x.data||'').slice(0,7) === chaveMes);
+      const e = doMes.filter(x => x.tipo === 'entrada').reduce((a,x) => a+x.val, 0);
+      const sd = doMes.filter(x => x.tipo === 'saida').reduce((a,x) => a+x.val, 0);
+      linhas.push(`<tr class="bk-mes-row">
+        <td colspan="3" style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2)">
+          ${MESES[parseInt(mm)-1]} ${aa}
+        </td>
+        <td class="mono" style="text-align:right;font-size:10px;color:var(--green)">${e ? '+'+fmtRs(e) : ''}</td>
+        <td class="mono" style="text-align:right;font-size:10px;color:var(--red)">${sd ? '−'+fmtRs(sd) : ''}</td>
+        <td class="mono" style="text-align:right;font-size:10px;color:${(e-sd)>=0?'var(--green)':'var(--red)'}" title="Resultado do mês">${(e-sd)>=0?'+':'−'}${fmtRs(Math.abs(+(e-sd).toFixed(2)))}</td>
+        <td></td>
+      </tr>`);
+    }
+
+    const isEnt   = m.tipo === 'entrada';
+    const saldoRow = saldoMap[m.id] ?? 0;
+    const diaSem  = DIA_SEM[new Date(m.data + 'T00:00:00').getDay()] || '';
+    const ehHoje  = m.data === hoje;
+    const origem  = m.origemLanc      ? '<span class="badge bdg-gray" style="font-size:8px">lançamento</span>'
+                  : isTransfMov(m)    ? '<span class="badge bdg-blue" style="font-size:8px">⇄ transferência</span>'
+                  : m.forma === 'OFX' ? '<span class="badge bdg-cyan" style="font-size:8px">OFX</span>' : '';
+    linhas.push(`<tr${ehHoje ? ' style="background:var(--blue-dim)"' : ''}>
+      <td class="mono" style="color:${ehHoje?'var(--blue)':'var(--t3)'};white-space:nowrap">
+        ${fmtDataBR(m.data)}
+        <div style="font-size:9px;color:var(--t4)">${diaSem}${ehHoje ? ' · hoje' : ''}</div>
+      </td>
+      <td style="color:var(--t1);max-width:260px">
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.desc || '—'}</div>
+        ${origem || m.forma && m.forma !== 'Lançamento' ? `<div style="margin-top:2px;display:flex;gap:4px;align-items:center">${origem}${m.forma && m.forma !== 'Lançamento' && m.forma !== 'OFX' ? `<span style="font-size:9px;color:var(--t3)">${m.forma}</span>` : ''}</div>` : ''}
+      </td>
+      <td><span class="cat-tag" style="font-size:9px">${m.cat || '—'}</span></td>
+      <td class="mono" style="text-align:right;color:${isEnt?'var(--green)':'var(--t4)'};font-weight:${isEnt?600:400}">${isEnt ? fmtRs(m.val) : '—'}</td>
+      <td class="mono" style="text-align:right;color:${!isEnt?'var(--red)':'var(--t4)'};font-weight:${!isEnt?600:400}">${!isEnt ? fmtRs(m.val) : '—'}</td>
+      <td class="mono" style="text-align:right;color:${saldoRow>=0?'var(--t1)':'var(--red)'};font-weight:600">${fmtRs(saldoRow)}</td>
+      <td>${m.origemLanc
+        ? `<button class="btn btn-ghost btn-xs" title="Vem da aba Lançamentos" onclick="openLancOps('${m.refLancId}')">⋯</button>`
+        : `<button class="btn btn-red btn-xs" onclick="delMov('${c.id}','${m.id}')" title="Excluir movimentação">✕</button>`}</td>
+    </tr>`);
+  });
+
+  tbody.innerHTML = linhas.join('');
+
+  // ── Rodapé com os totais do que está listado ──
+  if (tfoot) {
+    const entL = movs.filter(m => m.tipo === 'entrada').reduce((a,m) => a+m.val, 0);
+    const saiL = movs.filter(m => m.tipo === 'saida').reduce((a,m) => a+m.val, 0);
+    tfoot.innerHTML = `<tr style="background:var(--surface2);font-weight:700">
+      <td colspan="3" style="color:var(--t1);font-size:11px">
+        TOTAL ${movs.length !== doPeriodo.length ? 'DO FILTRO' : 'DO PERÍODO'} · ${movs.length} movimentação${movs.length===1?'':'ões'}
+      </td>
+      <td class="mono" style="text-align:right;color:var(--green)">${fmtRs(entL)}</td>
+      <td class="mono" style="text-align:right;color:var(--red)">${fmtRs(saiL)}</td>
+      <td class="mono" style="text-align:right;color:${saldoFinal>=0?'var(--cyan)':'var(--red)'}">${fmtRs(saldoFinal)}</td>
+      <td></td>
+    </tr>`;
+  }
+
+  renderAnaliseExtrato(movs, c);
+  renderGraficosConta(c, temAno ? parseInt(anoF) : new Date().getFullYear(), todas);
+}
+
+// ── Gráficos anuais da conta (seguem o ano escolhido no extrato) ──
+function renderGraficosConta(c, ano, movs){
+  const iniAno = `${ano}-01-01`;
   let saldoCurr = (c.saldoInicial || 0)
-    + movs.filter(mv => mv.data < iniAno).reduce((a,mv) => a + (mv.tipo==='entrada' ? mv.val : -mv.val), 0);
-  const saldoMes = [];
+    + movs.filter(m => m.data < iniAno).reduce((a,m) => a + (m.tipo === 'entrada' ? m.val : -m.val), 0);
+  const saldoMes = [], entArr = [], saiArr = [];
   for (let m = 0; m < 12; m++) {
-    const ent = movs.filter(mv => mv.tipo==='entrada' && noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0);
-    const sai = movs.filter(mv => mv.tipo==='saida'   && noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0);
+    const ent = movs.filter(x => x.tipo === 'entrada' && noMesAno(x.data, m, ano)).reduce((a,x) => a+x.val, 0);
+    const sai = movs.filter(x => x.tipo === 'saida'   && noMesAno(x.data, m, ano)).reduce((a,x) => a+x.val, 0);
     saldoCurr += ent - sai;
     saldoMes.push(+saldoCurr.toFixed(2));
+    entArr.push(ent); saiArr.push(sai);
   }
+  const lblEvo = document.getElementById('bk-evo-titulo');
+  if(lblEvo) lblEvo.textContent = `Evolução do Saldo — ${ano}`;
+  const lblBar = document.getElementById('bk-bar-titulo');
+  if(lblBar) lblBar.textContent = `Entradas vs Saídas — ${ano}`;
+
   mkCh('ch-bk-evolucao', {
     type: 'line',
     data: { labels: MESES3, datasets: [{
       data: saldoMes, borderColor: '#00d97e', backgroundColor: '#00d97e18',
       borderWidth: 2, fill: true, tension: .35, pointRadius: 3, pointBackgroundColor: '#00d97e'
     }]},
-    options: { ...chartBase, maintainAspectRatio: false, plugins: { legend: { display: false }}}
+    options: { ...chartBase, maintainAspectRatio: false,
+      plugins: { legend: { display:false }, tooltip: { callbacks: { label: ctx => ' Saldo: ' + fmtR(ctx.raw) } } } }
   });
-
-  // ── Gráfico barras entradas vs saídas ──
-  const entArr = [], saiArr = [];
-  for (let m = 0; m < 12; m++) {
-    entArr.push(movs.filter(mv=>mv.tipo==='entrada'&&noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0));
-    saiArr.push(movs.filter(mv=>mv.tipo==='saida'  &&noMesAno(mv.data,m,anoBk)).reduce((a,mv)=>a+mv.val,0));
-  }
   mkCh('ch-bk-barras', {
     type: 'bar',
     data: { labels: MESES3, datasets: [
@@ -6701,103 +6961,76 @@ function selectBanco(id) {
     ]},
     options: { ...chartBase, maintainAspectRatio: false, plugins: { legend: { display: false }}}
   });
+}
 
-  // ── Gráfico categorias de saída ──
+// ── Análise do período exibido: categorias e maiores movimentações ──
+function renderAnaliseExtrato(movs, c){
+  const saidas = movs.filter(m => m.tipo === 'saida' && !isTransfMov(m));
   const catMap = {};
-  movs.filter(m => m.tipo === 'saida' && !isTransfMov(m)).forEach(m => { catMap[m.cat] = (catMap[m.cat]||0) + m.val; });
+  saidas.forEach(m => { catMap[m.cat || '—'] = (catMap[m.cat || '—'] || 0) + m.val; });
   const catKeys = Object.keys(catMap);
+
+  const sub = document.getElementById('bk-cats-sub');
+  if(sub) sub.textContent = saidas.length
+    ? `${saidas.length} saída${saidas.length===1?'':'s'} no período exibido`
+    : 'sem saídas no período exibido';
+
   if (catKeys.length) {
     mkCh('ch-bk-cats', {
       type: 'doughnut',
       data: { labels: catKeys, datasets: [{ data: Object.values(catMap), backgroundColor: CORES_CAT, borderWidth: 0, hoverOffset: 4 }]},
       options: { responsive: true, maintainAspectRatio: false, cutout: '62%',
-        plugins: { legend: { position:'right', labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:10, padding:8 }}}}
+        plugins: { legend: { position:'right', labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:10, padding:8 }},
+                   tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmtR(ctx.raw)}` } } } }
     });
-  } else {
-    if (CH['ch-bk-cats']) { CH['ch-bk-cats'].destroy(); delete CH['ch-bk-cats']; }
-  }
+  } else if (CH['ch-bk-cats']) { CH['ch-bk-cats'].destroy(); delete CH['ch-bk-cats']; }
 
-  // ── Top categorias ──
-  const sorted = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-  const totalSai = sorted.reduce((a,c)=>a+c[1], 0);
+  // Maiores movimentações do período
   const topEl = document.getElementById('bk-top-cats');
-  if (topEl) topEl.innerHTML = sorted.slice(0,8).map(([cat,val],i) => `
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-        <span style="display:flex;align-items:center;gap:6px">
-          <span style="width:8px;height:8px;border-radius:50%;background:${CORES_CAT[i%CORES_CAT.length]};flex-shrink:0"></span>
-          <span style="color:var(--t2)">${cat}</span>
+  const subTop = document.getElementById('bk-top-sub');
+  if(subTop) subTop.textContent = movs.length ? 'as 8 maiores do período exibido' : 'nada no período exibido';
+  if (!topEl) return;
+  const maiores = movs.slice().sort((a,b) => b.val - a.val).slice(0,8);
+  const maxVal = maiores.length ? maiores[0].val : 1;
+  topEl.innerHTML = maiores.length ? maiores.map(m => {
+    const isEnt = m.tipo === 'entrada';
+    const cor = isEnt ? 'var(--green)' : 'var(--red)';
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:4px">
+        <span style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span style="color:${cor};flex-shrink:0">${isEnt ? '↑' : '↓'}</span>
+          <span style="color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.desc || '—'}</span>
         </span>
-        <span class="mono" style="color:var(--t1)">${fmtR(val)} <span style="color:var(--t3)">(${totalSai>0?pct(val/totalSai*100):'0%'})</span></span>
+        <span class="mono" style="color:var(--t1);white-space:nowrap">${fmtR(m.val)}</span>
       </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${totalSai>0?val/totalSai*100:0}%;background:${CORES_CAT[i%CORES_CAT.length]}"></div></div>
-    </div>`).join('') || '<p style="color:var(--t3);font-size:12px">Sem saídas registradas.</p>';
-
-  renderExtratoDetalhe();
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="prog-track" style="flex:1;margin-top:0"><div class="prog-fill" style="width:${m.val/maxVal*100}%;background:${cor}"></div></div>
+        <span style="font-size:9px;color:var(--t3);white-space:nowrap">${fmtDataBR(m.data)}</span>
+      </div>
+    </div>`;
+  }).join('') : '<p style="color:var(--t3);font-size:12px">Nada a mostrar no período exibido.</p>';
 }
 
-// ── Extrato com filtros ──
-function renderExtratoDetalhe() {
+// ── Exportar o extrato filtrado em CSV ──
+function exportarExtratoCSV(){
   const d = gs();
   const c = d.bancos.find(b => b.id === _bkSel);
-  if (!c) return;
-
-  const mesF  = document.getElementById('bk-fil-mes')?.value;
-  const tipoF = document.getElementById('bk-fil-tipo')?.value;
-  const busca = (document.getElementById('bk-fil-busca')?.value || '').toLowerCase();
-
-  const todasMovs = movimentacoesDaConta(c, d);
-  let movs = [...todasMovs].sort((a,b) => b.data.localeCompare(a.data) || b.ts - a.ts);
-  if (mesF !== '' && mesF !== undefined) movs = movs.filter(m => getMes(m.data) === parseInt(mesF));
-  if (tipoF) movs = movs.filter(m => m.tipo === tipoF);
-  if (busca) movs = movs.filter(m => (m.desc||'').toLowerCase().includes(busca) || (m.cat||'').toLowerCase().includes(busca));
-
-  const tbody = document.getElementById('bk-extrato-tbody');
-  const empty = document.getElementById('bk-extrato-empty');
-  if (!tbody) return;
-
-  if (!movs.length) {
-    tbody.innerHTML = '';
-    if (empty) empty.style.display = 'block';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  // Calcular saldo acumulado correndo (do mais recente para o mais antigo)
-  // Reconstruir saldo na data de cada mov
-  let saldoAcc = calcSaldoConta(c, d);
-  const allMovsOrdenados = [...todasMovs].sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts);
-  const saldoMap = {};
-  allMovsOrdenados.forEach(m => {
-    saldoMap[m.id] = +saldoAcc.toFixed(2);
-    saldoAcc -= m.tipo === 'entrada' ? m.val : -m.val;
+  if(!c) return;
+  const linhas = [...document.querySelectorAll('#bk-extrato-tbody tr')]
+    .filter(tr => !tr.classList.contains('bk-mes-row'));
+  if(!linhas.length){ alert('Não há movimentações para exportar.'); return; }
+  const csv = [['Data','Descrição','Categoria','Entrada','Saída','Saldo'].join(';')];
+  linhas.forEach(tr => {
+    const td = tr.children;
+    if(td.length < 6) return;
+    const txt = i => (td[i].innerText || '').split('\n')[0].trim();
+    csv.push([txt(0), `"${txt(1).replace(/"/g,'""')}"`, txt(2), txt(3), txt(4), txt(5)].join(';'));
   });
-
-  const tipoBdg = {
-    entrada:       '<span class="badge bdg-green">↑ Entrada</span>',
-    saida:         '<span class="badge bdg-red">↓ Saída</span>',
-    transferencia: '<span class="badge bdg-blue">⇄ Transf.</span>',
-  };
-
-  tbody.innerHTML = movs.map(m => {
-    const isPos = m.tipo === 'entrada';
-    const cor = isPos ? 'var(--green)' : m.tipo === 'transferencia' ? 'var(--blue)' : 'var(--red)';
-    const sinal = isPos ? '+' : '-';
-    const saldoRow = saldoMap[m.id] ?? 0;
-    return `<tr>
-      <td class="mono" style="color:var(--t3)">${m.data}</td>
-      <td style="color:var(--t1);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-        ${m.desc}${m.origemLanc?' <span class="badge bdg-gray" style="font-size:8px">lançamento</span>':''}
-      </td>
-      <td><span class="cat-tag" style="font-size:9px">${m.cat||'—'}</span></td>
-      <td>${tipoBdg[m.tipo] || ''}</td>
-      <td class="mono" style="color:${cor};font-weight:600">${sinal}${fmtRs(m.val)}</td>
-      <td class="mono" style="color:${saldoRow>=0?'var(--green)':'var(--red)'}">${fmtR(saldoRow)}</td>
-      <td>${m.origemLanc
-        ? `<button class="btn btn-ghost btn-xs" title="Vem da aba Lançamentos" onclick="openLancOps('${m.refLancId}')">⋯</button>`
-        : `<button class="btn btn-red btn-xs" onclick="delMov('${c.id}','${m.id}')">✕</button>`}</td>
-    </tr>`;
-  }).join('');
+  const blob = new Blob(['﻿' + csv.join('\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `extrato-${(c.nome||'conta').toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${today()}.csv`;
+  a.click();
 }
 
 // ── Modal de conta bancária ──
@@ -7280,7 +7513,9 @@ seedLancamentos();
 // ── Define mês atual como padrão em todos os filtros de mês ──
 (function initMesAtual() {
   const mes = curMes();
-  const selects = ['dash-mes', 'rel-dre-mes', 'l-fil-mes', 'cp-fil-mes', 'bk-fil-mes'];
+  // O extrato bancário (bk-fil-mes) abre sem filtro de mês: mostra o histórico
+  // completo em ordem cronológica, com separadores por mês.
+  const selects = ['dash-mes', 'rel-dre-mes', 'l-fil-mes', 'cp-fil-mes'];
   selects.forEach(function(id) {
     const el = document.getElementById(id);
     if (el) el.value = mes;

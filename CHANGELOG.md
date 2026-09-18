@@ -4,6 +4,67 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Extrato bancário: ordem cronológica e análise do período
+
+### 🎯 O que foi pedido
+
+Melhorar a análise e a visualização das movimentações das contas bancárias — o extrato —
+começando da **data mais antiga para a mais atual**.
+
+### 🐛 O que estava errado
+
+- O extrato vinha em ordem **decrescente** (mais recente primeiro) e o saldo era reconstruído
+  de trás para frente — o oposto de como se lê um extrato bancário.
+- O filtro de mês **ignorava o ano**: setembro de 2025 aparecia junto com setembro de 2026.
+- Não havia saldo anterior, totais do período nem qualquer fechamento.
+- A análise ao lado (categorias) usava **todas** as movimentações da conta, sem relação com o
+  período filtrado na tabela.
+
+### ✅ Corrigido e melhorado
+
+**Ordem e saldo**
+- Extrato em **ordem cronológica**: da movimentação mais antiga para a mais recente, com o
+  saldo corrido acumulando linha a linha, como em um extrato de banco.
+- Linha de abertura **"Saldo anterior ao período"**, para o saldo corrido começar do lugar certo.
+- Botão para **inverter a ordem** quando quiser ver primeiro o mais recente.
+
+**Leitura**
+- Colunas **Entrada** e **Saída** separadas (antes um único campo com sinal).
+- **Separadores por mês** com o subtotal de entradas, saídas e o resultado daquele mês.
+- Data com o **dia da semana**, destaque para a linha de **hoje**, e selo de origem da
+  movimentação (lançamento, transferência ou OFX).
+- Cabeçalho da tabela **fixo** ao rolar extratos longos.
+
+**Resumo do período**
+- Faixa com **Saldo anterior → Entradas → Saídas → Resultado → Saldo final**.
+- Rodapé com o total do que está listado e a contagem de movimentações.
+- Quando um filtro de tipo ou busca reduz a lista, o resumo continua mostrando o período
+  inteiro e o cabeçalho indica *"X de Y exibidas"* — sem números contraditórios.
+
+**Filtros**
+- Novo **filtro de ano** (o de mês deixou de misturar anos diferentes).
+- O extrato passa a abrir com o **histórico completo** em ordem cronológica, em vez de já vir
+  preso ao mês atual.
+- **Exportar CSV** do que está sendo exibido.
+
+**Análise**
+- "Saídas por Categoria" agora reflete o **período filtrado**, e não a conta inteira.
+- "Top Categorias" deu lugar a **Maiores Movimentações** do período, com valor, barra
+  proporcional e data.
+- Os gráficos **Evolução do Saldo** e **Entradas vs Saídas** passam a seguir o **ano escolhido
+  no extrato**, com o ano no título.
+
+### 🧪 Verificação
+
+**24 verificações automatizadas** cobrindo a ordem cronológica, o saldo corrido acumulado, a
+linha de saldo anterior, os separadores de mês, o resumo do período, o rodapé de totais, a
+inversão da ordem, os filtros de ano/mês/tipo/busca (inclusive a independência entre o resumo
+do período e o filtro de exibição) e a análise acompanhando o período. As suítes anteriores
+seguem passando: **19/19** (saldo), **10/10** (fluxo), **37/37** (contas a pagar), **22/22**
+(contas de reserva), **23/23** (lançamentos × reservas) e **24/24** (invariante DRE).
+
+---
+
 ## [2026-09-18] Lançamentos: reservas separadas do resultado
 
 ### 🎯 O que foi pedido
