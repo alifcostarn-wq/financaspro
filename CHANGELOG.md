@@ -4,6 +4,66 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-18] Lançamentos: reservas separadas do resultado
+
+### 🎯 O que foi pedido
+
+Na aba **Lançamentos**, separar as contas de reserva dos resultados — elas ainda apareciam
+misturadas ali.
+
+### 🐛 O que estava misturado
+
+Os KPIs de Receitas/Despesas já excluíam as reservas, mas o resto da aba continuava somando
+tudo junto:
+
+- o **Saldo Acumulado** incluía o dinheiro da poupança;
+- a coluna **Saldo Caixa** corria um único trilho, misturando conta corrente e reserva;
+- a **lista** trazia as linhas de reserva no meio das demais, com apenas um selo pequeno;
+- o **rodapé de seleção** somava as linhas de reserva no saldo líquido.
+
+### ✅ Corrigido
+
+**Dois blocos de KPI, com papéis distintos**
+- **Resultado do mês** (primeira linha): Receitas, Despesas, Saldo Líquido e Investimentos —
+  todos com a nota *"sem contas de reserva"*.
+- **Saldos** (segunda linha), separados:
+  - **Saldo Disponível** — o que está nas contas que entram no resultado (o "Anterior" do mês
+    passado agora também é o disponível, não o total);
+  - **🔒 Em Reservas** — quanto está guardado, com o movimento do mês ao lado
+    (*+R$ 36,50 no mês*). O cartão só aparece quando existe alguma conta de reserva;
+  - **Patrimônio em Caixa** — disponível + reservas, para o total continuar visível.
+
+**Filtro de visão no extrato**
+- Novo seletor com três opções:
+  - **📈 Resultado (sem reservas)** — padrão, mostra só o que compõe o resultado;
+  - **🔒 Somente reservas** — o extrato da poupança;
+  - **Tudo** — a lista completa.
+
+**Coluna de saldo em dois trilhos**
+- Cada linha passa a mostrar o saldo acumulado **do seu próprio trilho**: linhas de conta
+  corrente seguem o saldo disponível, linhas de reserva seguem o saldo da reserva (com o
+  cadeado 🔒). Antes um único trilho misturava os dois, e a coluna "pulava" valores quando as
+  reservas estavam ocultas.
+
+**Seleção de linhas**
+- Ao marcar linhas, as de reserva passam a ser somadas em um bloco próprio (**🔒 Em reservas**)
+  e não entram mais no saldo líquido. A contagem indica quantas das selecionadas são de reserva.
+
+### 🧪 Verificação
+
+**23 verificações automatizadas** cobrindo os três modos do filtro, os valores dos três KPIs de
+saldo, o "anterior" usando o disponível, o movimento de reservas no mês, os dois trilhos da
+coluna de saldo e a separação no rodapé de seleção. As suítes anteriores seguem passando:
+**19/19** (saldo), **10/10** (fluxo), **37/37** (contas a pagar), **22/22** (contas de reserva)
+e **24/24** (invariante DRE × motor de saldo).
+
+### ℹ️ Observações
+
+- A aba abre por padrão na visão **Resultado**. Se sentir falta das linhas da poupança, troque
+  o seletor para *Somente reservas* ou *Tudo* — nada foi apagado.
+
+---
+
 ## [2026-09-18] Contas de reserva: poupança fora do resultado
 
 ### 🎯 O que foi pedido

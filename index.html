@@ -1185,15 +1185,30 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <button class="btn btn-green" onclick="openM('m-lanc')">+ Novo Lançamento</button>
     </div>
   </div>
-  <div class="kpi-grid cols5">
-    <div class="kpi g"><div class="kpi-label">Receitas do Mês</div><div class="kpi-val g" id="lk-rec">R$ 0</div></div>
-    <div class="kpi r"><div class="kpi-label">Despesas do Mês</div><div class="kpi-val r" id="lk-des">R$ 0</div></div>
-    <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div></div>
+  <!-- Resultado do mês (contas de reserva ficam fora destes números) -->
+  <div class="kpi-grid cols4">
+    <div class="kpi g"><div class="kpi-label">Receitas do Mês</div><div class="kpi-val g" id="lk-rec">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
+    <div class="kpi r"><div class="kpi-label">Despesas do Mês</div><div class="kpi-val r" id="lk-des">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
+    <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div><div class="kpi-sub">receitas − despesas − investimentos</div></div>
     <div class="kpi b"><div class="kpi-label">Investimentos</div><div class="kpi-val b" id="lk-inv">R$ 0</div></div>
+  </div>
+
+  <!-- Saldo: disponível e reservas, separados -->
+  <div class="kpi-grid cols3" style="margin-bottom:20px">
     <div class="kpi c" style="border:1px solid var(--cyan);position:relative;overflow:hidden">
-      <div class="kpi-label" style="color:var(--cyan)">Saldo Acumulado</div>
+      <div class="kpi-label" style="color:var(--cyan)">Saldo Disponível</div>
       <div class="kpi-val c" id="lk-acum">R$ 0</div>
       <div id="lk-acum-sub" style="font-size:10px;color:var(--t3);margin-top:4px"></div>
+    </div>
+    <div class="kpi" id="lk-card-reservas" style="border:1px dashed var(--line2);position:relative;overflow:hidden">
+      <div class="kpi-label">🔒 Em Reservas</div>
+      <div class="kpi-val" id="lk-reservas" style="color:var(--t2)">R$ 0</div>
+      <div id="lk-reservas-sub" style="font-size:10px;color:var(--t3);margin-top:4px">fora do resultado</div>
+    </div>
+    <div class="kpi p">
+      <div class="kpi-label">Patrimônio em Caixa</div>
+      <div class="kpi-val p" id="lk-total">R$ 0</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px">disponível + reservas</div>
     </div>
   </div>
   <div class="card">
@@ -1218,6 +1233,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <option value="">Todos os tipos</option>
           <option>Receita</option><option>Despesa</option><option>Investimento</option><option>Transferência</option>
         </select>
+        <select id="l-fil-visao" onchange="renderLanc()" title="Separa o que compõe o resultado do que está em contas de reserva" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="resultado">📈 Resultado (sem reservas)</option>
+          <option value="reservas">🔒 Somente reservas</option>
+          <option value="tudo">Tudo</option>
+        </select>
         <select id="l-fil-status" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os status</option>
           <option value="pago">✓ Pago</option>
@@ -1241,7 +1261,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <th style="width:78px">Tipo</th>
           <th style="width:88px">Status</th>
           <th style="width:88px">Valor</th>
-          <th style="color:var(--cyan);white-space:nowrap;width:92px">Saldo Caixa</th>
+          <th style="color:var(--cyan);white-space:nowrap;width:92px" title="Saldo acumulado do próprio trilho: disponível ou reserva">Saldo</th>
           <th style="width:34px"></th>
         </tr></thead>
         <tbody id="l-tbody"></tbody>
@@ -1272,6 +1292,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <span id="l-sel-inv" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--blue)">R$ 0,00</span>
           </div>
           <div style="width:1px;height:32px;background:var(--line)"></div>
+          <div id="l-sel-res-box" style="display:none;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">🔒 Em reservas</span>
+            <span id="l-sel-res" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--cyan)">R$ 0,00</span>
+          </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
             <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Saldo líquido</span>
             <span id="l-sel-liq" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700">R$ 0,00</span>
@@ -2889,13 +2913,17 @@ function saldoInicialGlobal(d){
 // Linha do tempo única de eventos de caixa (lançamentos + movimentações não espelhadas)
 function timelineCaixa(d){
   d = d || gs();
+  const ids = idsReserva(d);
   const ev = [];
   (d.lancs || []).filter(l => l.status !== 'cancelado').forEach(l => {
-    ev.push({ data:l.data, ts:l.ts || 0, delta:efeitoLanc(l), lancId:l.id, efetivado: !l.pago || l.pago === 'Pago' });
+    ev.push({ data:l.data, ts:l.ts || 0, delta:efeitoLanc(l), lancId:l.id,
+              efetivado: !l.pago || l.pago === 'Pago',
+              reserva: !!l.caixaId && ids.has(l.caixaId) });
   });
   (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
     if(m.refLancId) return;                    // já representado pelo lançamento de origem
-    ev.push({ data:m.data, ts:m.ts || 0, delta:efeitoMovBanco(m), movId:m.id, efetivado:true });
+    ev.push({ data:m.data, ts:m.ts || 0, delta:efeitoMovBanco(m), movId:m.id,
+              efetivado:true, reserva: contaEhReserva(b) });
   }));
   return ev.sort((a, b) => (a.data || '').localeCompare(b.data || '') || (a.ts - b.ts));
 }
@@ -2923,6 +2951,33 @@ function mapaSaldoPorLancamento(d){
   timelineCaixa(d).forEach(e => {
     saldo += e.delta;
     if(e.lancId) mapa[e.lancId] = +saldo.toFixed(2);
+  });
+  return mapa;
+}
+
+// Saldo disponível = caixa consolidado menos o que está guardado em contas de reserva
+function calcDisponivelAte(dataISO, opts){
+  return +(calcSaldoAte(dataISO, opts) - calcReservasAte(dataISO)).toFixed(2);
+}
+
+/**
+ * Saldo por lançamento em DOIS trilhos separados:
+ *  • disponível — contas que entram no resultado
+ *  • reserva    — contas marcadas como reserva (poupança)
+ * Cada lançamento recebe o saldo do trilho a que pertence, para a coluna de saldo
+ * não "pular" valores quando as reservas estão ocultas.
+ */
+function mapaSaldosSeparados(d){
+  d = d || gs();
+  const temBancos = d.bancos && d.bancos.length;
+  let saldoRes  = temBancos ? d.bancos.filter(contaEhReserva).reduce((a,b)=>a+(b.saldoInicial||0),0) : 0;
+  let saldoDisp = temBancos
+    ? d.bancos.filter(b => !contaEhReserva(b)).reduce((a,b)=>a+(b.saldoInicial||0),0)
+    : ((d.cfg && d.cfg.si) || 0);
+  const mapa = {};
+  timelineCaixa(d).forEach(e => {
+    if(e.reserva){ saldoRes  += e.delta; if(e.lancId) mapa[e.lancId] = { v:+saldoRes.toFixed(2),  reserva:true  }; }
+    else         { saldoDisp += e.delta; if(e.lancId) mapa[e.lancId] = { v:+saldoDisp.toFixed(2), reserva:false }; }
   });
   return mapa;
 }
@@ -4508,6 +4563,11 @@ function renderLanc(){
     if(mesF!==''&&mesF!==undefined) items = items.filter(l=>getMes(l.data)===parseInt(mesF));
   }
 
+  // Separa o extrato entre o que compõe o resultado e o que está em contas de reserva
+  const visaoF = document.getElementById('l-fil-visao')?.value || 'resultado';
+  const idsResFil = idsReserva(d);
+  if(visaoF === 'resultado')      items = items.filter(l => !lancEhReserva(l, idsResFil));
+  else if(visaoF === 'reservas')  items = items.filter(l =>  lancEhReserva(l, idsResFil));
   if(tipoF)   items = items.filter(l=>l.tipo===tipoF);
   if(statusF === 'pago')   items = items.filter(l=>l.pago==='Pago' && l.status!=='cancelado');
   else if(statusF === 'aberto') items = items.filter(l=>(l.pago==='Pendente'||l.pago==='Agendado') && l.status!=='cancelado');
@@ -4525,28 +4585,52 @@ function renderLanc(){
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
 
-  // ── Saldo Acumulado (motor único de saldo) ──
-  // Consolida contas bancárias + lançamentos, de forma contínua no tempo:
-  // o saldo NÃO reinicia a cada ano — dezembro fecha e janeiro seguinte abre com esse valor.
+  // ── Saldos (motor único) ──
+  // Dois trilhos separados: o que está disponível (entra no resultado) e o que está
+  // guardado em contas de reserva. O saldo é contínuo no tempo, sem reiniciar a cada ano.
   const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const fimMesAtual = fimDoMes(kpiAno, kpiMes);
   const mAnt        = mesAnterior(kpiAno, kpiMes);
-  const acum        = calcSaldoAte(fimMesAtual);
-  const saldoAntes  = calcSaldoAte(fimDoMes(mAnt.ano, mAnt.mes));
-  const realizado   = calcSaldoAte(fimMesAtual, { somentePagos:true });
-  setC('lk-acum', fmtR(acum), acum>=0?'var(--cyan)':'var(--red)');
+  const fimMesAnt   = fimDoMes(mAnt.ano, mAnt.mes);
+
+  const totalCaixa  = calcSaldoAte(fimMesAtual);
+  const reservas    = calcReservasAte(fimMesAtual);
+  const disponivel  = +(totalCaixa - reservas).toFixed(2);
+  const dispAntes   = calcDisponivelAte(fimMesAnt);
+  const resAntes    = calcReservasAte(fimMesAnt);
+  const dispReal    = +(calcSaldoAte(fimMesAtual, { somentePagos:true }) - reservas).toFixed(2);
+
+  setC('lk-acum',  fmtR(disponivel), disponivel>=0 ? 'var(--cyan)'   : 'var(--red)');
+  setC('lk-total', fmtR(totalCaixa), totalCaixa>=0 ? 'var(--purple)' : 'var(--red)');
+
+  const rotuloAnt = MESES_ABREV[mAnt.mes] + (mAnt.ano !== parseInt(kpiAno) ? '/' + mAnt.ano : '');
   const acumSubEl = document.getElementById('lk-acum-sub');
   if(acumSubEl){
-    const rotuloAnt = MESES_ABREV[mAnt.mes] + (mAnt.ano !== parseInt(kpiAno) ? '/' + mAnt.ano : '');
     acumSubEl.innerHTML =
-      `Anterior (${rotuloAnt}): <b style="color:${saldoAntes>=0?'var(--green)':'var(--red)'}">${fmtR(saldoAntes)}</b>`
-      + (realizado !== acum
-          ? ` · realizado: <b style="color:${realizado>=0?'var(--t2)':'var(--red)'}">${fmtR(realizado)}</b>`
+      `Anterior (${rotuloAnt}): <b style="color:${dispAntes>=0?'var(--green)':'var(--red)'}">${fmtR(dispAntes)}</b>`
+      + (dispReal !== disponivel
+          ? ` · realizado: <b style="color:${dispReal>=0?'var(--t2)':'var(--red)'}">${fmtR(dispReal)}</b>`
           : '');
     acumSubEl.title =
-      'Saldo consolidado (contas banc\u00e1rias + lan\u00e7amentos), acumulado desde o in\u00edcio do hist\u00f3rico.\n'
-      + '• Anterior: saldo no fim de ' + rotuloAnt + '\n'
+      'Saldo dispon\u00edvel: contas que entram no resultado (contas de reserva ficam de fora).\n'
+      + '• Anterior: saldo dispon\u00edvel no fim de ' + rotuloAnt + '\n'
       + '• Realizado: considera apenas lan\u00e7amentos j\u00e1 efetivados (Pago)';
+  }
+
+  // Cartão de reservas — só aparece quando existe alguma conta de reserva
+  const temReservas = idsReserva(d).size > 0 || reservas !== 0;
+  const cardRes = document.getElementById('lk-card-reservas');
+  if(cardRes) cardRes.style.display = temReservas ? '' : 'none';
+  if(temReservas){
+    setC('lk-reservas', fmtR(reservas), reservas>=0 ? 'var(--t2)' : 'var(--red)');
+    const movRes = +(reservas - resAntes).toFixed(2);
+    const subRes = document.getElementById('lk-reservas-sub');
+    if(subRes){
+      subRes.innerHTML = movRes === 0
+        ? 'fora do resultado · sem movimento no mês'
+        : `fora do resultado · <b style="color:${movRes>0?'var(--green)':'var(--red)'}">${movRes>0?'+':''}${fmtR(movRes)}</b> no mês`;
+      subRes.title = 'O que entra e sai de contas de reserva n\u00e3o vira receita nem despesa — mas continua no seu patrim\u00f4nio.';
+    }
   }
 
   const tbody = document.getElementById('l-tbody');
@@ -4574,7 +4658,7 @@ function renderLanc(){
   // Usa exatamente o mesmo motor do KPI "Saldo Acumulado": parte dos saldos iniciais
   // das contas bancárias, inclui movimentações bancárias, ignora transferências
   // (dinheiro apenas muda de conta) e nunca conta duas vezes um lançamento espelhado.
-  const saldoMap = mapaSaldoPorLancamento(d);
+  const saldoMap = mapaSaldosSeparados(d);
 
   tbody.innerHTML = items.map(l => {
     const isCanceled  = l.status==='cancelado';
@@ -4583,14 +4667,17 @@ function renderLanc(){
     const valorPrefix = isTransf ? (l.transfDir==='saida'?'↑':l.transfDir==='entrada'?'↓':'⇄') : (l.tipo==='Receita'?'+':'-');
 
     // Saldo em caixa desta linha
-    const sLinha = isCanceled ? null : saldoMap[l.id];
+    const info   = saldoMap[l.id];
+    const sLinha = isCanceled || !info ? null : info.v;
+    const ehRes  = !!info && info.reserva;
     const sLinhaHtml = isCanceled
       ? `<td class="mono" style="color:var(--t3);font-size:10px">—</td>`
       : isTransf
         ? `<td class="mono" style="color:var(--t3);font-size:10px" title="Transferências não alteram o saldo total">—</td>`
-        : `<td class="mono" style="color:${sLinha>=0?'var(--cyan)':'var(--red)'};font-weight:600;white-space:nowrap;font-size:11px">${fmtRs(sLinha)}</td>`;
+        : `<td class="mono" style="color:${ehRes ? 'var(--t3)' : (sLinha>=0?'var(--cyan)':'var(--red)')};font-weight:600;white-space:nowrap;font-size:11px"
+              title="${ehRes ? 'Saldo acumulado da conta de reserva' : 'Saldo disponível acumulado'}">${fmtRs(sLinha)}${ehRes?' \u{1F512}':''}</td>`;
 
-    return `<tr data-id="${l.id}" data-tipo="${l.tipo}" data-valor="${l.valor}" data-canceled="${isCanceled}" data-transf="${isTransf}"
+    return `<tr data-id="${l.id}" data-tipo="${l.tipo}" data-valor="${l.valor}" data-canceled="${isCanceled}" data-transf="${isTransf}" data-reserva="${ehRes}"
       style="${isCanceled?'opacity:.4;':''}${isTransf?'background:rgba(0,200,200,.03);':''}"
       onclick="lancRowClick(event,'${l.id}')" class="l-row">
       <td style="padding:7px 6px 7px 10px" onclick="event.stopPropagation()">
@@ -4659,12 +4746,17 @@ function updLancSel(){
     return;
   }
 
-  // Calcular totais por tipo com base nos data-* da linha
-  let rec = 0, des = 0, inv = 0;
+  // Totais por tipo. Linhas de conta de reserva são somadas à parte: não são resultado.
+  let rec = 0, des = 0, inv = 0, res = 0, nRes = 0;
   sel.forEach(c => {
     const row  = c.closest('tr');
     const tipo = row?.dataset.tipo  || '';
     const val  = parseFloat(row?.dataset.valor) || 0;
+    if(row?.dataset.reserva === 'true'){
+      res += (tipo === 'Receita' ? val : -val);
+      nRes++;
+      return;
+    }
     if(tipo === 'Receita')      rec += val;
     else if(tipo === 'Despesa') des += val;
     else if(tipo === 'Investimento') inv += val;
@@ -4675,7 +4767,17 @@ function updLancSel(){
   // Atualizar rodapé
   const count = sel.length;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  set('l-sel-count', `${count} lançamento${count>1?'s':''} selecionado${count>1?'s':''}`);
+  set('l-sel-count', `${count} lançamento${count>1?'s':''} selecionado${count>1?'s':''}`
+      + (nRes ? ` · ${nRes} em reserva` : ''));
+  const resBox = document.getElementById('l-sel-res-box');
+  if(resBox){
+    resBox.style.display = nRes ? 'flex' : 'none';
+    const resEl = document.getElementById('l-sel-res');
+    if(resEl){
+      resEl.textContent = (res >= 0 ? '+' : '') + fmtRs(res);
+      resEl.style.color = res >= 0 ? 'var(--cyan)' : 'var(--red)';
+    }
+  }
   set('l-sel-rec', fmtRs(rec));
   set('l-sel-des', fmtRs(des));
   set('l-sel-inv', fmtRs(inv));
