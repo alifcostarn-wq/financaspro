@@ -1058,6 +1058,41 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
   </div>
 
+  <!-- ── AGENDA DE COMPROMISSOS: contas, faturas e dívidas em um lugar só ── -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header" style="flex-wrap:wrap;gap:10px">
+      <div>
+        <span class="card-title">Agenda de Compromissos</span>
+        <div class="card-sub" id="ag-sub">Contas a pagar, faturas de cartão e parcelas de dívida</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="ag-janela" onchange="renderAgenda()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="7">Próximos 7 dias</option>
+          <option value="30" selected>Próximos 30 dias</option>
+          <option value="60">Próximos 60 dias</option>
+          <option value="90">Próximos 90 dias</option>
+        </select>
+        <select id="ag-tipo" onchange="renderAgenda()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="">Todos os tipos</option>
+          <option value="conta">Contas a pagar</option>
+          <option value="fatura">Faturas de cartão</option>
+          <option value="divida">Parcelas de dívida</option>
+        </select>
+      </div>
+    </div>
+    <div class="kpi-grid cols4" style="margin-bottom:14px">
+      <div class="kpi r"><div class="kpi-label">Vencido</div><div class="kpi-val r" id="ag-k-vencido">R$ 0</div><div class="kpi-sub" id="ag-k-vencido-qt">—</div></div>
+      <div class="kpi a"><div class="kpi-label">A vencer na janela</div><div class="kpi-val a" id="ag-k-avencer">R$ 0</div><div class="kpi-sub" id="ag-k-avencer-qt">—</div></div>
+      <div class="kpi g"><div class="kpi-label">Caixa Disponível Hoje</div><div class="kpi-val g" id="ag-k-disp">R$ 0</div></div>
+      <div class="kpi b"><div class="kpi-label">Sobra Após Compromissos</div><div class="kpi-val b" id="ag-k-sobra">R$ 0</div><div class="kpi-sub" id="ag-k-sobra-sub">—</div></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>Vencimento</th><th>Compromisso</th><th>Tipo</th><th>Categoria</th><th>Situação</th><th>Valor</th><th>Acumulado</th><th>Ação</th></tr></thead>
+      <tbody id="ag-tbody"></tbody>
+      <tfoot id="ag-tfoot"></tfoot>
+    </table></div>
+  </div>
+
   <!-- ── LINHA 5: Últimos lançamentos + Projeção por dia ── -->
   <div class="g2">
     <div class="card">
@@ -1235,6 +1270,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <div class="tgl" onclick="setFxGran('semanal',this)">Semanal</div>
             <div class="tgl" onclick="setFxGran('diario',this)">Diário</div>
           </div>
+          <label id="fx-compr-box" style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:var(--t2);white-space:nowrap">
+            <input type="checkbox" id="fx-compr" checked onchange="renderRel()" style="width:15px;height:15px;accent-color:var(--purple)">
+            <span id="fx-compr-lbl">Incluir compromissos em aberto</span>
+          </label>
           <button class="btn btn-ghost btn-xs" onclick="exportarFluxoCSV()">⬇ CSV</button>
         </div>
       </div>
@@ -1504,6 +1543,13 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="kpi r"><div class="kpi-label">Realizado (Despesas)</div><div class="kpi-val r" id="orc-k-real-des">R$ 0</div></div>
     <div class="kpi g"><div class="kpi-label">Saldo Orçamentário</div><div class="kpi-val g" id="orc-k-saldo">R$ 0</div></div>
     <div class="kpi a"><div class="kpi-label">% Executado</div><div class="kpi-val a" id="orc-k-pct">0%</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 14px">
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:var(--t2)">
+      <input type="checkbox" id="orc-cartao" onchange="renderOrc()" style="width:15px;height:15px;accent-color:var(--purple)">
+      Incluir gastos do cartão de crédito
+    </label>
+    <span id="orc-aviso-cartao" style="font-size:10px;color:var(--t3);flex:1;min-width:220px"></span>
   </div>
 
   <!-- Visão: Previsto -->
@@ -2679,12 +2725,32 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Registrar pagamento dívida -->
 <div class="overlay" id="m-pg-div" style="display:none" onclick="cmoOut(event,'m-pg-div')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2>Registrar Pagamento</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-pg-div')">✕</button></div>
+    <div class="modal-hd">
+      <div>
+        <h2>Registrar Pagamento</h2>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px" id="pgd-sub">—</div>
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-pg-div')">✕</button>
+    </div>
     <div class="modal-bd">
-      <div class="form-grid cols2">
-        <div class="fg"><label>Data</label><input type="date" id="pgd-data"></div>
+      <div id="pgd-err" class="form-err" style="display:none"></div>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="fg"><label>Parcela</label><select id="pgd-parc" onchange="updPgDivPreview()"></select></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Data do Pagamento</label><input type="date" id="pgd-data"></div>
         <div class="fg"><label>Valor Pago</label><input type="number" id="pgd-val" step="0.01" min="0"></div>
       </div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label>Conta de Débito</label><select id="pgd-caixa"><option value="">— Sem vínculo de caixa —</option></select></div>
+        <div class="fg" style="display:flex;align-items:flex-end">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t2);margin:0 0 8px">
+            <input type="checkbox" id="pgd-gerar" checked style="width:16px;height:16px;accent-color:var(--green)">
+            Gerar lançamento de despesa
+          </label>
+        </div>
+      </div>
+      <div id="pgd-preview" class="cp-preview"></div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-pg-div')">Cancelar</button>
@@ -3034,6 +3100,8 @@ function gs(){
   d.contas =d.contas  ||[];
   d.divs   =d.divs    ||[];
   d.ccs    =d.ccs     ||[];
+  d.bancos =d.bancos  ||[];
+  d.kanban =d.kanban  ||[];
   return d;
 }
 function ss(d){localStorage.setItem(K,JSON.stringify(d))}
@@ -3518,7 +3586,10 @@ function renderDash(){
   set('dk-sal-sub', salAnt ? `vs ${fmtR(salAnt)} mês ant.` : '');
 
   // ── Contas pendentes ──
-  const pend = d.contas.filter(c => noMesAno(c.venc, mes, ano) && statusConta(c) !== 'Pago');
+  // Inclui o que venceu em meses anteriores e ainda não foi pago — atraso não some
+  // do contador só porque o mês virou.
+  const pend = d.contas.filter(c => statusConta(c) !== 'Pago'
+                 && (noMesAno(c.venc, mes, ano) || c.venc < today()));
   const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes, ano), 0);
   set('dk-pend', pend.length);
   set('dk-pend-v', fmtR(pend.reduce((a,c) => a+c.valor, 0)));
@@ -3529,17 +3600,8 @@ function renderDash(){
   const pctDes = salario > 0 ? des / salario * 100 : 100;
   const pctInv = salario > 0 ? inv / salario * 100 : 0;
   const taxaPoup = rec > 0 ? sal / rec * 100 : 0;
-
-  let score = 100;
-  // Penalidades
-  if (salDiv > d.cfg.pct)        score -= Math.min(25, (salDiv - d.cfg.pct) * 1.5);
-  if (pctDes > 70)               score -= Math.min(25, (pctDes - 70) * 0.8);
-  if (pctInv < 10 && inv > 0)    score -= Math.min(15, (10 - pctInv) * 1);
-  if (pctInv === 0)              score -= 15;
-  if (taxaPoup < 20 && rec > 0)  score -= Math.min(20, (20 - taxaPoup) * 0.6);
-  if (sal < 0)                   score -= 20;
-  if (pend.length > 0)           score -= Math.min(10, pend.length * 2);
-  score = Math.max(0, Math.min(100, Math.round(score)));
+  const diag = scoreSaude(d, { salDiv, pctDes, pctInv, taxaPoup, sal, rec, inv, mes, ano });
+  const score = diag.score;
 
   const scoreEl  = document.getElementById('dk-score');
   const scoreFill = document.getElementById('dk-score-fill');
@@ -3549,7 +3611,13 @@ function renderDash(){
   const scoreNota  = score >= 80 ? '😊 Excelente' : score >= 60 ? '🙂 Bom' : score >= 40 ? '😐 Atenção' : '😟 Crítico';
   if (scoreEl)   scoreEl.style.color = scoreColor;
   if (scoreFill) { scoreFill.style.width = score + '%'; scoreFill.style.background = scoreColor; }
-  if (scoreLbl)  scoreLbl.textContent = scoreNota;
+  if (scoreLbl){
+    // O score deixa de ser um número solto: mostra o que mais pesa contra
+    scoreLbl.textContent = diag.pior ? `${scoreNota} · pesa contra: ${diag.pior.label}` : scoreNota;
+    scoreLbl.title = diag.itens.length
+      ? diag.itens.map(x => `−${x.peso} ${x.label}: ${x.detalhe}`).join('\n')
+      : 'Nenhuma penalidade — todos os indicadores dentro do recomendado.';
+  }
 
   // ── Patrimônio Líquido ──
   // Caixa consolidado no fim do mês exibido (motor único) + investimentos − dívidas.
@@ -3560,7 +3628,7 @@ function renderDash(){
   const caixaLivre = +(caixa - reservas).toFixed(2);
   const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash)
                            .reduce((a,l) => a+l.valor, 0);
-  const totalDiv   = d.divs.reduce((a, dv) => a + (dv.saldo != null ? dv.saldo : (dv.total || 0)), 0);
+  const totalDiv   = d.divs.reduce((a, dv) => a + saldoDivida(dv), 0);
   const patrimonio = caixa + totalInv - totalDiv;
 
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
@@ -3854,6 +3922,138 @@ function renderDash(){
 
   // ── O QUE FAZER AGORA ──
   renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv);
+  // ── AGENDA DE COMPROMISSOS ──
+  renderAgenda();
+}
+
+
+// ── AGENDA DE COMPROMISSOS (dashboard) ──
+// Um só lugar para ver o que vai sair do caixa, venha de onde vier.
+function renderAgenda(){
+  const d = gs();
+  const dias  = parseInt(document.getElementById('ag-janela')?.value) || 30;
+  const tipoF = document.getElementById('ag-tipo')?.value || '';
+  const limite = addDias(today(), dias);
+
+  let lista = compromissosFuturos(d, { ate:limite });
+  if(tipoF) lista = lista.filter(x => x.tipo === tipoF);
+
+  const vencidos = lista.filter(x => x.vencido);
+  const aVencer  = lista.filter(x => !x.vencido);
+  const soma = l => +l.reduce((a,x) => a + x.valor, 0).toFixed(2);
+  const totVenc = soma(vencidos), totAVencer = soma(aVencer);
+  const disp = calcDisponivelAte(today(), { somentePagos:true });
+  const sobra = +(disp - totVenc - totAVencer).toFixed(2);
+
+  set('ag-sub', `Contas a pagar, faturas de cartão e parcelas de dívida até ${fmtDataBR(limite)}`);
+  setC('ag-k-vencido', fmtR(totVenc), totVenc ? 'var(--red)' : '');
+  set('ag-k-vencido-qt', `${vencidos.length} compromisso(s)`);
+  set('ag-k-avencer', fmtR(totAVencer));
+  set('ag-k-avencer-qt', `${aVencer.length} compromisso(s)`);
+  setC('ag-k-disp', fmtR(disp), disp >= 0 ? 'var(--green)' : 'var(--red)');
+  setC('ag-k-sobra', fmtR(sobra), sobra >= 0 ? 'var(--blue)' : 'var(--red)');
+  set('ag-k-sobra-sub', sobra >= 0
+    ? 'o caixa cobre os compromissos da janela'
+    : `faltam ${fmtR(Math.abs(sobra))} para honrar tudo`);
+
+  const tb = document.getElementById('ag-tbody');
+  if(!tb) return;
+  let acum = 0;
+  tb.innerHTML = lista.length ? lista.map(x => {
+    acum += x.valor;
+    const t = TIPOS_COMPROMISSO[x.tipo];
+    const dd = diasEntreISO(today(), x.data);
+    const situacao = x.vencido
+      ? `<span class="badge bdg-red" style="font-size:9px">${Math.abs(dd)}d em atraso</span>`
+      : dd === 0 ? '<span class="badge bdg-amber" style="font-size:9px">vence hoje</span>'
+      : `<span class="badge bdg-gray" style="font-size:9px">em ${dd}d</span>`;
+    const acao = x.tipo === 'conta'  ? `pagarConta('${x.refId}')`
+               : x.tipo === 'fatura' ? `pagarFatura('${x.origemId}',${x.ccMes},${x.ccAno})`
+               : `abrirPgDiv('${x.origemId}','${x.refId}')`;
+    return `<tr>
+      <td class="mono" style="color:${x.vencido ? 'var(--red)' : 'var(--t2)'}">${fmtDataBR(x.data)}</td>
+      <td style="color:var(--t1)">${x.desc}</td>
+      <td><span style="font-size:11px;color:${t.cor}">${t.icone} ${t.label}</span></td>
+      <td><span class="cat-tag" style="font-size:9px">${x.cat}</span></td>
+      <td>${situacao}</td>
+      <td class="mono" style="color:var(--red);font-weight:600">${fmtR(x.valor)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(acum)}</td>
+      <td><button class="btn btn-green btn-xs" onclick="irEPagar('${x.tipo}', &quot;${acao.replace(/"/g,'&quot;')}&quot;)">Pagar</button></td>
+    </tr>`; }).join('')
+   : `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">Nenhum compromisso em aberto até ${fmtDataBR(limite)}. 🎉</td></tr>`;
+
+  const tf = document.getElementById('ag-tfoot');
+  if(tf) tf.innerHTML = lista.length ? `<tr>
+      <td colspan="5" style="color:var(--t2);font-weight:600">Total a pagar na janela</td>
+      <td class="mono" style="color:var(--red);font-weight:700">${fmtR(totVenc + totAVencer)}</td>
+      <td colspan="2" class="mono" style="color:${sobra >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:600">
+        ${sobra >= 0 ? 'sobram ' : 'faltam '}${fmtR(Math.abs(sobra))}</td>
+    </tr>` : '';
+}
+// Leva para a aba certa e abre o modal de pagamento de lá
+function irEPagar(tipo, acao){
+  const pagina = TIPOS_COMPROMISSO[tipo].pagina;
+  go(pagina, document.querySelector(`.nav-btn[onclick*="'${pagina}'"]`));
+  setTimeout(() => { try { eval(acao); } catch(e) {} }, 60);
+}
+
+/**
+ * Score de saúde financeira (0–100) com o porquê de cada desconto.
+ * Antes o score só olhava o fluxo do mês: dava "Excelente" para quem tinha
+ * patrimônio líquido negativo, nenhuma reserva de emergência e compromissos
+ * maiores que o caixa. Agora esses três entram na conta.
+ */
+function scoreSaude(d, ctx){
+  const itens = [];
+  const pena = (peso, label, detalhe) => { if(peso > 0) itens.push({ peso:Math.round(peso), label, detalhe }); };
+  const cfgPct = (d.cfg && d.cfg.pct) || 20;
+
+  // ── Fluxo do mês ──
+  if(ctx.salDiv > cfgPct)
+    pena(Math.min(25, (ctx.salDiv - cfgPct) * 1.5), 'Dívidas altas',
+         `${pct(ctx.salDiv)} do salário em parcelas (máx. ${pct(cfgPct)})`);
+  if(ctx.pctDes > 70)
+    pena(Math.min(25, (ctx.pctDes - 70) * 0.8), 'Despesas altas',
+         `${pct(ctx.pctDes)} do salário em despesas`);
+  if(ctx.pctInv === 0)            pena(15, 'Sem investir', 'nenhum investimento no mês');
+  else if(ctx.pctInv < 10)        pena(Math.min(15, 10 - ctx.pctInv), 'Investe pouco', `${pct(ctx.pctInv)} do salário`);
+  if(ctx.taxaPoup < 20 && ctx.rec > 0)
+    pena(Math.min(20, (20 - ctx.taxaPoup) * 0.6), 'Sobra pequena', `taxa de poupança de ${pct(ctx.taxaPoup)}`);
+  if(ctx.sal < 0)                 pena(20, 'Mês no vermelho', `resultado de ${fmtR(ctx.sal)}`);
+
+  // ── Compromissos: atrasos e capacidade de honrar o mês ──
+  const compr   = compromissosFuturos(d);
+  const atraso  = compr.filter(x => x.vencido);
+  if(atraso.length)
+    pena(Math.min(15, atraso.length * 4), 'Contas em atraso',
+         `${atraso.length} compromisso(s), ${fmtR(atraso.reduce((a,x)=>a+x.valor,0))}`);
+
+  const disp   = calcDisponivelAte(today(), { somentePagos:true });
+  const aSair  = compr.filter(x => x.data <= fimDoMes(ctx.ano, ctx.mes)).reduce((a,x) => a + x.valor, 0);
+  if(aSair > disp)
+    pena(Math.min(20, (aSair - disp) / Math.max(1, aSair) * 20), 'Caixa insuficiente',
+         `${fmtR(aSair)} a pagar contra ${fmtR(disp)} disponível`);
+
+  // ── Reserva de emergência: meses de despesa cobertos pelo caixa livre ──
+  const desp12 = d.lancs.filter(l => l.status !== 'cancelado' && l.tipo === 'Despesa'
+                    && l.data >= addDias(today(), -365) && l.data <= today())
+                  .reduce((a,l) => a + (l.valor || 0), 0);
+  const mediaMes = desp12 / 12;
+  if(mediaMes > 0){
+    const meses = (calcSaldoAte(today(), { somentePagos:true })) / mediaMes;
+    if(meses < 3)
+      pena(Math.min(20, (3 - Math.max(0, meses)) / 3 * 20), 'Reserva de emergência',
+           `cobre ${meses.toFixed(1)} mês(es) de despesa (ideal: 3 a 6)`);
+  }
+
+  // ── Patrimônio líquido negativo ──
+  const patr = calcSaldoAte(today(), { somentePagos:true }) - d.divs.reduce((a,dv) => a + saldoDivida(dv), 0);
+  if(patr < 0) pena(15, 'Patrimônio negativo', `você deve ${fmtR(Math.abs(patr))} a mais do que tem`);
+
+  const desconto = itens.reduce((a,x) => a + x.peso, 0);
+  const score = Math.max(0, Math.min(100, Math.round(100 - desconto)));
+  const pior = itens.slice().sort((a,b) => b.peso - a.peso)[0] || null;
+  return { score, itens, pior };
 }
 
 function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv){
@@ -3902,6 +4102,46 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
       sub:`Separe ${fmtR(total)} para esses pagamentos.`,
       acao:'Ver agenda →',
       fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
+    });
+  }
+
+  // 3b. Faturas de cartão e parcelas de dívida em aberto
+  //     (antes o painel só enxergava Contas a Pagar — cartão e dívida ficavam de fora)
+  const comprOutros = compromissosFuturos(d).filter(x => x.tipo !== 'conta');
+  const comprVencidos = comprOutros.filter(x => x.vencido);
+  if(comprVencidos.length){
+    const total = comprVencidos.reduce((a,x)=>a+x.valor,0);
+    acoes.push({ nivel:'urgente', icon:'🔥', label:'Em atraso',
+      msg:`${comprVencidos.length} compromisso${comprVencidos.length>1?'s':''} vencido${comprVencidos.length>1?'s':''}`,
+      sub:`${comprVencidos.slice(0,2).map(x=>x.desc).join(', ')}${comprVencidos.length>2?` +${comprVencidos.length-2}`:''} — ${fmtR(total)}`,
+      acao:`Ir para ${TIPOS_COMPROMISSO[comprVencidos[0].tipo].pagina==='cartoes'?'Cartões':'Dívidas'} →`,
+      fn:`go('${TIPOS_COMPROMISSO[comprVencidos[0].tipo].pagina}',null)`
+    });
+  }
+  const compr7 = comprOutros.filter(x => !x.vencido && x.data <= addDias(today(),7));
+  if(compr7.length){
+    const total = compr7.reduce((a,x)=>a+x.valor,0);
+    const fat = compr7.filter(x=>x.tipo==='fatura').length;
+    const div = compr7.filter(x=>x.tipo==='divida').length;
+    const partes = [fat?`${fat} fatura${fat>1?'s':''} de cartão`:'', div?`${div} parcela${div>1?'s':''} de dívida`:''].filter(Boolean);
+    acoes.push({ nivel:'atencao', icon:'💳', label:'Vence esta semana',
+      msg:partes.join(' e '),
+      sub:`Separe ${fmtR(total)} para esses pagamentos nos próximos 7 dias.`,
+      acao:`Ir para ${TIPOS_COMPROMISSO[compr7[0].tipo].pagina==='cartoes'?'Cartões':'Dívidas'} →`,
+      fn:`go('${TIPOS_COMPROMISSO[compr7[0].tipo].pagina}',null)`
+    });
+  }
+
+  // 3c. Compromissos do mês maiores que o caixa disponível
+  const fimMes = fimDoMes(ano, mes);
+  const aSair  = compromissosFuturos(d, { ate:fimMes }).reduce((a,x)=>a+x.valor,0);
+  const disp   = calcDisponivelAte(today(), { somentePagos:true });
+  if(aSair > 0 && aSair > disp){
+    acoes.push({ nivel:'urgente', icon:'⚠️', label:'Caixa insuficiente',
+      msg:`Faltam ${fmtR(aSair - disp)} para honrar o mês`,
+      sub:`Você tem ${fmtR(disp)} disponível e ${fmtR(aSair)} a pagar até ${fmtDataBR(fimMes)}.`,
+      acao:'Ver fluxo de caixa →',
+      fn:`go('rel',null)`
     });
   }
 
@@ -4151,8 +4391,13 @@ function bucketsFluxo(gran, mes, ano){
  * O saldo é contínuo: a abertura de cada período é o fechamento do anterior, e a
  * abertura do primeiro traz todo o histórico anterior a ele.
  */
-function calcularFluxo(d, buckets, somentePagos){
-  const ev = timelineCaixa(d).filter(e => e.data && (!somentePagos || e.efetivado));
+function calcularFluxo(d, buckets, somentePagos, comCompromissos){
+  let ev = timelineCaixa(d).filter(e => e.data && (!somentePagos || e.efetivado));
+  // Projeção: soma o que está em aberto em Contas a Pagar, Cartões e Dívidas
+  if(comCompromissos && !somentePagos){
+    ev = ev.concat(eventosCompromissos(d)).sort((a,b) =>
+      (a.data || '').localeCompare(b.data || '') || (a.ts - b.ts));
+  }
   const temBancos  = d.bancos && d.bancos.length;
   const iniReserva = temBancos ? d.bancos.filter(contaEhReserva).reduce((a,b) => a + (b.saldoInicial||0), 0) : 0;
   let saldo = saldoInicialGlobal(d), reserva = iniReserva;
@@ -4179,16 +4424,26 @@ function calcularFluxo(d, buckets, somentePagos){
 
 function renderFluxoCaixa(d){
   const somentePagos = _relFilterView === 'realizado';
+  const comCompr = fxComCompromissos() && !somentePagos;
   const mes = getMesSel(), ano = anoRef();
   const buckets = bucketsFluxo(_fxGran, mes, ano);
-  const { abertura, linhas } = calcularFluxo(d, buckets, somentePagos);
-  _fxCache = { abertura, linhas, gran:_fxGran, mes, ano };
+  const { abertura, linhas } = calcularFluxo(d, buckets, somentePagos, comCompr);
+  _fxCache = { abertura, linhas, gran:_fxGran, mes, ano, comCompr };
+
+  // O seletor de compromissos só faz sentido no modo Previsto
+  const boxCompr = document.getElementById('fx-compr-box');
+  if(boxCompr) boxCompr.style.display = somentePagos ? 'none' : 'flex';
+  const resumoC = resumoCompromissos(d);
+  const lblCompr = document.getElementById('fx-compr-lbl');
+  if(lblCompr) lblCompr.textContent = resumoC.total
+    ? `Incluir compromissos em aberto (${fmtR(resumoC.total)})`
+    : 'Incluir compromissos em aberto';
 
   const escopo = _fxGran === 'mensal' ? `Ano de ${ano}`
                : _fxGran === 'semanal' ? `Semanas de ${MESES[mes]} de ${ano}`
                : `Dias de ${MESES[mes]} de ${ano}`;
   const modo = somentePagos ? 'realizado (somente o que já foi pago)' : 'previsto (inclui o que ainda não foi pago)';
-  set('fx-periodo-lbl', `${escopo} · ${modo}`);
+  set('fx-periodo-lbl', `${escopo} · ${modo}${comCompr ? ' · com contas, faturas e dívidas em aberto' : ''}`);
 
   const ult = linhas[linhas.length - 1] || { fim:abertura.saldo, disp:abertura.disp, reserva:abertura.reserva };
   const totEnt = +linhas.reduce((a,l) => a + l.ent, 0).toFixed(2);
@@ -4210,7 +4465,9 @@ function renderFluxoCaixa(d){
   const aviso = document.getElementById('fx-aviso');
   if(aviso) aviso.innerHTML = somentePagos
     ? '💡 Modo <b>Realizado</b>: só entram lançamentos já pagos e movimentações bancárias. Troque para <b>Previsto</b> no topo para projetar o caixa com o que ainda está por pagar.'
-    : '💡 Modo <b>Previsto</b>: inclui lançamentos ainda não pagos. O saldo final é uma projeção, não o dinheiro que existe hoje.';
+    : comCompr
+      ? `💡 Modo <b>Previsto</b>: além dos lançamentos em aberto, a projeção inclui <b>${resumoC.lista.length} compromisso(s)</b> de Contas a Pagar, Cartões e Dívidas (${fmtR(resumoC.total)}). Eles não entram no DRE nem no saldo atual — são dinheiro que ainda vai sair.`
+      : '💡 Modo <b>Previsto</b>: inclui lançamentos ainda não pagos, mas <b>não</b> as contas, faturas e parcelas de dívida em aberto. Marque a opção acima para projetar o caixa com tudo o que ainda vai sair.';
 
   // ── Entradas, saídas e saldo acumulado ──
   set('fx-ch-titulo', `Entradas, Saídas e Saldo Acumulado — ${escopo}`);
@@ -4328,6 +4585,7 @@ function renderDetalheFluxo(i){
       <td><span class="cat-tag" style="font-size:9px">${e.cat}</span></td>
       <td style="color:var(--t3);font-size:11px">${e.origem}${e.conta ? ' · ' + e.conta : ''}</td>
       <td>${e.efetivado ? '<span class="badge bdg-green" style="font-size:9px">Efetivado</span>'
+            : e.compromisso ? `<span class="badge bdg-purple" style="font-size:9px">${TIPOS_COMPROMISSO[e.compromisso].icone} Compromisso</span>`
                         : '<span class="badge bdg-amber" style="font-size:9px">A pagar</span>'}
           ${e.reserva ? '<span class="badge bdg-blue" style="font-size:9px;margin-left:4px">Reserva</span>' : ''}</td>
       <td class="mono" style="color:${e.delta > 0 ? 'var(--green)' : 'var(--t3)'}">${e.delta > 0 ? fmtR(e.delta) : '—'}</td>
@@ -4441,6 +4699,7 @@ const CORES_CLASSE = { Essencial:'#4dabf7', Escolha:'#cc5de8', Financeiro:'#ffd4
 const classeDespesa = cat => CLASSE_DESPESA[cat] || 'Outros';
 const DIA_SEM_LONGO = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
+const fxComCompromissos = () => { const e = document.getElementById('fx-compr'); return e ? e.checked : true; };
 const dpPeriodo = () => Math.max(1, parseInt(document.getElementById('dp-periodo')?.value) || 3);
 const dpFonte   = () => document.getElementById('dp-fonte')?.value || 'lanc';
 
@@ -5689,6 +5948,23 @@ function lancDeselectAll(){
 }
 
 // ── ORÇAMENTO ──
+// Parcelas de cartão que vencem no mês, no formato de lançamento, para que
+// Orçamento e relatórios possam orçar por categoria de consumo.
+function parcelasComoLancs(d, mes, ano){
+  const out = [];
+  (d.ccs || []).forEach(c => {
+    parcelasDaFatura(c, mes, ano).forEach(pp => {
+      out.push({ id:'cc-' + pp.g.id + '-' + pp.num, data:dataVencFatura(c, mes, ano),
+        tipo:'Despesa', cat:pp.g.cat || 'Outras Despesas', subcat:pp.g.subcat || '',
+        desc:pp.g.desc + (pp.total > 1 ? ` (${pp.num}/${pp.total})` : ''),
+        valor:pp.valor, caixaId:'', caixaNome:'Cartão · ' + c.nome,
+        pago:'Pago', status:'ativo', origem:'cartao', ts:pp.g.ts || 0 });
+    });
+  });
+  return out;
+}
+const orcComCartao = () => { const e = document.getElementById('orc-cartao'); return e ? e.checked : false; };
+
 let _orcMes = curMes();
 let _orcView = 'previsto'; // 'previsto' | 'realizado' | 'comparativo'
 
@@ -5729,7 +6005,17 @@ function renderOrc(){
 
   // Lançamentos ativos do mês (dentro do ano de referência configurado)
   const anoOrc = anoRef();
-  const lancs = semReservas(d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado'), d);
+  const comCartao = orcComCartao();
+  const base = semReservas(d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado'), d);
+  // Com o cartão incluído, as parcelas da fatura entram no lugar do lançamento de
+  // pagamento da fatura — assim o gasto pesa na categoria real e não conta duas vezes.
+  const lancs = comCartao
+    ? base.filter(l => l.origem !== 'fatura').concat(parcelasComoLancs(d, _orcMes, anoOrc))
+    : base;
+  const avisoOrc = document.getElementById('orc-aviso-cartao');
+  if(avisoOrc) avisoOrc.innerHTML = comCartao
+    ? '💡 As parcelas de cartão do mês entram na categoria da compra. O lançamento de pagamento da fatura é substituído por elas, para não contar duas vezes.'
+    : '💡 Gastos no cartão só aparecem aqui quando a fatura é paga e gera lançamento — na categoria do pagamento, não na da compra. Marque "incluir cartão" para orçar por categoria de consumo.';
 
   // ── KPIs ──
   const metaDes   = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa').reduce((a,o)=>a+o.val,0);
@@ -6830,7 +7116,7 @@ function saveDiv(){
 function renderDividas(){
   const d = gs();
   const totVal    = d.divs.reduce((a,dv)=>a+dv.total,0);
-  const totSaldo  = d.divs.reduce((a,dv)=>a+dv.saldo,0);
+  const totSaldo  = d.divs.reduce((a,dv)=>a+saldoDivida(dv),0);
   const totMensal = d.divs.reduce((a,dv)=>a+dv.mensal,0);
   const progGeral = totVal>0?(totVal-totSaldo)/totVal*100:0;
   const pctSal    = d.cfg.sal>0?totMensal/d.cfg.sal*100:0;
@@ -6863,12 +7149,13 @@ function renderDividas(){
   }
 
   lista.innerHTML = d.divs.map(dv=>{
-    const pago   = dv.total - dv.saldo;
+    const saldoDv = saldoDivida(dv);
+    const pago   = dv.total - saldoDv;
     const p      = dv.total>0 ? pago/dv.total*100 : 0;
     const nparc  = dv.nparc||1;
     const pagas  = dv.parcelas ? dv.parcelas.filter(pc=>pc.status==='Pago').length : (dv.pagas||0);
     const restam = nparc - pagas;
-    const meses  = dv.mensal>0 ? Math.ceil(dv.saldo/dv.mensal) : null;
+    const meses  = dv.mensal>0 ? Math.ceil(saldoDv/dv.mensal) : null;
 
     // Próxima parcela a vencer
     const proxParc = (dv.parcelas||[])
@@ -6898,7 +7185,7 @@ function renderDividas(){
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
         ${[
           ['Valor Total',   fmtR(dv.total),   'var(--t2)'],
-          ['Saldo Devedor', fmtR(dv.saldo),   'var(--red)'],
+          ['Saldo Devedor', fmtR(saldoDv),   'var(--red)'],
           ['Parcela Mensal',fmtR(dv.mensal),  'var(--green)'],
           ['Restam',        restam+'x',        'var(--amber)'],
         ].map(([l,v,c])=>`
@@ -6936,11 +7223,13 @@ function renderDividas(){
               ${(dv.parcelas||[]).map(pc=>`
                 <tr>
                   <td class="mono" style="color:var(--t3)">${pc.num}/${nparc}</td>
-                  <td class="mono" style="color:${pc.status!=='Pago'&&pc.venc<today()?'var(--red)':'var(--t2)'}">${pc.venc}</td>
-                  <td class="mono" style="font-weight:600">${fmtR(pc.valor)}</td>
-                  <td><span class="badge ${pc.status==='Pago'?'bdg-green':pc.status==='Vencida'?'bdg-red':'bdg-amber'}" style="font-size:9px">${pc.status}</span></td>
-                  <td class="mono" style="color:var(--t3)">${pc.dataPg||'—'}</td>
-                  <td>${pc.status!=='Pago'?`<button class="btn btn-green btn-xs" onclick="pagarParcela('${dv.id}','${pc.id}')">✓</button>`:''}</td>
+                  <td class="mono" style="color:${pc.status!=='Pago'&&pc.venc<today()?'var(--red)':'var(--t2)'}">${fmtDataBR(pc.venc)}</td>
+                  <td class="mono" style="font-weight:600">${fmtR(pc.valorPago != null ? pc.valorPago : pc.valor)}</td>
+                  <td><span class="badge ${pc.status==='Pago'?'bdg-green':pc.venc<today()?'bdg-red':'bdg-amber'}" style="font-size:9px">${pc.status==='Pago'?'Pago':pc.venc<today()?'Vencida':'Pendente'}</span>${pc.caixaNome?`<span style="font-size:9px;color:var(--t3);margin-left:4px">${pc.caixaNome}</span>`:''}</td>
+                  <td class="mono" style="color:var(--t3)">${pc.dataPg?fmtDataBR(pc.dataPg):'—'}</td>
+                  <td style="white-space:nowrap">${pc.status!=='Pago'
+                    ? `<button class="btn btn-green btn-xs" title="Pagar parcela" onclick="pagarParcela('${dv.id}','${pc.id}')">✓</button>`
+                    : `<button class="btn btn-ghost btn-xs" title="Desfazer pagamento" onclick="desfazerPgDiv('${dv.id}','${pc.id}')">↺</button>`}</td>
                 </tr>`).join('')}
             </tbody>
           </table>
@@ -6965,44 +7254,132 @@ function toggleParcelas(divId){
   if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
 
-function pagarParcela(divId, parcId){
-  const d  = gs();
-  const dv = d.divs.find(x=>x.id===divId);
-  if(!dv) return;
-  const pc = (dv.parcelas||[]).find(p=>p.id===parcId);
-  if(!pc) return;
-  pc.status = 'Pago';
-  pc.dataPg = today();
-  dv.saldo  = Math.max(0, dv.saldo - pc.valor);
-  dv.pagas  = (dv.parcelas||[]).filter(p=>p.status==='Pago').length;
-  dv.pags   = dv.pags||[];
-  dv.pags.push({id:uid(), data:today(), val:pc.valor, parcela:pc.num});
-  ss(d); renderDividas();
+// Um único caminho de pagamento: o modal, que vincula conta e gera o lançamento.
+// Antes havia um atalho aqui que marcava a parcela como paga sem avisar o caixa.
+function pagarParcela(divId, parcId){ abrirPgDiv(divId, parcId); }
+
+// Saldo devedor recalculado a partir das parcelas (fonte única) — cai para zero
+// quando todas estão pagas, sem depender de acumular subtrações à mão.
+function saldoDivida(dv){
+  if(!dv) return 0;
+  if(!(dv.parcelas || []).length) return Math.max(0, +(dv.saldo || 0).toFixed(2));
+  const aberto = dv.parcelas.filter(p => p.status !== 'Pago').reduce((a,p) => a + (p.valor || 0), 0);
+  return +Math.max(0, aberto).toFixed(2);
 }
 
-function abrirPgDiv(id){ _divTarget=id; openM('m-pg-div'); }
+// ── Lançamento gerado pelo pagamento de uma parcela de dívida ──
+// Sem isso o dinheiro sai da conta e o sistema não fica sabendo: a parcela
+// não aparecia no DRE, no fluxo de caixa nem no extrato bancário.
+function removerLancDaParcela(parcId, d){
+  const alvos = d.lancs.filter(l => l.refDivParcId === parcId);
+  alvos.forEach(l => (d.bancos || []).forEach(b => { b.movs = (b.movs || []).filter(m => m.refLancId !== l.id); }));
+  d.lancs = d.lancs.filter(l => l.refDivParcId !== parcId);
+}
+function gerarLancDaParcela(dv, pc, d){
+  removerLancDaParcela(pc.id, d);
+  if(!pc.gerarLanc) return;
+  const lanc = {
+    id:uid(), data:pc.dataPg || pc.venc, tipo:'Despesa',
+    cat:'Serviços & Financeiro', subcat:'Pagamento de Dívida',
+    desc:`${dv.nome} — parcela ${pc.num}/${pc.total}`,
+    valor:pc.valorPago != null ? pc.valorPago : pc.valor,
+    caixaId:pc.caixaId || '', caixaNome:pc.caixaNome || '', pago:'Pago',
+    obs:'Gerado do pagamento de parcela de dívida',
+    ts:Date.now(), status:'ativo', origem:'divida', refDivId:dv.id, refDivParcId:pc.id
+  };
+  d.lancs.push(lanc);
+  if(lanc.caixaId) lancToCaixa(lanc, d);
+}
 
-function savePgDiv(){
-  const data = document.getElementById('pgd-data')?.value;
-  const val  = parseFloat(document.getElementById('pgd-val')?.value)||0;
-  if(!data||!val){alert('Preencha data e valor.');return;}
-  const d  = gs();
-  const dv = d.divs.find(x=>x.id===_divTarget);
-  if(dv){
-    dv.saldo = Math.max(0, dv.saldo-val);
-    if(!dv.pags) dv.pags=[];
-    dv.pags.push({id:uid(), data, val});
-    // Tentar marcar próxima parcela como paga
-    const prox = (dv.parcelas||[]).find(p=>p.status==='Pendente');
-    if(prox){ prox.status='Pago'; prox.dataPg=data; dv.pagas=(dv.pagas||0)+1; }
+function abrirPgDiv(id, parcId){
+  _divTarget = id;
+  const d = gs(); const dv = d.divs.find(x => x.id === id);
+  if(!dv) return;
+  openM('m-pg-div');
+  const $ = x => document.getElementById(x);
+  const pend = (dv.parcelas || []).filter(p => p.status !== 'Pago')
+                                  .sort((a,b) => (a.venc||'').localeCompare(b.venc||''));
+  set('pgd-sub', `${dv.nome} · ${fmtR(saldoDivida(dv))} em aberto`);
+  if($('pgd-parc')){
+    $('pgd-parc').innerHTML = pend.length
+      ? pend.map(p => `<option value="${p.id}">Parcela ${p.num}/${p.total} · vence ${fmtDataBR(p.venc)} · ${fmtR(p.valor)}</option>`).join('')
+      : '<option value="">— sem parcelas em aberto —</option>';
+    if(parcId && pend.some(p => p.id === parcId)) $('pgd-parc').value = parcId;
   }
-  ss(d); closeM('m-pg-div'); renderDividas();
+  $('pgd-data').value = today();
+  popCaixas('pgd-caixa');
+  if($('pgd-gerar')) $('pgd-gerar').checked = true;
+  const err = $('pgd-err'); if(err) err.style.display = 'none';
+  updPgDivPreview();
+}
+function updPgDivPreview(){
+  const $ = x => document.getElementById(x);
+  const d = gs(); const dv = d.divs.find(x => x.id === _divTarget);
+  const pc = dv && (dv.parcelas || []).find(p => p.id === $('pgd-parc')?.value);
+  if($('pgd-val')) $('pgd-val').value = pc ? pc.valor : '';
+  const el = $('pgd-preview');
+  if(!el || !dv) return;
+  const pend = (dv.parcelas || []).filter(p => p.status !== 'Pago').length;
+  el.innerHTML = pc
+    ? `Parcela <b style="color:var(--t1)">${pc.num} de ${pc.total}</b>, vencimento ${fmtDataBR(pc.venc)}.
+       Depois deste pagamento restam <b style="color:var(--t1)">${pend - 1}</b> parcela(s) e
+       <b style="color:var(--red)">${fmtR(saldoDivida(dv) - pc.valor)}</b> em aberto.`
+    : '<span style="color:var(--t3)">Esta dívida não tem parcelas em aberto.</span>';
+}
+function savePgDiv(){
+  const $ = x => document.getElementById(x);
+  const data    = $('pgd-data')?.value || today();
+  const val     = parseFloat($('pgd-val')?.value) || 0;
+  const parcId  = $('pgd-parc')?.value || '';
+  const caixaId = $('pgd-caixa')?.value || '';
+  const gerar   = !!$('pgd-gerar')?.checked;
+  const err = $('pgd-err');
+  const falha = m => { if(err){ err.textContent = '⚠️ ' + m; err.style.display = 'block'; } else alert(m); };
+  if(!val || val <= 0) return falha('Informe o valor pago.');
+  if(!parcId)          return falha('Selecione a parcela a pagar.');
+  if(err) err.style.display = 'none';
+
+  const d  = gs();
+  const dv = d.divs.find(x => x.id === _divTarget);
+  if(!dv) return;
+  const pc = (dv.parcelas || []).find(p => p.id === parcId);
+  if(!pc) return;
+  const caixaNome = caixaId ? ((d.bancos || []).find(b => b.id === caixaId)?.nome || '') : '';
+  Object.assign(pc, { status:'Pago', dataPg:data, valorPago:+val.toFixed(2),
+                      caixaId, caixaNome, gerarLanc:gerar });
+  dv.pags = dv.pags || [];
+  dv.pags.push({ id:uid(), data, val:+val.toFixed(2), parcId });
+  dv.pagas = (dv.parcelas || []).filter(p => p.status === 'Pago').length;
+  dv.saldo = saldoDivida(dv);
+  gerarLancDaParcela(dv, pc, d);
+  ss(d); closeM('m-pg-div'); renderDividas(); refreshAll();
+}
+// Desfaz o pagamento de uma parcela e remove o lançamento gerado
+function desfazerPgDiv(divId, parcId){
+  const d = gs(); const dv = d.divs.find(x => x.id === divId);
+  const pc = dv && (dv.parcelas || []).find(p => p.id === parcId);
+  if(!pc) return;
+  if(!confirm(`Desfazer o pagamento da parcela ${pc.num}/${pc.total} de "${dv.nome}"?\n\nO lançamento gerado (se houver) será removido e a parcela volta a ficar em aberto.`)) return;
+  removerLancDaParcela(pc.id, d);
+  Object.assign(pc, { status:'Pendente', dataPg:'', valorPago:null, caixaId:'', caixaNome:'', gerarLanc:false });
+  dv.pags = (dv.pags || []).filter(x => x.parcId !== parcId);
+  dv.pagas = (dv.parcelas || []).filter(p => p.status === 'Pago').length;
+  dv.saldo = saldoDivida(dv);
+  ss(d); renderDividas(); refreshAll();
 }
 
 function delDiv(id){
-  const d = gs();
-  d.divs = d.divs.filter(x=>x.id!==id);
-  ss(d); renderDividas();
+  const d = gs(); const dv = d.divs.find(x => x.id === id);
+  if(!dv) return;
+  const pagas = (dv.parcelas || []).filter(p => p.status === 'Pago').length;
+  const vinc  = d.lancs.filter(l => l.refDivId === id).length;
+  if(!confirm(`Excluir a dívida "${dv.nome}"?\n\n`
+    + `• ${(dv.parcelas || []).length} parcela(s), ${pagas} já paga(s)\n`
+    + (vinc ? `• ${vinc} lançamento(s) de pagamento também serão removidos\n` : '')
+    + `\nEsta ação não pode ser desfeita.`)) return;
+  (dv.parcelas || []).forEach(p => removerLancDaParcela(p.id, d));
+  d.divs = d.divs.filter(x => x.id !== id);
+  ss(d); renderDividas(); refreshAll();
 }
 
 // ── CARTÕES ──
@@ -7664,6 +8041,98 @@ function delFat(ccId,fatId){
   removerLancDaFatura(f, d);
   c.faturas=c.faturas.filter(x=>x.id!==fatId);
   ss(d);renderCartoes();refreshAll();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── AGENDA DE COMPROMISSOS (o elo entre os módulos e o caixa) ──
+// Contas a pagar, faturas de cartão e parcelas de dívida só viram lançamento
+// QUANDO SÃO PAGAS. Antes disso são dinheiro que vai sair e que o caixa
+// precisa conhecer — senão a projeção mostra um saldo que não existe.
+//
+// Nada aqui entra em calcSaldoAte() nem no DRE: são compromissos, não fatos.
+// Entram apenas na projeção (modo Previsto) e nos avisos.
+// ══════════════════════════════════════════════════════════════
+const TIPOS_COMPROMISSO = {
+  conta:  { label:'Conta a pagar',       icone:'🧾', cor:'var(--amber)',  pagina:'contas'  },
+  fatura: { label:'Fatura de cartão',    icone:'💳', cor:'var(--purple)', pagina:'cartoes' },
+  divida: { label:'Parcela de dívida',   icone:'🏦', cor:'var(--red)',    pagina:'dividas' },
+};
+
+/**
+ * Tudo o que está em aberto e ainda vai sair do caixa.
+ * @param {object} d      estado
+ * @param {object} opts   { ate:'YYYY-MM-DD' limite, incluirVencidos:true }
+ * @returns {Array} eventos { data, valor, tipo, desc, cat, refId, origemId, vencido }
+ */
+function compromissosFuturos(d, opts){
+  d = d || gs();
+  const o = opts || {};
+  const hj = today();
+  const out = [];
+
+  // ── Contas a pagar em aberto ──
+  (d.contas || []).forEach(c => {
+    if(statusConta(c) === 'Pago' || !c.venc) return;
+    out.push({ data:c.venc, valor:+(c.valor || 0).toFixed(2), tipo:'conta',
+      desc:c.desc || 'Conta a pagar', cat:c.cat || 'Outras Despesas',
+      refId:c.id, origemId:c.id, vencido:c.venc < hj });
+  });
+
+  // ── Faturas de cartão ainda não pagas ──
+  // Percorre da competência corrente até o horizonte, pegando o que tem valor.
+  (d.ccs || []).forEach(c => {
+    const base = new Date();
+    const absIni = base.getFullYear() * 12 + base.getMonth() - 6;   // pega faturas atrasadas
+    for(let i = 0; i <= HORIZONTE_COMPROMISSOS + 6; i++){
+      const abs = absIni + i, m = abs % 12, a = Math.floor(abs / 12);
+      if(faturaPaga(c, m, a)) continue;
+      const val = getFaturaMes(c, m, a);
+      if(val <= 0) continue;
+      const venc = dataVencFatura(c, m, a);
+      out.push({ data:venc, valor:val, tipo:'fatura',
+        desc:`Fatura ${c.nome} — ${MESES[m]}/${a}`, cat:'Serviços & Financeiro',
+        refId:`${c.id}:${a}-${m}`, origemId:c.id, ccMes:m, ccAno:a, vencido:venc < hj });
+    }
+  });
+
+  // ── Parcelas de dívida em aberto ──
+  (d.divs || []).forEach(dv => {
+    (dv.parcelas || []).forEach(pc => {
+      if(pc.status === 'Pago' || !pc.venc) return;
+      out.push({ data:pc.venc, valor:+(pc.valor || 0).toFixed(2), tipo:'divida',
+        desc:`${dv.nome} — parcela ${pc.num}/${pc.total}`, cat:'Serviços & Financeiro',
+        refId:pc.id, origemId:dv.id, vencido:pc.venc < hj });
+    });
+  });
+
+  let lista = out;
+  if(o.ate) lista = lista.filter(x => x.data <= o.ate);
+  if(o.de)  lista = lista.filter(x => x.data >= o.de);
+  if(o.incluirVencidos === false) lista = lista.filter(x => !x.vencido);
+  return lista.sort((a,b) => (a.data || '').localeCompare(b.data || ''));
+}
+const HORIZONTE_COMPROMISSOS = 12;   // meses de fatura projetados
+
+// Compromissos no formato da linha do tempo de caixa, para entrar na projeção
+function eventosCompromissos(d){
+  return compromissosFuturos(d).map(x => ({
+    data:x.data, ts:0, delta:-x.valor, efetivado:false, reserva:false, deltaReserva:0,
+    desc:x.desc, cat:x.cat, conta:'', compromisso:x.tipo,
+    origem:TIPOS_COMPROMISSO[x.tipo].label,
+  }));
+}
+
+// Resumo para KPIs e avisos: total em aberto, vencido e a vencer em N dias
+function resumoCompromissos(d, dias){
+  const lista = compromissosFuturos(d);
+  const limite = addDias(today(), dias == null ? 30 : dias);
+  const vencidos = lista.filter(x => x.vencido);
+  const aVencer  = lista.filter(x => !x.vencido && x.data <= limite);
+  const soma = l => +l.reduce((a,x) => a + x.valor, 0).toFixed(2);
+  return {
+    lista, vencidos, aVencer,
+    totalVencido: soma(vencidos), totalAVencer: soma(aVencer), total: soma(lista),
+  };
 }
 
 // ── CONFIG ──

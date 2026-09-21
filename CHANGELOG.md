@@ -4,6 +4,124 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-21] Auditoria geral: os módulos passam a conversar entre si
+
+### 🎯 O que foi pedido
+
+Entender toda a lógica do sistema, corrigir o que está errado e **conectar todos os pontos**.
+
+### 🔍 O diagnóstico
+
+Cada módulo funcionava bem sozinho, mas o sistema não era um sistema: era um conjunto de
+ilhas. O padrão comum a quase todos os erros: **Contas a Pagar, Cartões e Dívidas só viram
+lançamento quando são pagos.** Antes disso, eram invisíveis para o resto do programa.
+
+Uma sonda automatizada em cima de uma base com uma conta a pagar, uma fatura e uma parcela
+de dívida em aberto mostrou o tamanho do buraco:
+
+| O que se esperava | O que o sistema respondia |
+|---|---|
+| Outubro com R$ 3.300 a sair | resultado **R$ 0,00** |
+| Projeção de dezembro realista | **+R$ 10.000** (não sabia de nada que devia) |
+| Pagar parcela de dívida move o caixa | **0 lançamentos, 0 movimentos, saldo intacto** |
+| Painel avisa sobre fatura e dívida | **só falava de Contas a Pagar** |
+| Orçamento de Alimentação vê o mercado do cartão | **R$ 0,00** |
+
+### 🐛 O que estava errado
+
+1. **A projeção de caixa desconhecia os compromissos.** O modo Previsto incluía lançamentos
+   não pagos, mas ignorava contas a pagar, faturas de cartão e parcelas de dívida em aberto.
+   O saldo projetado era ficção otimista.
+2. **Dívidas era uma ilha completa.** `savePgDiv` só mexia em `dv.saldo` e nas parcelas: não
+   gerava lançamento, não debitava conta, não aparecia no DRE, no fluxo nem no extrato. O
+   dinheiro saía da conta e o sistema não ficava sabendo. Havia ainda um segundo caminho de
+   pagamento (`pagarParcela`) que marcava a parcela como paga sem passar por lugar nenhum.
+3. **O saldo devedor era acumulado à mão** (`saldo - val`), podendo divergir das parcelas.
+4. **O painel "O que fazer agora" só enxergava Contas a Pagar** — fatura vencendo e parcela
+   de dívida atrasada não geravam aviso.
+5. **O contador de contas pendentes zerava na virada do mês**: filtrava pelo mês exibido, então
+   uma conta vencida em agosto sumia do KPI em setembro.
+6. **O Orçamento não enxergava o cartão.** Um mercado de R$ 800 pago no cartão não pesava na
+   meta de Alimentação — só aparecia, meses depois, como "Serviços & Financeiro" no pagamento
+   da fatura.
+7. **O Score de Saúde era vaidoso.** Só olhava o fluxo do mês: dava **81/100 "Excelente"** para
+   quem tinha patrimônio líquido de **−R$ 11.640**, nenhuma reserva de emergência e R$ 5.319
+   de compromissos contra R$ 6.360 em caixa.
+8. **`gs()` não inicializava `bancos` nem `kanban`**, o que exigia um monkey-patch de `gs()`
+   no fim do arquivo e guardas `(d.bancos||[])` espalhadas pelo código.
+
+### ✅ Corrigido e conectado
+
+**Motor de compromissos — o elo que faltava**
+- Nova função `compromissosFuturos(d)`: devolve, numa lista só, tudo o que está em aberto em
+  **Contas a Pagar, Cartões e Dívidas**, com data, valor, categoria, tipo e se está vencido.
+- Faturas entram pela **competência** (respeitando o fechamento do cartão), inclusive as
+  atrasadas dos últimos 6 meses e as projetadas dos próximos 12.
+- Compromissos **não entram** em `calcSaldoAte()` nem no DRE: são compromissos, não fatos.
+  Entram na projeção e nos avisos. O saldo de hoje continua sendo o saldo de hoje.
+
+**Fluxo de Caixa**
+- O modo **Previsto** passa a somar os compromissos em aberto, com uma opção para desligar.
+- O detalhamento do período marca cada um com o selo do módulo de origem.
+- No exemplo da sonda, a projeção de dezembro saiu de **+R$ 10.000** para **−R$ 4.300**.
+
+**Agenda de Compromissos (nova, no Dashboard)**
+- Uma tabela única com contas, faturas e parcelas ordenadas por vencimento, com valor
+  **acumulado** linha a linha, situação (em atraso / vence hoje / em N dias) e botão que leva
+  direto ao modal de pagamento do módulo certo.
+- Janela de 7, 30, 60 ou 90 dias e filtro por tipo.
+- KPIs: vencido, a vencer na janela, caixa disponível hoje e **sobra após compromissos** —
+  a resposta para "o dinheiro que tenho cobre o que devo?".
+
+**Dívidas conectada ao caixa**
+- Pagar uma parcela agora **gera lançamento de despesa** (Serviços & Financeiro › Pagamento de
+  Dívida) e pode **debitar uma conta bancária**, aparecendo no DRE, nos relatórios e no extrato.
+- Modal com seleção da parcela, valor pré-preenchido, conta de débito e prévia do que sobra.
+- **Desfazer pagamento** remove o lançamento e a movimentação e reabre a parcela.
+- Caminho único de pagamento: o atalho que marcava a parcela sem avisar o caixa foi eliminado.
+- **Saldo devedor recalculado a partir das parcelas** (fonte única), usado também no
+  patrimônio líquido.
+- Excluir dívida pede confirmação e limpa os lançamentos vinculados.
+
+**Painel "O que fazer agora"**
+- Novas ações para **faturas e parcelas vencidas**, **vencendo em 7 dias** e, acima de tudo,
+  **"Caixa insuficiente"** quando os compromissos do mês passam do disponível.
+- O contador de contas pendentes passa a incluir atrasos de meses anteriores.
+
+**Orçamento**
+- Opção **"incluir gastos do cartão de crédito"**: as parcelas do mês entram na categoria da
+  compra, substituindo o lançamento de pagamento da fatura para não contar duas vezes.
+
+**Score de Saúde honesto e explicável**
+- Passa a penalizar **patrimônio líquido negativo**, **reserva de emergência abaixo de 3 meses**,
+  **contas em atraso** e **compromissos maiores que o caixa**.
+- Deixa de ser um número solto: o rótulo mostra o fator que mais pesa contra e o tooltip lista
+  cada desconto com o motivo. No cenário da sonda o score caiu de 81 para 57.
+
+**Base**
+- `gs()` inicializa todas as coleções (`bancos` e `kanban` incluídos), tornando o monkey-patch
+  desnecessário.
+
+### 🧪 Testes
+
+- `test-conexoes.js` — **44 verificações**: motor de compromissos nos três módulos, projeção
+  com e sem compromissos, isolamento em relação ao saldo real e ao DRE, agenda (ordem, janelas,
+  filtros, KPIs), pagamento de dívida gerando lançamento e movimento bancário, desfazer, e
+  orçamento com cartão.
+- `test-score.js` — **11 verificações** em três cenários (saudável, endividado, em atraso).
+- Suítes existentes seguem passando: `test-full` (21), `test-fluxo` (10), `test-contas2` (37),
+  `test-reserva` (22), `test-lanc-reserva` (23), `test-extrato` (24), `test-cc` (53),
+  `test-despesas` (39), `test-fluxo-caixa` (52) e `test-invariante` (24 cenários).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado é migrado ou apagado. Os números mudam onde estavam errados: a projeção do fluxo
+passa a descontar o que você deve, o score cai para quem tem dívida ou atraso, e o saldo
+devedor passa a vir das parcelas. Pagamentos de dívida **já registrados antes desta versão não
+geram lançamento retroativo** — para trazê-los ao caixa, desfaça e refaça o pagamento.
+
+---
+
 ## [2026-09-18] Fluxo de Caixa: detalhamento, granularidade e correção do motor
 
 ### 🎯 O que foi pedido
