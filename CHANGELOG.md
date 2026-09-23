@@ -4,6 +4,107 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-23] Orçamento completo: sliders, pizzas, colunas e motor corrigido
+
+### 🎯 O que foi pedido
+
+Melhorar e deixar **completa** a aba de Orçamento, com **gráficos de pizza**, **gráficos de
+colunas** e **ajuste de valor por barra que aumenta e diminui**.
+
+### 🐛 O que estava errado (antes de acrescentar qualquer coisa)
+
+1. **Meta não tinha ano.** Guardava só o mês: uma meta de setembro valia para setembro de
+   *todos* os anos, e não havia como orçar 2027 diferente de 2026.
+2. **"Realizado" contava despesa não paga.** Lançamento pendente entrava como gasto feito.
+3. **Meta de categoria + meta de subcategoria somavam em dobro.** Alimentação R$ 1.000 com
+   Supermercado R$ 600 e Restaurante R$ 500 aparecia como R$ 2.100 orçados. Na base de teste,
+   o KPI mostrava **R$ 5.099** orçados onde o certo era **R$ 3.000** (dupla contagem mais uma
+   meta de 2025 vazando para 2026).
+4. **Gasto sem meta era invisível.** Se uma categoria não tinha meta, o orçamento nunca a
+   mostrava — o dinheiro sumia da análise.
+5. **Editar uma meta podia criar duplicata** (a checagem só existia na criação).
+6. **O Dashboard comparava meta de subcategoria com o gasto da categoria inteira**, gerando
+   alerta falso de "estourou" — em três lugares diferentes (barras, alertas e "O que fazer agora").
+7. **A paleta dos gráficos reprovava no teste de daltonismo** (roxo × azul com ΔE 4,3 para
+   deuteranopia) e as cores seguiam a *posição* no ranking, não a categoria: ao mudar um valor,
+   as categorias trocavam de cor.
+
+### ✅ Motor refeito
+
+- Toda meta passa a ter **mês e ano**. Migração automática: metas antigas são vinculadas ao ano
+  de referência das Configurações, uma única vez.
+- **Realizado = pago.** O que está em aberto — lançamento pendente **e conta a pagar do mês** —
+  vira **Pendente**, mostrado à parte e somado no **Projetado**.
+- **Hierarquia sem dupla contagem:** a meta da categoria é o teto da categoria inteira; metas de
+  subcategoria são limites dentro dela. Quando as subcategorias somam mais que a categoria, o
+  sistema avisa.
+- **Gastos sem meta** aparecem em lista própria, com botão para criar a meta no ato.
+- Situação de cada meta: *No limite*, *Atenção* (≥ 80%), *Vai estourar* (o pendente passa),
+  *Estourou*; para receita e investimento, *Atingida*, *A caminho* ou *Abaixo da meta*.
+- Edição recusa duplicata com mensagem clara, sem apagar nada.
+- Dashboard (barras, alertas e painel "O que fazer agora") passa a usar o mesmo motor.
+
+### ✅ Ajuste de metas por barra deslizante
+
+- Nova visão **🎚 Ajustar Metas**: **uma barra por meta** — arraste, use **−** / **+** ou digite
+  o valor. Grava ao soltar a barra, sem redesenhar a tela (o foco fica onde estava).
+- **Tudo recalcula enquanto você arrasta:** KPIs, a barra de distribuição da renda, o total de
+  cada categoria e a situação.
+- **Cor do trilho diz a situação:** azul dentro do limite, âmbar quando o pendente vai estourar,
+  vermelho quando a meta já está abaixo do que foi gasto, verde para receita atingida. Embaixo
+  de cada barra, em texto: "sobram R$ X · 84% usado", "já estourou em R$ Y"…
+- **Marcadores no trilho:** um traço no valor **realizado + pendente** e um triângulo na **média
+  dos últimos 3 meses** — dá para ver onde a meta fica em relação ao seu gasto real.
+- A barra cresce sozinha quando você digita um valor acima da escala.
+- O modal de nova meta também ganhou a barra, com o gasto do mês e a média de 3 meses da
+  categoria escolhida como referência.
+
+### ✅ Gráficos
+
+- **Pizzas** do **orçado** e do **realizado** por categoria, lado a lado, com o total no centro
+  e legenda com valor e percentual. As duas usam o **mesmo mapa de cores** (a mesma categoria tem
+  a mesma cor nas duas), com as 4 categorias que mais pesam no mês e o resto em **"Outras"**.
+- **Colunas "Orçado × Realizado por categoria"**: a coluna do realizado empilha o **pago** e o
+  **pendente**; o tooltip mostra a sobra ou o excesso.
+- **Colunas "Evolução anual"**: os 12 meses do ano; clicar em um mês abre esse mês.
+- **Paleta validada** para daltonismo (protanopia, deuteranopia e tritanopia) nos temas claro e
+  escuro, com passos próprios para cada fundo. Um eixo só em todos os gráficos.
+
+### ✅ Visões e ferramentas
+
+- **📊 Visão Geral:** KPIs, distribuição da renda, pizzas, colunas, **regra 50/30/20** (medidores
+  de necessidades, desejos e investimentos contra a referência) e **Leitura do orçamento** —
+  estouros, o que vai estourar, gastos sem meta, subcategorias acima da categoria, renda sem destino
+  e **quanto você pode gastar por dia** até o fim do mês.
+- **📋 Acompanhamento:** tabela categoria › subcategoria com meta, realizado, pendente, projetado,
+  saldo, % e situação, com barra de progresso em cada linha.
+- **📅 Anual:** colunas e tabela mês a mês com totais do ano.
+- **Seletor de ano** ao lado das abas de mês; as abas marcam com um ponto os meses que têm metas.
+- **Atalhos:** copiar metas do mês anterior · replicar para os próximos meses · **sugerir metas pela
+  média de 3 meses** · limpar o mês.
+- Novos KPIs: **renda de referência** (receita orçada, ou o salário das Configurações) e
+  **livre para orçar** (quanto da renda ainda não tem destino).
+- No celular, a barra ocupa a largura toda e o mês ativo fica centralizado na faixa de meses.
+
+### 🧪 Testes
+
+- `test-orcamento.js` — **84 verificações**: migração do ano, isolamento entre anos, hierarquia
+  sem dupla contagem, pago × pendente (incluindo conta a pagar), situações, média de 3 meses, KPIs,
+  pizzas (fatias, mesma cor por categoria, "Outras"), colunas (séries, empilhamento, eixo único),
+  50/30/20, leitura, sliders (pintura na abertura, atualização ao vivo sem gravar, gravação ao
+  soltar, botões ± em metas diferentes, arrasto sem reler o armazenamento, valor digitado acima da escala), atalhos, modal, acompanhamento, visão anual e
+  os alertas do Dashboard.
+- `test-conexoes.js` deixou de depender da data do relógio (a contagem de dias em atraso era fixa).
+- Suítes existentes seguem passando — **420 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhuma meta é apagada. As metas antigas **ganham o ano de referência** configurado e deixam de
+valer para os outros anos. Os números do orçamento mudam onde estavam errados: o orçado deixa de
+somar categoria e subcategoria em dobro, e o realizado deixa de contar o que ainda não foi pago.
+
+---
+
 ## [2026-09-21] Auditoria geral: os módulos passam a conversar entre si
 
 ### 🎯 O que foi pedido

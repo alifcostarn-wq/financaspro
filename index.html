@@ -46,10 +46,13 @@
   --sidebar:240px;
   /* Theme transition */
   --theme-transition: background .25s ease, color .25s ease, border-color .25s ease;
+  /* séries de gráfico validadas para daltonismo (orçado · realizado · pendente) */
+  --viz-prev:#3987e5; --viz-real:#d95926; --viz-pend:#199e70;
 }
 
 /* ── LIGHT THEME ── */
 body.theme-light{
+  --viz-prev:#2a78d6; --viz-real:#eb6834; --viz-pend:#1baf7a;
   --bg:#f0f4f8;
   --surface0:#ffffff;
   --surface1:#f7f9fc;
@@ -270,6 +273,118 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .fatdet-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
   background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px}
 .fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
+
+/* ── ORÇAMENTO ── */
+.orc-tab-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--viz-prev);margin-left:5px;vertical-align:middle}
+.orc-renda{padding:16px 20px}
+.orc-renda-hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--t2);margin-bottom:8px}
+.orc-renda-bar{display:flex;gap:2px;height:14px;border-radius:7px;overflow:hidden;background:var(--surface3)}
+.orc-renda-seg{height:100%;transition:width .18s ease;min-width:2px}
+.orc-renda-seg:first-child{border-radius:7px 0 0 7px}
+.orc-renda-seg:last-child{border-radius:0 7px 7px 0}
+.orc-renda-seg.vazio{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--line2) 6px 7px)!important}
+.orc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11px;color:var(--t2);margin-top:9px}
+.orc-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.orc-legend em{font-style:normal;color:var(--t3);margin-left:2px}
+.orc-legend-sl{margin:0 0 12px;padding:8px 12px;background:var(--surface2);border-radius:var(--r2)}
+.orc-lg-real{background:var(--viz-real)!important;width:3px!important;height:12px!important;border-radius:1px!important}
+.orc-lg-media{width:0!important;height:0!important;border-radius:0!important;background:none!important;
+  border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--t2)}
+.orc-barra-ctl{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.orc-chk{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:var(--t2)}
+.orc-chk input{width:15px;height:15px;accent-color:var(--viz-prev)}
+.orc-nota{font-size:10px;color:var(--t3);line-height:1.5}
+.orc-vazio{text-align:center;color:var(--t3);font-size:12px;padding:20px 8px}
+/* pizzas */
+.orc-pie-grid{display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:18px;align-items:center}
+.orc-pie-wrap{position:relative;height:190px}
+.orc-pie-wrap.vazio canvas{display:none}
+.orc-pie-wrap.vazio .orc-pie-centro{border:2px dashed var(--line2);border-radius:50%;inset:14px}
+.orc-pie-centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center}
+.orc-pie-centro em{font-style:normal;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+.orc-pie-centro b{font-size:13px;color:var(--t1)}
+.orc-leg-row{display:grid;grid-template-columns:12px 1fr auto 48px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:11.5px}
+.orc-leg-row:last-child{border-bottom:none}
+.orc-leg-row i{width:12px;height:12px;border-radius:3px}
+.orc-leg-nome{color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orc-leg-row .mono{color:var(--t1)}
+.orc-leg-row em{font-style:normal;color:var(--t3);text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px}
+/* 50/30/20 */
+.orc-meter{margin-bottom:14px}
+.orc-meter-hd{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--t1);margin-bottom:6px}
+.orc-meter-hd em{font-style:normal;font-size:10px;color:var(--t3);margin-left:4px}
+.orc-meter-st{font-size:10px;font-weight:600}
+.orc-meter-st.ok{color:var(--green)} .orc-meter-st.nok{color:var(--amber)}
+.orc-meter-trk{position:relative;height:10px;border-radius:5px;background:var(--surface3)}
+.orc-meter-fill{height:100%;border-radius:5px;background:var(--viz-prev);transition:width .18s ease}
+.orc-meter-ideal{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--t1);border-radius:1px}
+.orc-meter-ft{display:flex;gap:14px;flex-wrap:wrap;font-size:10.5px;color:var(--t3);margin-top:6px}
+.orc-meter-ft b{color:var(--t2)}
+/* ajustar metas */
+.orc-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.orc-salvo{margin-left:6px;color:var(--green);font-weight:600;opacity:0;transition:opacity .2s}
+.orc-salvo.on{opacity:1}
+.orc-bloco{margin-bottom:18px}
+.orc-bloco-hd{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);padding:0 2px 8px;border-bottom:1px solid var(--line2);margin-bottom:10px}
+.orc-bloco-hd .mono{color:var(--t1);font-size:12px;letter-spacing:0}
+.orc-cat{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:12px 16px;margin-bottom:10px}
+.orc-cat-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.orc-cat-nome{font-size:13px;font-weight:600;color:var(--t1)}
+.orc-cat-num{margin-left:auto;font-size:11px;color:var(--t3)}
+.orc-cat-num b{color:var(--t1)}
+.orc-cat-aviso{font-size:10.5px;color:var(--amber);margin:4px 0}
+.orc-sl{padding:9px 0 4px;border-top:1px dashed var(--line)}
+.orc-cat-hd + .orc-cat-aviso + .orc-sl{border-top:none}
+.orc-sl-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;margin-bottom:2px}
+.orc-sl-lbl{color:var(--t2);font-weight:600}
+.orc-sl-info{color:var(--t3)}
+.orc-sl-info b{color:var(--t2);font-weight:500}
+.orc-sl-row{display:flex;align-items:center;gap:8px}
+.orc-sl-trilho{position:relative;flex:1;min-width:120px;height:30px;display:flex;align-items:center}
+.orc-range{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;margin:0;cursor:pointer;
+  background:linear-gradient(to right,var(--orc-fill,var(--viz-prev)) var(--p,0%),var(--surface4) var(--p,0%));outline:none}
+.orc-range::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;
+  border:3px solid var(--orc-fill,var(--viz-prev));box-shadow:0 1px 5px rgba(0,0,0,.45);cursor:grab;position:relative;z-index:2}
+.orc-range::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--orc-fill,var(--viz-prev));cursor:grab}
+.orc-range:active::-webkit-slider-thumb{cursor:grabbing;transform:scale(1.1)}
+.orc-range:focus-visible{box-shadow:0 0 0 3px var(--blue-dim)}
+.orc-mk{position:absolute;top:50%;pointer-events:none;z-index:1}
+.orc-mk-real{width:3px;height:18px;margin-left:-1.5px;transform:translateY(-50%);background:var(--viz-real);border-radius:1px}
+.orc-mk-media{width:0;height:0;margin-left:-5px;transform:translateY(-15px);
+  border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--t2)}
+.orc-sl-btn{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line2);background:var(--surface3);
+  color:var(--t1);font-size:16px;line-height:1;cursor:pointer;transition:background .12s}
+.orc-sl-btn:hover{background:var(--surface4)}
+.orc-sl-btn:active{transform:scale(.94)}
+.orc-sl-num{width:104px;flex-shrink:0;background:var(--surface1);border:1px solid var(--line2);color:var(--t1);border-radius:8px;
+  padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right}
+.orc-sl-ic{width:26px;height:26px;flex-shrink:0;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--t3);cursor:pointer;font-size:12px}
+.orc-sl-ic:hover{background:var(--surface3);color:var(--t1)}
+.orc-sl-ic.del:hover{background:var(--red-dim);color:var(--red)}
+.orc-sl-st{font-size:10.5px;color:var(--t3);padding:2px 0 0 38px}
+.orc-semmeta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border:1px dashed var(--line2);border-radius:var(--r2);margin-bottom:8px;font-size:12px}
+.orc-semmeta-nome{color:var(--t1);font-weight:600;flex:1;min-width:140px}
+.orc-semmeta-nome em{font-style:normal;font-weight:400;font-size:10px;color:var(--t3);margin-left:4px}
+.orc-semmeta-med{font-size:10.5px;color:var(--t3)}
+/* tabelas */
+.orc-tbl .orc-tr-grupo td{background:var(--surface2);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3)}
+.orc-tbl .orc-tr-sub td:first-child{padding-left:28px;color:var(--t3);font-size:11px}
+.orc-tbl tfoot td{border-top:2px solid var(--line2);font-weight:600;color:var(--t1)}
+.orc-td-hint{font-size:9.5px;color:var(--t3);margin-top:2px}
+.orc-mini{position:relative;height:4px;border-radius:2px;background:var(--surface3);margin-top:5px;min-width:70px}
+.orc-mini div{position:absolute;left:0;top:0;bottom:0;border-radius:2px}
+.orc-tr-click{cursor:pointer}
+.orc-tr-click:hover td{background:var(--surface2)}
+.orc-tr-sel td{background:var(--blue-dim)}
+@media (max-width:760px){
+  .orc-pie-grid{grid-template-columns:1fr}
+  .orc-pie-wrap{height:170px;max-width:220px;margin:0 auto;width:100%}
+  .orc-sl-row{flex-wrap:wrap}
+  .orc-sl-trilho{order:-1;flex-basis:100%}
+  .orc-sl-num{flex:1}
+  .orc-sl-st{padding-left:0}
+  .orc-cat-num{margin-left:0;flex-basis:100%}
+}
 /* Blocos auxiliares de formulário (erro inline e prévia) */
 .form-err{padding:10px 14px;border-radius:var(--r2);font-size:12px;border-left:3px solid var(--red);
   background:var(--red-dim);color:var(--red);margin-bottom:12px}
@@ -1515,110 +1630,150 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- ───── ORÇAMENTO ───── -->
 <div class="page" id="page-orc">
   <div class="topbar">
-    <div class="topbar-left"><h1>Orçamento</h1><p>Planejamento por categoria e mês</p></div>
-    <div class="topbar-right" style="display:flex;gap:8px;align-items:center">
-      <!-- Toggle Previsto / Realizado -->
-      <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
-        <button id="orc-btn-prev" onclick="setOrcView('previsto')"
-          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--blue-dim);color:var(--blue)">
-          📋 Previsto
-        </button>
-        <button id="orc-btn-real" onclick="setOrcView('realizado')"
-          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
-          ✓ Realizado
-        </button>
-        <button id="orc-btn-comp" onclick="setOrcView('comparativo')"
-          style="padding:7px 14px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
-          ⇄ Comparativo
-        </button>
-      </div>
-      <button class="btn btn-blue" onclick="openM('m-orc')">+ Definir Meta</button>
+    <div class="topbar-left"><h1>Orçamento</h1><p id="orc-sub">Planejamento por categoria e mês</p></div>
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="orc-ano" onchange="renderOrc()" aria-label="Ano do orçamento"
+        style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif"></select>
+      <button class="btn btn-blue" onclick="openM('m-orc')">+ Nova Meta</button>
     </div>
   </div>
   <div class="month-tabs" id="orc-tabs"></div>
 
   <!-- KPIs do orçamento -->
-  <div class="kpi-grid cols4" id="orc-kpis" style="margin-bottom:16px">
-    <div class="kpi b"><div class="kpi-label">Previsto (Despesas)</div><div class="kpi-val b" id="orc-k-prev-des">R$ 0</div></div>
-    <div class="kpi r"><div class="kpi-label">Realizado (Despesas)</div><div class="kpi-val r" id="orc-k-real-des">R$ 0</div></div>
-    <div class="kpi g"><div class="kpi-label">Saldo Orçamentário</div><div class="kpi-val g" id="orc-k-saldo">R$ 0</div></div>
-    <div class="kpi a"><div class="kpi-label">% Executado</div><div class="kpi-val a" id="orc-k-pct">0%</div></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 14px">
-    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:var(--t2)">
-      <input type="checkbox" id="orc-cartao" onchange="renderOrc()" style="width:15px;height:15px;accent-color:var(--purple)">
-      Incluir gastos do cartão de crédito
-    </label>
-    <span id="orc-aviso-cartao" style="font-size:10px;color:var(--t3);flex:1;min-width:220px"></span>
+  <div class="kpi-grid cols6" id="orc-kpis" style="margin-bottom:14px">
+    <div class="kpi g"><div class="kpi-label">Renda de Referência</div><div class="kpi-val g" id="orc-k-renda">R$ 0</div><div class="kpi-sub" id="orc-k-renda-sub">—</div></div>
+    <div class="kpi b"><div class="kpi-label">Orçado (Despesas)</div><div class="kpi-val b" id="orc-k-prev-des">R$ 0</div></div>
+    <div class="kpi r"><div class="kpi-label">Realizado (Despesas)</div><div class="kpi-val r" id="orc-k-real-des">R$ 0</div><div class="kpi-sub" id="orc-k-real-sub">—</div></div>
+    <div class="kpi"><div class="kpi-label">Saldo Orçamentário</div><div class="kpi-val" id="orc-k-saldo">R$ 0</div><div class="kpi-sub" id="orc-k-saldo-sub">—</div></div>
+    <div class="kpi a"><div class="kpi-label">% Executado</div><div class="kpi-val a" id="orc-k-pct">0%</div><div class="kpi-sub" id="orc-k-pct-sub">—</div></div>
+    <div class="kpi p"><div class="kpi-label">Livre para Orçar</div><div class="kpi-val p" id="orc-k-livre">R$ 0</div><div class="kpi-sub" id="orc-k-livre-sub">—</div></div>
   </div>
 
-  <!-- Visão: Previsto -->
-  <div id="orc-view-previsto">
+  <!-- Distribuição da renda (atualiza enquanto os sliders são arrastados) -->
+  <div class="card orc-renda" id="orc-renda"></div>
+
+  <div class="orc-barra-ctl">
+    <div class="toggle-row" id="orc-views" style="margin-bottom:0">
+      <div class="tgl active" data-v="geral"   onclick="setOrcView('geral')">📊 Visão Geral</div>
+      <div class="tgl"        data-v="ajustar" onclick="setOrcView('ajustar')">🎚 Ajustar Metas</div>
+      <div class="tgl"        data-v="acomp"   onclick="setOrcView('acomp')">📋 Acompanhamento</div>
+      <div class="tgl"        data-v="anual"   onclick="setOrcView('anual')">📅 Anual</div>
+    </div>
+    <label class="orc-chk">
+      <input type="checkbox" id="orc-cartao" onchange="renderOrc()">
+      Incluir gastos do cartão de crédito
+    </label>
+  </div>
+  <div id="orc-aviso-cartao" class="orc-nota" style="margin:-4px 0 14px"></div>
+
+  <!-- ── Visão Geral ── -->
+  <div id="orc-view-geral">
     <div class="g2">
       <div class="card">
-        <div class="card-header"><span class="card-title">Resumo Previsto do Mês</span></div>
-        <div id="orc-resumo-prev"></div>
+        <div class="card-header"><span class="card-title">Orçado por Categoria</span><span class="badge bdg-blue" style="font-size:9px">Pizza</span></div>
+        <div class="orc-pie-grid">
+          <div class="orc-pie-wrap"><canvas id="ch-orc-pie-prev" aria-label="Pizza do orçado por categoria"></canvas>
+            <div class="orc-pie-centro"><em>orçado</em><b class="mono" id="orc-pie-prev-tot">R$ 0</b></div></div>
+          <div class="orc-pie-leg" id="orc-pie-prev-leg"></div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Distribuição Prevista por Categoria</span></div>
-        <div id="orc-dist-prev"></div>
+        <div class="card-header"><span class="card-title">Realizado por Categoria</span><span class="badge bdg-amber" style="font-size:9px">Pizza</span></div>
+        <div class="orc-pie-grid">
+          <div class="orc-pie-wrap"><canvas id="ch-orc-pie-real" aria-label="Pizza do realizado por categoria"></canvas>
+            <div class="orc-pie-centro"><em>realizado</em><b class="mono" id="orc-pie-real-tot">R$ 0</b></div></div>
+          <div class="orc-pie-leg" id="orc-pie-real-leg"></div>
+        </div>
       </div>
     </div>
     <div class="card">
       <div class="card-header">
-        <span class="card-title">Metas Cadastradas</span>
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="orc-fil-tipo" onchange="renderOrc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
-            <option value="">Todos os tipos</option>
-            <option value="Receita">Receita</option>
-            <option value="Despesa">Despesa</option>
-            <option value="Investimento">Investimento</option>
-          </select>
-        </div>
+        <div><span class="card-title">Orçado × Realizado por Categoria</span>
+          <div class="card-sub">Colunas: a barra da direita empilha o que já foi pago e o que ainda está pendente</div></div>
+        <span class="badge bdg-purple" style="font-size:9px">Colunas</span>
       </div>
-      <div class="tbl-wrap">
-        <table class="tbl">
-          <thead><tr><th>Categoria</th><th>Subcategoria</th><th>Tipo</th><th>Meta (Previsto)</th><th>Observação</th><th></th></tr></thead>
-          <tbody id="orc-tbody-prev"></tbody>
-        </table>
-      </div>
-      <div id="orc-empty-prev" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma meta definida para este mês. Clique em "+ Definir Meta".</div>
+      <div class="chart-box" style="height:300px"><canvas id="ch-orc-comp" aria-label="Colunas de orçado e realizado por categoria"></canvas></div>
+      <div id="orc-col-vazio" class="orc-vazio" style="display:none">Sem metas nem gastos de despesa neste mês.</div>
     </div>
-  </div>
-
-  <!-- Visão: Realizado -->
-  <div id="orc-view-realizado" style="display:none">
     <div class="g2">
       <div class="card">
-        <div class="card-header"><span class="card-title">Resumo Realizado do Mês</span></div>
-        <div id="orc-resumo-real"></div>
+        <div class="card-header"><span class="card-title">Regra 50 / 30 / 20</span></div>
+        <div id="orc-503020"></div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Progresso por Categoria</span></div>
-        <div id="orc-prog"></div>
+        <div class="card-header"><span class="card-title">Leitura do Orçamento</span></div>
+        <div id="orc-leitura"></div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Realizado por Categoria e Subcategoria</span></div>
-      <div class="tbl-wrap">
-        <table class="tbl">
-          <thead><tr><th>Categoria</th><th>Subcategoria</th><th>Tipo</th><th>Meta</th><th>Realizado</th><th>Saldo</th><th>%</th></tr></thead>
-          <tbody id="orc-tbody-real"></tbody>
-        </table>
-      </div>
-      <div id="orc-empty-real" style="text-align:center;padding:32px;color:var(--t3)">Nenhuma meta definida para este mês.</div>
     </div>
   </div>
 
-  <!-- Visão: Comparativo -->
-  <div id="orc-view-comparativo" style="display:none">
+  <!-- ── Ajustar Metas (sliders) ── -->
+  <div id="orc-view-ajustar" style="display:none">
     <div class="card">
-      <div class="card-header"><span class="card-title">Comparativo Previsto × Realizado</span></div>
-      <div class="chart-box" style="height:280px"><canvas id="ch-orc-comp"></canvas></div>
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div><span class="card-title">Ajustar Metas</span>
+          <div class="card-sub">Arraste a barra, use − / + ou digite o valor. Grava ao soltar. <span id="orc-salvo" class="orc-salvo">✓ salvo</span></div></div>
+        <select id="orc-fil-tipo" onchange="renderOrc()" aria-label="Filtrar por tipo"
+          style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="">Todos os tipos</option><option value="Despesa">Despesas</option>
+          <option value="Investimento">Investimentos</option><option value="Receita">Receitas</option>
+        </select>
+      </div>
+      <div class="orc-toolbar">
+        <button class="btn btn-ghost btn-xs" onclick="orcCopiarMesAnterior()">⎘ Copiar do mês anterior</button>
+        <button class="btn btn-ghost btn-xs" onclick="orcReplicar()">⇉ Replicar para os próximos meses</button>
+        <button class="btn btn-ghost btn-xs" onclick="orcSugerirPelaMedia()">✨ Sugerir pela média de 3 meses</button>
+        <button class="btn btn-ghost btn-xs" onclick="openM('m-orc')">+ Nova meta</button>
+        <button class="btn btn-red btn-xs" onclick="orcLimparMes()">🗑 Limpar mês</button>
+      </div>
+      <div class="orc-legend orc-legend-sl">
+        <span><i class="orc-lg-real"></i>realizado + pendente</span>
+        <span><i class="orc-lg-media"></i>média dos últimos 3 meses</span>
+        <span><i style="background:var(--viz-prev)"></i>meta dentro do limite</span>
+        <span><i style="background:var(--amber)"></i>passa com o pendente</span>
+        <span><i style="background:var(--red)"></i>já estourou</span>
+      </div>
+      <div id="orc-ajustar-lista"></div>
+    </div>
+  </div>
+
+  <!-- ── Acompanhamento ── -->
+  <div id="orc-view-acomp" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div><span class="card-title">Acompanhamento por Categoria e Subcategoria</span>
+          <div class="card-sub">Realizado = pago · Pendente = lançamentos em aberto e contas a pagar do mês</div></div>
+        <select id="orc-fil-tipo-acomp" onchange="renderOrc()" aria-label="Filtrar por tipo"
+          style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <option value="">Todos os tipos</option><option value="Despesa">Despesas</option>
+          <option value="Investimento">Investimentos</option><option value="Receita">Receitas</option>
+        </select>
+      </div>
+      <div class="tbl-wrap"><table class="tbl orc-tbl">
+        <thead><tr><th>Categoria</th><th>Meta</th><th>Realizado</th><th>Pendente</th><th>Projetado</th><th>Saldo</th><th>%</th><th>Situação</th></tr></thead>
+        <tbody id="orc-acomp-tbody"></tbody>
+        <tfoot id="orc-acomp-tfoot"></tfoot>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- ── Anual ── -->
+  <div id="orc-view-anual" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div><span class="card-title">Evolução Anual — Orçado × Realizado</span>
+          <div class="card-sub">Clique em um mês para abri-lo na Visão Geral</div></div>
+        <span class="badge bdg-purple" style="font-size:9px">Colunas</span>
+      </div>
+      <div class="chart-box" style="height:300px"><canvas id="ch-orc-anual" aria-label="Colunas de orçado e realizado por mês"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Análise Detalhada por Categoria</span></div>
-      <div id="orc-comp-detalhe"></div>
+      <div class="card-header"><span class="card-title">Mês a Mês</span></div>
+      <div class="tbl-wrap"><table class="tbl orc-tbl">
+        <thead><tr><th>Mês</th><th>Orçado</th><th>Realizado</th><th>Pendente</th><th>Diferença</th><th>%</th><th>Situação</th></tr></thead>
+        <tbody id="orc-anual-tbody"></tbody>
+        <tfoot id="orc-anual-tfoot"></tfoot>
+      </table></div>
     </div>
   </div>
 </div>
@@ -2417,12 +2572,14 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
     <div class="modal-bd">
       <input type="hidden" id="o-edit-id" value="">
-      <div class="form-grid cols2" style="margin-bottom:12px">
+      <div id="o-err" class="form-err" style="display:none"></div>
+      <div class="form-grid cols3" style="margin-bottom:12px">
         <div class="fg"><label>Tipo</label>
           <select id="o-tipo" onchange="updOrcCats();updOrcSubcats()"><option>Receita</option><option selected>Despesa</option><option>Investimento</option></select>
         </div>
+        <div class="fg"><label>Ano</label><select id="o-ano" onchange="updOrcPreview()"></select></div>
         <div class="fg"><label>Mês</label>
-          <select id="o-mes">
+          <select id="o-mes" onchange="updOrcPreview()">
             <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
             <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
             <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
@@ -2432,10 +2589,20 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Categoria *</label><select id="o-cat" onchange="updOrcSubcats()"></select></div>
-        <div class="fg"><label>Subcategoria <span style="color:var(--t3)">(opcional)</span></label><select id="o-subcat"></select></div>
+        <div class="fg"><label>Subcategoria <span style="color:var(--t3)">(opcional)</span></label><select id="o-subcat" onchange="updOrcPreview()"></select></div>
       </div>
-      <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Valor Meta (R$) *</label><input type="number" id="o-val" step="0.01" min="0" placeholder="0,00"></div>
+      <div class="fg" style="margin-bottom:12px">
+        <label>Valor da Meta (R$) *</label>
+        <div class="orc-sl-row">
+          <div class="orc-sl-trilho">
+            <input type="range" class="orc-range" id="o-range" min="0" max="1000" step="10" value="0" oninput="updOrcPreview('range')" aria-label="Ajustar valor da meta">
+            <span id="o-range-mk"></span>
+          </div>
+          <input type="number" class="orc-sl-num" id="o-val" step="0.01" min="0" placeholder="0,00" oninput="updOrcPreview('num')" style="width:120px">
+        </div>
+        <div id="o-prev-ref" class="orc-nota" style="margin-top:6px"></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px">
         <div class="fg"><label>Observação</label><input type="text" id="o-obs" placeholder="Opcional"></div>
       </div>
       <!-- Preview da meta -->
@@ -3385,11 +3552,19 @@ function openM(id){
   }
   if(id==='m-pagar'){ popCaixas('pg-caixa'); }
   if(id==='m-orc'){
-    document.getElementById('o-mes').value=_orcMes;
-    document.getElementById('o-edit-id').value='';
-    document.getElementById('m-orc-titulo').textContent='Definir Meta de Orçamento';
-    document.getElementById('o-val').value='';
-    document.getElementById('o-obs').value='';
+    const $ = x => document.getElementById(x);
+    $('o-mes').value = _orcMes;
+    const selAno = $('o-ano');
+    if(selAno){
+      const anos = new Set([orcAno(), anoRef(), new Date().getFullYear(), anoRef() + 1]);
+      selAno.innerHTML = [...anos].sort((a,b) => a - b).map(a => `<option value="${a}">${a}</option>`).join('');
+      selAno.value = String(orcAno());
+    }
+    $('o-edit-id').value = '';
+    $('m-orc-titulo').textContent = 'Definir Meta de Orçamento';
+    $('o-val').value = '';
+    $('o-obs').value = '';
+    const err = $('o-err'); if(err) err.style.display = 'none';
     updOrcCats();
     updOrcPreview();
   }
@@ -3756,14 +3931,16 @@ function renderDash(){
   // Barras de orçamento por categoria
   const orcDetalhe = document.getElementById('dk-cat-orcamento');
   if (orcDetalhe) {
-    const metasMes = d.orcs.filter(o => o.mes === mes && o.tipo === 'Despesa');
+    // Meta efetiva da categoria (respeita ano e não soma categoria + subcategoria)
+    const metaEf = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
+    const metasMes = Object.keys(metaEf);
     if (metasMes.length && cKeys.length) {
-      const catComMeta = cKeys.filter(cat => metasMes.find(m2 => m2.cat === cat));
+      const catComMeta = cKeys.filter(cat => metaEf[cat] != null);
       if (catComMeta.length) {
         orcDetalhe.innerHTML = '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">vs. orçamento</div>' +
           catComMeta.slice(0,4).map(cat => {
             const real = catM[cat] || 0;
-            const meta = metasMes.filter(m2 => m2.cat === cat).reduce((a,m2) => a+m2.val, 0);
+            const meta = metaEf[cat] || 0;
             const pp   = meta > 0 ? Math.min(100, real/meta*100) : 100;
             const over = real > meta;
             return `<div style="margin-bottom:7px">
@@ -3831,11 +4008,14 @@ function renderDash(){
   if (salDiv > d.cfg.pct) alertas.push({ tipo:'r', msg:`⚠ Dívidas comprometem ${pct(salDiv)} do salário (limite: ${pct(d.cfg.pct)})` });
 
   // Categorias estourando orçamento
-  const metas = d.orcs.filter(o => o.mes === mes && o.tipo === 'Despesa');
-  metas.forEach(m2 => {
-    const real = (catM[m2.cat] || 0);
-    if (real > m2.val) alertas.push({ tipo:'r', msg:`📊 ${m2.cat} estourou o orçamento: ${fmtR(real)} de ${fmtR(m2.val)}` });
-    else if (real / m2.val > 0.8) alertas.push({ tipo:'a', msg:`📊 ${m2.cat} em 80%+ do orçamento: ${fmtR(real)} de ${fmtR(m2.val)}` });
+  // Compara a meta efetiva da CATEGORIA com o gasto da categoria — antes uma meta de
+  // subcategoria era comparada com o gasto da categoria inteira e gerava alerta falso
+  const metasEf = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
+  Object.entries(metasEf).forEach(([cat, meta]) => {
+    const real = (catM[cat] || 0);
+    if (!(meta > 0)) return;
+    if (real > meta) alertas.push({ tipo:'r', msg:`📊 ${cat} estourou o orçamento: ${fmtR(real)} de ${fmtR(meta)}` });
+    else if (real / meta > 0.8) alertas.push({ tipo:'a', msg:`📊 ${cat} em 80%+ do orçamento: ${fmtR(real)} de ${fmtR(meta)}` });
   });
 
   // Sem investimentos
@@ -4168,9 +4348,10 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   }
 
   // 6. Orçamentos estourados
-  const metas=d.orcs.filter(o=>o.mes===mes&&o.tipo==='Despesa');
+  const metaEfA = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
+  const metas = Object.entries(metaEfA).map(([cat,val]) => ({ cat, val })).filter(m2 => m2.val > 0);
   const catM2={};
-  d.lancs.filter(l=>l.status!=='cancelado'&&l.tipo==='Despesa'&&new Date(l.data+'T00:00:00').getMonth()===mes&&new Date(l.data+'T00:00:00').getFullYear()===ano).forEach(l=>{catM2[l.cat]=(catM2[l.cat]||0)+l.valor;});
+  semReservas(d.lancs, d).filter(l=>l.status!=='cancelado'&&l.tipo==='Despesa'&&noMesAno(l.data,mes,ano)).forEach(l=>{catM2[l.cat]=(catM2[l.cat]||0)+l.valor;});
   const estouradas=metas.filter(m2=>(catM2[m2.cat]||0)>m2.val);
   if(estouradas.length){
     const pior=estouradas.sort((a,b)=>((catM2[b.cat]||0)/b.val)-((catM2[a.cat]||0)/a.val))[0];
@@ -5965,373 +6146,923 @@ function parcelasComoLancs(d, mes, ano){
 }
 const orcComCartao = () => { const e = document.getElementById('orc-cartao'); return e ? e.checked : false; };
 
-let _orcMes = curMes();
-let _orcView = 'previsto'; // 'previsto' | 'realizado' | 'comparativo'
+let _orcMes   = curMes();
+let _orcView  = 'geral';     // 'geral' | 'ajustar' | 'acomp' | 'anual'
+let _orcCache = null;        // último cálculo: base dos sliders ao vivo
+const _orcSaveT = {};         // gravação atrasada dos botões ±, uma por meta
 
-function setOrcView(v){
-  _orcView = v;
-  // Atualiza botões
-  ['previsto','realizado','comparativo'].forEach(x=>{
-    const btn = document.getElementById('orc-btn-'+x.replace('comparativo','comp'));
-    if(!btn) return;
-    if(x===v){
-      btn.style.background = x==='previsto'?'var(--blue-dim)':x==='realizado'?'var(--green-dim)':'var(--purple-dim)';
-      btn.style.color = x==='previsto'?'var(--blue)':x==='realizado'?'var(--green)':'var(--purple)';
-    } else {
-      btn.style.background = 'transparent';
-      btn.style.color = 'var(--t3)';
-    }
+// ══ Motor do orçamento ══════════════════════════════════════════
+// Regras:
+//  • Toda meta pertence a um mês E a um ano (antes só tinha mês e valia para todo ano).
+//  • Realizado = lançamentos pagos. O que ainda não foi pago (lançamento pendente ou
+//    conta a pagar do mês) é "pendente" e aparece à parte, somando no projetado.
+//  • Hierarquia: meta de categoria é o teto da categoria inteira; metas de subcategoria
+//    são limites dentro dela. O previsto da categoria é a meta de categoria quando ela
+//    existe — senão a soma das subcategorias. Nada soma em dobro.
+//  • Gasto em categoria sem meta não some: vira "fora do orçamento".
+const anoDaMeta  = o => (o && o.ano != null) ? parseInt(o.ano) : anoRef();
+const efetivadoL = l => !l.pago || l.pago === 'Pago';
+const TIPOS_ORC  = ['Despesa', 'Investimento', 'Receita'];
+
+function orcAno(){
+  const e = document.getElementById('orc-ano');
+  const v = e ? parseInt(e.value) : NaN;
+  return isNaN(v) ? anoRef() : v;
+}
+function metasDoMes(d, mes, ano){
+  return (d.orcs || []).filter(o => o.mes === parseInt(mes) && anoDaMeta(o) === parseInt(ano));
+}
+function lancsOrcamento(d, mes, ano, comCartao){
+  const base = semReservas(d.lancs.filter(l => noMesAno(l.data, mes, ano) && l.status !== 'cancelado'), d);
+  return comCartao
+    ? base.filter(l => l.origem !== 'fatura').concat(parcelasComoLancs(d, mes, ano))
+    : base;
+}
+// Média mensal de gasto (pago) por categoria e por categoria›subcategoria nos N meses anteriores
+function mediaGastos(d, mes, ano, n, comCartao){
+  n = n || 3;
+  const soma = {};
+  for(let i = 1; i <= n; i++){
+    const abs = parseInt(ano) * 12 + parseInt(mes) - i, m = abs % 12, a = Math.floor(abs / 12);
+    lancsOrcamento(d, m, a, comCartao).filter(l => efetivadoL(l) && l.tipo === 'Despesa').forEach(l => {
+      const k = l.cat || 'Outras Despesas';
+      soma[k] = (soma[k] || 0) + (l.valor || 0);
+      if(l.subcat){ const ks = k + '›' + l.subcat; soma[ks] = (soma[ks] || 0) + (l.valor || 0); }
+    });
+  }
+  const out = {};
+  Object.keys(soma).forEach(k => out[k] = +(soma[k] / n).toFixed(2));
+  return out;
+}
+
+// Recalcula previsto, projetado e situação de uma categoria.
+// `vals` (opcional) sobrepõe o valor de metas pelo id — é o que os sliders usam ao vivo.
+function derivarCategoria(g, vals){
+  const v = m => (vals && vals[m.id] != null) ? vals[m.id] : (m.val || 0);
+  const subs = Object.values(g.subs);
+  subs.forEach(s => { s.metaVal = s.meta ? v(s.meta) : 0; s.projetado = s.real + s.pend; });
+  g.somaSubs    = +subs.reduce((a,s) => a + s.metaVal, 0).toFixed(2);
+  g.metaCatVal  = g.metaCat ? v(g.metaCat) : null;
+  g.meta        = +(g.metaCat ? g.metaCatVal : g.somaSubs).toFixed(2);
+  g.temMeta     = !!g.metaCat || subs.some(s => s.meta);
+  g.subsExcedem = !!g.metaCat && g.somaSubs > g.metaCatVal + 0.005;
+  g.projetado   = +(g.real + g.pend).toFixed(2);
+  g.pct         = g.meta > 0 ? g.real / g.meta * 100 : null;
+  g.st          = orcStatus(g);
+  subs.forEach(s => { s.st = s.meta ? orcStatus({ tipo:g.tipo, temMeta:true, meta:s.metaVal, real:s.real, projetado:s.projetado }) : null; });
+  return g;
+}
+
+// Situação da meta — despesa: não passar; receita/investimento: alcançar
+function orcStatus(g){
+  if(!g.temMeta) return { k:'sem', label:'Sem meta', icone:'—', cls:'bdg-gray' };
+  if(g.tipo === 'Despesa'){
+    if(g.real > g.meta + 0.005)      return { k:'estourou', label:'Estourou',      icone:'⚠', cls:'bdg-red'   };
+    if(g.projetado > g.meta + 0.005) return { k:'vai',      label:'Vai estourar',  icone:'⏳', cls:'bdg-amber' };
+    if(g.meta > 0 && g.real / g.meta >= 0.8) return { k:'atencao', label:'Atenção', icone:'⚡', cls:'bdg-amber' };
+    return { k:'ok', label:'No limite', icone:'✓', cls:'bdg-green' };
+  }
+  if(g.real >= g.meta - 0.005)       return { k:'ok',      label:'Atingida',      icone:'✓', cls:'bdg-green' };
+  if(g.projetado >= g.meta - 0.005)  return { k:'atencao', label:'A caminho',     icone:'⏳', cls:'bdg-amber' };
+  return { k:'falta', label:'Abaixo da meta', icone:'↓', cls:'bdg-blue' };
+}
+
+/**
+ * Consolida metas, realizado e pendente do mês por tipo › categoria › subcategoria.
+ */
+function consolidarOrcamento(d, mes, ano, comCartao){
+  mes = parseInt(mes); ano = parseInt(ano);
+  const metas = metasDoMes(d, mes, ano);
+  const lancs = lancsOrcamento(d, mes, ano, comCartao);
+  const contasPend = (d.contas || []).filter(c => statusConta(c) !== 'Pago' && noMesAno(c.venc, mes, ano));
+  const cats = {};
+  const pega = (tipo, cat) => {
+    const k = tipo + '|' + cat;
+    return cats[k] || (cats[k] = { tipo, cat, metaCat:null, subs:{}, real:0, pend:0, qtd:0 });
+  };
+  const sub = (g, nome) => g.subs[nome] || (g.subs[nome] = { subcat:nome, meta:null, real:0, pend:0 });
+
+  metas.forEach(m => {
+    if(!TIPOS_ORC.includes(m.tipo)) return;
+    const g = pega(m.tipo, m.cat);
+    if(m.subcat) sub(g, m.subcat).meta = m; else g.metaCat = m;
   });
-  // Mostra/oculta views
-  ['previsto','realizado','comparativo'].forEach(x=>{
-    const el = document.getElementById('orc-view-'+x);
-    if(el) el.style.display = x===v ? 'block' : 'none';
+  lancs.forEach(l => {
+    if(!TIPOS_ORC.includes(l.tipo)) return;
+    const g = pega(l.tipo, l.cat || (l.tipo === 'Despesa' ? 'Outras Despesas' : l.tipo));
+    const pago = efetivadoL(l);
+    if(pago){ g.real += l.valor || 0; g.qtd++; } else g.pend += l.valor || 0;
+    if(l.subcat && g.subs[l.subcat]){ if(pago) g.subs[l.subcat].real += l.valor || 0; else g.subs[l.subcat].pend += l.valor || 0; }
+  });
+  // Conta a pagar em aberto no mês também é dinheiro comprometido na categoria
+  contasPend.forEach(c => {
+    const g = pega('Despesa', c.cat || 'Outras Despesas');
+    g.pend += c.valor || 0;
+    if(c.subcat && g.subs[c.subcat]) g.subs[c.subcat].pend += c.valor || 0;
+  });
+  Object.values(cats).forEach(g => {
+    g.real = +g.real.toFixed(2); g.pend = +g.pend.toFixed(2);
+    Object.values(g.subs).forEach(s => { s.real = +s.real.toFixed(2); s.pend = +s.pend.toFixed(2); });
+    derivarCategoria(g);
+  });
+  return { mes, ano, metas, lancs, contasPend, cats:Object.values(cats) };
+}
+
+function totaisOrcamento(cons){
+  const T = t => cons.cats.filter(g => g.tipo === t);
+  const s = (arr, f) => +arr.reduce((a,g) => a + f(g), 0).toFixed(2);
+  const D = T('Despesa');
+  return {
+    recMeta:s(T('Receita'), g => g.meta),      recReal:s(T('Receita'), g => g.real),
+    invMeta:s(T('Investimento'), g => g.meta), invReal:s(T('Investimento'), g => g.real),
+    desMeta:s(D, g => g.meta), desReal:s(D, g => g.real), desPend:s(D, g => g.pend),
+    desRealComMeta:s(D.filter(g => g.temMeta), g => g.real),
+    desForaMeta:s(D.filter(g => !g.temMeta), g => g.real + g.pend),
+    qtdForaMeta:D.filter(g => !g.temMeta && (g.real + g.pend) > 0).length,
+  };
+}
+// Renda de referência para distribuir o orçamento: a receita orçada; na falta dela,
+// o salário das configurações; na falta dos dois, a receita que de fato entrou.
+function rendaBase(d, tot){
+  if(tot.recMeta > 0)          return { v:tot.recMeta,   fonte:'receita orçada' };
+  if(d.cfg && d.cfg.sal > 0)   return { v:d.cfg.sal,     fonte:'salário das Configurações' };
+  return { v:tot.recReal, fonte:'receita realizada' };
+}
+// Meta efetiva por categoria (regra de hierarquia) — usada pelo Dashboard
+function metasEfetivasPorCategoria(d, mes, ano, tipo){
+  const out = {};
+  consolidarOrcamento(d, mes, ano, false).cats
+    .filter(g => g.tipo === (tipo || 'Despesa') && g.temMeta)
+    .forEach(g => { out[g.cat] = g.meta; });
+  return out;
+}
+const arred10 = v => Math.ceil((v || 0) / 10) * 10;
+const orcCatId = (tipo, cat) => 'orcc-' + (tipo + '-' + cat).normalize('NFD').replace(/[^\w]/g, '_');
+
+// ── Paleta validada (skill dataviz): 4 categorias + "Outras" nas pizzas;
+//    orçado / realizado / pendente nas colunas. Cada tema tem seus próprios passos.
+function paletaOrc(){
+  const claro = document.body.classList.contains('theme-light');
+  return claro
+    ? { cat:['#2a78d6','#eb6834','#1baf7a','#eda100'], outras:'#4b5563',
+        previsto:'#2a78d6', realizado:'#eb6834', pendente:'#1baf7a', superficie:'#ffffff',
+        tick:'#3a5068', grid:'#d0d9e6' }
+    : { cat:['#3987e5','#d95926','#199e70','#c98500'], outras:'#3f4654',
+        previsto:'#3987e5', realizado:'#d95926', pendente:'#199e70', superficie:'#131926',
+        tick:'#8fa3bf', grid:'#1f2838' };
+}
+
+// ══ Navegação ═══════════════════════════════════════════════════
+function setOrcView(v){
+  // nomes antigos continuam funcionando
+  v = ({ previsto:'ajustar', realizado:'acomp', comparativo:'geral' })[v] || v;
+  _orcView = v;
+  document.querySelectorAll('#orc-views .tgl').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+  ['geral','ajustar','acomp','anual'].forEach(x => {
+    const el = document.getElementById('orc-view-' + x);
+    if(el) el.style.display = x === v ? 'block' : 'none';
   });
   renderOrc();
 }
+function orcIrMes(mes, ano){
+  _orcMes = parseInt(mes);
+  const sel = document.getElementById('orc-ano');
+  if(sel && ano != null){
+    if(![...sel.options].some(o => o.value === String(ano))) sel.insertAdjacentHTML('beforeend', `<option value="${ano}">${ano}</option>`);
+    sel.value = String(ano);
+  }
+  renderOrc();
+}
+function initOrcAnoOpts(d){
+  const sel = document.getElementById('orc-ano');
+  if(!sel) return;
+  const anos = new Set([anoRef(), new Date().getFullYear(), anoRef() + 1]);
+  (d.orcs || []).forEach(o => anos.add(anoDaMeta(o)));
+  const lista = [...anos].filter(a => a > 1900).sort((a,b) => b - a);
+  const atual = sel.value || String(anoRef());
+  const html = lista.map(a => `<option value="${a}">${a}</option>`).join('');
+  if(sel.innerHTML !== html){ sel.innerHTML = html; }
+  sel.value = lista.includes(parseInt(atual)) ? atual : String(anoRef());
+}
 
+// ══ Render principal ════════════════════════════════════════════
 function renderOrc(){
   const d = gs();
-  const tipoFil = document.getElementById('orc-fil-tipo')?.value||'';
+  initOrcAnoOpts(d);
+  const ano = orcAno(), mes = _orcMes, comCartao = orcComCartao();
 
-  // Tabs de meses
   const tabs = document.getElementById('orc-tabs');
-  if(tabs) tabs.innerHTML = MESES.map((m,i)=>
-    `<div class="mtab ${i===_orcMes?'active':''}" onclick="_orcMes=${i};renderOrc()">${m.slice(0,3)}</div>`
-  ).join('');
+  if(tabs){
+    const comMeta = new Set((d.orcs || []).filter(o => anoDaMeta(o) === ano).map(o => o.mes));
+    tabs.innerHTML = MESES.map((m,i) =>
+      `<div class="mtab ${i === mes ? 'active' : ''}" onclick="orcIrMes(${i})">${m.slice(0,3)}${comMeta.has(i) ? '<span class="orc-tab-dot" title="Tem metas"></span>' : ''}</div>`
+    ).join('');
+    // no celular a faixa rola: mantém o mês ativo à vista
+    const ativo = tabs.querySelector('.mtab.active');
+    if(ativo && tabs.scrollWidth > tabs.clientWidth)
+      tabs.scrollLeft = Math.max(0, ativo.offsetLeft - tabs.offsetLeft - (tabs.clientWidth - ativo.offsetWidth) / 2);
+  }
 
-  let metas = d.orcs.filter(o=>o.mes===_orcMes);
-  if(tipoFil) metas = metas.filter(m=>m.tipo===tipoFil);
+  const cons  = consolidarOrcamento(d, mes, ano, comCartao);
+  const tot   = totaisOrcamento(cons);
+  const media = mediaGastos(d, mes, ano, 3, comCartao);
+  const renda = rendaBase(d, tot);
+  // Cores seguem a CATEGORIA, não a posição: as 4 que mais pesam no mês ficam fixas
+  // durante toda a tela (as duas pizzas usam o mesmo mapa); o resto vira "Outras".
+  const ordem = cons.cats.filter(g => g.tipo === 'Despesa')
+    .map(g => ({ cat:g.cat, peso:Math.max(g.meta, g.projetado) }))
+    .filter(x => x.peso > 0).sort((a,b) => b.peso - a.peso || a.cat.localeCompare(b.cat))
+    .slice(0, 4).map(x => x.cat);
+  _orcCache = { cons, tot, media, renda, mes, ano, comCartao, ordem, cfg:d.cfg };
 
-  // Lançamentos ativos do mês (dentro do ano de referência configurado)
-  const anoOrc = anoRef();
-  const comCartao = orcComCartao();
-  const base = semReservas(d.lancs.filter(l=>noMesAno(l.data,_orcMes,anoOrc) && l.status!=='cancelado'), d);
-  // Com o cartão incluído, as parcelas da fatura entram no lugar do lançamento de
-  // pagamento da fatura — assim o gasto pesa na categoria real e não conta duas vezes.
-  const lancs = comCartao
-    ? base.filter(l => l.origem !== 'fatura').concat(parcelasComoLancs(d, _orcMes, anoOrc))
-    : base;
+  set('orc-sub', `${MESES[mes]} de ${ano} · renda de referência: ${fmtR(renda.v)} (${renda.fonte})`);
   const avisoOrc = document.getElementById('orc-aviso-cartao');
   if(avisoOrc) avisoOrc.innerHTML = comCartao
     ? '💡 As parcelas de cartão do mês entram na categoria da compra. O lançamento de pagamento da fatura é substituído por elas, para não contar duas vezes.'
     : '💡 Gastos no cartão só aparecem aqui quando a fatura é paga e gera lançamento — na categoria do pagamento, não na da compra. Marque "incluir cartão" para orçar por categoria de consumo.';
 
-  // ── KPIs ──
-  const metaDes   = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa').reduce((a,o)=>a+o.val,0);
-  const realDes   = lancs.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-  const saldoOrc  = metaDes - realDes;
-  const pctExec   = metaDes>0 ? realDes/metaDes*100 : 0;
-  set('orc-k-prev-des', fmtR(metaDes));
-  setC('orc-k-real-des', fmtR(realDes), realDes>metaDes?'var(--red)':'var(--t1)');
-  setC('orc-k-saldo', fmtR(saldoOrc), saldoOrc>=0?'var(--green)':'var(--red)');
-  setC('orc-k-pct', pct(pctExec), pctExec>100?'var(--red)':pctExec>80?'var(--amber)':'var(--green)');
-
-  // ── VISÃO: PREVISTO ──
-  if(_orcView==='previsto'){
-    // Resumo previsto
-    const resEl = document.getElementById('orc-resumo-prev');
-    if(resEl){
-      const allMetas = d.orcs.filter(o=>o.mes===_orcMes);
-      const mr = allMetas.filter(m=>m.tipo==='Receita').reduce((a,m)=>a+m.val,0);
-      const md = allMetas.filter(m=>m.tipo==='Despesa').reduce((a,m)=>a+m.val,0);
-      const mi = allMetas.filter(m=>m.tipo==='Investimento').reduce((a,m)=>a+m.val,0);
-      resEl.innerHTML = [
-        ['Total Previsto de Receitas', mr, 'var(--green)'],
-        ['Total Previsto de Despesas', md, 'var(--red)'],
-        ['Total Previsto Investimentos', mi, 'var(--blue)'],
-        ['Saldo Previsto', mr-md-mi, ''],
-      ].map(([l,v,c])=>
-        `<div class="sum-row"><span class="sum-lbl">${l}</span><span class="sum-val" style="color:${c||'var(--t1)'}">${fmtR(v)}</span></div>`
-      ).join('');
-    }
-    // Distribuição prevista
-    const distEl = document.getElementById('orc-dist-prev');
-    if(distEl){
-      const desMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
-      const totalPrev = desMetas.reduce((a,m)=>a+m.val,0);
-      if(!desMetas.length){
-        distEl.innerHTML='<p style="color:var(--t3);font-size:12px">Nenhuma meta de despesa cadastrada.</p>';
-      } else {
-        distEl.innerHTML = desMetas.sort((a,b)=>b.val-a.val).map((m,i)=>{
-          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
-          const pp = totalPrev>0 ? m.val/totalPrev*100 : 0;
-          return `<div style="margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-              <span style="color:var(--t2)">${label}</span>
-              <span class="mono" style="color:var(--blue)">${fmtR(m.val)} <span style="color:var(--t3)">${pct(pp)}</span></span>
-            </div>
-            <div class="prog-track"><div class="prog-fill" style="width:${pp}%;background:${CORES_CAT[i%CORES_CAT.length]}"></div></div>
-          </div>`;
-        }).join('');
-      }
-    }
-    // Tabela previsto
-    const tbodyP = document.getElementById('orc-tbody-prev');
-    const emptyP = document.getElementById('orc-empty-prev');
-    if(!tbodyP) return;
-    if(!metas.length){ tbodyP.innerHTML=''; if(emptyP) emptyP.style.display='block'; return; }
-    if(emptyP) emptyP.style.display='none';
-    tbodyP.innerHTML = metas.sort((a,b)=>{
-      if(a.tipo!==b.tipo) return a.tipo.localeCompare(b.tipo);
-      return a.cat.localeCompare(b.cat);
-    }).map(m=>{
-      const label = m.cat + (m.subcat ? ` › ${m.subcat}` : '');
-      return `<tr>
-        <td style="color:var(--t1);font-weight:500">${m.cat}</td>
-        <td style="color:var(--t3);font-size:11px">${m.subcat||'<span style="color:var(--t4)">—</span>'}</td>
-        <td><span class="badge ${m.tipo==='Receita'?'bdg-green':m.tipo==='Investimento'?'bdg-blue':'bdg-red'}" style="font-size:9px">${m.tipo}</span></td>
-        <td class="mono" style="color:var(--blue);font-weight:600">${fmtR(m.val)}</td>
-        <td style="color:var(--t3);font-size:11px">${m.obs||'—'}</td>
-        <td class="tbl-actions">
-          <button class="btn btn-ghost btn-xs" onclick="editOrc('${m.id}')" title="Editar">✏</button>
-          <button class="btn btn-red btn-xs" onclick="delOrc('${m.id}')">✕</button>
-        </td>
-      </tr>`;
-    }).join('');
-  }
-
-  // ── VISÃO: REALIZADO ──
-  if(_orcView==='realizado'){
-    // Resumo realizado
-    const resReal = document.getElementById('orc-resumo-real');
-    if(resReal){
-      const allMetas = d.orcs.filter(o=>o.mes===_orcMes);
-      const mr = allMetas.filter(m=>m.tipo==='Receita').reduce((a,m)=>a+m.val,0);
-      const md = allMetas.filter(m=>m.tipo==='Despesa').reduce((a,m)=>a+m.val,0);
-      const mi = allMetas.filter(m=>m.tipo==='Investimento').reduce((a,m)=>a+m.val,0);
-      const rr = lancs.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-      const rd = lancs.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-      const ri = lancs.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-      resReal.innerHTML = [
-        ['Receita Prevista', mr, 'var(--green)'],
-        ['Receita Realizada', rr, 'var(--green)'],
-        ['Despesa Prevista', md, 'var(--red)'],
-        ['Despesa Realizada', rd, 'var(--red)'],
-        ['Saldo Previsto', mr-md-mi, ''],
-        ['Saldo Realizado', rr-rd-ri, ''],
-      ].map(([l,v,c])=>
-        `<div class="sum-row"><span class="sum-lbl">${l}</span><span class="sum-val" style="color:${c||'var(--t1)'}">${fmtR(v)}</span></div>`
-      ).join('');
-    }
-    // Progresso por categoria
-    const progEl = document.getElementById('orc-prog');
-    if(progEl){
-      const desMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
-      if(!desMetas.length){
-        progEl.innerHTML = '<p style="color:var(--t3);font-size:12px">Sem metas de despesa para este mês.</p>';
-      } else {
-        progEl.innerHTML = desMetas.map(m=>{
-          // Realizado: considera subcat se houver, senão soma toda a categoria
-          const real = m.subcat
-            ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0)
-            : lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
-          const pp    = m.val>0 ? Math.min(100,real/m.val*100) : 0;
-          const over  = real>m.val;
-          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
-          return `<div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-              <span style="color:var(--t2)">${label}</span>
-              <span class="mono" style="color:${over?'var(--red)':'var(--green)'}">${fmtR(real)} / ${fmtR(m.val)}</span>
-            </div>
-            <div class="prog-track"><div class="prog-fill" style="width:${pp}%;background:${over?'var(--red)':pp>80?'var(--amber)':'var(--green)'}"></div></div>
-          </div>`;
-        }).join('');
-      }
-    }
-    // Tabela realizado
-    const tbodyR = document.getElementById('orc-tbody-real');
-    const emptyR = document.getElementById('orc-empty-real');
-    if(!tbodyR) return;
-    if(!metas.length){ tbodyR.innerHTML=''; if(emptyR) emptyR.style.display='block'; return; }
-    if(emptyR) emptyR.style.display='none';
-    tbodyR.innerHTML = metas.sort((a,b)=>{
-      if(a.tipo!==b.tipo) return a.tipo.localeCompare(b.tipo);
-      return a.cat.localeCompare(b.cat);
-    }).map(m=>{
-      const real = m.subcat
-        ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0)
-        : lancs.filter(l=>l.cat===m.cat&&l.tipo===m.tipo).reduce((a,l)=>a+l.valor,0);
-      const saldo = m.val - real;
-      const pp    = m.val>0 ? real/m.val*100 : 0;
-      return `<tr>
-        <td style="color:var(--t1);font-weight:500">${m.cat}</td>
-        <td style="color:var(--t3);font-size:11px">${m.subcat||'<span style="color:var(--t4)">—</span>'}</td>
-        <td><span class="badge ${m.tipo==='Receita'?'bdg-green':m.tipo==='Investimento'?'bdg-blue':'bdg-red'}" style="font-size:9px">${m.tipo}</span></td>
-        <td class="mono" style="color:var(--blue)">${fmtR(m.val)}</td>
-        <td class="mono" style="color:${real>m.val?'var(--red)':'var(--green)'};font-weight:600">${fmtR(real)}</td>
-        <td class="mono" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmtR(saldo)}</td>
-        <td class="mono" style="color:${pp>100?'var(--red)':pp>80?'var(--amber)':'var(--t2)'}">${pct(pp)}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  // ── VISÃO: COMPARATIVO ──
-  if(_orcView==='comparativo'){
-    const allMetas = d.orcs.filter(o=>o.mes===_orcMes&&o.tipo==='Despesa');
-    const labels  = allMetas.map(m=>m.subcat?`${m.cat} › ${m.subcat}`:m.cat);
-    const prevVals = allMetas.map(m=>m.val);
-    const realVals = allMetas.map(m=>
-      m.subcat
-        ? lancs.filter(l=>l.cat===m.cat&&l.subcat===m.subcat&&l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0)
-        : lancs.filter(l=>l.cat===m.cat&&l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0)
-    );
-    mkCh('ch-orc-comp',{type:'bar',data:{labels,datasets:[
-      {label:'Previsto', data:prevVals, backgroundColor:'#4dabf730',borderColor:'#4dabf7',borderWidth:1.5,borderRadius:4},
-      {label:'Realizado',data:realVals, backgroundColor:'#ff4d6d30',borderColor:'#ff4d6d',borderWidth:1.5,borderRadius:4},
-    ]},options:{...chartBase,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8fa3bf',font:{size:11},boxWidth:12}}}}});
-
-    const compEl = document.getElementById('orc-comp-detalhe');
-    if(compEl){
-      if(!allMetas.length){
-        compEl.innerHTML='<p style="color:var(--t3);font-size:12px;text-align:center;padding:24px">Nenhuma meta cadastrada para este mês.</p>';
-      } else {
-        compEl.innerHTML = allMetas.map((m,i)=>{
-          const label = m.subcat ? `${m.cat} › ${m.subcat}` : m.cat;
-          const real  = realVals[i];
-          const over  = real > m.val;
-          const pp    = m.val>0 ? real/m.val*100 : 0;
-          const saldo = m.val - real;
-          const cor   = over ? 'var(--red)' : pp>80 ? 'var(--amber)' : 'var(--green)';
-          return `<div style="background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:14px;margin-bottom:8px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:4px">
-              <div>
-                <span style="font-size:13px;font-weight:600;color:var(--t1)">${label}</span>
-                ${over?'<span class="badge bdg-red" style="font-size:9px;margin-left:8px">⚠ Estourou</span>':pp>80?'<span class="badge bdg-amber" style="font-size:9px;margin-left:8px">⚡ Atenção</span>':'<span class="badge bdg-green" style="font-size:9px;margin-left:8px">✓ OK</span>'}
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:10px;color:var(--t3)">Previsto → Realizado</div>
-                <div class="mono" style="font-size:12px">${fmtR(m.val)} → <span style="color:${real>m.val?'var(--red)':'var(--green)'}">${fmtR(real)}</span></div>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <div style="flex:1">
-                <div class="prog-track lg"><div class="prog-fill" style="width:${Math.min(100,pp)}%;background:${cor}"></div></div>
-              </div>
-              <span class="mono" style="font-size:11px;color:${cor};min-width:50px;text-align:right">${pct(pp)}</span>
-              <span class="mono" style="font-size:11px;color:${saldo>=0?'var(--green)':'var(--red)'};min-width:90px;text-align:right">${saldo>=0?'sobra ':'excesso '}${fmtR(Math.abs(saldo))}</span>
-            </div>
-          </div>`;
-        }).join('');
-      }
-    }
-  }
+  renderOrcKpis(tot, renda);
+  renderDistribuicaoRenda(tot, renda);
+  if(_orcView === 'geral')   renderOrcGeral(cons, tot, renda);
+  if(_orcView === 'ajustar') renderOrcAjustar(cons, media);
+  if(_orcView === 'acomp')   renderOrcAcomp(cons, media);
+  if(_orcView === 'anual')   renderOrcAnual(d, ano, comCartao);
 }
 
-function saveOrc(){
-  const tipo   = document.getElementById('o-tipo')?.value;
-  const mes    = parseInt(document.getElementById('o-mes')?.value);
-  const cat    = document.getElementById('o-cat')?.value;
-  const subcat = document.getElementById('o-subcat')?.value||'';
-  const val    = parseFloat(document.getElementById('o-val')?.value)||0;
-  const obs    = document.getElementById('o-obs')?.value?.trim()||'';
-  const editId = document.getElementById('o-edit-id')?.value||'';
-  if(!cat||!val){alert('Preencha categoria e valor.');return;}
-  const d = gs();
-  if(editId){
-    const m = d.orcs.find(o=>o.id===editId);
-    if(m) Object.assign(m,{tipo,mes,cat,subcat,val,obs});
-  } else {
-    // Impede duplicata exata (mesma cat+subcat+tipo+mes)
-    d.orcs = d.orcs.filter(o=>!(o.cat===cat&&o.subcat===(subcat||'')&&o.tipo===tipo&&o.mes===mes));
-    d.orcs.push({id:uid(),tipo,mes,cat,subcat,val,obs});
+function renderOrcKpis(tot, renda){
+  const saldo = +(tot.desMeta - tot.desReal).toFixed(2);
+  const pctEx = tot.desMeta > 0 ? tot.desReal / tot.desMeta * 100 : 0;
+  const livre = +(renda.v - tot.desMeta - tot.invMeta).toFixed(2);
+  set('orc-k-renda', fmtR(renda.v));
+  set('orc-k-renda-sub', renda.fonte);
+  set('orc-k-prev-des', fmtR(tot.desMeta));
+  setC('orc-k-real-des', fmtR(tot.desReal), tot.desReal > tot.desMeta && tot.desMeta > 0 ? 'var(--red)' : '');
+  set('orc-k-real-sub', tot.desPend ? `+ ${fmtR(tot.desPend)} pendente` : 'nada pendente');
+  setC('orc-k-saldo', fmtR(saldo), saldo >= 0 ? 'var(--green)' : 'var(--red)');
+  set('orc-k-saldo-sub', tot.desPend ? `${fmtR(saldo - tot.desPend)} após pendentes` : 'meta − realizado');
+  setC('orc-k-pct', pct(pctEx), pctEx > 100 ? 'var(--red)' : pctEx > 80 ? 'var(--amber)' : 'var(--green)');
+  set('orc-k-pct-sub', tot.qtdForaMeta ? `${fmtR(tot.desForaMeta)} fora do orçamento` : 'tudo dentro do orçamento');
+  setC('orc-k-livre', fmtR(livre), livre >= 0 ? '' : 'var(--red)');
+  set('orc-k-livre-sub', livre >= 0 ? 'da renda ainda sem destino' : 'metas acima da renda');
+}
+
+// Barra de distribuição da renda: para onde vai cada real planejado
+function renderDistribuicaoRenda(tot, renda){
+  const el = document.getElementById('orc-renda');
+  if(!el) return;
+  const base = Math.max(renda.v, tot.desMeta + tot.invMeta, 0.01);
+  const livre = renda.v - tot.desMeta - tot.invMeta;
+  const pc = v => Math.max(0, v / base * 100);
+  const segs = [
+    { k:'des',  label:'Despesas orçadas',     v:tot.desMeta,           cor:'var(--viz-prev)' },
+    { k:'inv',  label:'Investimentos orçados',v:tot.invMeta,           cor:'var(--viz-pend)' },
+    livre >= 0
+      ? { k:'livre', label:'Livre (sem destino)', v:livre,            cor:'transparent', vazio:true }
+      : { k:'exc',   label:'⚠ Excede a renda',    v:-livre,           cor:'var(--red)' },
+  ];
+  el.innerHTML = `
+    <div class="orc-renda-hd">
+      <span>Distribuição da renda de <b class="mono">${fmtR(renda.v)}</b></span>
+      <span class="mono" style="color:${livre >= 0 ? 'var(--t2)' : 'var(--red)'}">${livre >= 0 ? `${pct(pc(livre))} livre` : `${fmtR(-livre)} acima da renda`}</span>
+    </div>
+    <div class="orc-renda-bar" role="img" aria-label="Distribuição da renda">
+      ${segs.filter(s => s.v > 0).map(s => `<div class="orc-renda-seg${s.vazio ? ' vazio' : ''}" style="width:${pc(s.v)}%;background:${s.cor}" title="${s.label}: ${fmtR(s.v)}"></div>`).join('')}
+    </div>
+    <div class="orc-legend">
+      ${segs.map(s => `<span><i style="background:${s.vazio ? 'var(--surface3)' : s.cor};${s.vazio ? 'border:1px dashed var(--line2)' : ''}"></i>${s.label} <b class="mono">${fmtR(s.v)}</b> <em>${pct(pc(s.v))}</em></span>`).join('')}
+    </div>`;
+}
+
+// ══ Visão Geral: pizzas, colunas, 50/30/20 e leitura ════════════
+function renderOrcGeral(cons, tot, renda){
+  const pal = paletaOrc();
+  const desp = cons.cats.filter(g => g.tipo === 'Despesa');
+  const ordem = _orcCache.ordem;
+  const corDe = cat => { const i = ordem.indexOf(cat); return i >= 0 ? pal.cat[i] : pal.outras; };
+
+  // Duas pizzas com o MESMO mapa de cores: a mesma categoria tem a mesma cor nas duas
+  const fatias = campo => {
+    const nomes = ordem.slice();
+    const vals  = nomes.map(c => { const g = desp.find(x => x.cat === c); return g ? g[campo] : 0; });
+    const resto = desp.filter(g => !ordem.includes(g.cat)).reduce((a,g) => a + g[campo], 0);
+    if(resto > 0.004){ nomes.push('Outras'); vals.push(+resto.toFixed(2)); }
+    return { nomes, vals, cores:nomes.map(n => n === 'Outras' ? pal.outras : corDe(n)) };
+  };
+  desenharPizza('ch-orc-pie-prev', 'orc-pie-prev-leg', 'orc-pie-prev-tot', fatias('meta'), 'orçado', 'Nenhuma meta de despesa neste mês.');
+  desenharPizza('ch-orc-pie-real', 'orc-pie-real-leg', 'orc-pie-real-tot', fatias('real'), 'realizado', 'Nenhuma despesa paga neste mês.');
+
+  // Colunas: orçado × (realizado + pendente) por categoria — um eixo só
+  const top = desp.filter(g => g.meta > 0 || g.projetado > 0)
+    .sort((a,b) => Math.max(b.meta, b.projetado) - Math.max(a.meta, a.projetado));
+  const cabe = top.slice(0, 8), resto = top.slice(8);
+  const lin = cabe.map(g => ({ cat:g.cat, meta:g.meta, real:g.real, pend:g.pend }));
+  if(resto.length) lin.push({ cat:`Outras (${resto.length})`,
+    meta:resto.reduce((a,g)=>a+g.meta,0), real:resto.reduce((a,g)=>a+g.real,0), pend:resto.reduce((a,g)=>a+g.pend,0) });
+  const vazioCol = document.getElementById('orc-col-vazio');
+  if(vazioCol) vazioCol.style.display = lin.length ? 'none' : 'block';
+  const moeda = v => 'R$' + Number(v).toLocaleString('pt-BR');
+  const barra = (label, data, cor, stack, raio) => ({ label, data, backgroundColor:cor, stack,
+    borderColor:pal.superficie, borderWidth:{ top:2 }, borderSkipped:'bottom',
+    borderRadius:raio, maxBarThickness:34, categoryPercentage:.72, barPercentage:.92 });
+  mkCh('ch-orc-comp', { type:'bar', data:{ labels:lin.map(x => x.cat), datasets:[
+      barra('Orçado',    lin.map(x => +x.meta.toFixed(2)), pal.previsto,  'orc',  4),
+      barra('Realizado', lin.map(x => +x.real.toFixed(2)), pal.realizado, 'real', c => lin[c.dataIndex] && lin[c.dataIndex].pend > 0 ? 0 : 4),
+      barra('Pendente',  lin.map(x => +x.pend.toFixed(2)), pal.pendente,  'real', 4),
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:true, labels:{ color:pal.tick, font:{size:11}, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+        tooltip:{ callbacks:{ label:ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}`,
+          footer:items => { const i = items[0].dataIndex; const x = lin[i];
+            const saldo = x.meta - x.real - x.pend;
+            return x.meta ? `${saldo >= 0 ? 'Sobra' : 'Excesso'}: ${fmtR(Math.abs(saldo))}` : 'Sem meta'; } } } },
+      scales:{ x:{ stacked:true, ticks:{ color:pal.tick, font:{size:10} }, grid:{ display:false } },
+               y:{ stacked:true, beginAtZero:true, ticks:{ color:pal.tick, font:{size:10}, callback:moeda }, grid:{ color:pal.grid } } } } });
+
+  renderRegra503020(cons, tot, renda);
+  renderLeituraOrc(cons, tot, renda);
+}
+
+function desenharPizza(canvasId, legId, totId, f, rotulo, vazioMsg){
+  const pal = paletaOrc();
+  const total = f.vals.reduce((a,v) => a + v, 0);
+  const wrap = document.getElementById(canvasId)?.closest('.orc-pie-wrap');
+  const leg  = document.getElementById(legId);
+  set(totId, fmtR(total));
+  if(total <= 0){
+    if(CH[canvasId]){ CH[canvasId].destroy(); delete CH[canvasId]; }
+    if(wrap) wrap.classList.add('vazio');
+    if(leg) leg.innerHTML = `<div class="orc-vazio">${vazioMsg}</div>`;
+    return;
   }
-  ss(d); closeM('m-orc'); _orcMes=mes; renderOrc();
+  if(wrap) wrap.classList.remove('vazio');
+  mkCh(canvasId, { type:'doughnut', data:{ labels:f.nomes, datasets:[{ data:f.vals, backgroundColor:f.cores,
+      borderColor:pal.superficie, borderWidth:2, hoverOffset:6 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'52%',
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{ label:ctx => ` ${ctx.label}: ${fmtR(ctx.raw)} (${pct(ctx.raw / total * 100)})` } } } } });
+  // Legenda com valor e % — nunca identidade só por cor
+  if(leg) leg.innerHTML = f.nomes.map((n,i) => `
+    <div class="orc-leg-row">
+      <i style="background:${f.cores[i]}"></i>
+      <span class="orc-leg-nome">${n}</span>
+      <span class="mono">${fmtR(f.vals[i])}</span>
+      <em>${pct(total > 0 ? f.vals[i] / total * 100 : 0)}</em>
+    </div>`).join('');
+}
+
+// 50/30/20 — medidor de cada fatia contra a referência (uma cor só, marca no ideal)
+function renderRegra503020(cons, tot, renda){
+  const el = document.getElementById('orc-503020');
+  if(!el) return;
+  const desp = cons.cats.filter(g => g.tipo === 'Despesa');
+  const classe = c => (typeof classeDespesa === 'function') ? classeDespesa(c) : 'Outros';
+  const soma = (f, campo) => desp.filter(g => f(classe(g.cat))).reduce((a,g) => a + g[campo], 0);
+  const necess = c => c === 'Essencial' || c === 'Financeiro';
+  const desejo = c => c === 'Escolha'   || c === 'Outros';
+  const base = renda.v || 0;
+  const linhas = [
+    { nome:'Necessidades', ideal:50, orc:soma(necess,'meta'), real:soma(necess,'real'), maxBom:true,
+      dica:'moradia, alimentação, transporte, saúde, educação, vestuário e dívidas' },
+    { nome:'Desejos',      ideal:30, orc:soma(desejo,'meta'), real:soma(desejo,'real'), maxBom:true,
+      dica:'lazer, beleza, festas, esporte e outros' },
+    { nome:'Investimentos',ideal:20, orc:tot.invMeta, real:tot.invReal, maxBom:false,
+      dica:'o que você separa para o futuro' },
+  ];
+  if(base <= 0){ el.innerHTML = '<div class="orc-vazio">Defina uma meta de receita ou o salário em Configurações para comparar com a regra 50/30/20.</div>'; return; }
+  el.innerHTML = linhas.map(x => {
+    const po = x.orc / base * 100, pr = x.real / base * 100;
+    const ok = x.maxBom ? po <= x.ideal + 0.05 : po >= x.ideal - 0.05;
+    const escala = Math.max(100, po + 5);
+    return `<div class="orc-meter">
+      <div class="orc-meter-hd">
+        <span><b>${x.nome}</b> <em>${x.dica}</em></span>
+        <span class="orc-meter-st ${ok ? 'ok' : 'nok'}">${ok ? '✓ dentro' : '⚠ fora'} da referência</span>
+      </div>
+      <div class="orc-meter-trk">
+        <div class="orc-meter-fill" style="width:${Math.min(100, po / escala * 100)}%"></div>
+        <span class="orc-meter-ideal" style="left:${x.ideal / escala * 100}%" title="Referência: ${x.ideal}%"></span>
+      </div>
+      <div class="orc-meter-ft">
+        <span>orçado <b class="mono">${pct(po)}</b> (${fmtR(x.orc)})</span>
+        <span>realizado <b class="mono">${pct(pr)}</b></span>
+        <span>referência <b class="mono">${x.ideal}%</b></span>
+      </div>
+    </div>`;
+  }).join('') + `<div class="orc-nota">Percentuais sobre a renda de referência (${fmtR(base)}). A marca vertical é a referência da regra 50/30/20.</div>`;
+}
+
+// Leitura do orçamento: o que merece atenção agora
+function renderLeituraOrc(cons, tot, renda){
+  const el = document.getElementById('orc-leitura');
+  if(!el) return;
+  const out = [];
+  const add = (ico, cor, txt) => out.push(`<div class="sum-row" style="align-items:flex-start;gap:10px">
+    <span style="font-size:15px;line-height:1.3">${ico}</span>
+    <span style="font-size:12px;color:var(--t2);line-height:1.6;flex:1">${txt}</span>
+    <span style="width:4px;align-self:stretch;border-radius:2px;background:${cor}"></span></div>`);
+  const desp = cons.cats.filter(g => g.tipo === 'Despesa');
+  const estouradas = desp.filter(g => g.st.k === 'estourou');
+  const vaiEstourar = desp.filter(g => g.st.k === 'vai');
+  const semMeta = desp.filter(g => !g.temMeta && g.projetado > 0).sort((a,b) => b.projetado - a.projetado);
+  const subsEx = desp.filter(g => g.subsExcedem);
+
+  if(!cons.metas.length){
+    add('🎯', 'var(--blue)', `Nenhuma meta em ${MESES[cons.mes]}/${cons.ano}. Use <b>Ajustar Metas</b> para copiar do mês anterior ou criar metas a partir da média dos últimos 3 meses.`);
+  }
+  estouradas.forEach(g => add('⚠️', 'var(--red)',
+    `<b style="color:var(--t1)">${g.cat}</b> estourou: ${fmtR(g.real)} gastos de ${fmtR(g.meta)} (<b style="color:var(--red)">+${fmtR(g.real - g.meta)}</b>).`));
+  vaiEstourar.forEach(g => add('⏳', 'var(--amber)',
+    `<b style="color:var(--t1)">${g.cat}</b> ainda cabe, mas com o pendente (${fmtR(g.pend)}) vai a ${fmtR(g.projetado)} — ${fmtR(g.projetado - g.meta)} acima da meta.`));
+  if(semMeta.length) add('📌', 'var(--amber)',
+    `${fmtR(tot.desForaMeta)} em ${semMeta.length} categoria(s) sem meta: ${semMeta.slice(0,3).map(g => `<b style="color:var(--t1)">${g.cat}</b> (${fmtR(g.projetado)})`).join(', ')}${semMeta.length > 3 ? '…' : ''}.`);
+  subsEx.forEach(g => add('🧩', 'var(--amber)',
+    `As subcategorias de <b style="color:var(--t1)">${g.cat}</b> somam ${fmtR(g.somaSubs)}, mais que a meta da categoria (${fmtR(g.metaCatVal)}).`));
+  const livre = renda.v - tot.desMeta - tot.invMeta;
+  if(livre < 0) add('🚨', 'var(--red)', `As metas somam <b style="color:var(--red)">${fmtR(-livre)}</b> a mais que a renda de referência (${fmtR(renda.v)}).`);
+  else if(cons.metas.length && renda.v > 0) add('💰', 'var(--green)', `${fmtR(livre)} da renda (${pct(livre / renda.v * 100)}) ainda não têm destino — dá para reforçar investimentos.`);
+
+  // Ritmo diário no mês corrente
+  const hoje = new Date();
+  if(cons.mes === hoje.getMonth() && cons.ano === hoje.getFullYear() && tot.desMeta > 0){
+    const diasRest = new Date(cons.ano, cons.mes + 1, 0).getDate() - hoje.getDate() + 1;
+    const cabe = tot.desMeta - tot.desReal - tot.desPend;
+    add(cabe >= 0 ? '📅' : '🛑', cabe >= 0 ? 'var(--blue)' : 'var(--red)', cabe >= 0
+      ? `Para fechar o mês dentro do orçamento, você pode gastar até <b style="color:var(--t1)">${fmtR(cabe / diasRest)}</b> por dia nos ${diasRest} dia(s) restantes.`
+      : `Com o que já foi gasto e o que está pendente, o mês já passou do orçamento em ${fmtR(-cabe)}.`);
+  }
+  if(!out.length) add('✅', 'var(--green)', 'Tudo dentro do orçamento neste mês.');
+  el.innerHTML = out.join('');
+}
+
+// ══ Visão Ajustar Metas: sliders ════════════════════════════════
+function orcPassoDe(max){ return max <= 1000 ? 5 : max <= 5000 ? 10 : max <= 20000 ? 50 : 100; }
+function orcMaxDe(val, real, media){
+  const bruto = Math.max(100, (val || 0) * 2, (real || 0) * 1.5, (media || 0) * 2);
+  const mag = Math.pow(10, Math.floor(Math.log10(bruto)));
+  return Math.ceil(bruto / mag) * mag;
+}
+
+function renderOrcAjustar(cons, media){
+  const el = document.getElementById('orc-ajustar-lista');
+  if(!el) return;
+  const tipoFil = document.getElementById('orc-fil-tipo')?.value || '';
+  const tipos = TIPOS_ORC.filter(t => !tipoFil || t === tipoFil);
+  const blocos = tipos.map(tipo => {
+    const cats = cons.cats.filter(g => g.tipo === tipo && g.temMeta).sort((a,b) => b.meta - a.meta || a.cat.localeCompare(b.cat));
+    if(!cats.length) return '';
+    const totMeta = cats.reduce((a,g) => a + g.meta, 0);
+    return `<div class="orc-bloco">
+      <div class="orc-bloco-hd"><span>${tipo === 'Despesa' ? 'Despesas' : tipo === 'Receita' ? 'Receitas' : 'Investimentos'}</span>
+        <span class="mono" id="orc-bt-${tipo}">${fmtR(totMeta)}</span></div>
+      ${cats.map(g => cardCategoria(g, media)).join('')}
+    </div>`;
+  }).join('');
+
+  const semMeta = cons.cats.filter(g => !g.temMeta && g.projetado > 0 && (!tipoFil || g.tipo === tipoFil))
+    .sort((a,b) => b.projetado - a.projetado);
+  const blocoSem = semMeta.length ? `<div class="orc-bloco">
+      <div class="orc-bloco-hd"><span>Gastos sem meta</span><span class="mono">${fmtR(semMeta.reduce((a,g)=>a+g.projetado,0))}</span></div>
+      ${semMeta.map(g => {
+        const sug = arred10(Math.max(g.projetado, media[g.cat] || 0));
+        return `<div class="orc-semmeta">
+          <span class="orc-semmeta-nome">${g.cat} <em>${g.tipo}</em></span>
+          <span class="mono">${fmtR(g.real)}${g.pend ? ` + ${fmtR(g.pend)} pendente` : ''}</span>
+          ${media[g.cat] ? `<span class="orc-semmeta-med">média 3m ${fmtR(media[g.cat])}</span>` : ''}
+          <button class="btn btn-blue btn-xs" onclick="orcCriarMetaRapida('${g.tipo}', &quot;${g.cat.replace(/"/g,'&quot;')}&quot;, ${sug})">+ Criar meta de ${fmtR(sug)}</button>
+        </div>`; }).join('')}
+    </div>` : '';
+
+  el.innerHTML = (blocos || blocoSem) ? blocos + blocoSem
+    : `<div class="orc-vazio" style="padding:36px">Nenhuma meta em ${MESES[cons.mes]}/${cons.ano}.<br>
+        Use os atalhos acima — copiar do mês anterior ou sugerir pela média — ou clique em <b>+ Nova Meta</b>.</div>`;
+  // trilho preenchido, cor e situação já na abertura — não só depois de arrastar
+  el.querySelectorAll('.orc-range[data-id]').forEach(r => orcPintarSlider(r.dataset.id, parseFloat(r.value) || 0));
+}
+
+function cardCategoria(g, media){
+  const linhas = [];
+  if(g.metaCat) linhas.push(sliderMeta(g.metaCat, g.metaCatVal, g.real, g.pend, media[g.cat], 'Toda a categoria', g.tipo));
+  Object.values(g.subs).filter(s => s.meta).sort((a,b) => b.metaVal - a.metaVal)
+    .forEach(s => linhas.push(sliderMeta(s.meta, s.metaVal, s.real, s.pend, media[g.cat + '›' + s.subcat], s.subcat, g.tipo)));
+  return `<div class="orc-cat" id="${orcCatId(g.tipo, g.cat)}">
+    <div class="orc-cat-hd">
+      <span class="orc-cat-nome">${g.cat}</span>
+      <span class="badge ${g.st.cls}" data-role="st" style="font-size:9px">${g.st.icone} ${g.st.label}</span>
+      <span class="orc-cat-num"><span data-role="real" class="mono">${fmtR(g.real)}</span> de <b data-role="meta" class="mono">${fmtR(g.meta)}</b></span>
+    </div>
+    ${g.subsExcedem ? `<div class="orc-cat-aviso" data-role="aviso">🧩 As subcategorias somam ${fmtR(g.somaSubs)}, mais que a meta da categoria.</div>` : '<div class="orc-cat-aviso" data-role="aviso" style="display:none"></div>'}
+    ${linhas.join('')}
+  </div>`;
+}
+
+function sliderMeta(m, val, real, pend, media, rotulo, tipo){
+  const max  = orcMaxDe(val, real + pend, media);
+  const step = orcPassoDe(max);
+  const pos  = v => Math.min(100, Math.max(0, v / max * 100));
+  return `<div class="orc-sl" data-id="${m.id}" data-max="${max}" data-real="${real}" data-pend="${pend}" data-tipo="${tipo}">
+    <div class="orc-sl-top">
+      <span class="orc-sl-lbl">${rotulo}</span>
+      <span class="orc-sl-info">realizado <b class="mono">${fmtR(real)}</b>${pend ? ` · pendente <b class="mono">${fmtR(pend)}</b>` : ''}${media ? ` · média 3m <b class="mono">${fmtR(media)}</b>` : ''}</span>
+    </div>
+    <div class="orc-sl-row">
+      <button class="orc-sl-btn" onclick="orcPasso('${m.id}',-1)" aria-label="Diminuir meta de ${rotulo}">−</button>
+      <div class="orc-sl-trilho">
+        <input type="range" class="orc-range" id="orc-r-${m.id}" data-id="${m.id}" min="0" max="${max}" step="${step}" value="${val}"
+          oninput="orcSliderInput('${m.id}')" onchange="orcSalvarMeta('${m.id}')" aria-label="Meta de ${rotulo}">
+        ${real + pend > 0 ? `<span class="orc-mk orc-mk-real" style="left:${pos(real + pend)}%" title="Realizado + pendente: ${fmtR(real + pend)}"></span>` : ''}
+        ${media ? `<span class="orc-mk orc-mk-media" style="left:${pos(media)}%" title="Média dos últimos 3 meses: ${fmtR(media)}"></span>` : ''}
+      </div>
+      <button class="orc-sl-btn" onclick="orcPasso('${m.id}',1)" aria-label="Aumentar meta de ${rotulo}">+</button>
+      <input type="number" class="orc-sl-num" id="orc-n-${m.id}" value="${val}" min="0" step="${step}"
+        oninput="orcNumInput('${m.id}')" onchange="orcSalvarMeta('${m.id}')" aria-label="Valor da meta de ${rotulo}">
+      <button class="orc-sl-ic" onclick="editOrc('${m.id}')" title="Editar">✎</button>
+      <button class="orc-sl-ic del" onclick="delOrc('${m.id}')" title="Excluir">✕</button>
+    </div>
+    <div class="orc-sl-st" id="orc-s-${m.id}"></div>
+  </div>`;
+}
+
+// Pinta um slider: cor do trilho diz se a meta já foi ultrapassada
+function orcPintarSlider(id, v){
+  const box = document.querySelector(`.orc-sl[data-id="${id}"]`);
+  const r = document.getElementById('orc-r-' + id);
+  if(!box || !r) return;
+  const max = parseFloat(r.max) || 1, real = parseFloat(box.dataset.real) || 0, pend = parseFloat(box.dataset.pend) || 0;
+  const tipo = box.dataset.tipo;
+  let cor = 'var(--viz-prev)', txt;
+  if(tipo === 'Despesa'){
+    if(real > v + 0.005)             { cor = 'var(--red)';   txt = `⚠ já estourou em ${fmtR(real - v)}`; }
+    else if(real + pend > v + 0.005) { cor = 'var(--amber)'; txt = `⏳ com o pendente passa ${fmtR(real + pend - v)}`; }
+    else txt = `✓ sobram ${fmtR(v - real - pend)}${v > 0 ? ` · ${pct((real + pend) / v * 100)} usado` : ''}`;
+  } else {
+    txt = real >= v - 0.005 ? `✓ meta atingida (${fmtR(real)})` : `faltam ${fmtR(v - real)}${v > 0 ? ` · ${pct(real / v * 100)} alcançado` : ''}`;
+    if(real >= v - 0.005) cor = 'var(--green)';
+  }
+  r.style.setProperty('--p', Math.min(100, v / max * 100) + '%');
+  r.style.setProperty('--orc-fill', cor);
+  const st = document.getElementById('orc-s-' + id);
+  if(st) st.textContent = txt;
+}
+
+function orcSliderInput(id){
+  const r = document.getElementById('orc-r-' + id);
+  const v = parseFloat(r.value) || 0;
+  const n = document.getElementById('orc-n-' + id); if(n) n.value = v;
+  orcPintarSlider(id, v);
+  orcAtualizarAoVivo();
+}
+function orcNumInput(id){
+  const n = document.getElementById('orc-n-' + id), r = document.getElementById('orc-r-' + id);
+  const v = Math.max(0, parseFloat(n.value) || 0);
+  if(v > parseFloat(r.max)) r.max = orcMaxDe(v, 0, 0);     // a barra cresce junto
+  r.value = v;
+  orcPintarSlider(id, v);
+  orcAtualizarAoVivo();
+}
+function orcPasso(id, dir){
+  const r = document.getElementById('orc-r-' + id);
+  if(!r) return;
+  const step = parseFloat(r.step) || 10;
+  const v = Math.max(0, +(parseFloat(r.value) + dir * step).toFixed(2));
+  if(v > parseFloat(r.max)) r.max = orcMaxDe(v, 0, 0);
+  r.value = v;
+  orcSliderInput(id);
+  clearTimeout(_orcSaveT[id]);
+  _orcSaveT[id] = setTimeout(() => { delete _orcSaveT[id]; orcSalvarMeta(id); }, 500);
+}
+// Grava só a meta alterada — sem redesenhar a lista, o foco fica onde estava
+function orcSalvarMeta(id){
+  const r = document.getElementById('orc-r-' + id);
+  if(!r) return;
+  const v = Math.max(0, +(parseFloat(document.getElementById('orc-n-' + id)?.value ?? r.value) || 0).toFixed(2));
+  const d = gs();
+  const m = d.orcs.find(o => o.id === id);
+  if(!m || m.val === v) return;
+  m.val = v;
+  m.editadoEm = new Date().toISOString();
+  ss(d);
+  if(_orcCache) _orcCache.cons.metas.forEach(x => { if(x.id === id) x.val = v; });
+  orcAtualizarAoVivo();
+  const ok = document.getElementById('orc-salvo');
+  if(ok){ ok.classList.add('on'); clearTimeout(ok._t); ok._t = setTimeout(() => ok.classList.remove('on'), 1400); }
+}
+
+// Recalcula totais, cabeçalhos de categoria e a barra da renda a partir dos
+// valores que estão nos sliders AGORA — enquanto o usuário arrasta
+function orcAtualizarAoVivo(){
+  if(!_orcCache) return;
+  const vals = {};
+  // só os sliders das metas — o do modal de nova meta não é uma meta existente
+  document.querySelectorAll('#orc-ajustar-lista .orc-range[data-id]').forEach(r => { vals[r.dataset.id] = parseFloat(r.value) || 0; });
+  _orcCache.cons.cats.forEach(g => derivarCategoria(g, vals));
+  const tot = totaisOrcamento(_orcCache.cons);
+  const renda = rendaBase({ cfg:_orcCache.cfg }, tot);   // sem reler o localStorage a cada pixel
+  _orcCache.tot = tot; _orcCache.renda = renda;
+  renderOrcKpis(tot, renda);
+  renderDistribuicaoRenda(tot, renda);
+  set('orc-sub', `${MESES[_orcCache.mes]} de ${_orcCache.ano} · renda de referência: ${fmtR(renda.v)} (${renda.fonte})`);
+  _orcCache.cons.cats.forEach(g => {
+    const box = document.getElementById(orcCatId(g.tipo, g.cat));
+    if(!box) return;
+    const q = s => box.querySelector(`[data-role="${s}"]`);
+    if(q('meta')) q('meta').textContent = fmtR(g.meta);
+    if(q('st')){ q('st').className = 'badge ' + g.st.cls; q('st').textContent = `${g.st.icone} ${g.st.label}`; }
+    const av = q('aviso');
+    if(av){ av.style.display = g.subsExcedem ? 'block' : 'none';
+      if(g.subsExcedem) av.textContent = `🧩 As subcategorias somam ${fmtR(g.somaSubs)}, mais que a meta da categoria.`; }
+  });
+  TIPOS_ORC.forEach(t => {
+    const el = document.getElementById('orc-bt-' + t);
+    if(el) el.textContent = fmtR(_orcCache.cons.cats.filter(g => g.tipo === t && g.temMeta).reduce((a,g) => a + g.meta, 0));
+  });
+}
+
+// ══ Visão Acompanhamento ════════════════════════════════════════
+function renderOrcAcomp(cons, media){
+  const tb = document.getElementById('orc-acomp-tbody');
+  const tf = document.getElementById('orc-acomp-tfoot');
+  if(!tb) return;
+  const tipoFil = document.getElementById('orc-fil-tipo-acomp')?.value || '';
+  const linhas = [];
+  TIPOS_ORC.filter(t => !tipoFil || t === tipoFil).forEach(tipo => {
+    const cats = cons.cats.filter(g => g.tipo === tipo && (g.temMeta || g.projetado > 0))
+      .sort((a,b) => (b.temMeta - a.temMeta) || (b.meta - a.meta) || (b.projetado - a.projetado));
+    if(!cats.length) return;
+    linhas.push(`<tr class="orc-tr-grupo"><td colspan="8">${tipo === 'Despesa' ? 'Despesas' : tipo === 'Receita' ? 'Receitas' : 'Investimentos'}</td></tr>`);
+    cats.forEach(g => {
+      linhas.push(linhaAcomp(g.cat, g, g.meta, g.temMeta, media[g.cat], false));
+      Object.values(g.subs).filter(s => s.meta).forEach(s =>
+        linhas.push(linhaAcomp(s.subcat, { tipo, real:s.real, pend:s.pend, projetado:s.projetado, st:s.st }, s.metaVal, true, media[g.cat + '›' + s.subcat], true)));
+    });
+  });
+  tb.innerHTML = linhas.length ? linhas.join('')
+    : `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">Sem metas nem gastos em ${MESES[cons.mes]}/${cons.ano}.</td></tr>`;
+  const t = totaisOrcamento(cons);
+  if(tf) tf.innerHTML = `<tr>
+    <td>Total de despesas</td>
+    <td class="mono">${fmtR(t.desMeta)}</td>
+    <td class="mono">${fmtR(t.desReal)}</td>
+    <td class="mono">${fmtR(t.desPend)}</td>
+    <td class="mono">${fmtR(t.desReal + t.desPend)}</td>
+    <td class="mono" style="color:${t.desMeta - t.desReal - t.desPend >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtR(t.desMeta - t.desReal - t.desPend)}</td>
+    <td class="mono">${t.desMeta > 0 ? pct(t.desReal / t.desMeta * 100) : '—'}</td>
+    <td></td></tr>`;
+}
+function linhaAcomp(nome, g, meta, temMeta, media, eSub){
+  const saldo = meta - g.real - g.pend;
+  const despesa = g.tipo === 'Despesa';
+  const p = meta > 0 ? g.real / meta * 100 : null;
+  const barra = meta > 0 ? `<div class="orc-mini"><div style="width:${Math.min(100, (g.real + g.pend) / meta * 100)}%;background:var(--viz-pend)"></div><div style="width:${Math.min(100, g.real / meta * 100)}%;background:${despesa && g.real > meta ? 'var(--red)' : 'var(--viz-real)'}"></div></div>` : '';
+  return `<tr${eSub ? ' class="orc-tr-sub"' : ''}>
+    <td>${eSub ? '↳ ' : ''}${nome}${media && !eSub ? `<div class="orc-td-hint">média 3m ${fmtR(media)}</div>` : ''}</td>
+    <td class="mono">${temMeta ? fmtR(meta) : '—'}</td>
+    <td class="mono">${fmtR(g.real)}</td>
+    <td class="mono" style="color:${g.pend ? 'var(--t2)' : 'var(--t4)'}">${g.pend ? fmtR(g.pend) : '—'}</td>
+    <td class="mono">${fmtR(g.projetado)}${barra}</td>
+    <td class="mono" style="color:${!temMeta ? 'var(--t4)' : (despesa ? saldo >= 0 : saldo <= 0) ? 'var(--green)' : 'var(--red)'}">${temMeta ? (despesa ? fmtR(saldo) : saldo > 0 ? `faltam ${fmtR(saldo)}` : `+${fmtR(-saldo)}`) : '—'}</td>
+    <td class="mono">${p != null ? pct(p) : '—'}</td>
+    <td>${g.st ? `<span class="badge ${g.st.cls}" style="font-size:9px">${g.st.icone} ${g.st.label}</span>` : ''}
+        ${!temMeta && !eSub ? `<button class="btn btn-blue btn-xs" style="margin-left:4px" onclick="orcCriarMetaRapida('${g.tipo}', &quot;${nome.replace(/"/g,'&quot;')}&quot;, ${arred10(Math.max(g.projetado, media || 0))})">+ Meta</button>` : ''}</td>
+  </tr>`;
+}
+
+// ══ Visão Anual ═════════════════════════════════════════════════
+function renderOrcAnual(d, ano, comCartao){
+  const pal = paletaOrc();
+  const meses = MESES.map((_, m) => {
+    const c = consolidarOrcamento(d, m, ano, comCartao);
+    const t = totaisOrcamento(c);
+    return { m, meta:t.desMeta, real:t.desReal, pend:t.desPend, rec:t.recMeta, recReal:t.recReal, metas:c.metas.length,
+             estouradas:c.cats.filter(g => g.tipo === 'Despesa' && g.st.k === 'estourou').length };
+  });
+  const moeda = v => 'R$' + Number(v).toLocaleString('pt-BR');
+  const barra = (label, data, cor, stack, raio) => ({ label, data, backgroundColor:cor, stack,
+    borderColor:pal.superficie, borderWidth:{ top:2 }, borderSkipped:'bottom', borderRadius:raio,
+    maxBarThickness:28, categoryPercentage:.74, barPercentage:.9 });
+  mkCh('ch-orc-anual', { type:'bar', data:{ labels:MESES3, datasets:[
+      barra('Orçado',    meses.map(x => x.meta), pal.previsto,  'orc',  4),
+      barra('Realizado', meses.map(x => x.real), pal.realizado, 'real', c => meses[c.dataIndex] && meses[c.dataIndex].pend > 0 ? 0 : 4),
+      barra('Pendente',  meses.map(x => x.pend), pal.pendente,  'real', 4),
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+      onClick:(e, el) => { if(el.length){ orcIrMes(el[0].index, ano); setOrcView('geral'); } },
+      plugins:{ legend:{ display:true, labels:{ color:pal.tick, font:{size:11}, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+        tooltip:{ callbacks:{ label:ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}` } } },
+      scales:{ x:{ stacked:true, ticks:{ color:pal.tick, font:{size:10} }, grid:{ display:false } },
+               y:{ stacked:true, beginAtZero:true, ticks:{ color:pal.tick, font:{size:10}, callback:moeda }, grid:{ color:pal.grid } } } } });
+
+  const tb = document.getElementById('orc-anual-tbody');
+  const tf = document.getElementById('orc-anual-tfoot');
+  const hoje = new Date();
+  if(tb) tb.innerHTML = meses.map(x => {
+    const dif = x.meta - x.real - x.pend;
+    const atual = x.m === hoje.getMonth() && ano === hoje.getFullYear();
+    return `<tr class="orc-tr-click${x.m === _orcMes ? ' orc-tr-sel' : ''}" onclick="orcIrMes(${x.m}, ${ano}); setOrcView('geral')">
+      <td>${MESES[x.m]}${atual ? ' <span class="badge bdg-green" style="font-size:8px">agora</span>' : ''}</td>
+      <td class="mono">${x.metas ? fmtR(x.meta) : '—'}</td>
+      <td class="mono">${fmtR(x.real)}</td>
+      <td class="mono" style="color:${x.pend ? 'var(--t2)' : 'var(--t4)'}">${x.pend ? fmtR(x.pend) : '—'}</td>
+      <td class="mono" style="color:${!x.metas ? 'var(--t4)' : dif >= 0 ? 'var(--green)' : 'var(--red)'}">${x.metas ? fmtR(dif) : '—'}</td>
+      <td class="mono">${x.meta > 0 ? pct(x.real / x.meta * 100) : '—'}</td>
+      <td>${!x.metas ? '<span class="badge bdg-gray" style="font-size:9px">— Sem metas</span>'
+            : x.estouradas ? `<span class="badge bdg-red" style="font-size:9px">⚠ ${x.estouradas} estourada(s)</span>`
+            : '<span class="badge bdg-green" style="font-size:9px">✓ No limite</span>'}</td>
+    </tr>`; }).join('');
+  const s = f => meses.reduce((a,x) => a + f(x), 0);
+  if(tf){ const dif = s(x => x.meta) - s(x => x.real) - s(x => x.pend);
+    tf.innerHTML = `<tr><td>Total ${ano}</td><td class="mono">${fmtR(s(x => x.meta))}</td><td class="mono">${fmtR(s(x => x.real))}</td>
+      <td class="mono">${fmtR(s(x => x.pend))}</td><td class="mono" style="color:${dif >= 0 ? 'var(--green)' : 'var(--red)'}">${fmtR(dif)}</td>
+      <td class="mono">${s(x => x.meta) > 0 ? pct(s(x => x.real) / s(x => x.meta) * 100) : '—'}</td><td></td></tr>`; }
+}
+
+// ══ Atalhos de produtividade ════════════════════════════════════
+function orcCriarMetaRapida(tipo, cat, val){
+  const d = gs(); const ano = orcAno(), mes = _orcMes;
+  if(metasDoMes(d, mes, ano).some(o => o.tipo === tipo && o.cat === cat && !o.subcat)) return;
+  d.orcs.push({ id:uid(), tipo, mes, ano, cat, subcat:'', val:+val, obs:'Criada a partir do gasto do mês' });
+  ss(d); renderOrc();
+}
+function orcCopiarMesAnterior(){
+  const d = gs(); const ano = orcAno(), mes = _orcMes;
+  const ant = mesAnterior(ano, mes);
+  const origem = metasDoMes(d, ant.mes, ant.ano);
+  if(!origem.length){ alert(`Não há metas em ${MESES[ant.mes]}/${ant.ano} para copiar.`); return; }
+  const atuais = metasDoMes(d, mes, ano);
+  if(atuais.length && !confirm(`${MESES[mes]}/${ano} já tem ${atuais.length} meta(s).\n\nSubstituir pelas ${origem.length} meta(s) de ${MESES[ant.mes]}/${ant.ano}?`)) return;
+  d.orcs = d.orcs.filter(o => !(o.mes === mes && anoDaMeta(o) === ano));
+  origem.forEach(o => d.orcs.push({ ...o, id:uid(), mes, ano, editadoEm:undefined }));
+  ss(d); renderOrc();
+}
+function orcReplicar(){
+  const d = gs(); const ano = orcAno(), mes = _orcMes;
+  const origem = metasDoMes(d, mes, ano);
+  if(!origem.length){ alert('Este mês não tem metas para replicar.'); return; }
+  if(mes === 11){ alert('Dezembro é o último mês do ano — não há meses seguintes para replicar.'); return; }
+  const n = 11 - mes;
+  if(!confirm(`Replicar as ${origem.length} meta(s) de ${MESES[mes]} para os ${n} mês(es) seguintes, até Dezembro/${ano}?\n\nAs metas que já existirem nesses meses serão substituídas.`)) return;
+  for(let m = mes + 1; m <= 11; m++){
+    d.orcs = d.orcs.filter(o => !(o.mes === m && anoDaMeta(o) === ano));
+    origem.forEach(o => d.orcs.push({ ...o, id:uid(), mes:m, ano, editadoEm:undefined }));
+  }
+  ss(d); renderOrc();
+}
+function orcSugerirPelaMedia(){
+  const d = gs(); const ano = orcAno(), mes = _orcMes;
+  const media = mediaGastos(d, mes, ano, 3, orcComCartao());
+  const comMeta = new Set(metasDoMes(d, mes, ano).filter(o => o.tipo === 'Despesa').map(o => o.cat));
+  const novas = Object.entries(media).filter(([k,v]) => !k.includes('›') && v > 0 && !comMeta.has(k))
+    .sort((a,b) => b[1] - a[1]);
+  if(!novas.length){ alert('Nenhuma categoria sem meta teve gasto nos últimos 3 meses.'); return; }
+  if(!confirm(`Criar ${novas.length} meta(s) com a média dos últimos 3 meses (arredondada para cima)?\n\n`
+      + novas.map(([k,v]) => `• ${k}: ${fmtR(arred10(v))}`).join('\n')
+      + '\n\nMetas que já existem não são alteradas.')) return;
+  novas.forEach(([cat, v]) => d.orcs.push({ id:uid(), tipo:'Despesa', mes, ano, cat, subcat:'', val:arred10(v), obs:'Sugerida pela média de 3 meses' }));
+  ss(d); renderOrc();
+}
+function orcLimparMes(){
+  const d = gs(); const ano = orcAno(), mes = _orcMes;
+  const atuais = metasDoMes(d, mes, ano);
+  if(!atuais.length) return;
+  if(!confirm(`Excluir as ${atuais.length} meta(s) de ${MESES[mes]}/${ano}?\n\nOs lançamentos não são afetados.`)) return;
+  d.orcs = d.orcs.filter(o => !(o.mes === mes && anoDaMeta(o) === ano));
+  ss(d); renderOrc();
+}
+
+// ══ Modal de meta ═══════════════════════════════════════════════
+function saveOrc(){
+  const $ = x => document.getElementById(x);
+  const tipo   = $('o-tipo')?.value;
+  const mes    = parseInt($('o-mes')?.value);
+  const ano    = parseInt($('o-ano')?.value) || orcAno();
+  const cat    = $('o-cat')?.value;
+  const subcat = $('o-subcat')?.value || '';
+  const val    = +(parseFloat($('o-val')?.value) || 0).toFixed(2);
+  const obs    = $('o-obs')?.value?.trim() || '';
+  const editId = $('o-edit-id')?.value || '';
+  const err = $('o-err');
+  const falha = m => { if(err){ err.textContent = '⚠️ ' + m; err.style.display = 'block'; } else alert(m); };
+  if(!cat)          return falha('Escolha a categoria.');
+  if(!(val > 0))    return falha('Informe um valor maior que zero.');
+  const d = gs();
+  const mesma = o => o.tipo === tipo && o.cat === cat && (o.subcat || '') === subcat && o.mes === mes && anoDaMeta(o) === ano;
+  if(editId){
+    // Antes a edição podia criar duas metas iguais no mesmo mês
+    const outra = d.orcs.find(o => o.id !== editId && mesma(o));
+    if(outra) return falha(`Já existe uma meta de ${cat}${subcat ? ' › ' + subcat : ''} em ${MESES[mes]}/${ano} (${fmtR(outra.val)}). Edite aquela ou escolha outra categoria.`);
+    const m = d.orcs.find(o => o.id === editId);
+    if(m) Object.assign(m, { tipo, mes, ano, cat, subcat, val, obs, editadoEm:new Date().toISOString() });
+  } else {
+    d.orcs = d.orcs.filter(o => !mesma(o));
+    d.orcs.push({ id:uid(), tipo, mes, ano, cat, subcat, val, obs });
+  }
+  if(err) err.style.display = 'none';
+  ss(d); closeM('m-orc');
+  _orcMes = mes;
+  const sel = $('orc-ano'); if(sel){ initOrcAnoOpts(d); sel.value = String(ano); }
+  renderOrc();
 }
 
 function editOrc(id){
   const d = gs();
-  const m = d.orcs.find(o=>o.id===id);
+  const m = d.orcs.find(o => o.id === id);
   if(!m) return;
-
-  // Preenche o modal diretamente (sem chamar openM que reseta tudo)
-  document.getElementById('m-orc-titulo').textContent = 'Editar Meta de Orçamento';
-  document.getElementById('o-edit-id').value  = id;
-  document.getElementById('o-tipo').value     = m.tipo;
-  document.getElementById('o-mes').value      = m.mes;
-  document.getElementById('o-val').value      = m.val;
-  document.getElementById('o-obs').value      = m.obs||'';
-
-  // Popula categorias do tipo e depois define a selecionada
-  updOrcCats();
-  setTimeout(()=>{
-    const catEl = document.getElementById('o-cat');
-    if(catEl) catEl.value = m.cat||'';
-    updOrcSubcats();
-    setTimeout(()=>{
-      const scEl = document.getElementById('o-subcat');
-      if(scEl) scEl.value = m.subcat||'';
-      updOrcPreview();
-    }, 60);
-  }, 60);
-
-  // Abre o overlay
-  document.getElementById('m-orc').style.display = 'flex';
+  const $ = x => document.getElementById(x);
+  openM('m-orc');
+  $('m-orc-titulo').textContent = 'Editar Meta de Orçamento';
+  $('o-edit-id').value = id;
+  $('o-tipo').value    = m.tipo;
+  $('o-mes').value     = m.mes;
+  if($('o-ano')){ if(![...$('o-ano').options].some(o => o.value === String(anoDaMeta(m)))) $('o-ano').insertAdjacentHTML('beforeend', `<option>${anoDaMeta(m)}</option>`);
+                  $('o-ano').value = String(anoDaMeta(m)); }
+  $('o-obs').value     = m.obs || '';
+  updOrcCats();                                  // síncrono: não precisa de setTimeout
+  $('o-cat').value = m.cat || '';
+  updOrcSubcats();
+  $('o-subcat').value = m.subcat || '';
+  $('o-val').value = m.val;
+  updOrcPreview();
 }
 
 let _delOrcId = null;
 function delOrc(id){
   _delOrcId = id;
   const d = gs();
-  const m = d.orcs.find(o=>o.id===id);
+  const m = d.orcs.find(o => o.id === id);
   if(!m) return;
-
-  const label = m.cat + (m.subcat ? ` › ${m.subcat}` : '');
-  // Mostra modal de confirmação de exclusão
-  document.getElementById('m-orc-del-label').textContent  = label;
-  document.getElementById('m-orc-del-tipo').textContent   = m.tipo;
-  document.getElementById('m-orc-del-valor').textContent  = fmtR(m.val);
-  document.getElementById('m-orc-del').style.display      = 'flex';
+  document.getElementById('m-orc-del-label').textContent = m.cat + (m.subcat ? ` › ${m.subcat}` : '');
+  document.getElementById('m-orc-del-tipo').textContent  = `${m.tipo} · ${MESES[m.mes]}/${anoDaMeta(m)}`;
+  document.getElementById('m-orc-del-valor').textContent = fmtR(m.val);
+  document.getElementById('m-orc-del').style.display     = 'flex';
 }
-
 function confirmarDelOrc(){
   if(!_delOrcId) return;
   const d = gs();
-  d.orcs = d.orcs.filter(o=>o.id!==_delOrcId);
+  d.orcs = d.orcs.filter(o => o.id !== _delOrcId);
   ss(d);
   _delOrcId = null;
   document.getElementById('m-orc-del').style.display = 'none';
   renderOrc();
 }
-
 function cancelarDelOrc(){
   _delOrcId = null;
   document.getElementById('m-orc-del').style.display = 'none';
 }
 
 function updOrcCats(){
-  const tipo = document.getElementById('o-tipo')?.value||'Despesa';
+  const tipo = document.getElementById('o-tipo')?.value || 'Despesa';
   const el   = document.getElementById('o-cat');
-  if(el) el.innerHTML = allCats(tipo).map(c=>`<option>${c}</option>`).join('');
+  if(el) el.innerHTML = allCats(tipo).map(c => `<option>${c}</option>`).join('');
   updOrcSubcats();
 }
-
 function updOrcSubcats(){
-  const tipo = document.getElementById('o-tipo')?.value||'Despesa';
-  const cat  = document.getElementById('o-cat')?.value||'';
+  const tipo = document.getElementById('o-tipo')?.value || 'Despesa';
+  const cat  = document.getElementById('o-cat')?.value || '';
   const el   = document.getElementById('o-subcat');
   if(!el) return;
-  const sc = subcats(tipo, cat);
-  el.innerHTML = '<option value="">— Toda a categoria —</option>' + sc.map(s=>`<option>${s}</option>`).join('');
+  el.innerHTML = '<option value="">— Toda a categoria —</option>' + subcats(tipo, cat).map(s => `<option>${s}</option>`).join('');
   updOrcPreview();
 }
+// Prévia do modal: slider sincronizado com o valor e referências da categoria
+function updOrcPreview(origem){
+  const $ = x => document.getElementById(x);
+  const tipo   = $('o-tipo')?.value || 'Despesa';
+  const cat    = $('o-cat')?.value || '';
+  const subcat = $('o-subcat')?.value || '';
+  const mes    = parseInt($('o-mes')?.value);
+  const ano    = parseInt($('o-ano')?.value) || orcAno();
+  const r = $('o-range'), n = $('o-val');
+  if(origem === 'range' && r && n) n.value = r.value;
+  const val = parseFloat(n?.value) || 0;
 
-function updOrcPreview(){
-  const cat    = document.getElementById('o-cat')?.value||'';
-  const subcat = document.getElementById('o-subcat')?.value||'';
-  const val    = parseFloat(document.getElementById('o-val')?.value)||0;
-  const prevCat   = document.getElementById('o-prev-cat');
-  const prevSubcat= document.getElementById('o-prev-subcat');
-  const prevVal   = document.getElementById('o-prev-val');
-  if(prevCat)    prevCat.textContent    = cat||'—';
-  if(prevSubcat) prevSubcat.textContent = subcat ? `› ${subcat}` : '';
-  if(prevVal)    prevVal.textContent    = fmtR(val);
+  // Referências: gasto do mês e média de 3 meses na categoria escolhida
+  const d = gs();
+  let real = 0, media = 0;
+  if(!isNaN(mes) && cat){
+    const cons = consolidarOrcamento(d, mes, ano, orcComCartao());
+    const g = cons.cats.find(x => x.tipo === tipo && x.cat === cat);
+    if(g) real = subcat ? ((g.subs[subcat] || {}).real || 0) : g.real;
+    if(tipo === 'Despesa'){ const md = mediaGastos(d, mes, ano, 3, orcComCartao()); media = md[subcat ? cat + '›' + subcat : cat] || 0; }
+  }
+  if(r){
+    const max = orcMaxDe(val, real, media);
+    r.max = max; r.step = orcPassoDe(max);
+    if(origem !== 'range') r.value = val;
+    r.style.setProperty('--p', Math.min(100, val / max * 100) + '%');
+    r.style.setProperty('--orc-fill', tipo === 'Despesa' && real > val ? 'var(--red)' : 'var(--viz-prev)');
+    const mk = (cls, v, t) => v > 0 ? `<span class="orc-mk ${cls}" style="left:${Math.min(100, v / max * 100)}%" title="${t}: ${fmtR(v)}"></span>` : '';
+    const trilho = $('o-range-mk');
+    if(trilho) trilho.innerHTML = mk('orc-mk-real', real, 'Gasto no mês') + mk('orc-mk-media', media, 'Média 3 meses');
+  }
+  if($('o-prev-cat'))    $('o-prev-cat').textContent    = cat || '—';
+  if($('o-prev-subcat')) $('o-prev-subcat').textContent = subcat ? `› ${subcat}` : '';
+  if($('o-prev-val'))    $('o-prev-val').textContent    = fmtR(val);
+  const ref = $('o-prev-ref');
+  if(ref) ref.innerHTML = [
+    real  ? `${tipo === 'Despesa' ? 'gasto' : 'recebido'} no mês <b class="mono">${fmtR(real)}</b>` : '',
+    media ? `média 3m <b class="mono">${fmtR(media)}</b>` : '',
+  ].filter(Boolean).join(' · ') || '<span style="color:var(--t4)">sem histórico nesta categoria</span>';
 }
-
-document.getElementById('o-tipo')?.addEventListener('change', updOrcCats);
-document.getElementById('o-cat')?.addEventListener('change', ()=>{updOrcSubcats();updOrcPreview();});
-document.getElementById('o-subcat')?.addEventListener('change', updOrcPreview);
-document.getElementById('o-val')?.addEventListener('input', updOrcPreview);
 
 // ── CONTAS A PAGAR ──
 // ── Helpers de data para parcelas ──
@@ -9182,6 +9913,20 @@ seedLancamentos();
 })();
 
 // ── MIGRAÇÃO ──
+// Metas de orçamento guardavam só o mês e valiam para todos os anos. Passam a
+// pertencer ao ano de referência em que foram criadas, uma única vez.
+(function migrarAnoDasMetas(){
+  try {
+    const d = gs();
+    if (d._orcAnoMigrado) return;
+    const a = anoRef(); let n = 0;
+    (d.orcs || []).forEach(o => { if (o.ano == null) { o.ano = a; n++; } });
+    d._orcAnoMigrado = true;
+    ss(d);
+    if (n) console.log('%c✓ ' + n + ' meta(s) de orçamento vinculada(s) ao ano ' + a + '.', 'color:#00d97e');
+  } catch(e) { console.warn('migrarAnoDasMetas:', e); }
+})();
+
 // Lançamentos importados podiam ficar vinculados à conta errada quando um nome era prefixo
 // de outro ("Conta Nubank" × "Conta Nubank Poliana"). Reatribui pelo nome exato, uma única vez.
 (function corrigirVinculoDeCaixa(){
