@@ -4,6 +4,74 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-23] Relatório por categoria: análise mês a mês
+
+### 🎯 O que foi pedido
+
+Melhorar o relatório **Por Categoria** e colocar opções de analisar **os meses separados** —
+antes ele mostrava só o ano inteiro.
+
+### 🐛 O que estava errado
+
+- Só existia a visão do **ano inteiro**: não dava para ver um mês, um trimestre ou comparar períodos.
+- Mostrava apenas **despesas**, sem subcategorias e sem o que puxou cada valor.
+- A **cor de cada categoria mudava conforme a posição** no ranking (a 1ª era sempre verde, a 2ª
+  sempre azul…): a mesma categoria trocava de cor quando mudava de lugar.
+- Os valores do eixo apareciam como "R$2.000" (sem espaço).
+- No celular, a barra de abas dos Relatórios (Visão Anual, Por Categoria…) deixava a página mais
+  larga que a tela, com rolagem lateral. Isso já acontecia antes e foi corrigido junto.
+
+### ✨ Implementado
+
+- **Escolha do período:** botões **Ano · Jan · Fev · … · Dez** (um clique por mês), setas **‹ ›**
+  para andar mês a mês — inclusive para o ano anterior — e **Outros períodos**: 1º a 4º trimestre,
+  1º e 2º semestre e últimos 3, 6 ou 12 meses. Meses sem lançamento ficam apagados.
+- **Comparação:** com o **período anterior** (ex.: julho × junho) ou com o **mesmo período do ano
+  passado** (julho/2026 × julho/2025), ou sem comparação.
+- **Receitas e investimentos** além de despesas, e opção **Lançamentos + cartão**: cada compra do
+  cartão entra na categoria dela, na fatura em que cai, e o pagamento da fatura sai da conta (senão
+  a mesma despesa contaria duas vezes).
+- **Abrir subcategorias:** clicar numa categoria (no gráfico, na lista ou na tabela) mostra a tela
+  inteira por subcategoria — ex.: Transporte → Combustível × Manutenção. "✕ limpar" volta.
+- **Indicadores do período:** total com variação, média mensal (ou por dia, quando é um mês),
+  maior categoria com % do total, **maior alta** e **maior queda** em relação à comparação, número
+  de lançamentos e ticket médio.
+- **Comparativo por categoria:** barras do período ao lado das do período comparado, com o valor
+  escrito na ponta e a variação no tooltip.
+- **Participação no período:** ranking com valor, % e variação (▲ ▼) de cada categoria.
+- **Evolução mês a mês:** colunas empilhadas das 5 maiores categorias do ano + "Outras", com os
+  meses fora do período em tom mais claro. **Clicar num mês** abre a análise daquele mês.
+- **Tabela mês a mês:** categoria × mês com total, média e %, tom mais forte no mês de maior valor
+  de cada linha e a coluna do período destacada. Clicar no mês ou na categoria detalha.
+- **Maiores lançamentos do período:** os 10 que mais pesaram, com categoria › subcategoria e a
+  marca 💳 nas compras de cartão.
+- Respeita o seletor **Previsto / Realizado** do topo dos Relatórios.
+
+### 🎨 Gráficos
+
+- **Cor segue a categoria**, não a posição: as 5 categorias com mais gasto no ano têm cor fixa
+  enquanto você troca de mês.
+- Cores **validadas para daltonismo** nos dois temas; "Outras" em cinza neutro e a comparação em
+  cinza, para o período atual se destacar.
+- Um eixo só em cada gráfico; a tabela mês a mês traz os números exatos de tudo que está nos
+  gráficos.
+- No celular, os meses rolam de lado, o mês escolhido fica centralizado e nada passa da largura
+  da tela.
+
+### 🧪 Testes
+
+- **`test-rel-cat.js` — 55 verificações:** períodos (mês, trimestre, semestre, móvel, virada do
+  ano), comparações, totais e variações conferidos à mão, Previsto × Realizado, lançamentos
+  cancelados, modo cartão sem contar a fatura em dobro, subcategorias, cliques no mês e na
+  categoria, receitas, eixo único e cores estáveis.
+- Suítes existentes seguem passando — **594 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. É só leitura: nada é gravado ou alterado.
+
+---
+
 ## [2026-09-23] Plano de contas editável e conta a pagar no cartão de crédito
 
 ### 🎯 O que foi pedido

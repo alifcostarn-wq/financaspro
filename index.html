@@ -275,6 +275,56 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
 
 
+/* ── RELATÓRIO POR CATEGORIA ── */
+.rc-filtros{margin-bottom:16px}
+.rc-sels{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rc-periodos{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.rc-chips{display:flex;gap:4px;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:3px}
+.rc-chip{border:none;background:transparent;color:var(--t2);font:600 11px 'Sora',sans-serif;padding:6px 10px;border-radius:5px;cursor:pointer;transition:.15s;min-width:38px}
+.rc-chip:hover{color:var(--t1);background:var(--surface3,var(--surface))}
+.rc-chip.vazio{color:var(--t3)}
+.rc-chip.on{background:var(--blue-dim);color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.rc-chip.parte{box-shadow:inset 0 -2px 0 var(--blue)}
+.rc-nav{border:1px solid var(--line2);background:var(--surface2);color:var(--t1);width:30px;height:30px;border-radius:var(--r2);cursor:pointer;font-size:16px;line-height:1}
+.rc-nav:disabled{opacity:.35;cursor:default}
+.rc-foco{font-size:11px;color:var(--t3);margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rc-foco a{color:var(--blue);cursor:pointer;text-decoration:none}
+.rc-foco a:hover{text-decoration:underline}
+.rc-foco b{color:var(--t1)}
+.rc-foco .rc-x{border:1px solid var(--line2);background:transparent;color:var(--t2);border-radius:5px;padding:1px 7px;cursor:pointer;font-size:10px}
+.rc-kpi-nome{font-size:15px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-g2{margin-bottom:16px}
+.rc-vazio{font-size:12px;color:var(--t3);text-align:center;padding:40px 0}
+.rc-rank-row{margin-bottom:11px}
+.rc-rank-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11px;margin-bottom:4px}
+.rc-rank-nome{color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-rank-nome.link{cursor:pointer}
+.rc-rank-nome.link:hover{color:var(--blue);text-decoration:underline}
+.rc-rank-nome small{color:var(--t3);margin-right:6px;font-family:'JetBrains Mono',monospace}
+.rc-rank-val{display:flex;align-items:baseline;gap:8px;flex-shrink:0}
+.rc-rank-val em{font-style:normal;color:var(--t3);font-size:10px;min-width:40px;text-align:right}
+.rc-delta{font-size:10px;font-weight:600;white-space:nowrap}
+.rc-delta.ruim{color:var(--red)}
+.rc-delta.bom{color:var(--green)}
+.rc-delta.neutro{color:var(--t3)}
+.rc-matriz th,.rc-matriz td{white-space:nowrap}
+.rc-matriz td.num,.rc-matriz th.num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px}
+.rc-matriz th.mes{cursor:pointer}
+.rc-matriz th.mes:hover{color:var(--blue)}
+.rc-matriz th.sel{color:var(--blue);box-shadow:inset 0 -2px 0 var(--blue)}
+.rc-matriz td.sel{box-shadow:inset 1px 0 0 var(--blue),inset -1px 0 0 var(--blue)}
+.rc-matriz td.cat{color:var(--t1);font-weight:500;position:sticky;left:0;background:var(--surface);z-index:1}
+.rc-matriz td.cat.link{cursor:pointer}
+.rc-matriz td.cat.link:hover{color:var(--blue)}
+.rc-matriz tfoot td{font-weight:700;color:var(--t1)}
+.rc-matriz td.tot{color:var(--t1);font-weight:600}
+@media (max-width:768px){
+  .rc-chips{order:-1;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+  .rc-chip{flex-shrink:0}
+  .rc-sels select{flex:1 1 140px}
+  #rc-outros{flex:1 1 0;min-width:0}
+}
+
 /* ── PLANO DE CONTAS ── */
 .plano-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .plano-bar .tgl em{font-style:normal;font-size:10px;color:var(--t3);margin-left:4px}
@@ -609,7 +659,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   #logout-btn{display:none}
 
   /* Toggle rows scroll */
-  .toggle-row{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .toggle-row{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;max-width:100%}
   .tgl{flex-shrink:0}
 
   /* Orçamento toggle */
@@ -1331,15 +1381,78 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
   <!-- Por Categoria -->
   <div id="rel-cat" style="display:none">
-    <div class="g2">
+    <div class="card rc-filtros">
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div>
+          <span class="card-title">Análise por Categoria</span>
+          <div class="card-sub" id="rc-sub">—</div>
+        </div>
+        <div class="rc-sels">
+          <select id="rc-tipo" onchange="rcSet('tipo',this.value)" title="O que analisar" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+            <option value="Despesa">Despesas</option><option value="Receita">Receitas</option><option value="Investimento">Investimentos</option>
+          </select>
+          <select id="rc-comparar" onchange="rcSet('comparar',this.value)" title="Comparar com" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+            <option value="anterior">vs período anterior</option>
+            <option value="ano">vs mesmo período do ano passado</option>
+            <option value="">Sem comparação</option>
+          </select>
+          <select id="rc-fonte" onchange="rcSet('cartao',this.value==='1')" title="Compras no cartão" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+            <option value="0">Somente lançamentos</option>
+            <option value="1">Lançamentos + cartão</option>
+          </select>
+        </div>
+      </div>
+      <div class="rc-periodos">
+        <button class="rc-nav" id="rc-prev" onclick="rcPasso(-1)" title="Mês anterior" aria-label="Mês anterior">‹</button>
+        <div class="rc-chips" id="rc-chips" role="tablist" aria-label="Período"></div>
+        <button class="rc-nav" id="rc-next" onclick="rcPasso(1)" title="Próximo mês" aria-label="Próximo mês">›</button>
+        <select id="rc-outros" onchange="if(this.value) rcSet('periodo',this.value)" title="Outros períodos" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+          <option value="">Outros períodos…</option>
+          <optgroup label="Trimestre"><option value="T1">1º trimestre</option><option value="T2">2º trimestre</option><option value="T3">3º trimestre</option><option value="T4">4º trimestre</option></optgroup>
+          <optgroup label="Semestre"><option value="S1">1º semestre</option><option value="S2">2º semestre</option></optgroup>
+          <optgroup label="Móvel"><option value="u3">Últimos 3 meses</option><option value="u6">Últimos 6 meses</option><option value="u12">Últimos 12 meses</option></optgroup>
+        </select>
+      </div>
+      <div class="rc-foco" id="rc-foco"></div>
+    </div>
+
+    <div class="kpi-grid cols6">
+      <div class="kpi r"><div class="kpi-label" id="rc-k-total-lbl">Total</div><div class="kpi-val r" id="rc-k-total">R$ 0</div><div class="kpi-sub" id="rc-k-total-sub">—</div></div>
+      <div class="kpi a"><div class="kpi-label">Média mensal</div><div class="kpi-val a" id="rc-k-media">R$ 0</div><div class="kpi-sub" id="rc-k-media-sub">—</div></div>
+      <div class="kpi p"><div class="kpi-label" id="rc-k-maior-lbl">Maior categoria</div><div class="kpi-val p rc-kpi-nome" id="rc-k-maior">—</div><div class="kpi-sub" id="rc-k-maior-sub">—</div></div>
+      <div class="kpi r"><div class="kpi-label">Maior alta</div><div class="kpi-val rc-kpi-nome" id="rc-k-alta">—</div><div class="kpi-sub" id="rc-k-alta-sub">—</div></div>
+      <div class="kpi g"><div class="kpi-label">Maior queda</div><div class="kpi-val rc-kpi-nome" id="rc-k-queda">—</div><div class="kpi-sub" id="rc-k-queda-sub">—</div></div>
+      <div class="kpi b"><div class="kpi-label">Lançamentos</div><div class="kpi-val b" id="rc-k-qtd">0</div><div class="kpi-sub" id="rc-k-qtd-sub">—</div></div>
+    </div>
+
+    <div class="g2 rc-g2">
       <div class="card">
-        <div class="card-header"><span class="card-title">Despesas por Categoria (ano)</span></div>
-        <div class="chart-box" style="height:300px"><canvas id="ch-rel-cat"></canvas></div>
+        <div class="card-header"><div><span class="card-title" id="rc-comp-titulo">Comparativo por categoria</span><div class="card-sub" id="rc-comp-sub">—</div></div></div>
+        <div class="chart-box" id="rc-comp-box" style="height:300px"><canvas id="ch-rc-comp"></canvas></div>
+        <div class="rc-vazio" id="rc-comp-vazio" style="display:none">Nada lançado neste período.</div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Ranking de Gastos</span></div>
-        <div id="rel-ranking"></div>
+        <div class="card-header"><div><span class="card-title">Participação no período</span><div class="card-sub" id="rc-rank-sub">—</div></div></div>
+        <div id="rc-ranking"></div>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div><span class="card-title">Evolução mês a mês</span><div class="card-sub" id="rc-evol-sub">Clique num mês para analisá-lo</div></div></div>
+      <div class="chart-box" style="height:280px"><canvas id="ch-rc-evol"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div><span class="card-title" id="rc-mat-titulo">Mês a mês por categoria</span><div class="card-sub">Tom mais forte = mês de maior valor na linha · clique no mês ou na categoria para detalhar</div></div></div>
+      <div class="tbl-wrap"><table class="tbl rc-matriz" id="rc-matriz"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div><span class="card-title">Maiores lançamentos do período</span><div class="card-sub" id="rc-top-sub">—</div></div></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th style="text-align:right">Valor</th><th style="text-align:right">% do período</th></tr></thead>
+        <tbody id="rc-top-tbody"></tbody>
+      </table></div>
     </div>
   </div>
 
@@ -4904,27 +5017,7 @@ function renderRel(){
   }
 
   // ── Por Categoria ──
-  if(_relView==='cat'){
-    const catMap={};
-    ativos.filter(l=>l.tipo==='Despesa').forEach(l=>{catMap[l.cat]=(catMap[l.cat]||0)+l.valor;});
-    const sorted=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    mkCh('ch-rel-cat',{type:'bar',data:{labels:sorted.map(c=>c[0]),datasets:[{data:sorted.map(c=>c[1]),backgroundColor:CORES_CAT,borderRadius:4}]},
-      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{x:{ticks:{color:'#4d6178',font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:'#1f2838'}},
-                y:{ticks:{color:'#8fa3bf',font:{size:11}},grid:{display:false}}}}});
-    const total=sorted.reduce((a,c)=>a+c[1],0);
-    document.getElementById('rel-ranking').innerHTML=sorted.slice(0,10).map(([cat,val],i)=>`
-      <div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-          <span style="display:flex;align-items:center;gap:6px">
-            <span style="width:8px;height:8px;border-radius:50%;background:${CORES_CAT[i]||'#888'};flex-shrink:0"></span>
-            <span style="color:var(--t2)">${cat}</span>
-          </span>
-          <span class="mono" style="color:var(--t1)">${fmtR(val)} <span style="color:var(--t3)">${total>0?pct(val/total*100):'0%'}</span></span>
-        </div>
-        <div class="prog-track"><div class="prog-fill" style="width:${total>0?val/total*100:0}%;background:${CORES_CAT[i]||'#888'}"></div></div>
-      </div>`).join('');
-  }
+  if(_relView==='cat') renderRelCategorias(d);
 
   // ── Fluxo de Caixa ──
   if(_relView==='fluxo') renderFluxoCaixa(d);
@@ -4936,6 +5029,388 @@ function renderRel(){
   if(_relView==='dre-mensal') renderDREMensal(d, ativos);
   if(_relView==='dre-semanal') renderDRESemanal(d, ativos);
   if(_relView==='dre-diario') renderDREDiario(d, ativos);
+}
+
+// ══ RELATÓRIO POR CATEGORIA ════════════════════════════════════
+// Antes: um gráfico e um ranking do ano inteiro, com a cor seguindo a posição.
+// Agora: período escolhido (mês, trimestre, semestre, ano ou janela móvel), comparação
+// com o período anterior ou o mesmo período do ano passado, foco numa categoria para
+// abrir as subcategorias e a visão mês a mês (evolução + matriz) do ano do relatório.
+const _rc = { periodo:'ano', tipo:'Despesa', foco:'', comparar:'anterior', cartao:false };
+let _rcCache = null;
+const ROTULO_TIPO_RC = { Despesa:'Despesas', Receita:'Receitas', Investimento:'Investimentos' };
+const SEM_SUB_RC = 'Sem subcategoria';
+
+// Cores validadas para daltonismo (skill dataviz): 5 categorias fixas + "Outras" neutra
+function paletaRC(){
+  const claro = document.body.classList.contains('theme-light');
+  return claro
+    ? { cat:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4'], outras:'#8a94a3',
+        serie:'#2a78d6', anterior:'#b4bfcc', tick:'#3a5068', grid:'#e3e9f0', sup:'#ffffff', texto:'#0d1a2b', apagado:.32 }
+    : { cat:['#3987e5','#d95926','#199e70','#c98500','#d55181'], outras:'#6b7688',
+        serie:'#3987e5', anterior:'#4a5568', tick:'#8fa3bf', grid:'#1f2838', sup:'#131926', texto:'#e4ecf8', apagado:.5 };
+}
+
+// Mês absoluto = ano*12 + mês (0–11): facilita comparar e atravessar a virada do ano
+const absData = dt => getAno(dt) * 12 + getMes(dt);
+const rotuloAbs = (abs, curto) => curto
+  ? `${MESES3[abs % 12]}/${String(Math.floor(abs / 12)).slice(2)}`
+  : `${MESES[abs % 12]}/${Math.floor(abs / 12)}`;
+const faixaRC = f => f ? (f.ini === f.fim ? rotuloAbs(f.ini) : `${rotuloAbs(f.ini, true)} a ${rotuloAbs(f.fim, true)}`) : '';
+
+// Período selecionado → intervalo de meses absolutos (as duas pontas incluídas)
+function periodoRC(cod, ano){
+  const hoje = new Date(), absHoje = hoje.getFullYear() * 12 + hoje.getMonth(), base = ano * 12;
+  const mk = (ini, fim, rotulo) => ({ cod, ini, fim, n:fim - ini + 1, rotulo });
+  let m;
+  if((m = /^m(\d{1,2})$/.exec(cod || ''))){ const a = base + Math.min(11, +m[1]); return mk(a, a, rotuloAbs(a)); }
+  if((m = /^x(\d+)$/.exec(cod || '')))    { const a = +m[1]; return mk(a, a, rotuloAbs(a)); }
+  if((m = /^T([1-4])$/.exec(cod || '')))  { const i = base + (m[1] - 1) * 3; return mk(i, i + 2, `${m[1]}º trimestre de ${ano}`); }
+  if((m = /^S([12])$/.exec(cod || '')))   { const i = base + (m[1] - 1) * 6; return mk(i, i + 5, `${m[1]}º semestre de ${ano}`); }
+  if((m = /^u(\d+)$/.exec(cod || '')))    { const n = Math.max(1, +m[1]); return mk(absHoje - n + 1, absHoje, `Últimos ${n} meses`); }
+  return { ...mk(base, base + 11, `Ano de ${ano}`), cod:'ano' };
+}
+// Período de comparação com o mesmo tamanho
+function comparacaoRC(p, modo){
+  if(modo === 'ano')      return { ini:p.ini - 12, fim:p.fim - 12 };
+  if(modo === 'anterior') return { ini:p.ini - p.n, fim:p.ini - 1 };
+  return null;
+}
+
+// Lançamentos do tipo no intervalo, respeitando Previsto/Realizado e sem reservas.
+// Com cartão, cada compra entra pela categoria dela na competência da fatura — e o
+// pagamento da fatura sai, senão a mesma despesa contaria duas vezes.
+function lancsRC(d, ini, fim, tipo, cartao){
+  const ativos = d.lancs.filter(l => l.status !== 'cancelado');
+  let base = semReservas(filtrarPorView(ativos, _relFilterView), d)
+    .filter(l => l.tipo === tipo && l.data && absData(l.data) >= ini && absData(l.data) <= fim);
+  if(cartao && tipo === 'Despesa'){
+    base = base.filter(l => l.origem !== 'fatura');
+    for(let a = ini; a <= fim; a++) base = base.concat(parcelasComoLancs(d, a % 12, Math.floor(a / 12)));
+  }
+  return base;
+}
+// Chave de agrupamento: categoria, ou subcategoria quando há uma categoria em foco
+const chaveRC = (l, foco) => foco ? (l.subcat || SEM_SUB_RC) : (l.cat || '(sem categoria)');
+function agregarRC(lancs, foco){
+  const m = {};
+  lancs.forEach(l => {
+    if(foco && l.cat !== foco) return;
+    const k = chaveRC(l, foco);
+    const g = m[k] || (m[k] = { nome:k, total:0, n:0 });
+    g.total += l.valor || 0; g.n++;
+  });
+  Object.values(m).forEach(g => { g.total = +g.total.toFixed(2); });
+  return m;
+}
+const somaRC = m => +Object.values(m).reduce((a, g) => a + g.total, 0).toFixed(2);
+
+// Tudo o que a tela precisa, calculado uma vez
+function dadosRC(d){
+  const ano = anoRef();
+  const p   = periodoRC(_rc.periodo, ano);
+  const cmp = comparacaoRC(p, _rc.comparar);
+  // Contexto mês a mês: o ano do relatório; se o período sai dele, os 12 meses até o fim do período
+  const foraDoAno = p.ini < ano * 12 || p.fim > ano * 12 + 11;
+  const ctxIni = foraDoAno ? p.fim - 11 : ano * 12;
+  const meses = Array.from({ length:12 }, (_, i) => ctxIni + i);
+  const ini = Math.min(ctxIni, p.ini, cmp ? cmp.ini : Infinity);
+  const fim = Math.max(ctxIni + 11, p.fim, cmp ? cmp.fim : -Infinity);
+  const cartao = _rc.cartao && _rc.tipo === 'Despesa';
+  const todos = lancsRC(d, ini, fim, _rc.tipo, cartao).filter(l => !_rc.foco || l.cat === _rc.foco);
+  const entre = (a, b) => todos.filter(l => { const x = absData(l.data); return x >= a && x <= b; });
+  const atual = entre(p.ini, p.fim), anterior = cmp ? entre(cmp.ini, cmp.fim) : [];
+  const porMes = meses.map(a => agregarRC(entre(a, a), _rc.foco));
+  // Total por mês do ano do relatório — para os chips de período
+  const chips = Array.from({ length:12 }, (_, m) => {
+    const a = ano * 12 + m;
+    const i = meses.indexOf(a);
+    return i >= 0 ? somaRC(porMes[i]) : somaRC(agregarRC(entre(a, a), _rc.foco));
+  });
+  return { ano, p, cmp, meses, porMes, chips, cartao,
+    gA:agregarRC(atual, _rc.foco), gP:agregarRC(anterior, _rc.foco), atual, anterior };
+}
+
+// Variação com ícone e sinal — a cor nunca carrega o sentido sozinha
+function deltaRC(atual, ant, tipo){
+  if(ant == null) return '';
+  const dif = +(atual - ant).toFixed(2);
+  if(Math.abs(dif) < 0.005) return '<span class="rc-delta neutro">= estável</span>';
+  const bom = tipo === 'Despesa' ? dif < 0 : dif > 0;
+  const txt = ant > 0 ? `${Math.abs(dif / ant * 100).toFixed(1).replace('.', ',')}%` : 'novo';
+  return `<span class="rc-delta ${bom ? 'bom' : 'ruim'}" title="${dif > 0 ? '+' : '-'}${fmtR(Math.abs(dif))}">${dif > 0 ? '▲' : '▼'} ${txt}</span>`;
+}
+const numRC = v => v ? Math.round(v).toLocaleString('pt-BR') : '—';
+const pctRC = v => (v || 0).toFixed(1).replace('.', ',') + '%';
+const faixaCurtaRC = f => f ? (f.ini === f.fim ? rotuloAbs(f.ini, true) : `${rotuloAbs(f.ini, true)}–${rotuloAbs(f.fim, true)}`) : '';
+
+// ── Ações ──
+function rcSet(k, v){
+  _rc[k] = v;
+  if(k === 'tipo') _rc.foco = '';
+  const outros = document.getElementById('rc-outros');
+  if(outros && k === 'periodo') outros.value = /^[TSu]/.test(v) ? v : '';
+  renderRelCategorias();
+}
+// Um mês absoluto: dentro do ano do relatório vira "m", fora dele "x"
+function rcMes(abs){
+  const ano = anoRef();
+  rcSet('periodo', Math.floor(abs / 12) === ano ? 'm' + (abs % 12) : 'x' + abs);
+}
+function rcPasso(dir){
+  const ano = anoRef();
+  const p = periodoRC(_rc.periodo, ano);
+  if(p.n === 1) return rcMes(p.ini + dir);
+  // de um período maior, as setas entram no primeiro/último mês dele
+  rcMes(dir > 0 ? p.ini : p.fim);
+}
+function rcFoco(cat){ _rc.foco = cat || ''; renderRelCategorias(); }
+
+// ── Tela ──
+function renderRelCategorias(d){
+  d = d || gs();
+  if(!document.getElementById('rc-chips')) return;
+  const $ = id => document.getElementById(id);
+  const r = dadosRC(d);
+  _rcCache = r;
+  const { p, cmp, gA, gP, ano } = r;
+  const tipo = _rc.tipo, foco = _rc.foco;
+  const tipoTxt = ROTULO_TIPO_RC[tipo] || tipo;
+  const nivel = foco ? 'subcategoria' : 'categoria';
+  const tot = somaRC(gA), totP = cmp ? somaRC(gP) : null;
+
+  // filtros
+  if($('rc-tipo')) $('rc-tipo').value = tipo;
+  if($('rc-comparar')) $('rc-comparar').value = _rc.comparar;
+  if($('rc-fonte')){ $('rc-fonte').value = r.cartao ? '1' : '0'; $('rc-fonte').style.display = tipo === 'Despesa' ? '' : 'none'; }
+  const modo = _relFilterView === 'realizado' ? 'realizado (só o que foi pago)' : 'previsto (inclui pendentes)';
+  set('rc-sub', `${p.rotulo} · ${modo}${r.cartao ? ' · com compras no cartão' : ''}${cmp ? ` · comparando com ${faixaRC(cmp)}` : ''}`);
+
+  // chips: Ano + 12 meses do ano do relatório
+  const mesSel = p.n === 1 && Math.floor(p.ini / 12) === ano ? p.ini % 12 : -1;
+  const noPeriodo = m => { const a = ano * 12 + m; return a >= p.ini && a <= p.fim; };
+  $('rc-chips').innerHTML =
+    `<button class="rc-chip${p.cod === 'ano' ? ' on' : ''}" role="tab" aria-selected="${p.cod === 'ano'}" onclick="rcSet('periodo','ano')" title="Ano de ${ano}: ${fmtR(r.chips.reduce((a,v)=>a+v,0))}">Ano</button>`
+    + MESES3.map((nm, m) => {
+        const cls = m === mesSel ? ' on' : (p.cod !== 'ano' && p.n > 1 && noPeriodo(m) ? ' parte' : '');
+        return `<button class="rc-chip${cls}${r.chips[m] ? '' : ' vazio'}" role="tab" aria-selected="${m === mesSel}" onclick="rcSet('periodo','m${m}')" title="${MESES[m]}/${ano}: ${fmtR(r.chips[m])}">${nm}</button>`;
+      }).join('');
+  if($('rc-outros')) $('rc-outros').value = /^[TSu]/.test(p.cod) ? p.cod : '';
+  // no celular os chips rolam de lado: mantém o mês escolhido à vista (sem rolar a página)
+  const chipOn = $('rc-chips').querySelector('.rc-chip.on, .rc-chip.parte');
+  if(chipOn && $('rc-chips').scrollWidth > $('rc-chips').clientWidth)
+    $('rc-chips').scrollLeft = chipOn.offsetLeft - ($('rc-chips').clientWidth - chipOn.offsetWidth) / 2;
+
+  // foco (drill-down)
+  $('rc-foco').innerHTML = foco
+    ? `<a onclick="rcFoco('')">Todas as categorias</a> › <b>${escHtml(foco)}</b> <span>— mostrando as subcategorias</span>
+       <button class="rc-x" onclick="rcFoco('')" title="Voltar para todas as categorias">✕ limpar</button>`
+    : `<span>Clique numa categoria (no gráfico, na lista ou na tabela) para abrir as subcategorias.</span>`;
+
+  // ── KPIs ──
+  set('rc-k-total-lbl', `Total de ${tipoTxt.toLowerCase()}`);
+  set('rc-k-total', fmtR(tot));
+  $('rc-k-total-sub').innerHTML = cmp ? `${deltaRC(tot, totP, tipo)} vs ${faixaCurtaRC(cmp)}: R$ ${numRC(totP)}` : escHtml(p.rotulo);
+  $('rc-k-total-sub').title = cmp ? `${faixaRC(cmp)}: ${fmtR(totP)}` : '';
+  set('rc-k-media', fmtR(tot / p.n));
+  const diasMes = a => new Date(Math.floor(a / 12), a % 12 + 1, 0).getDate();
+  const hojeAbs = new Date().getFullYear() * 12 + new Date().getMonth();
+  const dias = p.n === 1 ? (p.ini === hojeAbs ? new Date().getDate() : diasMes(p.ini)) : 0;
+  set('rc-k-media-sub', p.n === 1 ? `≈ ${fmtR(tot / Math.max(1, dias))} por dia` : `${p.n} meses`);
+  const lista = Object.values(gA).sort((a, b) => b.total - a.total || a.nome.localeCompare(b.nome));
+  set('rc-k-maior-lbl', `Maior ${nivel}`);
+  const maior = lista[0];
+  set('rc-k-maior', maior ? maior.nome : '—');
+  set('rc-k-maior-sub', maior ? `${fmtR(maior.total)} · ${pctRC(tot > 0 ? maior.total / tot * 100 : 0)} do total` : 'nada no período');
+  const difs = [...new Set([...Object.keys(gA), ...Object.keys(gP)])]
+    .map(k => ({ nome:k, a:(gA[k] || {}).total || 0, b:(gP[k] || {}).total || 0 }))
+    .map(x => ({ ...x, dif:+(x.a - x.b).toFixed(2) }));
+  const alta  = cmp ? difs.filter(x => x.dif > 0).sort((a, b) => b.dif - a.dif)[0] : null;
+  const queda = cmp ? difs.filter(x => x.dif < 0).sort((a, b) => a.dif - b.dif)[0] : null;
+  const altaRuim = tipo === 'Despesa';
+  const kAlta = $('rc-k-alta'), kQueda = $('rc-k-queda');
+  if(kAlta)  kAlta.className  = 'kpi-val rc-kpi-nome ' + (altaRuim ? 'r' : 'g');
+  if(kQueda) kQueda.className = 'kpi-val rc-kpi-nome ' + (altaRuim ? 'g' : 'r');
+  set('rc-k-alta', alta ? alta.nome : '—');
+  $('rc-k-alta-sub').innerHTML = !cmp ? 'sem comparação' : alta ? `▲ +${fmtR(alta.dif)} ${alta.b > 0 ? `(${pctRC(alta.dif / alta.b * 100)})` : '(novo)'}` : 'nenhuma alta';
+  set('rc-k-queda', queda ? queda.nome : '—');
+  $('rc-k-queda-sub').innerHTML = !cmp ? 'sem comparação' : queda ? `▼ -${fmtR(-queda.dif)} ${queda.b > 0 ? `(${pctRC(-queda.dif / queda.b * 100)})` : ''}` : 'nenhuma queda';
+  const qtd = lista.reduce((a, g) => a + g.n, 0);
+  set('rc-k-qtd', qtd);
+  set('rc-k-qtd-sub', qtd ? `ticket médio ${fmtR(tot / qtd)}` : '—');
+
+  renderRcComparativo(r, lista);
+  renderRcRanking(r, lista, tot);
+  renderRcEvolucao(r);
+  renderRcMatriz(r);
+  renderRcTop(r, tot);
+}
+
+// Comparativo: período × período de comparação, uma barra horizontal por categoria
+function renderRcComparativo(r, lista){
+  const pal = paletaRC();
+  const { p, cmp, gP } = r;
+  const foco = _rc.foco;
+  set('rc-comp-titulo', `Comparativo por ${foco ? 'subcategoria' : 'categoria'}`);
+  set('rc-comp-sub', cmp ? `${faixaRC(p)} × ${faixaRC(cmp)}` : faixaRC(p));
+  // inclui o que só existiu no período de comparação (caiu a zero)
+  const nomes = lista.map(g => g.nome);
+  if(cmp) Object.values(gP).sort((a, b) => b.total - a.total).forEach(g => { if(!nomes.includes(g.nome)) nomes.push(g.nome); });
+  const MAX = 12;
+  let linhas = nomes.slice(0, MAX).map(n => ({ nome:n, a:(r.gA[n] || {}).total || 0, b:(gP[n] || {}).total || 0 }));
+  const resto = nomes.slice(MAX);
+  if(resto.length) linhas.push({ nome:`Outras (${resto.length})`, outras:true,
+    a:+resto.reduce((s, n) => s + ((r.gA[n] || {}).total || 0), 0).toFixed(2),
+    b:+resto.reduce((s, n) => s + ((gP[n] || {}).total || 0), 0).toFixed(2) });
+  const box = document.getElementById('rc-comp-box'), vazio = document.getElementById('rc-comp-vazio');
+  if(!linhas.length || linhas.every(x => !x.a && !x.b)){
+    if(CH['ch-rc-comp']){ CH['ch-rc-comp'].destroy(); delete CH['ch-rc-comp']; }
+    if(box) box.style.display = 'none';
+    if(vazio) vazio.style.display = 'block';
+    return;
+  }
+  if(box){ box.style.display = ''; box.style.height = Math.max(220, linhas.length * (cmp ? 34 : 26) + 70) + 'px'; }
+  if(vazio) vazio.style.display = 'none';
+  const barra = (label, data, cor) => ({ label, data, backgroundColor:cor, borderRadius:4, borderSkipped:'start',
+    maxBarThickness:cmp ? 13 : 18, categoryPercentage:.78, barPercentage:.92 });
+  const ds = [barra(faixaRC(p), linhas.map(x => x.a), pal.serie)];
+  if(cmp) ds.push(barra(faixaRC(cmp), linhas.map(x => x.b), pal.anterior));
+  const curto = v => v >= 1000 ? (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits:1 }) + ' mil' : Math.round(v).toLocaleString('pt-BR');
+  mkCh('ch-rc-comp', { type:'bar', data:{ labels:linhas.map(x => x.nome), datasets:ds },
+    plugins:[{ id:'valorNaPonta', afterDatasetsDraw(chart){
+      // rótulo só na barra do período (seletivo), em cor de texto
+      const m = chart.getDatasetMeta(0); if(m.hidden) return;
+      const { ctx } = chart; ctx.save();
+      ctx.font = '600 10px Sora, sans-serif'; ctx.fillStyle = pal.tick; ctx.textBaseline = 'middle';
+      m.data.forEach((el, i) => { const v = chart.data.datasets[0].data[i]; if(v > 0) ctx.fillText(curto(v), el.x + 5, el.y); });
+      ctx.restore(); } }],
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', axis:'y', intersect:false },
+      onHover:(e, els) => { e.native.target.style.cursor = (!foco && els.length && !linhas[els[0].index].outras) ? 'pointer' : 'default'; },
+      onClick:(e, els) => { if(foco || !els.length) return; const x = linhas[els[0].index]; if(x && !x.outras) rcFoco(x.nome); },
+      plugins:{ legend:{ display:!!cmp, labels:{ color:pal.tick, font:{ size:11 }, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+        tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${fmtR(c.raw)}`,
+          footer:items => { if(!cmp) return ''; const x = linhas[items[0].dataIndex]; const dif = x.a - x.b;
+            return `Variação: ${dif >= 0 ? '+' : '-'}${fmtR(Math.abs(dif))}${x.b > 0 ? ` (${dif >= 0 ? '+' : '-'}${Math.abs(dif / x.b * 100).toFixed(1).replace('.', ',')}%)` : ''}`; } } } },
+      scales:{ x:{ beginAtZero:true, grace:'14%', ticks:{ color:pal.tick, font:{ size:10 }, callback:v => 'R$ ' + Number(v).toLocaleString('pt-BR') }, grid:{ color:pal.grid } },
+               y:{ ticks:{ color:pal.tick, font:{ size:11 } }, grid:{ display:false } } } } });
+}
+
+// Participação: lista com valor, % e variação — barra de uma cor só (identidade pelo nome)
+function renderRcRanking(r, lista, tot){
+  const el = document.getElementById('rc-ranking');
+  if(!el) return;
+  const pal = paletaRC();
+  const foco = _rc.foco;
+  set('rc-rank-sub', `${lista.length} ${foco ? 'subcategoria(s)' : 'categoria(s)'} · ${fmtR(tot)}`);
+  if(!lista.length){ el.innerHTML = '<div class="rc-vazio">Nada lançado neste período.</div>'; return; }
+  el.innerHTML = lista.map((g, i) => {
+    const share = tot > 0 ? g.total / tot * 100 : 0;
+    const ant = r.cmp ? ((r.gP[g.nome] || {}).total || 0) : null;
+    const link = !foco;
+    return `<div class="rc-rank-row">
+      <div class="rc-rank-top">
+        <span class="rc-rank-nome${link ? ' link' : ''}" ${link ? `onclick="rcFoco(${argJs(g.nome)})" title="Abrir subcategorias"` : ''}><small>${i + 1}</small>${escHtml(g.nome)}</span>
+        <span class="rc-rank-val"><span class="mono" style="color:var(--t1)">${fmtR(g.total)}</span><em>${pctRC(share)}</em>${r.cmp ? deltaRC(g.total, ant, _rc.tipo) : ''}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${share}%;background:${pal.serie}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// Evolução: colunas empilhadas por mês — 5 categorias do ano com cor fixa + "Outras".
+// As cores seguem a categoria (ordem pelo total do ano), então trocar o mês não repinta nada.
+function renderRcEvolucao(r){
+  const pal = paletaRC();
+  const { meses, porMes, p } = r;
+  const totCtx = {};
+  porMes.forEach(m => Object.values(m).forEach(g => { totCtx[g.nome] = (totCtx[g.nome] || 0) + g.total; }));
+  const top = Object.entries(totCtx).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5).map(x => x[0]);
+  const series = top.map((n, i) => ({ nome:n, cor:pal.cat[i], vals:porMes.map(m => (m[n] || {}).total || 0) }));
+  const outras = porMes.map(m => +Object.values(m).filter(g => !top.includes(g.nome)).reduce((a, g) => a + g.total, 0).toFixed(2));
+  if(outras.some(v => v > 0)) series.push({ nome:'Outras', cor:pal.outras, vals:outras });
+  const totais = porMes.map(m => somaRC(m));
+  const topo = meses.map((_, i) => { let t = -1; series.forEach((s, j) => { if(s.vals[i] > 0) t = j; }); return t; });
+  const inteiro = p.ini <= meses[0] && p.fim >= meses[11];
+  const noSel = i => inteiro || (meses[i] >= p.ini && meses[i] <= p.fim);
+  const anoUnico = Math.floor(meses[0] / 12) === Math.floor(meses[11] / 12);
+  set('rc-evol-sub', `${anoUnico ? 'Ano de ' + Math.floor(meses[0] / 12) : faixaRC({ ini:meses[0], fim:meses[11] })} · clique num mês para analisá-lo`);
+  mkCh('ch-rc-evol', { type:'bar',
+    data:{ labels:meses.map(a => anoUnico ? MESES3[a % 12] : rotuloAbs(a, true)),
+      datasets:series.map((s, j) => ({ label:s.nome, data:s.vals.map(v => +v.toFixed(2)), stack:'m',
+        backgroundColor:c => noSel(c.dataIndex) ? s.cor : corAlfa(s.cor, pal.apagado),
+        borderColor:pal.sup, borderWidth:{ top:2 }, borderSkipped:'bottom',
+        borderRadius:c => topo[c.dataIndex] === j ? { topLeft:4, topRight:4 } : 0,
+        maxBarThickness:42, categoryPercentage:.72, barPercentage:.9 })) },
+    options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      onHover:(e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+      onClick:(e, els, chart) => {
+        const pts = chart.getElementsAtEventForMode(e, 'index', { intersect:false }, false);
+        if(pts.length) rcMes(meses[pts[0].index]);
+      },
+      plugins:{ legend:{ display:series.length > 1, labels:{ color:pal.tick, font:{ size:11 }, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+        tooltip:{ itemSort:(a, b) => b.datasetIndex - a.datasetIndex,
+          callbacks:{ title:items => rotuloAbs(meses[items[0].dataIndex]),
+            label:c => c.raw ? ` ${c.dataset.label}: ${fmtR(c.raw)}` : null,
+            footer:items => `Total: ${fmtR(totais[items[0].dataIndex])}` } } },
+      scales:{ x:{ stacked:true, ticks:{ color:pal.tick, font:{ size:10 } }, grid:{ display:false } },
+               y:{ stacked:true, beginAtZero:true, ticks:{ color:pal.tick, font:{ size:10 }, callback:v => 'R$ ' + Number(v).toLocaleString('pt-BR') }, grid:{ color:pal.grid } } } } });
+}
+
+// Matriz categoria × mês — a tabela do gráfico, com o tom da linha mostrando o mês mais pesado
+function renderRcMatriz(r){
+  const tb = document.getElementById('rc-matriz');
+  if(!tb) return;
+  const pal = paletaRC();
+  const { meses, porMes, p } = r;
+  const foco = _rc.foco;
+  set('rc-mat-titulo', foco ? `Mês a mês — subcategorias de ${foco}` : 'Mês a mês por categoria');
+  const tot = {};
+  porMes.forEach(m => Object.values(m).forEach(g => { tot[g.nome] = (tot[g.nome] || 0) + g.total; }));
+  const nomes = Object.keys(tot).sort((a, b) => tot[b] - tot[a] || a.localeCompare(b));
+  const totalGeral = nomes.reduce((a, n) => a + tot[n], 0);
+  const mesesComDado = porMes.filter(m => somaRC(m) > 0).length || 1;
+  const sel = i => meses[i] >= p.ini && meses[i] <= p.fim && !(p.ini <= meses[0] && p.fim >= meses[11]);
+  const anoUnico = Math.floor(meses[0] / 12) === Math.floor(meses[11] / 12);
+  tb.tHead.innerHTML = `<tr><th>${foco ? 'Subcategoria' : 'Categoria'}</th>${meses.map((a, i) =>
+      `<th class="num mes${sel(i) ? ' sel' : ''}" onclick="rcMes(${a})" title="Analisar ${rotuloAbs(a)}">${anoUnico ? MESES3[a % 12] : rotuloAbs(a, true)}</th>`).join('')}
+    <th class="num">Total</th><th class="num" title="Média dos meses com lançamento">Média</th><th class="num">%</th></tr>`;
+  if(!nomes.length){
+    tb.tBodies[0].innerHTML = `<tr><td colspan="${meses.length + 4}" style="text-align:center;color:var(--t3);padding:20px">Nada lançado nestes meses.</td></tr>`;
+    tb.tFoot.innerHTML = '';
+    return;
+  }
+  tb.tBodies[0].innerHTML = nomes.map(n => {
+    const vals = porMes.map(m => (m[n] || {}).total || 0);
+    const max = Math.max(...vals);
+    return `<tr>
+      <td class="cat${foco ? '' : ' link'}" ${foco ? '' : `onclick="rcFoco(${argJs(n)})" title="Abrir subcategorias"`}>${escHtml(n)}</td>
+      ${vals.map((v, i) => `<td class="num${sel(i) ? ' sel' : ''}" style="${v > 0 && max > 0 ? `background:${corAlfa(pal.serie, .06 + .34 * v / max)};` : ''}color:${v > 0 ? 'var(--t1)' : 'var(--t3)'}" title="${escAttr(n)} · ${rotuloAbs(meses[i])}: ${fmtR(v)}">${numRC(v)}</td>`).join('')}
+      <td class="num tot">${numRC(tot[n])}</td>
+      <td class="num">${numRC(tot[n] / mesesComDado)}</td>
+      <td class="num" style="color:var(--t3)">${pctRC(totalGeral > 0 ? tot[n] / totalGeral * 100 : 0)}</td>
+    </tr>`;
+  }).join('');
+  const totMes = porMes.map(m => somaRC(m));
+  tb.tFoot.innerHTML = `<tr><td class="cat">Total</td>${totMes.map((v, i) => `<td class="num${sel(i) ? ' sel' : ''}">${numRC(v)}</td>`).join('')}
+    <td class="num tot">${numRC(totalGeral)}</td><td class="num">${numRC(totalGeral / mesesComDado)}</td><td class="num">100%</td></tr>`;
+}
+
+// Maiores lançamentos: o que puxou o total do período
+function renderRcTop(r, tot){
+  const tb = document.getElementById('rc-top-tbody');
+  if(!tb) return;
+  const top = [...r.atual].sort((a, b) => (b.valor || 0) - (a.valor || 0)).slice(0, 10);
+  set('rc-top-sub', `${faixaRC(r.p)}${_rc.foco ? ' · ' + _rc.foco : ''} · ${r.atual.length} lançamento(s)`);
+  tb.innerHTML = top.length ? top.map(l => `<tr>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(l.data)}</td>
+      <td style="color:var(--t1)">${escHtml(l.desc || '—')}${l.origem === 'cartao' ? ` <span class="badge bdg-purple" style="font-size:8px">💳 ${escHtml((l.caixaNome || '').replace('Cartão · ', ''))}</span>` : ''}</td>
+      <td><span class="cat-tag" style="font-size:9px">${escHtml(l.cat || '—')}${l.subcat ? ' › ' + escHtml(l.subcat) : ''}</span></td>
+      <td class="mono" style="text-align:right;color:var(--t1)">${fmtR(l.valor || 0)}</td>
+      <td class="mono" style="text-align:right;color:var(--t3)">${pctRC(tot > 0 ? (l.valor || 0) / tot * 100 : 0)}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:center;color:var(--t3);padding:20px">Nada lançado neste período.</td></tr>`;
 }
 
 // ── FLUXO DE CAIXA ──
