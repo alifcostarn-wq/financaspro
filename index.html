@@ -275,6 +275,36 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
 
 
+/* ── CALCULADORA DOS CAMPOS DE VALOR ── */
+.calc-campo{position:relative;display:flex}
+.calc-campo input{flex:1;min-width:0;padding-right:42px !important}
+.calc-abrir{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:32px;height:28px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;opacity:.8;transition:.15s}
+.calc-abrir:hover,.calc-abrir.on{background:var(--surface3);opacity:1}
+.calc-abrir:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+#calc-pop{position:fixed;z-index:400;width:280px;background:var(--surface1);border:1px solid var(--line2);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:12px;outline:none}
+#calc-pop.folha{left:0;right:0;bottom:0;top:auto;width:auto;border-radius:18px 18px 0 0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.calc-topo{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px}
+.calc-fechar{border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:5px}
+.calc-fechar:hover{background:var(--surface3);color:var(--t1)}
+.calc-tela{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:10px;text-align:right}
+.calc-fita{font:11px 'JetBrains Mono',monospace;color:var(--t3);min-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calc-expr{font:600 21px 'JetBrains Mono',monospace;color:var(--t1);word-break:break-all;min-height:28px;line-height:1.3}
+.calc-expr.vazio{color:var(--t3)}
+.calc-prev{font-size:12px;color:var(--green);min-height:17px;font-weight:600}
+.calc-prev.erro{color:var(--red)}
+.calc-teclas{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-k{height:42px;border:1px solid var(--line);border-radius:9px;background:var(--surface2);color:var(--t1);font:600 16px 'Sora',sans-serif;cursor:pointer;transition:background .1s;touch-action:manipulation}
+.calc-k:hover{background:var(--surface3)}
+.calc-k:active{background:var(--surface4)}
+.calc-k.op{color:var(--blue);font-size:18px}
+.calc-k.fn{color:var(--t2);font-size:14px}
+.calc-k.igual{grid-column:span 2;background:var(--blue-dim);color:var(--blue);border-color:var(--blue)}
+.calc-k.usar{grid-column:span 2;background:var(--green);color:#04130b;border-color:var(--green);font-size:13px}
+.calc-k.usar:disabled{opacity:.4;cursor:not-allowed}
+.calc-dica{font-size:9.5px;color:var(--t3);text-align:center;margin-top:8px}
+#calc-pop.folha .calc-k{height:48px}
+#calc-pop.folha .calc-dica{display:none}
+
 /* ── RELATÓRIO POR CATEGORIA ── */
 .rc-filtros{margin-bottom:16px}
 .rc-sels{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -4120,7 +4150,264 @@ function openM(id){
   }
   if(id==='m-pg-div'){document.getElementById('pgd-data').value=today();}
 }
-function closeM(id){document.getElementById(id).style.display='none';}
+function closeM(id){document.getElementById(id).style.display='none'; fecharCalc();}
+// ══ CALCULADORA DOS CAMPOS DE VALOR ═════════════════════════════
+// Botão 🧮 ao lado dos campos de valor em R$: faz a conta (soma de notas, divisão
+// da conta do restaurante, desconto em %) e joga o resultado no campo.
+// Também abre digitando + × ÷ direto no campo, já com o valor que estava nele.
+const CAMPOS_CALC = ['l-valor', 'cp-val', 'pg-valor', 'g-val', 'pf-val', 'bm-val'];
+const _calc = { alvo:null, expr:'', fita:'', resultado:false };
+const OPS_CALC = '+−×÷';
+
+// Conta sem eval(): + − × ÷, parênteses e %, com vírgula ou ponto como decimal.
+// "a + b%" soma b% de a (como nas calculadoras de mesa); "a × b%" é a × b/100.
+function calcAvaliar(txt){
+  const s = String(txt || '').replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/')
+    .replace(/−/g, '-').replace(/,/g, '.');
+  if(!s) throw new Error('Digite uma conta');
+  let i = 0;
+  const olha = () => s[i];
+  const numero = () => {
+    const m = /^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));
+    if(!m) throw new Error('Conta incompleta');
+    i += m[0].length;
+    return parseFloat(m[0]);
+  };
+  const fator = () => {
+    if(olha() === '-'){ i++; const f = fator(); return { v:-f.v, pct:f.pct }; }
+    if(olha() === '+'){ i++; return fator(); }
+    let v;
+    if(olha() === '('){
+      i++; v = expr();
+      if(olha() !== ')') throw new Error('Falta fechar o parêntese');
+      i++;
+    } else v = numero();
+    if(olha() === '%'){ i++; return { v, pct:true }; }
+    return { v, pct:false };
+  };
+  const termo = () => {
+    const f = fator();
+    let v = f.pct ? f.v / 100 : f.v, sozinho = true;
+    while(olha() === '*' || olha() === '/'){
+      const op = s[i++], g = fator(), w = g.pct ? g.v / 100 : g.v;
+      if(op === '/' && w === 0) throw new Error('Não dá para dividir por zero');
+      v = op === '*' ? v * w : v / w;
+      sozinho = false;
+    }
+    return { v, pctSolo:sozinho && f.pct, bruto:f.v };
+  };
+  const expr = () => {
+    let v = termo().v;
+    while(olha() === '+' || olha() === '-'){
+      const op = s[i++], t = termo();
+      const w = t.pctSolo ? v * t.bruto / 100 : t.v;
+      v = op === '+' ? v + w : v - w;
+    }
+    return v;
+  };
+  const v = expr();
+  if(i < s.length) throw new Error('Conta inválida');
+  if(!isFinite(v)) throw new Error('Resultado inválido');
+  return +v.toFixed(10);
+}
+// Número no formato da tela (vírgula decimal, sem milhar, sinal de menos tipográfico)
+const numCalc = v => (v < 0 ? '−' : '') + String(+Math.abs(v).toFixed(10)).replace('.', ',');
+
+// Resultado da conta em andamento: ignora operador/vírgula no fim e fecha parênteses abertos
+function calcResultado(){
+  let e = _calc.expr;
+  while(e && (OPS_CALC.includes(e.slice(-1)) || ',('.includes(e.slice(-1)))) e = e.slice(0, -1);
+  if(!e) return { ok:false, vazio:true };
+  const abertos = (e.match(/\(/g) || []).length - (e.match(/\)/g) || []).length;
+  e += ')'.repeat(Math.max(0, abertos));
+  try { return { ok:true, v:calcAvaliar(e) }; }
+  catch(err){ return { ok:false, erro:err.message }; }
+}
+
+function calcTecla(k){
+  const e = _calc.expr, ult = e.slice(-1);
+  const dig = c => /\d/.test(c);
+  const fecha = c => c === ')' || c === '%';
+  // depois do "=" (ou ao abrir com valor), número novo começa outra conta; operador continua
+  const recomeca = _calc.resultado && (/^\d$/.test(k) || k === ',' || k === '(');
+  _calc.resultado = false;
+  if(recomeca){ _calc.fita = ''; _calc.expr = ''; return calcTecla(k); }
+  if(k === 'C'){ _calc.expr = ''; _calc.fita = ''; }
+  else if(k === '⌫') _calc.expr = e.slice(0, -1);
+  else if(/^\d$/.test(k)) _calc.expr = e + (fecha(ult) ? '×' : '') + k;
+  else if(k === ','){
+    const trecho = e.split(/[+−×÷()%]/).pop();
+    if(!trecho.includes(',')) _calc.expr = e + (dig(ult) ? ',' : (fecha(ult) ? '×0,' : '0,'));
+  }
+  else if(OPS_CALC.includes(k)){
+    if(!e || ult === '(') { if(k === '−') _calc.expr = e + k; }
+    else if(OPS_CALC.includes(ult)) _calc.expr = (e.length === 1 || e.slice(-2, -1) === '(') ? e : e.slice(0, -1) + k;
+    else if(ult === ',') _calc.expr = e.slice(0, -1) + k;
+    else _calc.expr = e + k;
+  }
+  else if(k === '%'){ if(dig(ult) || ult === ')') _calc.expr = e + '%'; }
+  else if(k === '(') _calc.expr = e + ((dig(ult) || fecha(ult)) ? '×(' : '(');
+  else if(k === ')'){
+    const abertos = (e.match(/\(/g) || []).length - (e.match(/\)/g) || []).length;
+    if(abertos > 0 && (dig(ult) || fecha(ult))) _calc.expr = e + ')';
+  }
+  else if(k === '='){
+    const r = calcResultado();
+    if(r.ok){ _calc.fita = e + ' ='; _calc.expr = numCalc(r.v); _calc.resultado = true; }
+  }
+  calcTela();
+}
+
+function calcTela(){
+  const $ = id => document.getElementById(id);
+  if(!$('calc-pop')) return;
+  const r = calcResultado();
+  $('calc-expr').textContent = _calc.expr || '0';
+  $('calc-expr').classList.toggle('vazio', !_calc.expr);
+  $('calc-fita').textContent = _calc.fita;
+  const prev = $('calc-prev'), usar = $('calc-usar');
+  const negativo = r.ok && r.v < 0;
+  prev.className = 'calc-prev' + ((!r.ok && !r.vazio) || negativo ? ' erro' : '');
+  prev.textContent = r.vazio ? 'Digite a conta' : !r.ok ? r.erro
+    : negativo ? 'O valor não pode ser negativo' : '= ' + fmtR(+r.v.toFixed(2));
+  usar.disabled = !r.ok || negativo;
+}
+
+// Cria a calculadora uma vez só, fora dos modais (fica por cima de qualquer um)
+function garantirCalc(){
+  let pop = document.getElementById('calc-pop');
+  if(pop) return pop;
+  const teclas = [
+    ['C','fn'], ['(','fn'], [')','fn'], ['⌫','fn'],
+    ['7'], ['8'], ['9'], ['÷','op'],
+    ['4'], ['5'], ['6'], ['×','op'],
+    ['1'], ['2'], ['3'], ['−','op'],
+    [',',''], ['0'], ['%','op'], ['+','op'] ];
+  const rotulo = { '⌫':'Apagar', 'C':'Limpar', '÷':'Dividir', '×':'Multiplicar', '−':'Subtrair', '+':'Somar', '%':'Porcentagem', ',':'Vírgula' };
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="calc-pop" role="dialog" aria-label="Calculadora" tabindex="-1" style="display:none">
+      <div class="calc-topo"><span>🧮 Calculadora</span><button type="button" class="calc-fechar" onclick="fecharCalc(true)" aria-label="Fechar calculadora">✕</button></div>
+      <div class="calc-tela">
+        <div class="calc-fita" id="calc-fita"></div>
+        <div class="calc-expr" id="calc-expr" aria-live="polite">0</div>
+        <div class="calc-prev" id="calc-prev"></div>
+      </div>
+      <div class="calc-teclas" onmousedown="if(event.target.closest('.calc-k'))event.preventDefault()">
+        ${teclas.map(([k, cls]) => `<button type="button" class="calc-k ${cls || ''}" data-k="${k}" onclick="calcTecla(this.dataset.k)"${rotulo[k] ? ` aria-label="${rotulo[k]}"` : ''}>${k}</button>`).join('')}
+        <button type="button" class="calc-k igual" data-k="=" onclick="calcTecla('=')" aria-label="Igual">=</button>
+        <button type="button" class="calc-k usar" id="calc-usar" onclick="calcUsar()">✓ Usar valor</button>
+      </div>
+      <div class="calc-dica">Teclado: números, + − * / ( ) % · Enter usa o valor · Esc fecha</div>
+    </div>`);
+  pop = document.getElementById('calc-pop');
+  pop.addEventListener('keydown', calcTeclado);
+  // clique fora fecha
+  document.addEventListener('mousedown', ev => {
+    if(pop.style.display === 'none') return;
+    if(!ev.target.closest('#calc-pop') && !ev.target.closest('.calc-abrir')) fecharCalc();
+  });
+  // rolar o modal por baixo reposiciona (no desktop)
+  document.addEventListener('scroll', () => { if(pop.style.display !== 'none') posicionarCalc(); }, true);
+  window.addEventListener('resize', () => { if(pop.style.display !== 'none') posicionarCalc(); });
+  return pop;
+}
+
+function calcTeclado(ev){
+  const mapa = { '*':'×', 'x':'×', 'X':'×', '/':'÷', '-':'−', '+':'+', '.':',', ',':',', '(':'(', ')':')', '%':'%', '=':'=' };
+  let k = null;
+  if(/^\d$/.test(ev.key)) k = ev.key;
+  else if(mapa[ev.key]) k = mapa[ev.key];
+  else if(ev.key === 'Backspace') k = '⌫';
+  else if(ev.key === 'Delete') k = 'C';
+  else if(ev.key === 'Enter'){ ev.preventDefault(); calcUsar(); return; }
+  else if(ev.key === 'Escape'){ ev.preventDefault(); ev.stopPropagation(); fecharCalc(true); return; }
+  if(!k) return;
+  ev.preventDefault();
+  calcTecla(k);
+}
+
+function posicionarCalc(){
+  const pop = document.getElementById('calc-pop');
+  const inp = _calc.alvo && document.getElementById(_calc.alvo);
+  if(!pop || !inp) return;
+  const folha = window.innerWidth <= 768;
+  pop.classList.toggle('folha', folha);
+  if(folha){ pop.style.left = ''; pop.style.top = ''; return; }
+  const r = (inp.closest('.calc-campo') || inp).getBoundingClientRect();
+  const m = (inp.closest('.modal') || inp).getBoundingClientRect();
+  const w = pop.offsetWidth || 280, h = pop.offsetHeight || 420;
+  const W = window.innerWidth, H = window.innerHeight;
+  const topoAoLado = Math.max(8, Math.min(r.top + r.height / 2 - h / 2, H - h - 8));
+  let left, top;
+  // 1º embaixo do campo; 2º ao lado do modal (não cobre o formulário); por último, em cima
+  if(r.bottom + 6 + h <= H - 8){ left = Math.min(r.right - w, W - w - 8); top = r.bottom + 6; }
+  else if(m.right + 12 + w <= W - 8){ left = m.right + 12; top = topoAoLado; }
+  else if(m.left - 12 - w >= 8){ left = m.left - 12 - w; top = topoAoLado; }
+  else { left = Math.min(r.right - w, W - w - 8); top = Math.max(8, r.top - h - 6); }
+  pop.style.left = Math.max(8, left) + 'px';
+  pop.style.top = top + 'px';
+}
+
+function abrirCalc(id, btn, inicio){
+  const pop = garantirCalc();
+  const inp = document.getElementById(id);
+  if(!inp) return;
+  if(pop.style.display !== 'none' && _calc.alvo === id && !inicio) return fecharCalc(true);
+  document.querySelectorAll('.calc-abrir.on').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  _calc.alvo = id;
+  const atual = parseFloat(inp.value);
+  _calc.expr = atual > 0 ? numCalc(atual) : '';
+  _calc.fita = '';
+  _calc.resultado = atual > 0;
+  pop.style.visibility = 'hidden';
+  pop.style.display = 'block';
+  posicionarCalc();
+  pop.style.visibility = '';
+  if(inicio) calcTecla(inicio); else calcTela();
+  pop.focus({ preventScroll:true });
+}
+
+function fecharCalc(voltarFoco){
+  const pop = document.getElementById('calc-pop');
+  if(!pop || pop.style.display === 'none') return;
+  pop.style.display = 'none';
+  document.querySelectorAll('.calc-abrir.on').forEach(b => b.classList.remove('on'));
+  const inp = _calc.alvo && document.getElementById(_calc.alvo);
+  if(voltarFoco && inp && inp.offsetParent) inp.focus({ preventScroll:true });
+}
+
+// Grava o resultado (2 casas) no campo e avisa quem escuta o campo (prévias, diferenças)
+function calcUsar(){
+  const r = calcResultado();
+  const inp = _calc.alvo && document.getElementById(_calc.alvo);
+  if(!inp || !r.ok || r.v < 0){ calcTela(); return; }
+  inp.value = String(+r.v.toFixed(2));
+  inp.dispatchEvent(new Event('input', { bubbles:true }));
+  inp.dispatchEvent(new Event('change', { bubbles:true }));
+  fecharCalc(true);
+}
+
+// Coloca o botão 🧮 em cada campo de valor e o atalho de digitar + × ÷ no campo
+function instalarCalculadoras(){
+  CAMPOS_CALC.forEach(id => {
+    const inp = document.getElementById(id);
+    if(!inp || inp.closest('.calc-campo')) return;
+    const box = document.createElement('div');
+    box.className = 'calc-campo';
+    inp.parentNode.insertBefore(box, inp);
+    box.appendChild(inp);
+    box.insertAdjacentHTML('beforeend',
+      `<button type="button" class="calc-abrir" onclick="abrirCalc('${id}', this)" title="Calculadora (ou digite + * / no campo)" aria-label="Abrir calculadora" aria-haspopup="dialog">🧮</button>`);
+    inp.addEventListener('keydown', ev => {
+      const op = { '+':'+', '*':'×', '/':'÷' }[ev.key];
+      if(!op) return;
+      ev.preventDefault();
+      abrirCalc(id, box.querySelector('.calc-abrir'), op);
+    });
+  });
+}
+
 function cmoOut(e,id){if(e.target===document.getElementById(id))closeM(id);}
 
 // ── SIDEBAR SALDO ──
@@ -11297,6 +11584,7 @@ seedLancamentos();
 })();
 
 // ── INIT ──
+try { instalarCalculadoras(); } catch(e) { console.warn('calculadora:', e); }
 // Plano de contas salvo pelo usuário (categorias, classes e papéis)
 try { aplicarPlanoContas(lerPlano()); } catch(e) { console.warn('plano de contas:', e); }
 // ── Define mês atual como padrão em todos os filtros de mês ──

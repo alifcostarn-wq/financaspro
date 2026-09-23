@@ -4,6 +4,51 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-23] Calculadora nos campos de valor
+
+### 🎯 O que foi pedido
+
+Na hora de fazer um lançamento, ter a opção de uma **calculadora**.
+
+### ✨ Implementado
+
+- **Botão 🧮 dentro do campo Valor** do lançamento. Abre uma calculadora; o resultado vai direto
+  para o campo com **✓ Usar valor** (ou Enter), já arredondado em centavos.
+- Também nos outros campos de valor em R$: **conta a pagar**, **registrar pagamento**,
+  **compra no cartão**, **pagamento de fatura** e **movimentação bancária**. As prévias desses
+  modais (fatura em que a compra cai, juros/desconto do pagamento, parcelas) se atualizam com o
+  valor calculado.
+- **Contas:** soma, subtração, multiplicação, divisão, parênteses e **porcentagem** como nas
+  calculadoras de mesa — `200 + 10%` = 220, `200 − 10%` = 180, `200 × 10%` = 20. Aceita vírgula
+  ou ponto como decimal. Exemplo: dividir o almoço — `(85,90 + 64) ÷ 3` = R$ 49,97.
+- **Resultado ao vivo** enquanto digita; **=** fecha a conta e guarda o que foi feito na linha de
+  cima. Depois do =, um número novo começa outra conta e um operador continua a partir do
+  resultado.
+- **Abre com o valor que já está no campo**, pronto para continuar a conta.
+- **Atalho:** digitar **+**, **\*** ou **/** direto no campo Valor abre a calculadora com o valor
+  e a operação.
+- **Teclado físico:** números, + − * / ( ) % e vírgula/ponto; **Enter** usa o valor, **Backspace**
+  apaga, **Delete** limpa e **Esc** fecha.
+- **Proteções:** não deixa usar resultado negativo nem dividir por zero, avisando na tela; a conta
+  é calculada sem executar texto como código.
+- **Posição:** no computador abre embaixo do campo ou **ao lado do modal**, sem cobrir o
+  formulário; no celular vira um painel no rodapé com teclas grandes.
+- Fecha ao clicar fora, no ✕, com Esc ou ao fechar o modal. Funciona nos temas claro e escuro.
+
+### 🧪 Testes
+
+- **`test-calculadora.js` — 52 verificações:** 18 contas conferidas (porcentagem, parênteses,
+  precedência, vírgula/ponto, erros), regras do teclado da tela, teclado físico, Enter/Esc,
+  abrir/fechar, atalho no campo, lançamento salvo com o valor calculado, prévias de conta a pagar
+  e compra no cartão, pagamento de fatura e o painel no celular.
+- Suítes existentes seguem passando — **646 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. A calculadora só preenche o campo; o lançamento continua sendo salvo como antes.
+
+---
+
 ## [2026-09-23] Relatório por categoria: análise mês a mês
 
 ### 🎯 O que foi pedido
