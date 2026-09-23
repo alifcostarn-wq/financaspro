@@ -4,6 +4,57 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-23] Gráficos de fluxo de caixa sem eixo duplo
+
+### 🎯 O que foi pedido
+
+Separar o gráfico do Fluxo de Caixa que usava duas escalas verticais no mesmo desenho.
+
+### 🐛 O que estava errado
+
+- **Dois gráficos com eixo duplo** — o do **Fluxo de Caixa** (entradas e saídas à esquerda,
+  saldo à direita) e o do **DRE Diário** (o mesmo arranjo). Com duas escalas diferentes no mesmo
+  desenho, a altura da linha do saldo e a altura das barras parecem comparáveis, mas não são: o
+  ponto onde a linha cruza uma barra não significa nada. É o erro de gráfico mais comum.
+- **A curva suavizada do saldo inventava valores.** Entre dois pontos a linha fazia arcos que
+  passavam acima ou abaixo do saldo real — no DRE Diário ela mergulhava abaixo do saldo antes de
+  um salário; no mensal inchava acima do valor entre setembro e outubro.
+- **Área preenchida com eixo que não começa em zero** — a área sugere tamanho a partir do zero,
+  mas o eixo começava em R$ 4.000 ou R$ 17.000, exagerando a variação.
+- **"R$-2.000"** no eixo, em vez de "-R$ 2.000".
+- O gráfico do DRE Diário usava cores fixas do tema escuro também no tema claro.
+
+### ✅ Corrigido
+
+- Cada um virou **dois gráficos empilhados no mesmo eixo do tempo**:
+  - em cima, **entradas acima de zero e saídas abaixo**, uma coluna por período, com o
+    resultado do período no tooltip;
+  - embaixo, o **saldo acumulado** (no Fluxo de Caixa, com o caixa total e o disponível quando há
+    contas de reserva; sem reserva, as duas linhas seriam iguais e fica uma só).
+- **Alinhamento exato:** eixo vertical com a mesma largura e a mesma folga nos dois, para cada
+  período cair na mesma coluna — medido em pixels nos dois temas.
+- Saldo em **segmentos retos**, sem valores inventados entre os pontos. Sem área sob a linha;
+  **só o trecho abaixo de zero** ganha sombra vermelha.
+- **Nome de cada linha escrito na ponta**, em cor de texto — a identificação não depende só da cor.
+- **Linha do zero destacada** como referência dos dois gráficos; valores do eixo em pt-BR.
+- **Cores validadas para daltonismo** nos dois temas: entradas em verde-água e saídas em laranja
+  (mantém a intuição de verde/vermelho sem a dupla verde × vermelho, que some para quem tem
+  deuteranopia); saldo total em azul e disponível em âmbar.
+
+### 🧪 Testes
+
+- `test-fluxo-caixa.js` passa de 52 para **71 verificações**: séries, sinal das saídas, um eixo só
+  em cada gráfico, eixo x compartilhado, largura e folga iguais, segmentos retos, sombra só no
+  negativo, formato do eixo, DRE Diário dividido e uma **varredura de todas as visões de Relatórios
+  confirmando que nenhum gráfico do sistema tem mais de um eixo vertical**.
+- Suítes existentes seguem passando — **439 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Só a forma de desenhar mudou; os números são os mesmos.
+
+---
+
 ## [2026-09-23] Orçamento completo: sliders, pizzas, colunas e motor corrigido
 
 ### 🎯 O que foi pedido

@@ -390,6 +390,9 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   background:var(--red-dim);color:var(--red);margin-bottom:12px}
 .cp-preview{background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);
   padding:11px 14px;font-size:12px;color:var(--t2);line-height:1.6}
+/* Fluxo de caixa: títulos dos dois gráficos empilhados */
+.fx-painel-tit{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.fx-painel-tit span{font-weight:400;color:var(--t3)}
 /* Fluxo de caixa: linhas clicáveis, abertura e período corrente */
 #fx-tbody .fx-row{cursor:pointer;transition:background .12s}
 #fx-tbody .fx-row:hover{background:var(--surface2)}
@@ -1404,20 +1407,20 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-header"><span class="card-title" id="fx-ch-titulo">Entradas, Saídas e Saldo Acumulado</span></div>
-      <div class="chart-box" style="height:300px"><canvas id="ch-rel-fluxo"></canvas></div>
+      <div class="card-header">
+        <div><span class="card-title" id="fx-ch-titulo">Movimento e Saldo</span>
+          <div class="card-sub">Dois gráficos no mesmo eixo do tempo — cada período fica na mesma coluna nos dois</div></div>
+      </div>
+      <div class="fx-painel-tit">Entradas e saídas por período</div>
+      <div class="chart-box" style="height:230px"><canvas id="ch-rel-fluxo" aria-label="Entradas acima de zero e saídas abaixo de zero, por período"></canvas></div>
+      <div class="fx-painel-tit" style="margin-top:16px">Saldo acumulado <span id="fx-saldo-sub"></span></div>
+      <div class="chart-box" style="height:230px"><canvas id="ch-fx-disp" aria-label="Saldo acumulado ao fim de cada período"></canvas></div>
+      <div class="orc-nota" style="margin-top:8px">O disponível desconta o que está guardado em contas de reserva (poupança/investimento). Quando o saldo fica negativo, o trecho abaixo de zero aparece em vermelho.</div>
     </div>
 
-    <div class="g2" style="margin-bottom:16px">
-      <div class="card">
-        <div class="card-header"><span class="card-title">Caixa Total × Disponível</span></div>
-        <div class="chart-box" style="height:230px"><canvas id="ch-fx-disp"></canvas></div>
-        <div style="font-size:10px;color:var(--t3);margin-top:8px">O disponível desconta o que está guardado em contas de reserva (poupança/investimento).</div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">Leitura do Caixa</span></div>
-        <div id="fx-alertas"></div>
-      </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><span class="card-title">Leitura do Caixa</span></div>
+      <div id="fx-alertas"></div>
     </div>
 
     <div class="card" style="margin-bottom:16px">
@@ -1482,7 +1485,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div><span class="card-title">DRE Diário — Fluxo de Caixa</span><div class="card-sub" id="dre-d-titulo">Dias do mês selecionado</div></div>
         <span class="badge bdg-amber">Diário</span>
       </div>
-      <div class="chart-box" style="height:260px;margin-bottom:16px"><canvas id="ch-dre-diario"></canvas></div>
+      <div class="fx-painel-tit">Entradas e saídas por dia</div>
+      <div class="chart-box" style="height:210px"><canvas id="ch-dre-diario" aria-label="Entradas acima de zero e saídas abaixo de zero, por dia"></canvas></div>
+      <div class="fx-painel-tit" style="margin-top:14px">Saldo acumulado ao fim de cada dia</div>
+      <div class="chart-box" style="height:190px;margin-bottom:16px"><canvas id="ch-dre-diario-saldo" aria-label="Saldo acumulado ao fim de cada dia"></canvas></div>
       <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr><th>Data</th><th>Dia</th><th>Entradas</th><th>Saídas</th><th>Resultado Dia</th><th>Saldo Acum.</th></tr></thead>
@@ -4527,6 +4533,96 @@ function renderRel(){
 // sistema. Antes a abertura vinha do motor e os incrementos vinham só dos lançamentos:
 // movimentação bancária avulsa e dinheiro que ia para a poupança não mexiam na curva,
 // e o saldo final da projeção não batia com o saldo real.
+// ── Gráficos de fluxo: movimento e saldo em DOIS gráficos no mesmo eixo do tempo ──
+// Antes cada tela tinha um gráfico só com dois eixos verticais (movimento de um lado,
+// saldo do outro). Duas escalas diferentes no mesmo desenho fazem comparar alturas que
+// não se comparam. Agora são dois gráficos empilhados, com a mesma largura de eixo,
+// para cada período cair exatamente na mesma coluna nos dois.
+const LARGURA_EIXO_FLUXO = 78;
+// Cores validadas para daltonismo (skill dataviz), com passos próprios de cada tema
+function paletaFluxo(){
+  const claro = document.body.classList.contains('theme-light');
+  return claro
+    ? { ent:'#1baf7a', sai:'#eb6834', total:'#2a78d6', disp:'#eda100', neg:'#e34948',
+        tick:'#3a5068', grid:'#e3e9f0', zero:'#8a9bb0', sup:'#ffffff' }
+    : { ent:'#199e70', sai:'#d95926', total:'#3987e5', disp:'#c98500', neg:'#e66767',
+        tick:'#8fa3bf', grid:'#1f2838', zero:'#5b6b80', sup:'#131926' };
+}
+const corAlfa = (hex, a) => hex + Math.round(a * 255).toString(16).padStart(2, '0');
+// Mesma folga nos dois gráficos: sem isso o de linha reserva espaço para o raio dos
+// pontos e as colunas do fim deixam de cair no mesmo x que as do gráfico de cima
+const LAYOUT_FLUXO = { autoPadding:false, padding:{ top:10, right:12, bottom:0, left:0 } };
+function eixosFluxo(pal){
+  const moeda = v => (v < 0 ? '-' : '') + 'R$ ' + Math.abs(Number(v)).toLocaleString('pt-BR');
+  return {
+    x:{ offset:true, ticks:{ color:pal.tick, font:{size:10}, maxRotation:0, autoSkip:true, autoSkipPadding:10 },
+        grid:{ display:false } },
+    y:{ ticks:{ color:pal.tick, font:{size:10}, callback:moeda },
+        // a linha do zero é a referência dos dois gráficos: mais forte que a grade
+        grid:{ color:c => (c.tick && c.tick.value === 0) ? pal.zero : pal.grid,
+               lineWidth:c => (c.tick && c.tick.value === 0) ? 1.5 : 1, drawTicks:false },
+        border:{ display:false },
+        afterFit:s => { s.width = LARGURA_EIXO_FLUXO; } },
+  };
+}
+// Nome da série escrito no fim de cada linha, em cor de texto (identidade não fica só na cor)
+const rotuloFimDeLinha = {
+  id:'rotuloFimDeLinha',
+  afterDatasetsDraw(chart, _args, opts){
+    const pts = chart.data.datasets.map((ds, i) => {
+      const m = chart.getDatasetMeta(i);
+      return (!m.hidden && m.data.length) ? { ds, p:m.data[m.data.length - 1] } : null;
+    }).filter(Boolean);
+    if(pts.length < 2) return;                 // série única: o título já diz o que é
+    const { ctx } = chart;
+    pts.sort((a,b) => a.p.y - b.p.y);
+    ctx.save();
+    ctx.font = '600 10px Sora, sans-serif';
+    ctx.fillStyle = (opts && opts.cor) || '#8fa3bf';
+    ctx.textAlign = 'right';
+    pts.forEach((x, i) => {                    // o de cima escreve acima; o de baixo, abaixo
+      const acima = i === 0;
+      ctx.textBaseline = acima ? 'bottom' : 'top';
+      ctx.fillText(x.ds.label, x.p.x - 8, x.p.y + (acima ? -7 : 7));
+    });
+    ctx.restore();
+  }
+};
+// Entradas acima de zero, saídas abaixo — uma coluna por período, um eixo só
+function graficoEntradasSaidas(id, labels, ent, sai){
+  const pal = paletaFluxo(), ex = eixosFluxo(pal);
+  mkCh(id, { type:'bar', data:{ labels, datasets:[
+      { label:'Entradas', data:ent.map(v => +(v || 0).toFixed(2)), backgroundColor:pal.ent, stack:'mov',
+        borderRadius:{ topLeft:4, topRight:4 }, borderSkipped:false, maxBarThickness:38, categoryPercentage:.7 },
+      { label:'Saídas',   data:sai.map(v => -(+(v || 0).toFixed(2))), backgroundColor:pal.sai, stack:'mov',
+        borderRadius:{ bottomLeft:4, bottomRight:4 }, borderSkipped:false, maxBarThickness:38, categoryPercentage:.7 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false }, layout:LAYOUT_FLUXO,
+      plugins:{ legend:{ display:true, labels:{ color:pal.tick, font:{size:11}, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+        tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${fmtR(Math.abs(c.raw))}`,
+          footer:it => { const i = it[0].dataIndex; return `Resultado: ${fmtR((ent[i] || 0) - (sai[i] || 0))}`; } } } },
+      scales:{ x:{ ...ex.x, stacked:true }, y:{ ...ex.y, stacked:true } } } });
+}
+// Saldo acumulado: linha com segmentos retos (curva suavizada inventava valores entre
+// os pontos). Sem área sob a linha — o eixo não começa em zero, e área sugere tamanho a
+// partir do zero. Só o trecho abaixo de zero ganha sombra vermelha.
+function graficoSaldo(id, labels, series){
+  const pal = paletaFluxo();
+  const denso = labels.length > 16;
+  mkCh(id, { type:'line', data:{ labels, datasets:series.map(s => ({
+      label:s.label, data:s.data.map(v => +(v || 0).toFixed(2)), borderColor:s.cor, borderWidth:2, tension:0,
+      pointRadius:denso ? 0 : 4, pointHoverRadius:5, pointBackgroundColor:s.cor,
+      pointBorderColor:pal.sup, pointBorderWidth:2,
+      fill:s.preencher ? { target:'origin', above:'transparent', below:corAlfa(pal.neg, .24) } : false,
+    })) },
+    plugins:[rotuloFimDeLinha],
+    options:{ responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false }, layout:LAYOUT_FLUXO,
+      plugins:{ legend:{ display:series.length > 1, labels:{ color:pal.tick, font:{size:11}, boxWidth:12, boxHeight:3 } },
+        rotuloFimDeLinha:{ cor:pal.tick },
+        tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${fmtR(c.raw)}` } } },
+      scales:eixosFluxo(pal) } });
+}
+
 let _fxGran = 'mensal';   // 'mensal' | 'semanal' | 'diario'
 let _fxDet  = null;       // índice do período aberto no detalhamento
 let _fxCache = null;      // último cálculo, para o detalhamento e o CSV
@@ -4650,39 +4746,18 @@ function renderFluxoCaixa(d){
       ? `💡 Modo <b>Previsto</b>: além dos lançamentos em aberto, a projeção inclui <b>${resumoC.lista.length} compromisso(s)</b> de Contas a Pagar, Cartões e Dívidas (${fmtR(resumoC.total)}). Eles não entram no DRE nem no saldo atual — são dinheiro que ainda vai sair.`
       : '💡 Modo <b>Previsto</b>: inclui lançamentos ainda não pagos, mas <b>não</b> as contas, faturas e parcelas de dívida em aberto. Marque a opção acima para projetar o caixa com tudo o que ainda vai sair.';
 
-  // ── Entradas, saídas e saldo acumulado ──
-  set('fx-ch-titulo', `Entradas, Saídas e Saldo Acumulado — ${escopo}`);
-  const base = getChartBase();
-  const tick = base.scales.y.ticks.color, grid = base.scales.y.grid.color;
-  const moeda = v => 'R$' + Number(v).toLocaleString('pt-BR');
-  mkCh('ch-rel-fluxo', { data:{ labels:linhas.map(l => l.label), datasets:[
-      { type:'bar',  label:'Entradas', data:linhas.map(l => l.ent),  backgroundColor:'#00d97e35', borderColor:'#00d97e', borderWidth:1.5, borderRadius:4, order:3 },
-      { type:'bar',  label:'Saídas',   data:linhas.map(l => -l.sai), backgroundColor:'#ff4d6d35', borderColor:'#ff4d6d', borderWidth:1.5, borderRadius:4, order:3 },
-      { type:'line', label:'Saldo acumulado', data:linhas.map(l => l.fim), borderColor:'#4dabf7',
-        backgroundColor:'#4dabf715', borderWidth:2.5, tension:.3, pointRadius:3,
-        pointBackgroundColor:linhas.map(l => l.fim >= 0 ? '#4dabf7' : '#ff4d6d'), fill:false, yAxisID:'y1', order:1 },
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{ legend:{ display:true, labels:{ color:'#8fa3bf', font:{size:11}, boxWidth:12 } } },
-      scales:{
-        x : { ticks:{ color:tick, font:{size:10} }, grid:{ color:grid } },
-        y : { position:'left',  ticks:{ color:tick, font:{size:10}, callback:moeda }, grid:{ color:grid },
-              title:{ display:true, text:'Movimento', color:tick, font:{size:9} } },
-        y1: { position:'right', ticks:{ color:'#4dabf7', font:{size:10}, callback:moeda },
-              grid:{ display:false }, title:{ display:true, text:'Saldo', color:'#4dabf7', font:{size:9} } },
-      } } });
-
-  // ── Caixa total × disponível ──
+  // ── Movimento e saldo: dois gráficos no mesmo eixo do tempo (sem eixo duplo) ──
+  set('fx-ch-titulo', `Movimento e Saldo — ${escopo}`);
+  const rotulos = linhas.map(l => l.label);
+  graficoEntradasSaidas('ch-rel-fluxo', rotulos, linhas.map(l => l.ent), linhas.map(l => l.sai));
+  const palF = paletaFluxo();
   const temReserva = linhas.some(l => l.reserva !== 0) || abertura.reserva !== 0;
-  mkCh('ch-fx-disp', { type:'line', data:{ labels:linhas.map(l => l.label), datasets:[
-      { label:'Caixa total', data:linhas.map(l => l.fim), borderColor:'#4dabf7', backgroundColor:'#4dabf715',
-        borderWidth:2, tension:.3, pointRadius:2, fill:true },
-      { label:'Disponível', data:linhas.map(l => l.disp), borderColor:'#00d97e', backgroundColor:'#00d97e12',
-        borderWidth:2, tension:.3, pointRadius:2, fill:true, borderDash:temReserva ? [] : [5,4] },
-    ]},
-    options:{ ...base, maintainAspectRatio:false,
-      plugins:{ legend:{ display:true, labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:12 } } } } });
+  // Sem reserva, total e disponível são a mesma linha: mostra uma só
+  graficoSaldo('ch-fx-disp', rotulos, temReserva
+    ? [ { label:'Caixa total', data:linhas.map(l => l.fim),  cor:palF.total, preencher:true },
+        { label:'Disponível',  data:linhas.map(l => l.disp), cor:palF.disp } ]
+    : [ { label:'Saldo acumulado', data:linhas.map(l => l.fim), cor:palF.total, preencher:true } ]);
+  set('fx-saldo-sub', temReserva ? '· total e o que está disponível fora das reservas' : '· ao fim de cada período');
 
   renderTabelaFluxo(linhas, abertura);
   renderAlertasFluxo(linhas, abertura, { totEnt, totSai, totRes, menor, ult, somentePagos, escopo });
@@ -5542,31 +5617,12 @@ function renderDREDiario(d, ativos) {
     dias.push({ d2, dataStr, r, de, i, bkEnt, bkSai, totalEnt, totalSai, resDia, acum, diaSem, detalhes });
   }
 
-  // Preparar dados para gráfico (somente dias com movimento)
-  const diasComMov = dias.filter(d2 => d2.totalEnt > 0 || d2.totalSai > 0);
   const labelsGrafico = dias.map(d2 => String(d2.d2).padStart(2, '0'));
 
-  mkCh('ch-dre-diario', {
-    type: 'bar',
-    data: {
-      labels: labelsGrafico,
-      datasets: [
-        { label: 'Entradas', data: dias.map(d2 => d2.totalEnt), backgroundColor: '#00d97e45', borderColor: '#00d97e', borderWidth: 1, borderRadius: 3 },
-        { label: 'Saídas',   data: dias.map(d2 => d2.totalSai), backgroundColor: '#ff4d6d45', borderColor: '#ff4d6d', borderWidth: 1, borderRadius: 3 },
-        { label: 'Saldo Acum.', data: dias.map(d2 => d2.acum), type: 'line', borderColor: '#4dabf7', backgroundColor: '#4dabf710', fill: true, tension: 0.3, pointRadius: dias.map(d2 => d2.resDia !== 0 ? 3 : 0), borderWidth: 1.5, yAxisID: 'y2' },
-      ]
-    },
-    options: {
-      ...chartBase,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: true, labels: { color: '#8fa3bf', font: { size: 11 }, boxWidth: 10 } } },
-      scales: {
-        x: { ticks: { color: '#4d6178', font: { size: 9 } }, grid: { color: '#1f2838' } },
-        y: { ticks: { color: '#4d6178', font: { size: 9 }, callback: v => 'R$' + Number(v).toLocaleString('pt-BR') }, grid: { color: '#1f2838' } },
-        y2: { position: 'right', ticks: { color: '#4dabf7', font: { size: 9 }, callback: v => 'R$' + Number(v).toLocaleString('pt-BR') }, grid: { display: false } },
-      }
-    }
-  });
+  // Entradas/saídas e saldo em dois gráficos alinhados — antes era um só, com dois eixos
+  graficoEntradasSaidas('ch-dre-diario', labelsGrafico, dias.map(d2 => d2.totalEnt), dias.map(d2 => d2.totalSai));
+  graficoSaldo('ch-dre-diario-saldo', labelsGrafico,
+    [{ label:'Saldo acumulado', data:dias.map(d2 => d2.acum), cor:paletaFluxo().total, preencher:true }]);
 
   // Tabela diária com detalhes expansíveis
   const tbody = document.getElementById('dre-d-tbody');
