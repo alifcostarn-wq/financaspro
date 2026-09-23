@@ -274,6 +274,50 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px}
 .fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
 
+
+/* ── PLANO DE CONTAS ── */
+.plano-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.plano-bar .tgl em{font-style:normal;font-size:10px;color:var(--t3);margin-left:4px}
+.plano-busca{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 12px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif}
+.plano-nova{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.plano-nova input{flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:8px 12px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif}
+.plano-nova select{background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif}
+.plano-cat{border:1px solid var(--line);border-radius:var(--r2);margin-bottom:6px;background:var(--surface1);transition:border-color .12s}
+.plano-cat.aberto{border-color:var(--line2);background:var(--surface2)}
+.plano-cat-hd{display:flex;align-items:center;gap:10px;padding:8px 10px;flex-wrap:wrap}
+.plano-exp{width:24px;height:24px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:12px;border-radius:6px}
+.plano-exp:hover{background:var(--surface3);color:var(--t1)}
+.plano-nome{font-size:13px;font-weight:600;color:var(--t1);cursor:text}
+.plano-uso{font-size:10.5px;color:var(--t3)}
+.plano-papel{font-size:9.5px;font-weight:600;color:var(--blue);background:var(--blue-dim);padding:2px 7px;border-radius:10px;cursor:help}
+.plano-classe{margin-left:auto;background:var(--surface2);border:1px solid var(--line2);color:var(--t2);padding:4px 8px;border-radius:7px;font-size:11px;font-family:'Sora',sans-serif}
+.plano-acts{display:flex;gap:2px}
+.plano-uso + .plano-acts,.plano-papel + .plano-acts{margin-left:auto}   /* abas sem seletor de classe */
+.plano-acts button,.plano-sub button{width:26px;height:26px;border:1px solid transparent;background:transparent;color:var(--t3);cursor:pointer;border-radius:7px;font-size:12px}
+.plano-acts button:hover:not(:disabled),.plano-sub button:hover{background:var(--surface3);color:var(--t1)}
+.plano-acts button.del:hover,.plano-sub button.del:hover{background:var(--red-dim);color:var(--red)}
+.plano-acts button:disabled{opacity:.3;cursor:default}
+.plano-subs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 12px 44px}
+.plano-sub{display:inline-flex;align-items:center;gap:3px;background:var(--surface1);border:1px solid var(--line2);border-radius:16px;padding:2px 4px 2px 10px;font-size:11.5px;color:var(--t2)}
+.plano-sub.hit{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-dim)}
+.plano-sub em{font-style:normal;font-size:10px;color:var(--t3);margin:0 2px 0 4px;font-family:'JetBrains Mono',monospace}
+.plano-sub button{width:20px;height:20px;font-size:10px;border-radius:50%}
+.plano-sub-nome{cursor:text}
+.plano-sub-nova input{background:transparent;border:1px dashed var(--line2);color:var(--t1);border-radius:16px;padding:4px 12px;font-size:11.5px;font-family:'Sora',sans-serif;width:170px}
+.plano-sub-nova input:focus{border-style:solid;border-color:var(--green);outline:none}
+.plano-inline{background:var(--surface1);border:1px solid var(--green);color:var(--t1);border-radius:6px;padding:3px 8px;font-size:12.5px;font-family:'Sora',sans-serif;min-width:160px;outline:none}
+.plano-orfas{margin-top:14px;border:1px dashed var(--amber);border-radius:var(--r2);padding:12px 14px;background:var(--amber-dim)}
+.plano-orfas-hd{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:4px}
+.plano-orfas-hd em{font-style:normal;margin-left:4px}
+.plano-orfa{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line);font-size:12px;color:var(--t2)}
+.plano-orfa-nome{flex:1;min-width:160px}
+.plano-orfa-nome em{font-style:normal;font-size:10.5px;color:var(--t3);margin-left:6px}
+.plano-orfa-mover{display:inline-flex;gap:6px;align-items:center}
+.plano-orfa-mover select{background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:4px 8px;border-radius:7px;font-size:11px;font-family:'Sora',sans-serif}
+@media (max-width:640px){
+  .plano-subs{padding-left:12px}
+  .plano-classe{margin-left:0}
+}
 /* ── ORÇAMENTO ── */
 .orc-tab-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--viz-prev);margin-left:5px;vertical-align:middle}
 .orc-renda{padding:16px 20px}
@@ -747,6 +791,10 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #m-conta .cp-tipo-btn:hover{border-color:var(--line2);color:var(--t1)}
 #m-conta .cp-tipo-btn.active{border-color:var(--green);background:var(--green-dim);color:var(--green)}
 #m-conta .cp-tipo-btn.active small{color:var(--green);opacity:.75}
+#m-conta .cp-forma-row{margin-bottom:12px}
+#m-conta .cp-tipo-btn.cartao.active{border-color:var(--purple);background:var(--purple-dim);color:var(--purple)}
+#m-conta .cp-tipo-btn.cartao.active small{color:var(--purple)}
+#m-conta .cp-cc-aviso{font-size:11px;color:var(--t3);margin-top:6px;line-height:1.45}
 #m-conta .cp-escopo{display:flex;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:4px;margin-bottom:14px}
 #m-conta .cp-escopo button{flex:1;padding:6px;border:none;border-radius:5px;background:transparent;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
 #m-conta .cp-escopo button.active{background:var(--surface4);color:var(--t1)}
@@ -1792,7 +1840,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
   <div class="kpi-grid cols5">
     <div class="kpi r"><div class="kpi-label">Total do Período</div><div class="kpi-val r" id="ck-total">R$ 0</div></div>
-    <div class="kpi a"><div class="kpi-label">Em Aberto</div><div class="kpi-val a" id="ck-pend">R$ 0</div></div>
+    <div class="kpi a"><div class="kpi-label">Em Aberto</div><div class="kpi-val a" id="ck-pend">R$ 0</div><div class="kpi-sub" id="ck-pend-sub"></div></div>
     <div class="kpi g"><div class="kpi-label">Pago</div><div class="kpi-val g" id="ck-pago">R$ 0</div></div>
     <div class="kpi r"><div class="kpi-label">Vencidas</div><div class="kpi-val r" id="ck-venc">R$ 0</div><div class="kpi-sub" id="ck-venc-sub">nenhuma em atraso</div></div>
     <div class="kpi b"><div class="kpi-label">Vence em 7 dias</div><div class="kpi-val b" id="ck-7d">R$ 0</div><div class="kpi-sub" id="ck-7d-sub">nada a vencer</div></div>
@@ -1838,7 +1886,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
         </select>
         <select id="cp-fil-st" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
-          <option value="">Todos os status</option><option>Pendente</option><option>Pago</option><option>Vencida</option>
+          <option value="">Todos os status</option><option>Pendente</option><option>Pago</option><option>Vencida</option><option>No cartão</option>
         </select>
         <select id="cp-fil-cat" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
         <input id="cp-busca" type="text" placeholder="Buscar…" oninput="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
@@ -2009,9 +2057,32 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Categorias do Sistema</span></div>
-    <div id="cats-display" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <div class="card" id="plano-card">
+    <div class="card-header" style="flex-wrap:wrap;gap:10px">
+      <div><span class="card-title">Plano de Contas</span>
+        <div class="card-sub">Categorias e subcategorias usadas em todo o sistema. Renomear ou mesclar atualiza lançamentos, contas, metas, cartões e extratos.</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="planoRestaurarUI()" title="Devolve o que falta do padrão, sem apagar nada">↺ Restaurar padrão</button>
+    </div>
+    <div class="plano-bar">
+      <div class="toggle-row" id="plano-tipos" style="margin-bottom:0">
+        <div class="tgl active" data-t="Despesa" onclick="planoTipo('Despesa')">Despesas <em>0</em></div>
+        <div class="tgl" data-t="Receita" onclick="planoTipo('Receita')">Receitas <em>0</em></div>
+        <div class="tgl" data-t="Investimento" onclick="planoTipo('Investimento')">Investimentos <em>0</em></div>
+      </div>
+      <input type="search" id="plano-busca" class="plano-busca" placeholder="Buscar categoria ou subcategoria…" oninput="renderPlano()" aria-label="Buscar no plano de contas">
+    </div>
+    <div class="orc-nota" id="plano-resumo" style="margin:8px 0 10px"></div>
+    <div id="plano-err" class="form-err" style="display:none"></div>
+    <div class="plano-nova">
+      <input type="text" id="plano-nova-cat" placeholder="Nome da nova categoria…" onkeydown="if(event.key==='Enter')planoCriarCatUI()" aria-label="Nome da nova categoria">
+      <select id="plano-nova-classe" aria-label="Classe da nova categoria" title="Classe usada na regra 50/30/20">
+        <option>Essencial</option><option>Escolha</option><option>Financeiro</option><option selected>Outros</option>
+      </select>
+      <button class="btn btn-green btn-sm" onclick="planoCriarCatUI()">+ Adicionar categoria</button>
+    </div>
+    <div id="plano-lista"></div>
+    <div id="plano-orfas"></div>
+    <div class="orc-nota" style="margin-top:10px">Dica: clique duas vezes no nome para renomear. A classe (Essencial, Escolha, Financeiro, Outros) define onde a despesa entra na regra 50/30/20 e no relatório de Despesas Pessoais.</div>
   </div>
   <div class="card">
     <div class="card-header"><span class="card-title">Dados</span></div>
@@ -2691,11 +2762,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Descrição *</label><input type="text" id="cp-desc" placeholder="Ex: Aluguel"></div>
         <div class="fg"><label>Categoria</label>
-          <select id="cp-cat" onchange="updCpSubcat()">
-            <option>Moradia</option><option>Alimentação</option><option>Transporte</option><option>Saúde</option>
-            <option>Educação</option><option>Lazer</option><option>Salão de Beleza</option><option>Vestuário</option>
-            <option>Festas/Datas</option><option>Serviços &amp; Financeiro</option><option>Esporte</option><option>Outras Despesas</option>
-          </select>
+          <select id="cp-cat" onchange="updCpSubcat()"></select>
         </div>
       </div>
       <div class="form-grid cols2" style="margin-bottom:12px">
@@ -2752,13 +2819,25 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg" id="cp-fim-qtd-wrap" style="display:none"><label>Nº de ocorrências</label><input type="number" id="cp-fim-qtd" min="1" step="1" placeholder="Ex: 12" oninput="updCpPreview()"></div>
       </div>
 
+      <!-- Forma de pagamento: pelo caixa ou no cartão de crédito -->
+      <input type="hidden" id="cp-forma" value="caixa">
+      <div class="fg" style="margin-bottom:6px"><label>Forma de pagamento</label></div>
+      <div class="cp-tipo-row cp-forma-row" id="cp-forma-row">
+        <button type="button" class="cp-tipo-btn active" id="cpf-caixa" onclick="setCpForma('caixa')">🏦 Conta / dinheiro<small>sai do caixa quando for paga</small></button>
+        <button type="button" class="cp-tipo-btn cartao" id="cpf-cartao" onclick="setCpForma('cartao')">💳 Cartão de crédito<small>entra na fatura do cartão</small></button>
+      </div>
+      <div id="cp-cc-wrap" style="display:none;margin-bottom:12px">
+        <div class="fg"><label>Cartão</label><select id="cp-cc" onchange="updCpPreview()"></select></div>
+        <div class="cp-cc-aviso" id="cp-cc-aviso"></div>
+      </div>
+
       <!-- Prévia do que será criado -->
       <div id="cp-preview" style="background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px">
         <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prévia</div>
         <div id="cp-preview-body" style="font-size:12px;color:var(--t2)">—</div>
       </div>
 
-      <div class="form-grid cols2" style="margin-bottom:12px">
+      <div class="form-grid cols2" id="cp-st-row" style="margin-bottom:12px">
         <div class="fg"><label id="cp-st-label">Status</label>
           <select id="cp-st" onchange="toggleCpCaixa()"><option>Pendente</option><option>Pago</option></select>
         </div>
@@ -3059,6 +3138,32 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 </div>
 
 <!-- ═══════════════ SCRIPT ═══════════════ -->
+<!-- Modal: excluir / mesclar categoria do plano de contas -->
+<div class="overlay" id="m-plano-del" style="display:none" onclick="cmoOut(event,'m-plano-del')">
+  <div class="modal" style="max-width:460px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2 id="pd-titulo">Excluir</h2><div style="font-size:11px;color:var(--t3);margin-top:2px" id="pd-sub">—</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-plano-del')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="pd-err" class="form-err" style="display:none"></div>
+      <div class="cp-preview" id="pd-uso" style="margin-bottom:10px">—</div>
+      <div class="alert alert-b" id="pd-papel" style="display:none"></div>
+      <div id="pd-destino-box">
+        <div class="fg" style="margin-bottom:10px"><label id="pd-destino-lbl">Mover os registros para:</label><select id="pd-destino"></select></div>
+        <label id="pd-levar-box" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);cursor:pointer">
+          <input type="checkbox" id="pd-levar" checked style="width:15px;height:15px;accent-color:var(--green)">
+          Levar as subcategorias em uso para o destino (nada se perde)
+        </label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-plano-del')">Cancelar</button>
+      <button class="btn btn-red" id="pd-btn" onclick="planoConfirmarExclusao()">Excluir</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Nova Conta Bancária -->
 <div class="overlay" id="m-banco" style="display:none" onclick="cmoOut(event,'m-banco')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -3148,7 +3253,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Descrição *</label><input type="text" id="bm-desc" placeholder="Ex: Pagamento de cliente"></div>
       </div>
       <div class="form-grid cols2">
-        <div class="fg"><label>Categoria</label><select id="bm-cat"></select></div>
+        <div class="fg"><label>Categoria</label><select id="bm-cat" onchange="updBmSubcat()"></select></div>
+        <div class="fg"><label>Subcategoria</label><select id="bm-subcat"><option value="">—</option></select></div>
+      </div>
+      <div class="form-grid" style="margin-top:12px">
         <div class="fg"><label>Forma</label>
           <select id="bm-forma">
             <option>PIX</option><option>TED</option><option>DOC</option><option>Depósito</option>
@@ -3238,7 +3346,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 // ── CONSTANTS ──
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const MESES3 = MESES.map(m=>m.slice(0,3));
-const CATS = {
+const CATS_PADRAO = {
   Receita: {
     'Receitas': ['Pro-Labore','Dividendos','Vendas','Outras Receitas']
   },
@@ -3261,6 +3369,307 @@ const CATS = {
   }
 };
 const CORES_CAT = ['#00d97e','#4dabf7','#cc5de8','#ffd43b','#ff4d6d','#22d3ee','#f06595','#a9e34b','#ff8787','#74c0fc','#b197fc','#ffa94d'];
+
+// ══════════════════════════════════════════════════════════════
+// ── PLANO DE CONTAS (categorias e subcategorias editáveis) ──
+// CATS_PADRAO é só o ponto de partida. O plano que vale fica em d.planoContas e é
+// editado em Configurações. CATS, CLASSE_DESPESA e PAPEIS são preenchidos a partir
+// dele (mutação no lugar, para quem já guardou a referência continuar vendo o atual).
+// ══════════════════════════════════════════════════════════════
+const TIPOS_PLANO = ['Receita', 'Despesa', 'Investimento'];      // ordem histórica de CATS
+const CLASSES_DESPESA = ['Essencial', 'Escolha', 'Financeiro', 'Outros'];
+// Classificação padrão das despesas (necessidade × escolha) — 50/30/20 e Despesas Pessoais
+const CLASSE_PADRAO = {
+  'Moradia':'Essencial', 'Alimentação':'Essencial', 'Transporte':'Essencial',
+  'Saúde':'Essencial',   'Educação':'Essencial',    'Vestuário':'Essencial',
+  'Lazer':'Escolha',     'Salão de Beleza':'Escolha','Festas/Datas':'Escolha', 'Esporte':'Escolha',
+  'Serviços & Financeiro':'Financeiro', 'Outras Despesas':'Outros',
+};
+// Papéis: categorias que o próprio sistema usa ao gerar registros. Acompanham
+// renomeações e mesclagens — senão o sistema gravaria numa categoria que não existe.
+const PAPEIS_PADRAO = {
+  financeiro:        { tipo:'Despesa',      cat:'Serviços & Financeiro', rotulo:'pagamento de fatura de cartão' },
+  pagamentoDivida:   { tipo:'Despesa',      cat:'Serviços & Financeiro', sub:'Pagamento de Dívida', rotulo:'pagamento de parcela de dívida' },
+  outrasDespesas:    { tipo:'Despesa',      cat:'Outras Despesas',       rotulo:'despesa sem categoria e importação OFX' },
+  receitaPadrao:     { tipo:'Receita',      cat:'Receitas',              rotulo:'receita importada por OFX' },
+};
+const CATS = {};
+const CLASSE_DESPESA = {};
+const PAPEIS = {};
+const rotuloTipo = t => t === 'Despesa' ? 'Despesas' : t === 'Receita' ? 'Receitas' : 'Investimentos';
+const normNome   = s => (s || '').trim().replace(/\s+/g, ' ');
+const mesmoNome  = (a, b) => normNome(a).toLocaleLowerCase('pt-BR') === normNome(b).toLocaleLowerCase('pt-BR');
+const clonar     = o => JSON.parse(JSON.stringify(o));
+
+function planoPadrao(){
+  const p = { versao:1, papeis:clonar(PAPEIS_PADRAO) };
+  TIPOS_PLANO.forEach(t => {
+    p[t] = Object.entries(CATS_PADRAO[t] || {}).map(([nome, subs]) => {
+      const c = { nome, subs:subs.slice() };
+      if(t === 'Despesa') c.classe = CLASSE_PADRAO[nome] || 'Outros';
+      return c;
+    });
+  });
+  return p;
+}
+const planoValido = p => !!p && TIPOS_PLANO.every(t => Array.isArray(p[t]));
+function lerPlano(d){ d = d || gs(); return planoValido(d.planoContas) ? d.planoContas : planoPadrao(); }
+
+function aplicarPlanoContas(p){
+  p = planoValido(p) ? p : lerPlano();
+  Object.keys(CATS).forEach(k => delete CATS[k]);
+  Object.keys(CLASSE_DESPESA).forEach(k => delete CLASSE_DESPESA[k]);
+  TIPOS_PLANO.forEach(t => {
+    CATS[t] = {};
+    p[t].forEach(c => {
+      CATS[t][c.nome] = (c.subs || []).slice();
+      if(t === 'Despesa') CLASSE_DESPESA[c.nome] = c.classe || 'Outros';
+    });
+  });
+  Object.keys(PAPEIS).forEach(k => delete PAPEIS[k]);
+  Object.assign(PAPEIS, clonar(PAPEIS_PADRAO));
+  Object.entries(p.papeis || {}).forEach(([k, v]) => { if(PAPEIS[k]) Object.assign(PAPEIS[k], v); });
+}
+aplicarPlanoContas(planoPadrao());          // até o armazenamento ser lido na inicialização
+
+// Categoria que o sistema usa para um papel — se ela sumiu do plano, cai na última do tipo
+function papel(nome){
+  const r = PAPEIS[nome];
+  if(!r) return '';
+  const cats = Object.keys(CATS[r.tipo] || {});
+  return cats.includes(r.cat) ? r.cat : (cats[cats.length - 1] || r.cat);
+}
+function papelSub(nome){
+  const r = PAPEIS[nome];
+  if(!r || !r.sub) return '';
+  return ((CATS[r.tipo] || {})[papel(nome)] || []).includes(r.sub) ? r.sub : '';
+}
+
+// ── Onde os registros guardam categoria (para contar uso e propagar mudanças) ──
+function refsCategoria(d){
+  const out = [];
+  const add = (o, tipo, fonte, semSub) => { if(o && o.cat) out.push({ o, tipo, fonte, semSub:!!semSub }); };
+  (d.lancs || []).forEach(l => { if(l.tipo && l.tipo !== 'Transferência') add(l, l.tipo, 'lanc'); });
+  (d.contas || []).forEach(c => add(c, 'Despesa', 'conta'));
+  (d.orcs || []).forEach(o => add(o, o.tipo, 'meta'));
+  (d.ccs || []).forEach(cc => {
+    (cc.gastos || []).forEach(g => { if(!g.refContaId) add(g, 'Despesa', 'cartao'); });   // espelho segue a conta
+    (cc.faturas || []).forEach(f => add(f, 'Despesa', 'fatura', true));
+  });
+  // Movimentação espelhada de lançamento segue o lançamento; transferência não tem categoria
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if(m.refLancId || isTransfMov(m)) return;
+    const tipo = m.tipo === 'entrada' ? 'Receita' : ((CATS.Investimento || {})[m.cat] ? 'Investimento' : 'Despesa');
+    add(m, tipo, 'banco');
+  }));
+  return out;
+}
+const ROTULO_FONTE = {
+  lanc:['lançamento','lançamentos'], conta:['conta a pagar','contas a pagar'], meta:['meta','metas'],
+  cartao:['compra no cartão','compras no cartão'], fatura:['pagamento de fatura','pagamentos de fatura'],
+  banco:['movimentação bancária','movimentações bancárias'] };
+
+// Uso de todas as categorias e subcategorias num passe só
+function mapaUsoCategorias(d){
+  const m = {};
+  refsCategoria(d).forEach(r => {
+    const k = r.tipo + '|' + r.o.cat;
+    const u = m[k] || (m[k] = { n:0, porFonte:{}, subs:{} });
+    u.n++; u.porFonte[r.fonte] = (u.porFonte[r.fonte] || 0) + 1;
+    if(r.o.subcat && !r.semSub){
+      const s = u.subs[r.o.subcat] || (u.subs[r.o.subcat] = { n:0, porFonte:{} });
+      s.n++; s.porFonte[r.fonte] = (s.porFonte[r.fonte] || 0) + 1;
+    }
+  });
+  return m;
+}
+const descreverUso = porFonte => Object.entries(porFonte).sort((a,b) => b[1] - a[1])
+  .map(([f, n]) => `${n} ${ROTULO_FONTE[f][n > 1 ? 1 : 0]}`).join(', ');
+
+// Movimentação espelhada copia categoria do lançamento de origem
+function sincronizarMovsEspelho(d){
+  const porId = {};
+  (d.lancs || []).forEach(l => porId[l.id] = l);
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    const l = m.refLancId && porId[m.refLancId];
+    if(l){ m.cat = l.cat; if(l.subcat != null) m.subcat = l.subcat; }
+  }));
+}
+// Depois de mesclar, duas metas podem apontar para a mesma categoria no mesmo mês: soma
+function mesclarMetasDuplicadas(d){
+  const vistas = {};
+  d.orcs = (d.orcs || []).filter(o => {
+    const k = [o.tipo, o.cat, o.subcat || '', o.mes, anoDaMeta(o)].join('|');
+    if(!vistas[k]){ vistas[k] = o; return true; }
+    vistas[k].val = +((vistas[k].val || 0) + (o.val || 0)).toFixed(2);
+    vistas[k].obs = [vistas[k].obs, 'metas somadas ao mesclar categorias'].filter(Boolean).join(' · ');
+    return false;
+  });
+}
+
+// Toda alteração passa por aqui: valida, grava o plano, propaga e reaplica.
+// `fn(p, d)` devolve uma mensagem de erro (string) para cancelar sem gravar nada.
+function alterarPlano(fn){
+  const d = gs();
+  const p = clonar(lerPlano(d));
+  const erro = fn(p, d);
+  if(typeof erro === 'string' && erro) return erro;
+  d.planoContas = p;
+  sincronizarMovsEspelho(d);
+  sincronizarContasNoCartao(d);
+  mesclarMetasDuplicadas(d);
+  ss(d);
+  aplicarPlanoContas(p);
+  return '';
+}
+const achaCat = (p, tipo, nome) => (p[tipo] || []).find(c => c.nome === nome);
+
+function planoCriarCategoria(tipo, nome, classe){
+  nome = normNome(nome);
+  if(!nome) return 'Informe o nome da categoria.';
+  return alterarPlano(p => {
+    if(p[tipo].some(c => mesmoNome(c.nome, nome))) return `Já existe a categoria "${nome}" em ${rotuloTipo(tipo)}.`;
+    const c = { nome, subs:[] };
+    if(tipo === 'Despesa') c.classe = CLASSES_DESPESA.includes(classe) ? classe : 'Outros';
+    p[tipo].push(c);
+  });
+}
+function planoRenomearCategoria(tipo, antigo, novo){
+  novo = normNome(novo);
+  if(!novo) return 'O nome não pode ficar vazio.';
+  if(novo === antigo) return '';
+  return alterarPlano((p, d) => {
+    const c = achaCat(p, tipo, antigo);
+    if(!c) return `A categoria "${antigo}" não existe.`;
+    if(p[tipo].some(x => x !== c && mesmoNome(x.nome, novo))) return `Já existe a categoria "${novo}" em ${rotuloTipo(tipo)}. Para juntar as duas, use Excluir › mesclar.`;
+    c.nome = novo;
+    refsCategoria(d).forEach(r => { if(r.tipo === tipo && r.o.cat === antigo) r.o.cat = novo; });
+    Object.values(p.papeis || {}).forEach(v => { if(v.tipo === tipo && v.cat === antigo) v.cat = novo; });
+  });
+}
+// Exclui a categoria; se tem uso (ou é papel do sistema), move os registros para `destino`.
+// Com `levarSubs`, as subcategorias em uso vão junto para o destino — nada se perde.
+function planoExcluirCategoria(tipo, nome, destino, levarSubs){
+  return alterarPlano((p, d) => {
+    const c = achaCat(p, tipo, nome);
+    if(!c) return `A categoria "${nome}" não existe.`;
+    const refs = refsCategoria(d).filter(r => r.tipo === tipo && r.o.cat === nome);
+    const papeis = Object.values(p.papeis || {}).filter(v => v.tipo === tipo && v.cat === nome);
+    if((refs.length || papeis.length) && !destino) return `"${nome}" está em uso. Escolha para onde mover os registros.`;
+    if(destino){
+      const dst = achaCat(p, tipo, destino);
+      if(!dst || destino === nome) return 'Escolha uma categoria de destino diferente.';
+      refs.forEach(r => {
+        r.o.cat = destino;
+        const s = r.o.subcat || '';
+        if(!s || r.semSub) return;
+        if(dst.subs.includes(s)) return;
+        if(levarSubs !== false) dst.subs.push(s); else r.o.subcat = '';
+      });
+      papeis.forEach(v => { v.cat = destino; if(v.sub && !dst.subs.includes(v.sub)) dst.subs.push(v.sub); });
+    }
+    p[tipo] = p[tipo].filter(x => x !== c);
+    if(!p[tipo].length) return `${rotuloTipo(tipo)} precisa ter ao menos uma categoria.`;
+  });
+}
+function planoMoverCategoria(tipo, nome, dir){
+  return alterarPlano(p => {
+    const i = p[tipo].findIndex(c => c.nome === nome), j = i + dir;
+    if(i < 0 || j < 0 || j >= p[tipo].length) return 'fim';
+    [p[tipo][i], p[tipo][j]] = [p[tipo][j], p[tipo][i]];
+  });
+}
+function planoClassificar(nome, classe){
+  if(!CLASSES_DESPESA.includes(classe)) return 'Classe inválida.';
+  return alterarPlano(p => { const c = achaCat(p, 'Despesa', nome); if(!c) return 'Categoria não encontrada.'; c.classe = classe; });
+}
+function planoCriarSub(tipo, cat, sub){
+  sub = normNome(sub);
+  if(!sub) return 'Informe o nome da subcategoria.';
+  return alterarPlano(p => {
+    const c = achaCat(p, tipo, cat);
+    if(!c) return `A categoria "${cat}" não existe.`;
+    if(c.subs.some(s => mesmoNome(s, sub))) return `"${cat}" já tem a subcategoria "${sub}".`;
+    c.subs.push(sub);
+  });
+}
+function planoRenomearSub(tipo, cat, antigo, novo){
+  novo = normNome(novo);
+  if(!novo) return 'O nome não pode ficar vazio.';
+  if(novo === antigo) return '';
+  return alterarPlano((p, d) => {
+    const c = achaCat(p, tipo, cat);
+    if(!c || !c.subs.includes(antigo)) return `A subcategoria "${antigo}" não existe.`;
+    if(c.subs.some(s => s !== antigo && mesmoNome(s, novo))) return `"${cat}" já tem a subcategoria "${novo}". Para juntar as duas, use Excluir › mesclar.`;
+    c.subs = c.subs.map(s => s === antigo ? novo : s);
+    refsCategoria(d).forEach(r => { if(r.tipo === tipo && r.o.cat === cat && r.o.subcat === antigo) r.o.subcat = novo; });
+    Object.values(p.papeis || {}).forEach(v => { if(v.tipo === tipo && v.cat === cat && v.sub === antigo) v.sub = novo; });
+  });
+}
+function planoExcluirSub(tipo, cat, sub, destinoSub){
+  return alterarPlano((p, d) => {
+    const c = achaCat(p, tipo, cat);
+    if(!c || !c.subs.includes(sub)) return `A subcategoria "${sub}" não existe.`;
+    if(destinoSub && (destinoSub === sub || !c.subs.includes(destinoSub))) return 'Escolha uma subcategoria de destino diferente.';
+    refsCategoria(d).forEach(r => { if(r.tipo === tipo && r.o.cat === cat && r.o.subcat === sub) r.o.subcat = destinoSub || ''; });
+    Object.values(p.papeis || {}).forEach(v => { if(v.tipo === tipo && v.cat === cat && v.sub === sub) v.sub = destinoSub || ''; });
+    c.subs = c.subs.filter(s => s !== sub);
+  });
+}
+// Devolve ao plano o que falta do padrão, sem apagar nem renomear nada seu
+function planoRestaurarPadrao(){
+  let n = 0;
+  const erro = alterarPlano(p => {
+    const base = planoPadrao();
+    TIPOS_PLANO.forEach(t => base[t].forEach(bc => {
+      const c = p[t].find(x => mesmoNome(x.nome, bc.nome));
+      if(!c){ p[t].push(bc); n += 1 + bc.subs.length; return; }
+      bc.subs.forEach(s => { if(!c.subs.some(x => mesmoNome(x, s))) { c.subs.push(s); n++; } });
+    }));
+  });
+  return erro || n;
+}
+// Categorias e subcategorias usadas em registros mas ausentes do plano
+function categoriasOrfas(d){
+  d = d || gs();
+  const out = {};
+  refsCategoria(d).forEach(r => {
+    const noPlano = (CATS[r.tipo] || {})[r.o.cat];
+    const k = r.tipo + '|' + r.o.cat;
+    if(!noPlano){
+      const o = out[k] || (out[k] = { tipo:r.tipo, cat:r.o.cat, sub:null, n:0, subs:{} });
+      o.n++; if(r.o.subcat && !r.semSub) o.subs[r.o.subcat] = (o.subs[r.o.subcat] || 0) + 1;
+    } else if(r.o.subcat && !r.semSub && !noPlano.includes(r.o.subcat)){
+      const ks = k + '|' + r.o.subcat;
+      const o = out[ks] || (out[ks] = { tipo:r.tipo, cat:r.o.cat, sub:r.o.subcat, n:0 });
+      o.n++;
+    }
+  });
+  return Object.values(out).sort((a,b) => b.n - a.n);
+}
+// Leva para o plano uma categoria (ou subcategoria) órfã, com as subcategorias em uso
+function planoAdotarOrfa(tipo, cat, sub){
+  return alterarPlano((p, d) => {
+    let c = achaCat(p, tipo, cat);
+    if(!c){ c = { nome:cat, subs:[] }; if(tipo === 'Despesa') c.classe = 'Outros'; p[tipo].push(c); }
+    const usadas = new Set();
+    refsCategoria(d).forEach(r => { if(r.tipo === tipo && r.o.cat === cat && r.o.subcat && !r.semSub) usadas.add(r.o.subcat); });
+    (sub ? [sub] : [...usadas]).forEach(s => { if(!c.subs.includes(s)) c.subs.push(s); });
+  });
+}
+// Move os registros de uma categoria órfã para uma do plano (subcategoria vai junto se existir lá)
+function planoMoverOrfa(tipo, cat, sub, destino){
+  return alterarPlano((p, d) => {
+    const dst = achaCat(p, tipo, destino);
+    if(!dst) return 'Escolha a categoria de destino.';
+    refsCategoria(d).forEach(r => {
+      if(r.tipo !== tipo || r.o.cat !== cat) return;
+      if(sub != null && r.o.subcat !== sub) return;
+      r.o.cat = destino;
+      if(r.o.subcat && !dst.subs.includes(r.o.subcat)) r.o.subcat = '';
+    });
+  });
+}
 
 // ── STATE ──
 const K='fpro_v2';
@@ -3548,13 +3957,14 @@ function openM(id){
     $('cp-fim-qtd').value  = '';
     $('cp-st').value = 'Pendente';
     $('cp-data-pg').value = '';
-    $('cp-cat').selectedIndex = 0;
+    popCpCats('');
     const err = $('cp-err'); if(err) err.style.display = 'none';
     popCaixas('cp-caixa');
+    popCpCartoes('');
     updCpSubcat();
     setCpTipo('unica');
     setCpEscopo('uma');
-    toggleCpCaixa();
+    setCpForma('caixa');
   }
   if(id==='m-pagar'){ popCaixas('pg-caixa'); }
   if(id==='m-orc'){
@@ -3588,7 +3998,7 @@ function openM(id){
     }
     const cat = $('pf-cat');
     if(cat){ cat.innerHTML = allCats('Despesa').map(c=>`<option>${c}</option>`).join('');
-             if(allCats('Despesa').includes('Serviços & Financeiro')) cat.value='Serviços & Financeiro'; }
+             cat.value = papel('financeiro'); }
     const v = $('pf-val'); if(v){ v.value=''; delete v.dataset.tocado; }
     const g = $('pf-gerar'); if(g) g.checked = true;
     const err = $('pf-err'); if(err) err.style.display='none';
@@ -3618,7 +4028,7 @@ function updSbSaldo(){
   }
   // Conta o que realmente exige ação: vencidas + a vencer nos próximos 7 dias
   const pend = d.contas.filter(c => {
-    if(statusConta(c) === 'Pago') return false;
+    if(!contaEmAberto(c)) return false;
     const dd = diasAte(c.venc);
     return dd !== null && dd <= 7;
   }).length;
@@ -3769,7 +4179,7 @@ function renderDash(){
   // ── Contas pendentes ──
   // Inclui o que venceu em meses anteriores e ainda não foi pago — atraso não some
   // do contador só porque o mês virou.
-  const pend = d.contas.filter(c => statusConta(c) !== 'Pago'
+  const pend = d.contas.filter(c => contaEmAberto(c)
                  && (noMesAno(c.venc, mes, ano) || c.venc < today()));
   const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes, ano), 0);
   set('dk-pend', pend.length);
@@ -4003,7 +4413,7 @@ function renderDash(){
   // Contas vencendo
   const avencer = d.contas.filter(c => {
     const dd = diasAte(c.venc);
-    return dd !== null && dd >= 0 && dd <= 7 && statusConta(c) !== 'Pago';
+    return dd !== null && dd >= 0 && dd <= 7 && contaEmAberto(c);
   });
   if (avencer.length) alertas.push({ tipo:'a', msg:`⏰ ${avencer.length} conta(s) vencem em 7 dias — ${fmtR(avencer.reduce((a,c)=>a+c.valor,0))}` });
 
@@ -4267,7 +4677,7 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   }
 
   // 2. Vencendo em até 3 dias
-  const urgentes3 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>=0 && dd<=3 && statusConta(c)!=='Pago'; });
+  const urgentes3 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>=0 && dd<=3 && contaEmAberto(c); });
   if(urgentes3.length){
     const total=urgentes3.reduce((a,c)=>a+c.valor,0);
     const nomes=urgentes3.slice(0,2).map(c=>c.desc.length>26?c.desc.slice(0,26)+'…':c.desc).join(', ');
@@ -4280,7 +4690,7 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
   }
 
   // 3. Vencendo em 4–7 dias
-  const urgentes7 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>3 && dd<=7 && statusConta(c)!=='Pago'; });
+  const urgentes7 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>3 && dd<=7 && contaEmAberto(c); });
   if(urgentes7.length){
     const total=urgentes7.reduce((a,c)=>a+c.valor,0);
     acoes.push({ nivel:'atencao', icon:'📅', label:'Vence esta semana',
@@ -4945,12 +5355,7 @@ function exportarFluxoCSV(){
 // ── RELATÓRIO: ANÁLISE DE DESPESAS PESSOAIS ──
 // Classificação por grupo de categoria: separa o que é compromisso do que é escolha
 // sem exigir que cada lançamento seja reclassificado à mão.
-const CLASSE_DESPESA = {
-  'Moradia':'Essencial', 'Alimentação':'Essencial', 'Transporte':'Essencial',
-  'Saúde':'Essencial',   'Educação':'Essencial',    'Vestuário':'Essencial',
-  'Lazer':'Escolha',     'Salão de Beleza':'Escolha','Festas/Datas':'Escolha', 'Esporte':'Escolha',
-  'Serviços & Financeiro':'Financeiro', 'Outras Despesas':'Outros',
-};
+// (a classificação de cada categoria vive no Plano de Contas — ver CLASSE_DESPESA)
 const CORES_CLASSE = { Essencial:'#4dabf7', Escolha:'#cc5de8', Financeiro:'#ffd43b', Outros:'#8fa3bf' };
 const classeDespesa = cat => CLASSE_DESPESA[cat] || 'Outros';
 const DIA_SEM_LONGO = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -4980,14 +5385,14 @@ function despesasDoPeriodo(d, jan, incluirCartao){
   const list = semReservas(filtrarPorView(base, _relFilterView), d)
     .filter(l => l.data >= jan.de && l.data <= jan.ate)
     .filter(l => !(incluirCartao && l.origem === 'fatura'))
-    .map(l => ({ data:l.data, cat:l.cat || 'Outras Despesas', sub:l.subcat || '',
+    .map(l => ({ data:l.data, cat:l.cat || papel('outrasDespesas'), sub:l.subcat || '',
                  desc:l.desc, valor:l.valor || 0, fonte:'Lançamento' }));
   if(incluirCartao){
     (d.ccs || []).forEach(c => {
       for(let abs = jan.iniAbs; abs <= jan.fimAbs; abs++){
         const m = abs % 12, a = Math.floor(abs / 12);
         parcelasDaFatura(c, m, a).forEach(pp => {
-          list.push({ data:dataVencFatura(c, m, a), cat:pp.g.cat || 'Outras Despesas', sub:pp.g.subcat || '',
+          list.push({ data:dataVencFatura(c, m, a), cat:pp.g.cat || papel('outrasDespesas'), sub:pp.g.subcat || '',
             desc:pp.g.desc + (pp.total > 1 ? ` (${pp.num}/${pp.total})` : ''),
             valor:pp.valor, fonte:'Cartão · ' + c.nome });
         });
@@ -6192,7 +6597,7 @@ function parcelasComoLancs(d, mes, ano){
   (d.ccs || []).forEach(c => {
     parcelasDaFatura(c, mes, ano).forEach(pp => {
       out.push({ id:'cc-' + pp.g.id + '-' + pp.num, data:dataVencFatura(c, mes, ano),
-        tipo:'Despesa', cat:pp.g.cat || 'Outras Despesas', subcat:pp.g.subcat || '',
+        tipo:'Despesa', cat:pp.g.cat || papel('outrasDespesas'), subcat:pp.g.subcat || '',
         desc:pp.g.desc + (pp.total > 1 ? ` (${pp.num}/${pp.total})` : ''),
         valor:pp.valor, caixaId:'', caixaNome:'Cartão · ' + c.nome,
         pago:'Pago', status:'ativo', origem:'cartao', ts:pp.g.ts || 0 });
@@ -6241,7 +6646,7 @@ function mediaGastos(d, mes, ano, n, comCartao){
   for(let i = 1; i <= n; i++){
     const abs = parseInt(ano) * 12 + parseInt(mes) - i, m = abs % 12, a = Math.floor(abs / 12);
     lancsOrcamento(d, m, a, comCartao).filter(l => efetivadoL(l) && l.tipo === 'Despesa').forEach(l => {
-      const k = l.cat || 'Outras Despesas';
+      const k = l.cat || papel('outrasDespesas');
       soma[k] = (soma[k] || 0) + (l.valor || 0);
       if(l.subcat){ const ks = k + '›' + l.subcat; soma[ks] = (soma[ks] || 0) + (l.valor || 0); }
     });
@@ -6290,7 +6695,8 @@ function consolidarOrcamento(d, mes, ano, comCartao){
   mes = parseInt(mes); ano = parseInt(ano);
   const metas = metasDoMes(d, mes, ano);
   const lancs = lancsOrcamento(d, mes, ano, comCartao);
-  const contasPend = (d.contas || []).filter(c => statusConta(c) !== 'Pago' && noMesAno(c.venc, mes, ano));
+  // Conta no cartão já pesa pela compra espelho da fatura — não entra aqui de novo
+  const contasPend = (d.contas || []).filter(c => contaEmAberto(c) && noMesAno(c.venc, mes, ano));
   const cats = {};
   const pega = (tipo, cat) => {
     const k = tipo + '|' + cat;
@@ -6305,14 +6711,14 @@ function consolidarOrcamento(d, mes, ano, comCartao){
   });
   lancs.forEach(l => {
     if(!TIPOS_ORC.includes(l.tipo)) return;
-    const g = pega(l.tipo, l.cat || (l.tipo === 'Despesa' ? 'Outras Despesas' : l.tipo));
+    const g = pega(l.tipo, l.cat || (l.tipo === 'Despesa' ? papel('outrasDespesas') : l.tipo));
     const pago = efetivadoL(l);
     if(pago){ g.real += l.valor || 0; g.qtd++; } else g.pend += l.valor || 0;
     if(l.subcat && g.subs[l.subcat]){ if(pago) g.subs[l.subcat].real += l.valor || 0; else g.subs[l.subcat].pend += l.valor || 0; }
   });
   // Conta a pagar em aberto no mês também é dinheiro comprometido na categoria
   contasPend.forEach(c => {
-    const g = pega('Despesa', c.cat || 'Outras Despesas');
+    const g = pega('Despesa', c.cat || papel('outrasDespesas'));
     g.pend += c.valor || 0;
     if(c.subcat && g.subs[c.subcat]) g.subs[c.subcat].pend += c.valor || 0;
   });
@@ -7148,9 +7554,54 @@ function diasAte(dateStr){
 // Status derivado da conta (compara datas, nunca horas: o que vence hoje NÃO está vencido)
 function statusConta(c){
   if(!c) return 'Pendente';
+  // Conta atrelada a cartão: quem sai do caixa é a fatura, não a conta
+  if(c.ccId) return 'No cartão';
   if(c.status === 'Pago' || c.dataPg) return 'Pago';
   if(c.venc && c.venc < today()) return 'Vencida';
   return 'Pendente';
+}
+
+// Conta que ainda exige pagamento pelo caixa (pendente ou vencida). Conta no cartão fica
+// de fora: ela já está dentro da fatura, que é o compromisso de caixa de verdade.
+function contaEmAberto(c){
+  const st = statusConta(c);
+  return st === 'Pendente' || st === 'Vencida';
+}
+
+// ── Conta a pagar no cartão de crédito ──
+// A conta atrelada a um cartão vira uma compra espelho (1x) na fatura, na data do
+// vencimento. Assim fatura, limite, orçamento e relatórios já a enxergam, sem contar
+// em dobro: a conta não gera lançamento — o que entra no caixa é o pagamento da fatura.
+function sincronizarContasNoCartao(d){
+  const ccPorId = {};
+  (d.ccs || []).forEach(cc => { ccPorId[cc.id] = cc; cc.gastos = cc.gastos || []; });
+  const noCartao = {};
+  (d.contas || []).forEach(c => {
+    if(c.ccId && !ccPorId[c.ccId]) c.ccId = '';     // cartão excluído: volta a ser conta comum
+    if(c.ccId) noCartao[c.id] = c;
+  });
+  (d.ccs || []).forEach(cc => {
+    cc.gastos = cc.gastos.filter(g => !g.refContaId
+      || (noCartao[g.refContaId] && noCartao[g.refContaId].ccId === cc.id));
+  });
+  Object.values(noCartao).forEach(c => {
+    const cc = ccPorId[c.ccId];
+    let g = cc.gastos.find(x => x.refContaId === c.id);
+    if(!g){
+      g = { id:'cp' + c.id, refContaId:c.id, origem:'conta', ts:c.ts || Date.now() };
+      cc.gastos.push(g);
+    }
+    Object.assign(g, { data:c.venc, val:+(c.valor || 0).toFixed(2), desc:c.desc,
+      cat:c.cat || papel('outrasDespesas'), subcat:c.subcat || '', parc:1 });
+  });
+}
+// Em qual fatura a conta entra (competência, vencimento e se já foi paga)
+function faturaDaConta(c, d){
+  const cc = c && c.ccId && ((d || gs()).ccs || []).find(x => x.id === c.ccId);
+  if(!cc || !c.venc) return null;
+  const comp = competenciaGasto({ data:c.venc }, cc);
+  return { cc, mes:comp.mes, ano:comp.ano,
+    venc:dataVencFatura(cc, comp.mes, comp.ano), paga:faturaPaga(cc, comp.mes, comp.ano) };
 }
 
 // Periodicidades disponíveis para contas recorrentes
@@ -7218,7 +7669,7 @@ function materializarRecorrencias(d, salvar){
         serieId: sid, serieNum: indice,
         dataPg: '', status: 'Pendente',
         parcela: 1, totalParcelas: 1, grupoId: '',
-        caixaId: '', caixaNome: '',
+        caixaId: '', caixaNome: '', ccId: ref.ccId || '',
         ts: Date.now() + criadas
       };
       d.contas.push(nova);
@@ -7227,6 +7678,7 @@ function materializarRecorrencias(d, salvar){
     }
   });
 
+  if(criadas) sincronizarContasNoCartao(d);
   if(criadas && salvar !== false) ss(d);
   return criadas;
 }
@@ -7239,6 +7691,7 @@ function encerrarRecorrencia(serieId, removerFuturas){
   if(removerFuturas){
     d.contas = (d.contas || []).filter(c =>
       !(c.serieId === serieId && statusConta(c) !== 'Pago' && c.venc > hoje));
+    sincronizarContasNoCartao(d);
   }
   ss(d);
   refreshAll();
@@ -7301,8 +7754,59 @@ function toggleCpCaixa(){
   }
 }
 
+// Categorias do contas a pagar vêm do plano de contas (mantém a atual mesmo se órfã)
+function popCpCats(atual){
+  const el = document.getElementById('cp-cat');
+  if(!el) return;
+  const cats = allCats('Despesa');
+  if(atual && !cats.includes(atual)) cats.push(atual);
+  el.innerHTML = cats.map(c => `<option value="${escAttr(c)}">${escHtml(c)}</option>`).join('');
+  el.value = atual && cats.includes(atual) ? atual : (cats[0] || '');
+}
+
+// Cartões disponíveis para atrelar a conta, com o limite livre de cada um
+function popCpCartoes(sel){
+  const el = document.getElementById('cp-cc');
+  if(!el) return;
+  const ccs = gs().ccs || [];
+  el.innerHTML = ccs.length
+    ? ccs.map(cc => `<option value="${cc.id}">${escHtml(cc.nome)}${cc.band ? ' (' + escHtml(cc.band) + ')' : ''}</option>`).join('')
+    : '<option value="">— Nenhum cartão cadastrado —</option>';
+  if(sel && ccs.some(cc => cc.id === sel)) el.value = sel;
+}
+
+// Forma de pagamento: no cartão a conta não tem status próprio — segue a fatura
+function setCpForma(f){
+  const $ = id => document.getElementById(id);
+  if($('cp-forma')) $('cp-forma').value = f;
+  const cartao = f === 'cartao';
+  if($('cpf-caixa'))  $('cpf-caixa').classList.toggle('active', !cartao);
+  if($('cpf-cartao')) $('cpf-cartao').classList.toggle('active', cartao);
+  if($('cp-cc-wrap')) $('cp-cc-wrap').style.display = cartao ? 'block' : 'none';
+  if($('cp-st-row'))  $('cp-st-row').style.display  = cartao ? 'none' : '';
+  if(cartao){
+    if($('cp-caixa-wrap')) $('cp-caixa-wrap').style.display = 'none';
+    if($('cp-data-pg-wrap')) $('cp-data-pg-wrap').style.display = 'none';
+  } else {
+    toggleCpCaixa();
+  }
+  updCpPreview();
+}
+
+// Onde a conta cai no cartão escolhido (para a prévia)
+function cpInfoCartao(venc){
+  if(document.getElementById('cp-forma')?.value !== 'cartao') return null;
+  const d = gs();
+  const cc = (d.ccs || []).find(x => x.id === document.getElementById('cp-cc')?.value);
+  if(!cc || !venc) return null;
+  const comp = competenciaGasto({ data:venc }, cc);
+  return { cc, mes:comp.mes, ano:comp.ano, vencFat:dataVencFatura(cc, comp.mes, comp.ano),
+           livre:+((cc.lim || 0) - limiteUsado(cc)).toFixed(2) };
+}
+
 // Prévia do que será criado (quantas contas, valores e datas)
 function updCpPreview(){
+  updCpAvisoCartao();
   const el = document.getElementById('cp-preview-body');
   if(!el) return;
   const tipo = document.getElementById('cp-tipo')?.value || 'unica';
@@ -7312,8 +7816,13 @@ function updCpPreview(){
 
   if(!val || !venc){ el.innerHTML = '<span style="color:var(--t3)">Informe valor e vencimento para ver a prévia.</span>'; return; }
 
+  const inf = cpInfoCartao(venc);
+  const linhaCartao = txt => inf
+    ? `<div style="font-size:11px;color:var(--purple);margin-top:4px">💳 ${escHtml(inf.cc.nome)}: ${txt}. Não gera lançamento — o caixa sai no pagamento da fatura.</div>` : '';
+
   if(tipo === 'unica'){
-    el.innerHTML = `<strong style="color:var(--t1)">1 conta</strong> de <strong style="color:var(--green)">${fmtR(val)}</strong> vencendo em <strong style="color:var(--t1)">${fmtBR(venc)}</strong>.`;
+    el.innerHTML = `<strong style="color:var(--t1)">1 conta</strong> de <strong style="color:var(--green)">${fmtR(val)}</strong> vencendo em <strong style="color:var(--t1)">${fmtBR(venc)}</strong>.`
+      + linhaCartao(`entra na fatura de ${MESES[inf ? inf.mes : 0]}/${inf ? inf.ano : ''}`);
     return;
   }
 
@@ -7325,6 +7834,10 @@ function updCpPreview(){
     el.innerHTML = `<strong style="color:var(--t1)">${n} parcelas</strong> de <strong style="color:var(--green)">${fmtR(vals[0])}</strong>${dif},`
       + ` de ${fmtBR(venc)} até <strong style="color:var(--t1)">${fmtBR(ult)}</strong>.`
       + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Total: ${fmtR(val)} — cada parcela vira uma conta própria.</div>`;
+    if(inf){
+      const compUlt = competenciaGasto({ data:ult }, inf.cc);
+      el.innerHTML += linhaCartao(`uma parcela por fatura, de ${MESES3[inf.mes]}/${inf.ano} a ${MESES3[compUlt.mes]}/${compUlt.ano}`);
+    }
     return;
   }
 
@@ -7346,7 +7859,30 @@ function updCpPreview(){
   const totalTxt = fimTipo === 'qtd' && fimQtd ? ` — total de ${fmtR(val * fimQtd)}` : '';
   el.innerHTML = `<strong style="color:var(--cyan)">🔁 ${PERIODICIDADES[per].label}</strong> de <strong style="color:var(--green)">${fmtR(val)}</strong>, ${termino}${totalTxt}.`
     + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Próximas: ${proximas.join(' · ')}${proximas.length===3?' …':''}</div>`
-    + `<div style="font-size:11px;color:var(--t3);margin-top:2px">O sistema mantém geradas as contas dos próximos ${HORIZONTE_REC_MESES} meses.</div>`;
+    + `<div style="font-size:11px;color:var(--t3);margin-top:2px">O sistema mantém geradas as contas dos próximos ${HORIZONTE_REC_MESES} meses.</div>`
+    + linhaCartao(`cada cobrança entra na fatura do mês em que vence — a 1ª na de ${MESES3[inf ? inf.mes : 0]}/${inf ? inf.ano : ''}`);
+}
+
+// Resumo do cartão escolhido: fatura em que a conta entra e limite livre
+function updCpAvisoCartao(){
+  const el = document.getElementById('cp-cc-aviso');
+  if(!el) return;
+  if(!(gs().ccs || []).length){
+    el.innerHTML = 'Cadastre um cartão na aba <b>Cartões</b> para usar esta opção.';
+    return;
+  }
+  const venc = document.getElementById('cp-venc')?.value || '';
+  const val  = parseFloat(document.getElementById('cp-val')?.value) || 0;
+  const tipo = document.getElementById('cp-tipo')?.value || 'unica';
+  const inf  = cpInfoCartao(venc);
+  if(!inf){ el.innerHTML = 'Informe o vencimento para ver em qual fatura a conta entra.'; return; }
+  const fmtBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
+  const primeira = tipo === 'parcelada'
+    ? dividirParcelas(val, parseInt(document.getElementById('cp-parc')?.value) || 2)[0] : val;
+  const estoura = primeira > 0 && primeira > inf.livre;
+  el.innerHTML = `Cobrança em ${fmtBR(venc)} → fatura de <b style="color:var(--purple)">${MESES[inf.mes]}/${inf.ano}</b>`
+    + ` (vence ${fmtBR(inf.vencFat)}) · limite livre <b style="color:${estoura ? 'var(--red)' : 'var(--t1)'}">${fmtR(inf.livre)}</b>`
+    + (estoura ? ` <span style="color:var(--red)">— a cobrança passa do limite livre</span>` : '');
 }
 
 // Compatibilidade com chamadas antigas
@@ -7367,7 +7903,7 @@ function editConta(id){
   // Descrição sem o sufixo de parcela
   document.getElementById('cp-desc').value = c.totalParcelas > 1
     ? (c.desc || '').replace(/ \(\d+\/\d+\)$/, '') : (c.desc || '');
-  document.getElementById('cp-cat').value = c.cat || 'Outras Despesas';
+  popCpCats(c.cat || papel('outrasDespesas'));
   updCpSubcat();
   const sc = document.getElementById('cp-subcat'); if(sc) sc.value = c.subcat || '';
   document.getElementById('cp-obs').value  = c.obs || '';
@@ -7398,7 +7934,8 @@ function editConta(id){
     document.getElementById('m-conta-sub').textContent = 'Conta única';
   }
 
-  toggleCpCaixa();
+  popCpCartoes(c.ccId || '');
+  setCpForma(c.ccId ? 'cartao' : 'caixa');
   if(c.caixaId){ const cx = document.getElementById('cp-caixa'); if(cx) cx.value = c.caixaId; }
   updCpPreview();
   document.getElementById('m-conta').style.display = 'flex';
@@ -7419,6 +7956,8 @@ function saveConta(){
   const st     = $('cp-st')?.value || 'Pendente';
   const dataPg = $('cp-data-pg')?.value;
   const caixaId= $('cp-caixa')?.value || '';
+  const noCartao = $('cp-forma')?.value === 'cartao';
+  const ccId   = noCartao ? ($('cp-cc')?.value || '') : '';
 
   const err = $('cp-err');
   const falha = msg => { if(err){ err.textContent = '⚠️ ' + msg; err.style.display = 'block'; } };
@@ -7429,6 +7968,9 @@ function saveConta(){
   if(!val)  faltando.push('Valor');
   if(!venc) faltando.push('Vencimento');
   if(faltando.length) return falha('Preencha: ' + faltando.join(', ') + '.');
+  if(noCartao && !ccId) return falha((gs().ccs || []).length
+    ? 'Escolha o cartão em que a conta será cobrada.'
+    : 'Nenhum cartão cadastrado — cadastre um na aba Cartões ou escolha "Conta / dinheiro".');
 
   const per     = $('cp-periodicidade')?.value || 'Mensal';
   const fimTipo = $('cp-fim-tipo')?.value || 'nunca';
@@ -7454,6 +7996,7 @@ function saveConta(){
       alvo.desc = desc + nl;
       alvo.cat = cat; alvo.subcat = subcat; alvo.obs = obs;
       alvo.valor = val;
+      alvo.ccId = ccId;
       if(primeira){ alvo.venc = venc; }
     };
     aplicar(c, true);
@@ -7467,8 +8010,14 @@ function saveConta(){
       irmas.forEach(x => aplicar(x, false));
     }
 
-    // Status
-    if(st === 'Pago'){
+    // Status (no cartão não há pagamento próprio: desfaz o que houver e segue a fatura)
+    if(ccId){
+      c.status = 'Pendente';
+      c.dataPg = '';
+      c.valorPago = null;
+      c.caixaId = ''; c.caixaNome = '';
+      removerLancDaConta(c, d);
+    } else if(st === 'Pago'){
       c.status = 'Pago';
       c.dataPg = dataPg || today();
       c.caixaId = caixaId;
@@ -7484,13 +8033,14 @@ function saveConta(){
       removerLancDaConta(c, d);
     }
 
+    sincronizarContasNoCartao(d);
     ss(d); closeM('m-conta'); refreshAll();
     return;
   }
 
   // ───────────── CRIAÇÃO ─────────────
   const marcarPaga = (conta, i) => {
-    if(i !== 0 || st !== 'Pago') return;
+    if(i !== 0 || st !== 'Pago' || conta.ccId) return;
     conta.status = 'Pago';
     conta.dataPg = dataPg || today();
     conta.caixaId = caixaId;
@@ -7508,7 +8058,7 @@ function saveConta(){
         desc: `${desc} (${i+1}/${n})`, cat, subcat, obs,
         rec: 'Única', dataPg: '', status: 'Pendente',
         parcela: i+1, totalParcelas: n, grupoId,
-        caixaId: '', caixaNome: '', ts: Date.now() + i
+        caixaId: '', caixaNome: '', ccId, ts: Date.now() + i
       };
       d.contas.push(conta);
       marcarPaga(conta, i);
@@ -7522,7 +8072,7 @@ function saveConta(){
       serieId, serieNum: 1,
       dataPg: '', status: 'Pendente',
       parcela: 1, totalParcelas: 1, grupoId: '',
-      caixaId: '', caixaNome: '', ts: Date.now()
+      caixaId: '', caixaNome: '', ccId, ts: Date.now()
     };
     d.contas.push(ancora);
     marcarPaga(ancora, 0);
@@ -7532,12 +8082,13 @@ function saveConta(){
       id: uid(), venc, valor: val, desc, cat, subcat, obs,
       rec: 'Única', dataPg: '', status: 'Pendente',
       parcela: 1, totalParcelas: 1, grupoId: '',
-      caixaId: '', caixaNome: '', ts: Date.now()
+      caixaId: '', caixaNome: '', ccId, ts: Date.now()
     };
     d.contas.push(conta);
     marcarPaga(conta, 0);
   }
 
+  sincronizarContasNoCartao(d);
   ss(d); closeM('m-conta'); refreshAll();
 }
 
@@ -7547,7 +8098,7 @@ function gerarLancDaConta(c, d){
   const valor = c.valorPago != null ? c.valorPago : c.valor;
   const lanc = {
     id: uid(), data: c.dataPg || c.venc, tipo: 'Despesa',
-    cat: c.cat || 'Outras Despesas', subcat: c.subcat || '',
+    cat: c.cat || papel('outrasDespesas'), subcat: c.subcat || '',
     desc: c.desc, valor,
     caixaId: c.caixaId || '', caixaNome: c.caixaNome || '',
     pago: 'Pago',
@@ -7575,6 +8126,7 @@ function pagarConta(id){
   const d = gs();
   const c = d.contas.find(x => x.id === id);
   if(!c) return;
+  if(c.ccId) return abrirFaturaDaConta(id);   // quem se paga é a fatura do cartão
   popCaixas('pg-caixa');
   document.getElementById('pg-conta-id').value = c.id;
   document.getElementById('pg-desc').textContent = c.desc;
@@ -7590,6 +8142,16 @@ function pagarConta(id){
   if(c.caixaId){ const cx = document.getElementById('pg-caixa'); if(cx) cx.value = c.caixaId; }
   updPgDif();
   document.getElementById('m-pagar').style.display = 'flex';
+}
+
+// Abre a aba Cartões na fatura em que a conta foi cobrada
+function abrirFaturaDaConta(id){
+  const d = gs();
+  const f = faturaDaConta(d.contas.find(x => x.id === id), d);
+  if(!f) return;
+  _ccSel = f.cc.id;
+  go('cartoes', document.querySelector('.nav-btn[onclick*="\'cartoes\'"]'));
+  verFatura(f.mes, f.ano);
 }
 
 // Mostra juros/multa ou desconto quando o valor pago difere do previsto
@@ -7699,6 +8261,7 @@ function execDelConta(escopo){
   const ids = new Set(alvos.map(x => x.id));
   alvos.forEach(x => removerLancDaConta(x, d));
   d.contas = d.contas.filter(x => !ids.has(x.id));
+  sincronizarContasNoCartao(d);
   ss(d);
   closeM('m-del-conta');
   refreshAll();
@@ -7752,11 +8315,14 @@ function renderContas(){
   const valorDe = c => (statusConta(c) === 'Pago' && c.valorPago != null) ? c.valorPago : c.valor;
   const total = items.reduce((a,c) => a + valorDe(c), 0);
   const pagas = items.filter(c => statusConta(c) === 'Pago');
-  const abertas = items.filter(c => statusConta(c) !== 'Pago');
+  const abertas = items.filter(contaEmAberto);
+  const noCartao = items.filter(c => statusConta(c) === 'No cartão');
   const vencidas = items.filter(c => statusConta(c) === 'Vencida');
   const em7 = abertas.filter(c => { const dd = diasAte(c.venc); return dd !== null && dd >= 0 && dd <= 7; });
   set('ck-total', fmtR(total));
   set('ck-pend',  fmtR(abertas.reduce((a,c) => a + c.valor, 0)));
+  set('ck-pend-sub', noCartao.length
+    ? `+ 💳 ${fmtR(noCartao.reduce((a,c) => a + c.valor, 0))} no cartão (${noCartao.length})` : '');
   set('ck-pago',  fmtR(pagas.reduce((a,c) => a + valorDe(c), 0)));
   setC('ck-venc', fmtR(vencidas.reduce((a,c) => a + c.valor, 0)), vencidas.length ? 'var(--red)' : '');
   set('ck-venc-sub', vencidas.length ? `${vencidas.length} conta${vencidas.length>1?'s':''} em atraso` : 'nenhuma em atraso');
@@ -7764,7 +8330,7 @@ function renderContas(){
   set('ck-7d-sub', em7.length ? `${em7.length} conta${em7.length>1?'s':''} a vencer` : 'nada a vencer');
 
   // ── Lembrete do dia ──
-  const contasHoje = (d.contas||[]).filter(c => c.venc === today() && statusConta(c) !== 'Pago');
+  const contasHoje = (d.contas||[]).filter(c => c.venc === today() && contaEmAberto(c));
   const wrapHoje = document.getElementById('ck-hoje-wrap');
   if(wrapHoje){
     if(contasHoje.length){
@@ -7810,10 +8376,11 @@ function renderContas(){
   }
   if(empty) empty.style.display = 'none';
 
-  const stBdg = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red' };
+  const stBdg = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red', 'No cartão':'bdg-purple' };
   tbody.innerHTML = items.map(c => {
     const st   = statusConta(c);
-    const dias = st !== 'Pago' ? diasAte(c.venc) : null;
+    const fat  = st === 'No cartão' ? faturaDaConta(c, d) : null;
+    const dias = contaEmAberto(c) ? diasAte(c.venc) : null;
     const diasLabel = dias === null ? ''
       : dias < 0  ? `<div style="font-size:9px;color:var(--red)">Venceu há ${Math.abs(dias)}d</div>`
       : dias === 0? `<div style="font-size:9px;color:var(--amber)">Vence hoje</div>`
@@ -7839,12 +8406,16 @@ function renderContas(){
       <td style="color:var(--t3);font-size:10px">${c.subcat||'—'}</td>
       <td class="mono" style="color:var(--t1);font-weight:600">${fmtR(valorMostrado)}${difPg}</td>
       <td class="mono" style="color:var(--t3)">
-        ${c.dataPg||'—'}
+        ${fat ? `<div style="font-size:10px;color:var(--purple)">💳 ${escHtml(fat.cc.nome)}</div>
+                 <div style="font-size:9px;color:var(--t3)">fatura ${MESES3[fat.mes]}/${String(fat.ano).slice(2)} · ${fat.paga ? 'paga ✓' : 'vence ' + fmtDataBR(fat.venc)}</div>`
+              : (c.dataPg||'—')}
         ${c.caixaNome ? `<div style="font-size:9px;color:var(--t3)">🏦 ${c.caixaNome}</div>` : ''}
       </td>
-      <td><span class="badge ${stBdg[st]||'bdg-gray'}">${st}</span></td>
+      <td><span class="badge ${fat && fat.paga ? 'bdg-green' : (stBdg[st]||'bdg-gray')}" ${fat ? 'title="Paga junto com a fatura do cartão"' : ''}>${fat ? (fat.paga ? '💳 Fatura paga' : '💳 No cartão') : st}</span></td>
       <td class="tbl-actions">
-        ${st !== 'Pago'
+        ${fat
+          ? `<button class="btn btn-ghost btn-xs" onclick="abrirFaturaDaConta('${c.id}')" title="Ver a fatura do cartão">💳 Fatura</button>`
+          : st !== 'Pago'
           ? `<button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>`
           : `<button class="btn btn-ghost btn-xs" onclick="desfazerPagamento('${c.id}')" title="Desfazer pagamento">↩</button>`}
         <button class="btn btn-ghost btn-xs" onclick="editConta('${c.id}')" title="Editar">✎</button>
@@ -8067,7 +8638,7 @@ function gerarLancDaParcela(dv, pc, d){
   if(!pc.gerarLanc) return;
   const lanc = {
     id:uid(), data:pc.dataPg || pc.venc, tipo:'Despesa',
-    cat:'Serviços & Financeiro', subcat:'Pagamento de Dívida',
+    cat:papel('pagamentoDivida'), subcat:papelSub('pagamentoDivida'),
     desc:`${dv.nome} — parcela ${pc.num}/${pc.total}`,
     valor:pc.valorPago != null ? pc.valorPago : pc.valor,
     caixaId:pc.caixaId || '', caixaNome:pc.caixaNome || '', pago:'Pago',
@@ -8248,7 +8819,10 @@ function getFatAberta(c, mes = curMes(), ano){
 // Limite comprometido = todas as parcelas cujas faturas ainda não foram pagas
 function limiteUsado(c){
   let total = 0;
+  const hj = today();
   (c.gastos || []).forEach(g => {
+    // Conta a pagar no cartão só consome limite quando é cobrada (ex.: assinatura dos próximos meses)
+    if(g.refContaId && g.data > hj) return;
     const n = Math.max(1, parseInt(g.parc) || 1);
     const comp = competenciaGasto(g, c);
     dividirParcelas(g.val || 0, n).forEach((v, i) => {
@@ -8345,14 +8919,17 @@ function delCC(id){
   if(!c) return;
   const ng=(c.gastos||[]).length, nf=(c.faturas||[]).length;
   const vinc=d.lancs.filter(l=>l.refCcId===c.id).length;
+  const nc=(d.contas||[]).filter(x=>x.ccId===c.id).length;
   const msg=`Excluir o cartão "${c.nome}"?\n\n`
     +`• ${ng} gasto(s) registrado(s)\n`
+    +(nc?`• ${nc} conta(s) a pagar atrelada(s) voltam a ser pagas pelo caixa\n`:'')
     +`• ${nf} fatura(s) no histórico\n`
     +(vinc?`• ${vinc} lançamento(s) de pagamento de fatura também serão removidos\n`:'')
     +`\nEsta ação não pode ser desfeita.`;
   if(!confirm(msg)) return;
   (c.faturas||[]).forEach(f=>removerLancDaFatura(f, d));
   d.ccs=d.ccs.filter(x=>x.id!==id);
+  sincronizarContasNoCartao(d);   // desvincula as contas que eram cobradas nele
   if(_ccSel===id) _ccSel=null;
   ss(d); renderCartoes(); refreshAll();
 }
@@ -8370,7 +8947,7 @@ function gerarLancDaFatura(c, f, d){
   if(!f.gerarLanc) return;
   const lanc={
     id:uid(), data:f.dataPg||dataVencFatura(c,f.mes,f.ano), tipo:'Despesa',
-    cat:f.cat||'Serviços & Financeiro', subcat:f.subcat||'',
+    cat:f.cat||papel('financeiro'), subcat:f.subcat||'',
     desc:`Fatura ${c.nome} — ${MESES[f.mes]}/${f.ano}`, valor:f.valor,
     caixaId:f.caixaId||'', caixaNome:f.caixaNome||'', pago:'Pago',
     obs:'Gerado do pagamento de fatura de cartão de crédito',
@@ -8597,7 +9174,7 @@ function renderFaturaDetalhe(c, mes, anoCC){
   if(!tb) return;
   tb.innerHTML=parcelas.length?parcelas.map(p=>`<tr>
       <td class="mono" style="color:var(--t3)">${fmtDataBR(p.g.data)}</td>
-      <td style="color:var(--t1)">${p.g.desc}</td>
+      <td style="color:var(--t1)">${p.g.desc}${p.g.refContaId?' <span class="badge bdg-gray" style="font-size:8px" title="Lançada em Contas a Pagar">📄 Conta a pagar</span>':''}</td>
       <td><span class="cat-tag" style="font-size:9px">${p.g.cat||'—'}</span></td>
       <td style="color:var(--t3)">${p.total>1?`${p.num}/${p.total}`:'À vista'}</td>
       <td class="mono" style="color:var(--t3)">${fmtR(p.g.val)}</td>
@@ -8620,7 +9197,7 @@ function renderTabelaGastos(c){
     const comp=competenciaGasto(g,c);
     return `<tr>
       <td class="mono" style="color:var(--t3)">${fmtDataBR(g.data)}</td>
-      <td style="color:var(--t1)">${g.desc}</td>
+      <td style="color:var(--t1)">${g.desc}${g.refContaId?' <span class="badge bdg-gray" style="font-size:8px" title="Lançada em Contas a Pagar — edite por lá">📄 Conta a pagar</span>':''}</td>
       <td><span class="cat-tag" style="font-size:9px">${g.cat||'—'}</span></td>
       <td style="color:var(--t3)">${n>1?`${n}x`:'À vista'}</td>
       <td class="mono" style="color:var(--t3)">${MESES3[comp.mes]}/${String(comp.ano).slice(2)}</td>
@@ -8705,6 +9282,7 @@ function editGasto(ccId,gId){
   const d=gs(); const c=d.ccs.find(x=>x.id===ccId);
   const g=c&&(c.gastos||[]).find(x=>x.id===gId);
   if(!g) return;
+  if(g.refContaId) return editConta(g.refContaId);   // compra vinda de Contas a Pagar
   _ccSel=ccId;
   openM('m-gasto');
   const $=x=>document.getElementById(x);
@@ -8751,6 +9329,7 @@ function delGasto(ccId,gId){
   const d=gs();const c=d.ccs.find(cc=>cc.id===ccId);
   const g=c&&(c.gastos||[]).find(x=>x.id===gId);
   if(!g) return;
+  if(g.refContaId) return delConta(g.refContaId);    // exclui pela conta (única, parcelas ou série)
   const n=Math.max(1,parseInt(g.parc)||1);
   if(!confirm(`Excluir a compra "${g.desc}" de ${fmtR(g.val)}${n>1?` (${n}x)`:''}?\n\nAs parcelas serão removidas das faturas.`)) return;
   c.gastos=c.gastos.filter(x=>x.id!==gId);
@@ -8790,7 +9369,7 @@ function savePagFat(){
   const val=parseFloat($('pf-val')?.value)||0;
   const caixaId=$('pf-caixa')?.value||'';
   const gerarLanc=!!$('pf-gerar')?.checked;
-  const cat=$('pf-cat')?.value||'Serviços & Financeiro';
+  const cat=$('pf-cat')?.value||papel('financeiro');
   const err=$('pf-err');
   const falha=(m)=>{ if(err){err.textContent='⚠️ '+m;err.style.display='block';} else alert(m); };
   if(!_ccSel) return falha('Selecione um cartão.');
@@ -8859,9 +9438,9 @@ function compromissosFuturos(d, opts){
 
   // ── Contas a pagar em aberto ──
   (d.contas || []).forEach(c => {
-    if(statusConta(c) === 'Pago' || !c.venc) return;
+    if(!contaEmAberto(c) || !c.venc) return;   // no cartão: vem pela fatura, logo abaixo
     out.push({ data:c.venc, valor:+(c.valor || 0).toFixed(2), tipo:'conta',
-      desc:c.desc || 'Conta a pagar', cat:c.cat || 'Outras Despesas',
+      desc:c.desc || 'Conta a pagar', cat:c.cat || papel('outrasDespesas'),
       refId:c.id, origemId:c.id, vencido:c.venc < hj });
   });
 
@@ -8877,7 +9456,7 @@ function compromissosFuturos(d, opts){
       if(val <= 0) continue;
       const venc = dataVencFatura(c, m, a);
       out.push({ data:venc, valor:val, tipo:'fatura',
-        desc:`Fatura ${c.nome} — ${MESES[m]}/${a}`, cat:'Serviços & Financeiro',
+        desc:`Fatura ${c.nome} — ${MESES[m]}/${a}`, cat:papel('financeiro'),
         refId:`${c.id}:${a}-${m}`, origemId:c.id, ccMes:m, ccAno:a, vencido:venc < hj });
     }
   });
@@ -8887,7 +9466,7 @@ function compromissosFuturos(d, opts){
     (dv.parcelas || []).forEach(pc => {
       if(pc.status === 'Pago' || !pc.venc) return;
       out.push({ data:pc.venc, valor:+(pc.valor || 0).toFixed(2), tipo:'divida',
-        desc:`${dv.nome} — parcela ${pc.num}/${pc.total}`, cat:'Serviços & Financeiro',
+        desc:`${dv.nome} — parcela ${pc.num}/${pc.total}`, cat:papel('pagamentoDivida'),
         refId:pc.id, origemId:dv.id, vencido:pc.venc < hj });
     });
   });
@@ -8961,12 +9540,228 @@ function renderCfg(){
       <span style="font-size:12px;color:var(--t2)">${f}</span>
       <button class="btn btn-red btn-xs" onclick="delForma(${i})">✕</button>
     </div>`).join('');
-  const cd=document.getElementById('cats-display');
-  if(cd){
-    const all=allCatsFlat();
-    cd.innerHTML=all.map((c,i)=>`<span class="cat-tag"><span class="cat-dot" style="background:${CORES_CAT[i%CORES_CAT.length]}"></span>${c}</span>`).join('');
+  renderPlano();
+}
+// ── PLANO DE CONTAS: tela em Configurações ──
+let _planoTipo = 'Despesa';
+const _planoAbertos = new Set();
+const escAttr = s => String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;');
+const escHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+// Argumento seguro para onclick="fn(…)" — nomes de categoria podem ter aspas e &
+const argJs = s => escAttr(JSON.stringify(String(s)));
+
+function planoAviso(msg, ok){
+  const el = document.getElementById('plano-err');
+  if(!el) return;
+  if(!msg){ el.style.display = 'none'; return; }
+  el.className = ok ? 'alert alert-g' : 'form-err';
+  el.textContent = (ok ? '✓ ' : '⚠️ ') + msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  if(ok) el._t = setTimeout(() => { el.style.display = 'none'; }, 2600);
+}
+function planoDepois(erro, okMsg){
+  if(erro && erro !== 'fim'){ planoAviso(erro); return false; }
+  planoAviso(erro === 'fim' ? '' : okMsg, !!okMsg);
+  renderPlano();
+  try { refreshAll(); } catch(_){}
+  return true;
+}
+function planoTipo(t){ _planoTipo = t; planoAviso(''); renderPlano(); }
+function planoToggle(cat){ _planoAbertos.has(cat) ? _planoAbertos.delete(cat) : _planoAbertos.add(cat); renderPlano(); }
+
+function renderPlano(){
+  const lista = document.getElementById('plano-lista');
+  if(!lista) return;
+  const d = gs();
+  const p = lerPlano(d);
+  const uso = mapaUsoCategorias(d);
+  const busca = normNome(document.getElementById('plano-busca')?.value || '').toLocaleLowerCase('pt-BR');
+
+  document.querySelectorAll('#plano-tipos .tgl').forEach(b => {
+    const t = b.dataset.t;
+    b.classList.toggle('active', t === _planoTipo);
+    const em = b.querySelector('em'); if(em) em.textContent = p[t].length;
+  });
+  const cl = document.getElementById('plano-nova-classe');
+  if(cl) cl.style.display = _planoTipo === 'Despesa' ? '' : 'none';
+
+  // papéis do sistema por categoria, para mostrar o selo "usada pelo sistema"
+  const papeisDe = {};
+  Object.entries(PAPEIS).forEach(([k, v]) => {
+    if(v.tipo !== _planoTipo) return;
+    const c = papel(k);
+    (papeisDe[c] = papeisDe[c] || []).push(v.rotulo + (v.sub && papelSub(k) ? ` (${papelSub(k)})` : ''));
+  });
+
+  const cats = p[_planoTipo];
+  const filtradas = cats.map((c, i) => ({ c, i })).filter(({c}) => !busca
+    || c.nome.toLocaleLowerCase('pt-BR').includes(busca)
+    || c.subs.some(s => s.toLocaleLowerCase('pt-BR').includes(busca)));
+  const totalReg = cats.reduce((a,c) => a + ((uso[_planoTipo + '|' + c.nome] || {}).n || 0), 0);
+  set('plano-resumo', `${cats.length} categoria(s) · ${cats.reduce((a,c) => a + c.subs.length, 0)} subcategoria(s) · ${totalReg} registro(s) em ${rotuloTipo(_planoTipo).toLowerCase()}`);
+
+  lista.innerHTML = filtradas.length ? filtradas.map(({ c, i }) => {
+    const u = uso[_planoTipo + '|' + c.nome] || { n:0, porFonte:{}, subs:{} };
+    const aberto = _planoAbertos.has(c.nome) || (busca && c.subs.some(s => s.toLocaleLowerCase('pt-BR').includes(busca)));
+    const pap = papeisDe[c.nome];
+    const A = argJs(c.nome), T = argJs(_planoTipo);
+    return `<div class="plano-cat${aberto ? ' aberto' : ''}" data-cat="${escAttr(c.nome)}">
+      <div class="plano-cat-hd">
+        <button class="plano-exp" onclick="planoToggle(${A})" aria-expanded="${aberto}" aria-label="Mostrar subcategorias de ${escAttr(c.nome)}">${aberto ? '▾' : '▸'}</button>
+        <span class="plano-nome" data-role="nome" ondblclick="planoRenomearUI(${T},${A})">${escHtml(c.nome)}</span>
+        <span class="plano-uso" title="${escAttr(descreverUso(u.porFonte) || 'sem uso')}">${u.n ? `${u.n} registro(s)` : 'sem uso'} · ${c.subs.length} sub</span>
+        ${pap ? `<span class="plano-papel" title="Usada pelo sistema em: ${escAttr(pap.join('; '))}">⚙ sistema</span>` : ''}
+        ${_planoTipo === 'Despesa' ? `<select class="plano-classe" onchange="planoDepois(planoClassificar(${A}, this.value), 'Classe atualizada.')" aria-label="Classe de ${escAttr(c.nome)}" title="Classe usada na regra 50/30/20 e em Despesas Pessoais">
+            ${CLASSES_DESPESA.map(k => `<option${(c.classe || 'Outros') === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''}
+        <span class="plano-acts">
+          <button onclick="planoDepois(planoMoverCategoria(${T},${A},-1))" title="Subir" ${i === 0 ? 'disabled' : ''}>↑</button>
+          <button onclick="planoDepois(planoMoverCategoria(${T},${A},1))" title="Descer" ${i === cats.length - 1 ? 'disabled' : ''}>↓</button>
+          <button onclick="planoRenomearUI(${T},${A})" title="Renomear">✎</button>
+          <button class="del" onclick="planoExcluirUI(${T},${A})" title="Excluir ou mesclar">✕</button>
+        </span>
+      </div>
+      ${aberto ? `<div class="plano-subs">
+        ${c.subs.map(sb => {
+          const us = (u.subs[sb] || { n:0, porFonte:{} });
+          const S = argJs(sb);
+          const hit = busca && sb.toLocaleLowerCase('pt-BR').includes(busca);
+          return `<span class="plano-sub${hit ? ' hit' : ''}" data-sub="${escAttr(sb)}" title="${escAttr(descreverUso(us.porFonte) || 'sem uso')}">
+            <span class="plano-sub-nome" ondblclick="planoRenomearSubUI(${T},${A},${S})">${escHtml(sb)}</span>
+            <em>${us.n}</em>
+            <button onclick="planoRenomearSubUI(${T},${A},${S})" title="Renomear">✎</button>
+            <button class="del" onclick="planoExcluirSubUI(${T},${A},${S})" title="Excluir ou mesclar">✕</button>
+          </span>`; }).join('')}
+        <span class="plano-sub-nova">
+          <input type="text" placeholder="+ nova subcategoria" aria-label="Nova subcategoria de ${escAttr(c.nome)}"
+            onkeydown="if(event.key==='Enter'){ if(planoDepois(planoCriarSub(${T},${A}, this.value), 'Subcategoria criada.')) {} }">
+        </span>
+      </div>` : ''}
+    </div>`;
+  }).join('')
+  : `<div class="orc-vazio">${busca ? 'Nada encontrado para essa busca.' : 'Nenhuma categoria.'}</div>`;
+
+  renderPlanoOrfas(d);
+}
+
+// Renomear na própria linha: Enter grava, Esc cancela
+function planoEditarInline(el, valor, gravar){
+  if(!el) return;
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = valor; inp.className = 'plano-inline';
+  let feito = false;
+  const fim = ok => { if(feito) return; feito = true; if(ok && normNome(inp.value) !== valor) gravar(inp.value); else renderPlano(); };
+  inp.onkeydown = e => { if(e.key === 'Enter') fim(true); if(e.key === 'Escape') fim(false); };
+  inp.onblur = () => fim(true);
+  el.replaceWith(inp);
+  inp.focus(); inp.select();
+}
+function planoRenomearUI(tipo, cat){
+  const el = document.querySelector(`.plano-cat[data-cat="${CSS.escape(cat)}"] [data-role="nome"]`);
+  planoEditarInline(el, cat, novo => {
+    const erro = planoRenomearCategoria(tipo, cat, novo);
+    if(!erro && _planoAbertos.has(cat)){ _planoAbertos.delete(cat); _planoAbertos.add(normNome(novo)); }
+    planoDepois(erro, `"${cat}" agora se chama "${normNome(novo)}" — registros atualizados.`);
+  });
+}
+function planoRenomearSubUI(tipo, cat, sub){
+  const el = document.querySelector(`.plano-cat[data-cat="${CSS.escape(cat)}"] .plano-sub[data-sub="${CSS.escape(sub)}"] .plano-sub-nome`);
+  planoEditarInline(el, sub, novo => planoDepois(planoRenomearSub(tipo, cat, sub, novo), `Subcategoria renomeada — registros atualizados.`));
+}
+function planoCriarCatUI(){
+  const inp = document.getElementById('plano-nova-cat');
+  const classe = document.getElementById('plano-nova-classe')?.value;
+  const nome = normNome(inp?.value);
+  if(planoDepois(planoCriarCategoria(_planoTipo, nome, classe), `Categoria "${nome}" criada.`)){
+    if(inp) inp.value = '';
+    _planoAbertos.add(nome); renderPlano();
   }
 }
+function planoRestaurarUI(){
+  if(!confirm('Devolver ao plano as categorias e subcategorias do padrão que estiverem faltando?\n\nNada seu é apagado nem renomeado.')) return;
+  const r = planoRestaurarPadrao();
+  if(typeof r === 'string') return planoAviso(r);
+  planoDepois('', r ? `${r} item(ns) do padrão devolvido(s) ao plano.` : 'O plano já tinha tudo do padrão.');
+}
+
+// ── Excluir / mesclar (modal) ──
+let _planoDel = null;
+function planoExcluirUI(tipo, cat){ planoAbrirExclusao({ tipo, cat, sub:null }); }
+function planoExcluirSubUI(tipo, cat, sub){ planoAbrirExclusao({ tipo, cat, sub }); }
+function planoAbrirExclusao(alvo){
+  _planoDel = alvo;
+  const d = gs(); const p = lerPlano(d);
+  const uso = mapaUsoCategorias(d)[alvo.tipo + '|' + alvo.cat] || { n:0, porFonte:{}, subs:{} };
+  const u = alvo.sub ? (uso.subs[alvo.sub] || { n:0, porFonte:{} }) : uso;
+  const pap = Object.entries(PAPEIS).filter(([k, v]) => v.tipo === alvo.tipo && papel(k) === alvo.cat && (!alvo.sub || papelSub(k) === alvo.sub));
+  const precisaDestino = u.n > 0 || (!alvo.sub && pap.length);
+  const $ = x => document.getElementById(x);
+  $('pd-titulo').textContent = alvo.sub ? `Excluir a subcategoria "${alvo.sub}"` : `Excluir a categoria "${alvo.cat}"`;
+  $('pd-sub').textContent = alvo.sub ? `em ${alvo.cat} · ${rotuloTipo(alvo.tipo)}` : rotuloTipo(alvo.tipo);
+  $('pd-uso').innerHTML = u.n
+    ? `Usada em <b>${u.n}</b> registro(s): ${descreverUso(u.porFonte)}.`
+    : 'Nenhum registro usa esta ' + (alvo.sub ? 'subcategoria.' : 'categoria.');
+  $('pd-papel').style.display = pap.length && !alvo.sub ? 'block' : 'none';
+  $('pd-papel').textContent = pap.length ? `⚙ O sistema usa esta categoria para: ${pap.map(([,v]) => v.rotulo).join('; ')}. Esse uso passa para o destino.` : '';
+  const sel = $('pd-destino');
+  const opcoes = alvo.sub
+    ? ['', ...(p[alvo.tipo].find(c => c.nome === alvo.cat)?.subs || []).filter(s => s !== alvo.sub)]
+    : p[alvo.tipo].map(c => c.nome).filter(n => n !== alvo.cat);
+  sel.innerHTML = (alvo.sub ? '' : '<option value="">— escolha —</option>')
+    + opcoes.map(o => `<option value="${escAttr(o)}">${o ? escHtml(o) : '(sem subcategoria)'}</option>`).join('');
+  $('pd-destino-box').style.display = precisaDestino ? 'block' : 'none';
+  $('pd-destino-lbl').textContent = alvo.sub ? 'Os registros passam para a subcategoria:' : 'Mover (mesclar) os registros para a categoria:';
+  $('pd-levar-box').style.display = precisaDestino && !alvo.sub && Object.keys(uso.subs).length ? 'flex' : 'none';
+  $('pd-levar').checked = true;
+  $('pd-btn').textContent = precisaDestino ? 'Mesclar e excluir' : 'Excluir';
+  $('pd-err').style.display = 'none';
+  openM('m-plano-del');
+}
+function planoConfirmarExclusao(){
+  if(!_planoDel) return;
+  const a = _planoDel, $ = x => document.getElementById(x);
+  const destBox = $('pd-destino-box').style.display !== 'none';
+  const destino = destBox ? $('pd-destino').value : '';
+  let erro;
+  if(a.sub) erro = planoExcluirSub(a.tipo, a.cat, a.sub, destino);
+  else {
+    if(destBox && !destino){ $('pd-err').textContent = '⚠️ Escolha para onde mover os registros.'; $('pd-err').style.display = 'block'; return; }
+    erro = planoExcluirCategoria(a.tipo, a.cat, destino, $('pd-levar').checked);
+  }
+  if(erro){ $('pd-err').textContent = '⚠️ ' + erro; $('pd-err').style.display = 'block'; return; }
+  closeM('m-plano-del');
+  _planoAbertos.delete(a.cat);
+  if(destino && !a.sub) _planoAbertos.add(destino);
+  planoDepois('', destino
+    ? `${a.sub ? `"${a.sub}"` : `"${a.cat}"`} mesclada em "${destino || '(sem subcategoria)'}" — registros movidos.`
+    : `${a.sub ? 'Subcategoria' : 'Categoria'} excluída.`);
+  _planoDel = null;
+}
+
+// ── Categorias em uso fora do plano ──
+function renderPlanoOrfas(d){
+  const el = document.getElementById('plano-orfas');
+  if(!el) return;
+  const orfas = categoriasOrfas(d).filter(o => o.tipo === _planoTipo);
+  if(!orfas.length){ el.innerHTML = ''; return; }
+  const opcoes = allCats(_planoTipo).map(c => `<option value="${escAttr(c)}">${escHtml(c)}</option>`).join('');
+  el.innerHTML = `<div class="plano-orfas">
+    <div class="plano-orfas-hd">⚠️ Em uso, mas fora do plano <em>${orfas.length}</em></div>
+    <div class="orc-nota" style="margin-bottom:8px">Registros antigos ou importados com nomes que não existem no plano. Adote o nome ou mova os registros para uma categoria existente.</div>
+    ${orfas.map(o => {
+      const T = argJs(o.tipo), C = argJs(o.cat), S = o.sub == null ? 'null' : argJs(o.sub);
+      const rotulo = o.sub ? `${escHtml(o.cat)} › <b>${escHtml(o.sub)}</b>` : `<b>${escHtml(o.cat)}</b>`;
+      return `<div class="plano-orfa">
+        <span class="plano-orfa-nome">${rotulo} <em>${o.n} registro(s)</em></span>
+        <button class="btn btn-ghost btn-xs" onclick="planoDepois(planoAdotarOrfa(${T},${C},${S}), 'Adicionado ao plano.')">+ Adicionar ao plano</button>
+        ${o.sub ? '' : `<span class="plano-orfa-mover">
+          <select aria-label="Mover ${escAttr(o.cat)} para">${opcoes}</select>
+          <button class="btn btn-blue btn-xs" onclick="planoDepois(planoMoverOrfa(${T},${C},null,this.previousElementSibling.value), 'Registros movidos.')">Mover</button>
+        </span>`}
+      </div>`; }).join('')}
+  </div>`;
+}
+
 function addForma(){
   const v=document.getElementById('nova-forma')?.value?.trim();
   if(!v)return;
@@ -9025,8 +9820,7 @@ seedDadosIniciais();
 let _bkSel = null; // id da conta selecionada
 let _bkMovTipo = 'entrada'; // 'entrada' | 'saida'
 
-const BK_CATS_ENT = ['Salário','Freelance','Transferência Recebida','Rendimento','Dividendos','Vendas','Reembolso','Outros'];
-const BK_CATS_SAI = ['Alimentação','Moradia','Transporte','Saúde','Educação','Lazer','Vestuário','Serviços','Transferência Enviada','Impostos','Investimento','Outros'];
+// (as categorias das movimentações vêm do Plano de Contas)
 
 // ── Movimentações de uma conta ──
 // Junta as movimentações próprias com os lançamentos efetivados vinculados à conta
@@ -9625,13 +10419,25 @@ function openMBkMov(tipo) {
   const isEnt = tipo === 'entrada';
   document.getElementById('m-bk-mov-titulo').textContent = isEnt ? 'Nova Entrada' : 'Nova Saída';
   document.getElementById('btn-salvar-mov').className = isEnt ? 'btn btn-green' : 'btn btn-red';
-  const cats = isEnt ? BK_CATS_ENT : BK_CATS_SAI;
+  // Categorias do plano de contas (antes era uma lista própria, desligada do resto)
   const catEl = document.getElementById('bm-cat');
-  if (catEl) catEl.innerHTML = cats.map(c => `<option>${c}</option>`).join('');
+  if (catEl) catEl.innerHTML = isEnt
+    ? allCats('Receita').map(c => `<option data-t="Receita">${c}</option>`).join('')
+    : `<optgroup label="Despesas">${allCats('Despesa').map(c => `<option data-t="Despesa">${c}</option>`).join('')}</optgroup>`
+      + `<optgroup label="Investimentos">${allCats('Investimento').map(c => `<option data-t="Investimento">${c}</option>`).join('')}</optgroup>`;
+  updBmSubcat();
   document.getElementById('bm-data').value = today();
   document.getElementById('bm-val').value = '';
   document.getElementById('bm-desc').value = '';
   openM('m-bk-mov');
+}
+
+function updBmSubcat() {
+  const catEl = document.getElementById('bm-cat'), el = document.getElementById('bm-subcat');
+  if (!catEl || !el) return;
+  const opt = catEl.options[catEl.selectedIndex];
+  const tipo = opt ? opt.dataset.t : 'Despesa';
+  el.innerHTML = '<option value="">—</option>' + subcats(tipo, catEl.value).map(s => `<option>${s}</option>`).join('');
 }
 
 // ── Salvar movimentação ──
@@ -9640,13 +10446,14 @@ function saveMov() {
   const val  = parseFloat(document.getElementById('bm-val')?.value) || 0;
   const desc = document.getElementById('bm-desc')?.value?.trim();
   const cat  = document.getElementById('bm-cat')?.value;
+  const subcat = document.getElementById('bm-subcat')?.value || '';
   const forma= document.getElementById('bm-forma')?.value;
   if (!data || !val || !desc) { alert('Preencha data, valor e descrição.'); return; }
   if (!_bkSel) { alert('Nenhuma conta selecionada.'); return; }
   const d = gs();
   const c = d.bancos.find(b => b.id === _bkSel);
   if (!c) return;
-  c.movs.push({ id: uid(), data, val, desc, cat, forma, tipo: _bkMovTipo, ts: Date.now() });
+  c.movs.push({ id: uid(), data, val, desc, cat, subcat, forma, tipo: _bkMovTipo, ts: Date.now() });
   ss(d); closeM('m-bk-mov'); selectBanco(_bkSel); renderBancos();
 }
 
@@ -10015,6 +10822,8 @@ seedLancamentos();
 })();
 
 // ── INIT ──
+// Plano de contas salvo pelo usuário (categorias, classes e papéis)
+try { aplicarPlanoContas(lerPlano()); } catch(e) { console.warn('plano de contas:', e); }
 // ── Define mês atual como padrão em todos os filtros de mês ──
 (function initMesAtual() {
   const mes = curMes();
@@ -10753,7 +11562,7 @@ function ofxImportar(){
     if(movsExist.has(chave)){ ignoradas++; return; }
 
     const tipo = t.sinal >= 0 ? 'entrada' : 'saida';
-    const cat  = tipo==='entrada' ? 'Receitas' : 'Outras Despesas';
+    const cat  = tipo==='entrada' ? papel('receitaPadrao') : papel('outrasDespesas');
 
     // Cria movimento bancário
     const mov = {

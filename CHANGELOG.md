@@ -4,6 +4,102 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-09-23] Plano de contas editável e conta a pagar no cartão de crédito
+
+### 🎯 O que foi pedido
+
+1. Criar em **Configurações** as opções de criar, editar e gerenciar o **plano de contas**
+   (categorias e subcategorias do sistema).
+2. Ao criar uma **conta a pagar**, poder **atrelar a despesa a um cartão de crédito**.
+
+### 🐛 O que estava errado
+
+- As categorias eram **fixas no código**: não havia como criar, renomear ou excluir nenhuma.
+- Cada tela tinha **sua própria lista**: o modal de Contas a Pagar tinha as categorias escritas à
+  mão; o extrato bancário usava listas separadas ("Freelance", "Aluguel"…) que não existiam no
+  resto do sistema. Uma movimentação lançada no banco caía em categoria que o DRE e o orçamento não
+  conheciam.
+- Categorias antigas (ex.: "Assinaturas", "Viagens" de compras de cartão) ficavam **invisíveis**:
+  tinham registros, mas não apareciam em nenhuma lista para corrigir.
+- Conta a pagar só podia ser paga **pelo caixa**. Uma assinatura cobrada no cartão ou era lançada
+  duas vezes (na conta e no cartão), ou ficava fora da fatura.
+
+### ✨ Implementado — Plano de Contas (Configurações)
+
+- **Novo cartão "Plano de Contas"** com abas **Despesas / Receitas / Investimentos** (com a
+  contagem de cada uma), busca por categoria ou subcategoria e resumo de uso.
+- **Categorias:** criar (com a classe **Essencial / Escolha / Financeiro / Outros**, que define a
+  regra 50/30/20 e o relatório de Despesas Pessoais), **renomear** (duplo clique ou ✎), mudar a
+  classe, **reordenar** (↑ ↓) e **excluir**.
+- **Subcategorias:** criar, renomear e excluir direto nos chips, cada um com a quantidade de
+  registros que o usa.
+- **Renomear propaga para tudo:** lançamentos, contas a pagar, metas do orçamento, compras de
+  cartão, pagamentos de fatura e movimentações bancárias. Renomear para um nome que já existe
+  **mescla** as duas categorias (as subcategorias se juntam e metas repetidas do mesmo mês são
+  somadas, sem duplicar).
+- **Excluir com segurança:** o sistema mostra quantos registros usam a categoria e onde
+  (ex.: "6 lançamentos, 2 contas a pagar") e pede o **destino** dos registros antes de apagar —
+  com a opção de levar as subcategorias junto. Nada fica órfão.
+- **Categorias do sistema protegidas:** as que o sistema usa sozinho (pagamento de fatura, parcela
+  de dívida, importação OFX, despesa sem categoria) aparecem com o selo **⚙ sistema**; ao
+  renomear, o sistema passa a usar o novo nome; para excluir, é preciso escolher outra categoria
+  para assumir a função.
+- **"Em uso, mas fora do plano":** lista categorias antigas ou importadas que têm registros mas não
+  estão no plano, com **Adicionar ao plano** ou **Mover** os registros para uma categoria existente.
+- **Restaurar padrão** volta ao plano original (os registros não são apagados).
+- **Uma lista só no sistema inteiro:** Contas a Pagar, lançamentos, cartões, orçamento e o
+  **extrato bancário** passam a usar o plano. A movimentação bancária ganhou **subcategoria** e
+  separa despesas de investimentos.
+
+### ✨ Implementado — Conta a pagar no cartão de crédito
+
+- **Forma de pagamento** no modal da conta: **🏦 Conta / dinheiro** (como antes) ou
+  **💳 Cartão de crédito**, com a escolha do cartão.
+- **Prévia da fatura:** ao escolher o cartão, o sistema mostra em qual fatura a cobrança entra
+  (respeitando o dia de fechamento), quando ela vence e o **limite livre** — em vermelho se a
+  cobrança passar dele.
+- Funciona para conta **única, parcelada** (uma parcela por fatura) e **recorrente** (cada
+  cobrança entra na fatura do mês em que vence; as próximas ocorrências já nascem no cartão).
+- A conta vira uma **compra na fatura** do cartão, marcada com **📄 Conta a pagar**: soma na
+  fatura, no limite, no orçamento por categoria (com "incluir cartão") e nos relatórios.
+- **Sem contar em dobro:** a conta no cartão **não gera lançamento** nem sai do caixa sozinha —
+  o dinheiro sai no **pagamento da fatura**, como qualquer compra no cartão. Ela também sai dos
+  alertas de vencimento, do contador do menu, das contas pendentes do painel e dos compromissos
+  futuros (onde entra pela fatura).
+- **Na lista de Contas a Pagar:** status **💳 No cartão** (ou **💳 Fatura paga** quando a fatura
+  daquele mês foi quitada), o cartão e a fatura na coluna de pagamento e o botão **💳 Fatura**,
+  que abre a aba Cartões direto na fatura certa. Novo filtro de status "No cartão" e o KPI
+  **Em Aberto** mostra à parte quanto está no cartão.
+- **Limite:** cobrança futura (ex.: os próximos meses de uma assinatura) **só ocupa o limite
+  quando é cobrada**.
+- **Tudo sincronizado:** editar a conta (valor, data, categoria, cartão — inclusive "esta e as
+  próximas") atualiza a compra na fatura; trocar de volta para caixa remove a compra; trocar uma
+  conta **já paga** para o cartão desfaz o lançamento e a movimentação bancária. Na aba Cartões,
+  editar ou excluir a compra marcada abre a própria conta. Encerrar a recorrência ou excluir a
+  conta limpa as compras; excluir o cartão avisa e devolve as contas para pagamento pelo caixa.
+
+### 🧪 Testes
+
+- **`test-plano.js` — 50 verificações:** criar, duplicar, renomear, mesclar, excluir com destino,
+  mover, classes, papéis do sistema, órfãs, restaurar padrão, extrato bancário e propagação para
+  todos os módulos.
+- **`test-conta-cartao.js` — 50 verificações:** modal, prévia, compra espelho, fatura, limite,
+  compromissos, contador do menu, única/parcelada/recorrente, edição em série, lista, filtro,
+  KPI, navegação para a fatura, fatura paga, troca caixa ↔ cartão, plano de contas, exclusões e
+  validação.
+- Suítes existentes seguem passando — **539 verificações** no total. (O antigo `test-contas.js`
+  já não roda desde a reformulação de Contas a Pagar — usa um campo que não existe mais; foi
+  substituído pelo `test-contas2.js`.)
+
+### ⚠️ Impacto nos dados existentes
+
+- Nenhum dado é apagado. Sem plano salvo, o sistema usa o plano padrão (o mesmo de antes).
+- Categorias antigas que estavam fora da lista aparecem em **"Em uso, mas fora do plano"** para
+  você decidir o que fazer com elas.
+- Contas a pagar existentes continuam como **pagamento pelo caixa**.
+
+---
+
 ## [2026-09-23] Gráficos de fluxo de caixa sem eixo duplo
 
 ### 🎯 O que foi pedido
