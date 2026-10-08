@@ -4,6 +4,50 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-08] Menu lateral recolhível
+
+### 🎯 O que foi pedido
+
+Ajustar o menu principal para **recolher** e aumentar o espaço na tela.
+
+### ✨ Implementado
+
+- **Botão « no topo do menu** recolhe o menu lateral para uma faixa só com os ícones
+  (de 240px para 68px). As telas ganham **172px de largura**: gráficos, tabelas e cartões se
+  ajustam na hora. O mesmo botão (agora »») expande de novo.
+- **A escolha fica salva** neste navegador: ao voltar, o menu abre do jeito que você deixou.
+  Sem escolha salva, telas estreitas (menos de 1100px de largura) já abrem com o menu recolhido.
+- **Recolhido, nada se perde:**
+  - passar o mouse num ícone mostra o **nome do item** ao lado (ex.: "Contas a Pagar · 1");
+  - o contador de contas vira um **selo no ícone**;
+  - os títulos das seções viram linhas divisórias;
+  - o **saldo atual** sai do rodapé e aparece ao passar o mouse no avatar;
+  - o botão de tema continua no rodapé.
+- **Acessível pelo teclado:** os itens do menu agora recebem foco com **Tab** e abrem com
+  **Enter** ou **Espaço**; a dica com o nome aparece também no foco.
+- No **celular** nada muda: o menu continua sendo a gaveta lateral com os nomes.
+
+### 🐛 Corrigido
+
+- O botão **Sair** ficava solto no canto da tela, **por cima dos itens do menu** (cobria Kanban e
+  Configurações). Agora é um item no **rodapé do menu**, com ícone — e também aparece na gaveta
+  do celular, onde antes não havia como sair.
+
+### 🧪 Testes
+
+- **`test-menu.js` — 22 verificações:** abrir/recolher, escolha salva × largura da tela,
+  larguras do menu e do conteúdo, nomes escondidos e dicas (no mouse e no foco, com contador),
+  saldo na dica do avatar, Tab + Enter navegando, Sair dentro do menu e celular sem mudanças.
+- Dois testes antigos dependiam da data de hoje e passaram a falhar com a virada do mês; agora
+  rodam com a data em que foram montados, e o que verificam não mudou.
+- Suítes existentes seguem passando — **668 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Só a preferência do menu é guardada neste navegador.
+
+---
+
 ## [2026-09-23] Calculadora nos campos de valor
 
 ### 🎯 O que foi pedido

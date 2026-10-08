@@ -124,6 +124,44 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-heig
 .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--line)}
 .sidebar-footer-info{font-size:11px;color:var(--t3);text-align:center}
 
+/* ── MENU RECOLHÍVEL (desktop) ── */
+.nav-btn{position:relative}
+.sb-recolher{position:absolute;top:22px;right:12px;width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--surface2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.sb-recolher:hover{color:var(--t1);background:var(--surface3)}
+.sb-recolher:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+.sb-recolher svg{width:15px;height:15px;transition:transform .2s}
+.sb-sair{margin:10px 0 0;border-radius:6px;border-left:none;padding:8px 10px;color:var(--t3)}
+.sb-sair:hover{color:var(--red);background:var(--red-dim)}
+#menu-dica{position:fixed;z-index:300;pointer-events:none;background:var(--surface4);color:var(--t1);border:1px solid var(--line2);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.35);display:none}
+#menu-dica::before{content:'';position:absolute;left:-5px;top:50%;width:8px;height:8px;background:inherit;border-left:1px solid var(--line2);border-bottom:1px solid var(--line2);transform:translateY(-50%) rotate(45deg)}
+#logout-btn{display:none !important}
+@media (min-width:769px){
+  /* só no computador: ao cruzar para o celular a margem muda na hora, sem animar */
+  .sidebar,.main{transition:width .2s ease,margin-left .2s ease,background .25s,border-color .25s}
+  body.menu-recolhido{--sidebar:68px}
+  body.menu-recolhido .sidebar{overflow-x:hidden}
+  body.menu-recolhido .logo{padding:16px 0 12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  body.menu-recolhido .logo-mark{margin:0}
+  body.menu-recolhido .logo-text,body.menu-recolhido .logo-sub{display:none}
+  body.menu-recolhido .sb-recolher{position:static}
+  body.menu-recolhido .sb-recolher svg{transform:rotate(180deg)}
+  body.menu-recolhido .nav-section{font-size:0;height:1px;padding:0;margin:10px 16px 6px;background:var(--line)}
+  body.menu-recolhido .nav-btn{justify-content:center;padding:10px 0;margin:2px 10px;border-left:none;border-radius:8px}
+  body.menu-recolhido .nav-btn svg{width:18px;height:18px}
+  body.menu-recolhido .nav-txt{display:none}
+  body.menu-recolhido .nav-btn .pill{position:absolute;top:2px;right:2px;margin:0;padding:0 5px;min-width:16px;line-height:16px;text-align:center;font-size:9px}
+  body.menu-recolhido .sidebar-footer{padding:12px 8px}
+  body.menu-recolhido #sb-user-info{justify-content:center;padding:6px 0 !important;background:transparent !important;border-color:transparent !important}
+  body.menu-recolhido #sb-user-info > div:last-child{display:none}
+  body.menu-recolhido .sb-aparencia{justify-content:center !important}
+  body.menu-recolhido .sb-aparencia > span{display:none}
+  body.menu-recolhido #sb-saldo{display:none}
+  body.menu-recolhido .sb-sair{justify-content:center;margin:6px 2px 0}
+}
+@media (max-width:768px){
+  .sb-recolher{display:none}
+}
+
 /* ── MAIN ── */
 .main{margin-left:var(--sidebar);min-height:100vh}
 .page{display:none;padding:28px 32px 40px}.page.active{display:block}
@@ -1033,6 +1071,16 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <button class="mob-fab" onclick="openM('m-lanc')" title="Novo lançamento" aria-label="Novo lançamento">＋</button>
 
 
+<script>
+// Menu recolhido: aplica a preferência antes de desenhar, para a tela não "pular"
+(function(){
+  try {
+    var pref = localStorage.getItem('fpro_menu');
+    var recolher = pref ? pref === 'recolhido' : window.innerWidth < 1100;
+    if(recolher) document.body.classList.add('menu-recolhido');
+  } catch(e) {}
+})();
+</script>
 <nav class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-mark">
@@ -1040,6 +1088,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <span class="logo-text">FinançasPro</span>
     </div>
     <div class="logo-sub">Controle Financeiro</div>
+    <button class="sb-recolher" id="sb-recolher" onclick="alternarMenu()" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+    </button>
     <!-- Close button only visible on mobile -->
     <button onclick="closeDrawer()" style="display:none;position:absolute;top:18px;right:16px;background:var(--surface3);border:1px solid var(--line);color:var(--t2);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;align-items:center;justify-content:center" id="sidebar-close-btn">✕</button>
   </div>
@@ -1105,13 +1156,17 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div id="sb-user-perfil" style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">—</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="sb-aparencia" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <span style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Aparência</span>
       <div class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Alternar tema">🌙</div>
     </div>
     <div class="sidebar-footer-info" id="sb-saldo">
       Saldo atual<br><strong id="sb-saldo-val" style="color:var(--green);font-family:'JetBrains Mono',monospace">R$ 0,00</strong>
       <div id="sb-reservas" style="display:none;font-size:9px;color:var(--t3);margin-top:3px"></div>
+    </div>
+    <div class="nav-btn sb-sair" onclick="doLogout()" role="button" tabindex="0" data-label="Sair">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
     </div>
   </div>
 </nav>
@@ -11583,8 +11638,82 @@ seedLancamentos();
   } catch(e) { console.warn('corrigirVinculoDeCaixa:', e); }
 })();
 
+
+// ══ MENU RECOLHÍVEL ══════════════════════════════════════════════
+// No computador o menu lateral pode ficar só com os ícones (68px), dando mais largura
+// para as telas. A escolha fica salva neste navegador; sem escolha, telas estreitas
+// (menos de 1100px) já abrem recolhidas. No celular o menu continua sendo a gaveta.
+const menuRecolhido = () => document.body.classList.contains('menu-recolhido');
+function aplicarMenu(recolhido, salvar){
+  document.body.classList.toggle('menu-recolhido', !!recolhido);
+  const b = document.getElementById('sb-recolher');
+  if(b){
+    const t = recolhido ? 'Expandir menu' : 'Recolher menu';
+    b.title = t; b.setAttribute('aria-label', t); b.setAttribute('aria-expanded', String(!recolhido));
+  }
+  if(salvar){ try { localStorage.setItem('fpro_menu', recolhido ? 'recolhido' : 'aberto'); } catch(e) {} }
+  esconderDicaMenu();
+}
+function alternarMenu(){ aplicarMenu(!menuRecolhido(), true); }
+
+// Nome do item ao passar o mouse (ou focar pelo teclado) quando o menu está recolhido
+function mostrarDicaMenu(el){
+  if(!menuRecolhido() || window.innerWidth <= 768) return;
+  let dica = document.getElementById('menu-dica');
+  if(!dica){
+    dica = document.createElement('div');
+    dica.id = 'menu-dica'; dica.setAttribute('role', 'tooltip');
+    document.body.appendChild(dica);
+  }
+  const pill = el.querySelector('.pill');
+  const extra = pill && pill.style.display !== 'none' && pill.textContent.trim() ? ` · ${pill.textContent.trim()}` : '';
+  dica.textContent = (typeof el._dica === 'function' ? el._dica() : (el.dataset.label || '')) + extra;
+  const r = el.getBoundingClientRect();
+  dica.style.display = 'block';
+  dica.style.left = Math.round(r.right + 10) + 'px';
+  dica.style.top  = Math.round(r.top + r.height / 2 - dica.offsetHeight / 2) + 'px';
+}
+function esconderDicaMenu(){ const d = document.getElementById('menu-dica'); if(d) d.style.display = 'none'; }
+
+function instalarMenu(){
+  const comDica = el => {
+    el.addEventListener('mouseenter', () => mostrarDicaMenu(el));
+    el.addEventListener('mouseleave', esconderDicaMenu);
+    el.addEventListener('focus', () => mostrarDicaMenu(el));
+    el.addEventListener('blur', esconderDicaMenu);
+  };
+  document.querySelectorAll('#sidebar .nav-btn').forEach(btn => {
+    // o texto solto vira <span class="nav-txt">, que some quando o menu recolhe
+    [...btn.childNodes].forEach(n => {
+      if(n.nodeType === 3 && n.textContent.trim()){
+        const sp = document.createElement('span');
+        sp.className = 'nav-txt'; sp.textContent = n.textContent.trim();
+        btn.replaceChild(sp, n);
+      }
+    });
+    const nome = btn.dataset.label || (btn.querySelector('.nav-txt') || {}).textContent || '';
+    btn.dataset.label = nome;
+    btn.setAttribute('aria-label', nome);
+    // itens do menu acessíveis pelo teclado (Tab + Enter/Espaço)
+    if(!btn.hasAttribute('tabindex')) btn.tabIndex = 0;
+    if(!btn.hasAttribute('role')) btn.setAttribute('role', 'button');
+    btn.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); btn.click(); } });
+    comDica(btn);
+  });
+  // recolhido, o saldo some do rodapé: vai para a dica do avatar
+  const user = document.getElementById('sb-user-info');
+  if(user){
+    user._dica = () => `${document.getElementById('sb-user-nome')?.textContent || 'Usuário'} · Saldo ${document.getElementById('sb-saldo-val')?.textContent || ''}`;
+    comDica(user);
+  }
+  const tema = document.getElementById('theme-toggle-btn');
+  if(tema){ tema.dataset.label = 'Alternar tema'; comDica(tema); }
+  aplicarMenu(menuRecolhido(), false);
+}
+
 // ── INIT ──
 try { instalarCalculadoras(); } catch(e) { console.warn('calculadora:', e); }
+try { instalarMenu(); } catch(e) { console.warn('menu:', e); }
 // Plano de contas salvo pelo usuário (categorias, classes e papéis)
 try { aplicarPlanoContas(lerPlano()); } catch(e) { console.warn('plano de contas:', e); }
 // ── Define mês atual como padrão em todos os filtros de mês ──
