@@ -313,6 +313,10 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .fatdet-nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
 
 
+/* ── STATUS DO LANÇAMENTO GERADO POR OUTRA TELA ── */
+.badge.st-origem{display:inline-flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.25;white-space:nowrap;border-radius:8px}
+.badge.st-origem small{font-size:8px;font-weight:500;opacity:.85;letter-spacing:0;text-transform:none}
+
 /* ── CALCULADORA DOS CAMPOS DE VALOR ── */
 .calc-campo{position:relative;display:flex}
 .calc-campo input{flex:1;min-width:0;padding-right:42px !important}
@@ -7234,6 +7238,11 @@ function renderLanc(){
   if(empty) empty.style.display='none';
 
   const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Transferência:'var(--cyan)'};
+  const ORIGEM_LANC = {
+    conta:  { rotulo:'📋 conta a pagar',   dica:'Pago pela tela Contas a Pagar — para desfazer o pagamento, use aquela tela' },
+    fatura: { rotulo:'💳 fatura do cartão', dica:'Pagamento de fatura registrado na tela Cartões de Crédito' },
+    divida: { rotulo:'📉 parcela de dívida', dica:'Pagamento de parcela registrado na tela Dívidas' },
+  };
   const bdgTipo= {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Transferência:'bdg-cyan'};
   const idsRes = idsReserva(d);   // contas de reserva: marcadas na lista, mas fora dos KPIs
 
@@ -7242,10 +7251,15 @@ function renderLanc(){
     if(l.status==='estornado') return '<span class="badge bdg-amber" style="font-size:9px">↩ Estornado</span>';
     if(l.status==='estorno')   return '<span class="badge" style="background:#201500;color:var(--amber);border-color:var(--amber);font-size:9px">↩ Estorno</span>';
     if(l.tipo==='Transferência') return '<span class="badge bdg-cyan" style="font-size:9px">⇄ Transferência</span>';
-    if(l.origem==='conta')     return '<span class="badge bdg-blue" style="font-size:9px">📋 Conta a Pagar</span>';
-    if(l.pago==='Pendente')    return '<span class="badge bdg-amber" style="font-size:9px">⏳ Pendente</span>';
-    if(l.pago==='Agendado')    return '<span class="badge bdg-blue" style="font-size:9px">📅 Agendado</span>';
-    return '<span class="badge bdg-green" style="font-size:9px">✓ Pago</span>';
+    // Gerado por outra tela (conta a pagar, fatura, dívida): a cor segue a situação do
+    // pagamento — verde quando pago — e a origem vai escrita embaixo, pequena.
+    const og  = ORIGEM_LANC[l.origem];
+    const sub = og ? `<small>${og.rotulo}</small>` : '';
+    const cls = og ? ' st-origem' : '';
+    const dica = og ? ` title="${og.dica}"` : '';
+    if(l.pago==='Pendente')    return `<span class="badge bdg-amber${cls}" style="font-size:9px"${dica}>⏳ Pendente${sub}</span>`;
+    if(l.pago==='Agendado')    return `<span class="badge bdg-blue${cls}" style="font-size:9px"${dica}>📅 Agendado${sub}</span>`;
+    return `<span class="badge bdg-green${cls}" style="font-size:9px"${dica}>✓ Pago${sub}</span>`;
   };
 
   // ── Saldo consolidado por linha ──

@@ -4,6 +4,45 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-13] Lançamentos: conta paga aparece como paga
+
+### 🎯 O que foi pedido
+
+No extrato de **Lançamentos**, a conta que foi paga pela tela Contas a Pagar deve aparecer
+**em verde e como "Pago — conta a pagar"**: do jeito que estava, parecia que ainda estava em aberto.
+
+### 🐛 O que estava errado
+
+- O lançamento gerado ao pagar uma conta mostrava um selo **azul "📋 Conta a Pagar"** na coluna
+  Status, sem dizer se estava pago. Azul é a mesma cor de "Agendado", então a conta paga
+  parecia pendente — embora o valor já estivesse descontado do saldo.
+
+### ✅ Corrigido
+
+- O selo agora segue a **situação do pagamento**: **verde "✓ Pago"**, com a origem escrita
+  embaixo em letra pequena — **📋 conta a pagar**.
+- O mesmo vale para os outros lançamentos que o sistema cria sozinho:
+  **💳 fatura do cartão** (pagamento de fatura) e **📉 parcela de dívida**.
+- Se um desses lançamentos estiver pendente, aparece **amarelo "⏳ Pendente"**, também com a origem.
+- Passar o mouse no selo explica de onde veio e onde desfazer (ex.: "para desfazer o pagamento,
+  use a tela Contas a Pagar").
+- Lançamentos feitos à mão continuam iguais. O filtro **"✓ Pago"** já incluía essas contas e
+  continua incluindo; **"⏳ Aberto"** não as mostra.
+
+### 🧪 Testes
+
+- **`test-status-lanc.js` — 11 verificações:** conta paga pelo fluxo real de Contas a Pagar
+  aparece verde com a origem, sem o selo azul; fatura e dívida com a origem; lançamentos
+  manuais iguais a antes; pendente de conta em amarelo; filtros Pago/Aberto; desfazer o
+  pagamento tira o lançamento do extrato.
+- Suítes existentes seguem passando — **679 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Só a aparência do selo mudou; os lançamentos já estavam gravados como pagos.
+
+---
+
 ## [2026-10-08] Menu lateral recolhível
 
 ### 🎯 O que foi pedido
