@@ -4,6 +4,68 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-14] Logo e ícones do FinançasPro
+
+### 🎯 O que foi pedido
+
+Criar a **logo** e os **ícones** do FinançasPro.
+
+### ✨ Implementado — a marca
+
+- **Símbolo "F que decola":** um **F** cuja perna de cima vira uma **seta subindo** — finanças sob
+  controle e crescendo. Fica num quadrado de cantos arredondados no gradiente **verde → ciano**
+  que o sistema já usava, com o desenho em tinta escura para ter contraste.
+- Escolhido entre cinco conceitos testados de 16 px a 160 px nos fundos escuro e claro: os outros
+  ficavam genéricos (barras de gráfico) ou viravam borrão em tamanho pequeno.
+- **Logotipo:** "Finanças" + **"Pro" em gradiente**, na fonte **Sora** (a mesma do sistema).
+  Versões horizontal e vertical (com a assinatura "CONTROLE FINANCEIRO"), para fundo escuro e claro.
+  No fundo claro o "Pro" usa um verde e um ciano mais escuros, para não ficar apagado no branco.
+- **Arquivos em `marca/`:** símbolo, símbolo monocromático, logotipos em SVG (com o nome convertido
+  em curvas — ficam iguais em qualquer computador) e em PNG de alta resolução para usar fora do
+  sistema, mais um **guia da marca** (`marca/README.md`) com cores, fonte e regras de uso, e a
+  prancha `marca/apresentacao.png`.
+
+### ✨ Implementado — ícones
+
+- **Aba do navegador:** `favicon.svg` e `favicon.ico` (16, 32 e 48 px), numa versão reforçada para
+  tamanho pequeno (desenho maior e traço mais grosso).
+- **iPhone:** ícone de 180 px para "Adicionar à Tela de Início".
+- **Android / computador:** ícones de 192 e 512 px e um *maskable* (o Android recorta em círculo ou
+  quadrado sem cortar o desenho), declarados no novo `manifest.webmanifest` — com nome, cores e
+  ícone ao adicionar o FinançasPro à tela inicial.
+- **Prévia do link:** imagem de compartilhamento (1200 × 630) que aparece ao mandar o endereço do
+  sistema no WhatsApp ou por e-mail.
+- **Cor da barra do navegador** no celular acompanha o tema (escuro ou claro).
+
+### 🎨 No sistema
+
+- O 💰 saiu do **menu lateral**, do **topo do celular** e da **tela de login**: no lugar entra o
+  símbolo, e o nome passa a ser "Finanças**Pro**" com o "Pro" em gradiente (com as cores certas em
+  cada tema). O login ganhou o símbolo em destaque acima do nome.
+- O símbolo é definido uma vez só na página e reaproveitado nos três lugares.
+
+### ℹ️ Sobre adicionar à tela inicial
+
+No **iPhone**, o atalho abre no Safari, de propósito: lá, um app "em tela cheia" guarda os dados
+separados do Safari e os seus lançamentos pareceriam ter sumido. No **Android** e no computador
+o FinançasPro pode ser instalado como app e usa os mesmos dados do navegador.
+
+### 🧪 Testes
+
+- **`test-marca.js` — 29 verificações:** todos os arquivos existem com o tamanho certo, o manifesto
+  aponta para ícones existentes, o `favicon.ico` é válido, os logotipos não dependem da fonte, e —
+  conferindo os pixels — os ícones têm o fundo em gradiente, o F escuro e os cantos certos; no
+  sistema, símbolo e nome no menu, no celular, no login e com o menu recolhido, e a troca de tema.
+- Durante a geração apareceu um defeito (os PNGs saíam só com o F, sem o fundo); foi corrigido, e
+  a verificação de pixels acima existe para não deixar acontecer de novo.
+- Suítes existentes seguem passando — **708 verificações** no total.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Só a aparência e os arquivos de ícone mudaram.
+
+---
+
 ## [2026-10-13] Lançamentos: conta paga aparece como paga
 
 ### 🎯 O que foi pedido

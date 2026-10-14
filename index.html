@@ -4,12 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinançasPro — Controle Financeiro Pessoal</title>
+<meta name="description" content="Controle financeiro pessoal: lançamentos, contas a pagar, cartões, orçamento e relatórios.">
+<meta name="application-name" content="FinançasPro">
+<meta name="apple-mobile-web-app-title" content="FinançasPro">
+<meta name="theme-color" content="#080c14">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="FinançasPro">
+<meta property="og:title" content="FinançasPro — Controle Financeiro Pessoal">
+<meta property="og:description" content="Controle financeiro pessoal: lançamentos, contas a pagar, cartões, orçamento e relatórios.">
+<meta property="og:image" content="https://financaspro-taupe.vercel.app/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logotipo FinançasPro — Controle Financeiro">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
+  --marca-a:#00d97e;
+  --marca-b:#22d3ee;
   /* Core */
   --bg:#080c14;
   --surface0:#0d1220;
@@ -52,6 +72,8 @@
 
 /* ── LIGHT THEME ── */
 body.theme-light{
+  --marca-a:#00a85e;
+  --marca-b:#0891b2;
   --viz-prev:#2a78d6; --viz-real:#eb6834; --viz-pend:#1baf7a;
   --bg:#f0f4f8;
   --surface0:#ffffff;
@@ -102,12 +124,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);min-heig
 }
 .logo{padding:22px 20px 18px;border-bottom:1px solid var(--line);position:relative}
 .logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:2px}
-.logo-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--green),var(--cyan));
-  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
-}
-.logo-text{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.logo-icon{width:36px;height:36px;flex-shrink:0;display:flex;filter:drop-shadow(0 4px 10px rgba(0,217,126,.22))}
+.logo-icon svg,.fp-simbolo{width:100%;height:100%;display:block}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-.4px}
+.logo-pro{background:linear-gradient(135deg,var(--marca-a),var(--marca-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+body.theme-light .logo-icon{filter:drop-shadow(0 3px 8px rgba(0,168,94,.18))}
 .logo-sub{font-size:10px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase;margin-left:46px}
 
 .nav-section{padding:20px 16px 6px;font-size:10px;color:var(--t4);font-weight:600;letter-spacing:.1em;text-transform:uppercase}
@@ -607,7 +628,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   padding:0 16px;align-items:center;justify-content:space-between;
 }
 .mob-topbar-logo{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;letter-spacing:-.3px}
-.mob-topbar-logo .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:14px}
+.mob-topbar-logo .logo-icon{width:30px;height:30px}
 .mob-topbar-right{display:flex;align-items:center;gap:8px}
 .mob-icon-btn{width:36px;height:36px;border-radius:var(--r2);background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all .15s;flex-shrink:0}
 .mob-icon-btn:hover,.mob-icon-btn:active{background:var(--surface3);color:var(--t1)}
@@ -925,12 +946,22 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 </style>
 </head>
 <body>
+<!-- Símbolo da marca: definido uma vez e reutilizado com <use href="#fp-simbolo"> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="fp-marca-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100"><stop offset="0" stop-color="#00d97e"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+  <symbol id="fp-simbolo" viewBox="0 0 100 100">
+    <rect width="100" height="100" rx="23" fill="url(#fp-marca-grad)"/>
+    <g fill="none" stroke="#06121f" stroke-width="11.5" stroke-linecap="round" stroke-linejoin="round"><path d="M33 78V41H49L67 23"/><path d="M56 23H67V34"/><path d="M33 60H48"/></g>
+  </symbol>
+</svg>
 
 <style>
 #login-overlay{position:fixed;inset:0;background:#080c14;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif}
 #login-overlay.hidden{display:none}
 #login-card{background:#0d1220;border:1px solid #232d3d;border-radius:14px;padding:36px 32px;width:360px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-#login-card h2{color:#e4ecf8;font-size:20px;font-weight:600;margin-bottom:6px;text-align:center}
+#login-card h2{color:#e4ecf8;font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;text-align:center}
+#login-card h2 .logo-pro{background:linear-gradient(135deg,#00d97e,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+#login-card .login-simbolo{display:block;width:60px;height:60px;margin:0 auto 16px;filter:drop-shadow(0 8px 22px rgba(0,217,126,.28))}
 #login-card p.sub{color:#8fa3bf;font-size:12px;text-align:center;margin-bottom:24px}
 #login-card .field{margin-bottom:14px}
 #login-card label{display:block;color:#8fa3bf;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-weight:600}
@@ -944,7 +975,8 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 </style>
 <div id="login-overlay">
   <div id="login-card">
-    <h2>FinançasPro</h2>
+    <svg class="login-simbolo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#fp-simbolo"/></svg>
+    <h2>Finanças<span class="logo-pro">Pro</span></h2>
     <p class="sub">Acesse sua conta</p>
     <form onsubmit="doLogin(event)">
       <div class="field"><label>E-mail</label><input id="login-email" type="email" autocomplete="username" required></div>
@@ -1027,8 +1059,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- ═══ MOBILE TOPBAR ═══ -->
 <div class="mob-topbar" id="mob-topbar">
   <div class="mob-topbar-logo">
-    <div class="logo-icon">💰</div>
-    FinançasPro
+    <div class="logo-icon"><svg class="fp-simbolo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#fp-simbolo"/></svg></div>
+    <span>Finanças<span class="logo-pro">Pro</span></span>
   </div>
   <div class="mob-topbar-right">
     <div class="mob-icon-btn" id="mob-theme-btn" onclick="toggleTheme()" title="Alternar tema" style="font-size:15px">🌙</div>
@@ -1088,8 +1120,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <nav class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-mark">
-      <div class="logo-icon">💰</div>
-      <span class="logo-text">FinançasPro</span>
+      <div class="logo-icon"><svg class="fp-simbolo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#fp-simbolo"/></svg></div>
+      <span class="logo-text">Finanças<span class="logo-pro">Pro</span></span>
     </div>
     <div class="logo-sub">Controle Financeiro</div>
     <button class="sb-recolher" id="sb-recolher" onclick="alternarMenu()" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true" aria-controls="sidebar">
@@ -11941,6 +11973,9 @@ function applyTheme(theme) {
     if (mob) mob.textContent = '🌙';
   }
   localStorage.setItem(THEME_KEY, theme);
+  // Cor da barra do navegador no celular acompanha o tema
+  const corBarra = document.querySelector('meta[name="theme-color"]');
+  if (corBarra) corBarra.setAttribute('content', theme === 'light' ? '#f0f4f8' : '#080c14');
   // Update chartBase colors live
   const isLight = theme === 'light';
   const tickColor = isLight ? '#3a5068' : '#4d6178';
