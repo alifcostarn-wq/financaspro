@@ -938,6 +938,28 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #m-conta .cp-tipo-btn.cartao.active{border-color:var(--purple);background:var(--purple-dim);color:var(--purple)}
 #m-conta .cp-tipo-btn.cartao.active small{color:var(--purple)}
 #m-conta .cp-cc-aviso{font-size:11px;color:var(--t3);margin-top:6px;line-height:1.45}
+#m-conta .cp-prazos-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+#m-conta .cp-prazos-chips button{border:1px solid var(--line2);background:var(--surface2);color:var(--t2);font:600 10px 'Sora',sans-serif;padding:3px 8px;border-radius:20px;cursor:pointer}
+#m-conta .cp-prazos-chips button:hover{color:var(--t1);border-color:var(--green)}
+#m-conta .cp-pl{margin-top:10px;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+#m-conta .cp-pl-cab,#m-conta .cp-pl-lin{display:grid;grid-template-columns:54px 1fr 1fr 30px;gap:8px;align-items:center;padding:5px 10px}
+#m-conta .cp-pl-cab{background:var(--surface3);font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+#m-conta .cp-pl-lista{max-height:236px;overflow-y:auto}
+#m-conta .cp-pl-lin + .cp-pl-lin{border-top:1px solid var(--line)}
+#m-conta .cp-pl-num{font:600 11px 'JetBrains Mono',monospace;color:var(--t2)}
+#m-conta .cp-pl-lin input{width:100%;background:var(--surface1);border:1px solid var(--line);border-radius:6px;color:var(--t1);padding:5px 7px;font-size:12px;font-family:inherit;min-width:0}
+#m-conta .cp-pl-lin input:focus{outline:none;border-color:var(--green)}
+#m-conta .cp-pl-lin input.ed{border-color:var(--amber);background:var(--amber-dim)}
+#m-conta .cp-pl-reset{border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:14px;border-radius:5px;padding:2px}
+#m-conta .cp-pl-reset:hover{color:var(--t1);background:var(--surface3)}
+#m-conta .cp-pl-erro{padding:7px 10px;font-size:11px;color:var(--red);background:var(--red-dim);border-bottom:1px solid var(--line)}
+#m-conta .cp-pl-dica{font-size:10.5px;color:var(--t3);margin-top:6px;line-height:1.45}
+#m-conta .cp-pl-dica b{color:var(--amber);font-weight:600}
+@media (max-width:768px){
+  #m-conta .cp-pl-cab,#m-conta .cp-pl-lin{grid-template-columns:32px 1.55fr 1fr 22px;gap:6px;padding:5px 7px}
+  #m-conta .cp-pl-lin input{padding:5px 4px;font-size:11.5px}
+  #m-conta .cp-pl-num{font-size:10px}
+}
 #m-conta .cp-escopo{display:flex;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:4px;margin-bottom:14px}
 #m-conta .cp-escopo button{flex:1;padding:6px;border:none;border-radius:5px;background:transparent;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
 #m-conta .cp-escopo button.active{background:var(--surface4);color:var(--t1)}
@@ -3011,15 +3033,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         </div>
         <!-- Parcelada -->
         <div class="fg" id="cp-parc-wrap" style="display:none">
-          <label>Número de Parcelas</label>
-          <select id="cp-parc" onchange="updCpPreview()">
-            <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
-            <option value="5">5x</option><option value="6">6x</option><option value="7">7x</option>
-            <option value="8">8x</option><option value="9">9x</option><option value="10">10x</option>
-            <option value="11">11x</option><option value="12">12x</option><option value="18">18x</option>
-            <option value="24">24x</option><option value="36">36x</option><option value="48">48x</option>
-            <option value="60">60x</option>
-          </select>
+          <label for="cp-parc">Nº de parcelas</label>
+          <input type="number" id="cp-parc" min="2" max="360" step="1" value="2" list="cp-parc-sugestoes" placeholder="Ex: 10" oninput="updCpPreview()">
+          <datalist id="cp-parc-sugestoes"><option value="2"><option value="3"><option value="4"><option value="5"><option value="6"><option value="8"><option value="10"><option value="12"><option value="18"><option value="24"><option value="36"><option value="48"><option value="60"></datalist>
         </div>
         <!-- Recorrente -->
         <div class="fg" id="cp-periodo-wrap" style="display:none">
@@ -3033,6 +3049,34 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="Semestral">Semestral</option>
             <option value="Anual">Anual</option>
           </select>
+        </div>
+      </div>
+
+      <!-- Parcelada: como vencem as parcelas -->
+      <div class="form-grid cols2" id="cp-parc-regra" style="display:none;margin-bottom:12px">
+        <div class="fg"><label for="cp-parc-modo">Vencimento das parcelas</label>
+          <select id="cp-parc-modo" onchange="setCpParcModo(this.value)">
+            <option value="mensal">Todo mês</option>
+            <option value="quinzenal">Quinzenal (a cada 15 dias)</option>
+            <option value="semanal">Semanal (a cada 7 dias)</option>
+            <option value="bimestral">A cada 2 meses</option>
+            <option value="trimestral">A cada 3 meses</option>
+            <option value="dias">A cada N dias…</option>
+            <option value="prazos">Prazos em dias (30/60/90…)</option>
+            <option value="manual">Digitar cada vencimento</option>
+          </select>
+        </div>
+        <div class="fg" id="cp-parc-dias-wrap" style="display:none"><label for="cp-parc-dias">Intervalo em dias</label>
+          <input type="number" id="cp-parc-dias" min="1" max="365" step="1" placeholder="Ex: 10" oninput="updCpPreview()">
+        </div>
+        <div class="fg" id="cp-prazos-wrap" style="display:none"><label for="cp-prazos">Prazos em dias (a partir da compra)</label>
+          <input type="text" id="cp-prazos" placeholder="Ex: 30/60/90" autocomplete="off" oninput="updCpPreview()">
+          <div class="cp-prazos-chips">
+            <button type="button" onclick="cpUsarPrazos('30/60/90')">30/60/90</button>
+            <button type="button" onclick="cpUsarPrazos('30/60/90/120')">30/60/90/120</button>
+            <button type="button" onclick="cpUsarPrazos('28/56/84')">28/56/84</button>
+            <button type="button" onclick="cpUsarPrazos('0/30/60')">entrada + 30/60</button>
+          </div>
         </div>
       </div>
 
@@ -3306,13 +3350,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Subcategoria</label><select id="g-subcat"><option value="">—</option></select></div>
       </div>
       <div class="form-grid">
-        <div class="fg"><label>Parcelas</label>
-          <select id="g-parc" onchange="updGastoPreview()">
-            <option value="1">À vista (1x)</option><option value="2">2x</option><option value="3">3x</option>
-            <option value="4">4x</option><option value="5">5x</option><option value="6">6x</option>
-            <option value="7">7x</option><option value="8">8x</option><option value="9">9x</option>
-            <option value="10">10x</option><option value="12">12x</option><option value="18">18x</option><option value="24">24x</option>
-          </select>
+        <div class="fg"><label for="g-parc">Parcelas (1 = à vista)</label>
+          <input type="number" id="g-parc" min="1" max="99" step="1" value="1" list="g-parc-sugestoes" placeholder="1 = à vista" oninput="updGastoPreview()">
+          <datalist id="g-parc-sugestoes"><option value="1"><option value="2"><option value="3"><option value="4"><option value="5"><option value="6"><option value="10"><option value="12"><option value="18"><option value="24"></datalist>
         </div>
       </div>
       <div id="g-preview" class="cp-preview" style="margin-top:12px"></div>
@@ -4185,6 +4225,13 @@ function openM(id){
     $('cp-desc').value = '';
     $('cp-obs').value  = '';
     $('cp-parc').value = '2';
+    $('cp-parc').disabled = false;
+    $('cp-parc-modo').value = 'mensal';
+    $('cp-parc-dias').value = '';
+    $('cp-prazos').value = '';
+    $('cp-parc-dias-wrap').style.display = 'none';
+    $('cp-prazos-wrap').style.display = 'none';
+    _cpPlano = [];
     $('cp-periodicidade').value = 'Mensal';
     $('cp-fim-tipo').value = 'nunca';
     $('cp-fim-data').value = '';
@@ -8573,12 +8620,13 @@ function setCpTipo(t){
   });
   const mostra = (id, ok) => { const e = document.getElementById(id); if(e) e.style.display = ok ? '' : 'none'; };
   mostra('cp-parc-wrap',    t === 'parcelada');
+  mostra('cp-parc-regra',   t === 'parcelada');
   mostra('cp-periodo-wrap', t === 'recorrente');
   mostra('cp-fim-wrap',     t === 'recorrente');
   const lblVal  = document.getElementById('cp-val-label');
   const lblVenc = document.getElementById('cp-venc-label');
   if(lblVal)  lblVal.textContent  = t === 'parcelada' ? 'Valor Total *' : t === 'recorrente' ? 'Valor de cada conta *' : 'Valor *';
-  if(lblVenc) lblVenc.textContent = t === 'unica' ? 'Vencimento *' : t === 'parcelada' ? '1º Vencimento *' : '1º Vencimento *';
+  if(lblVenc) cpRotuloVenc();
   const stLbl = document.getElementById('cp-st-label');
   if(stLbl) stLbl.textContent = t === 'unica' ? 'Status' : 'Status (1ª conta)';
   updCpFim();
@@ -8667,6 +8715,201 @@ function cpInfoCartao(venc){
            livre:+((cc.lim || 0) - limiteUsado(cc)).toFixed(2) };
 }
 
+// ══ Parcelamento: quinzenal, a cada N dias, prazos 30/60/90 e vencimentos digitados ══
+const MAX_PARC = 360;
+const MODOS_PARC = {
+  mensal:     { desc:'mensais',        data:(b, i) => addMeses(b, i) },
+  quinzenal:  { desc:'quinzenais',     data:(b, i) => addDias(b, 15 * i) },
+  semanal:    { desc:'semanais',       data:(b, i) => addDias(b, 7 * i) },
+  bimestral:  { desc:'a cada 2 meses', data:(b, i) => addMeses(b, 2 * i) },
+  trimestral: { desc:'a cada 3 meses', data:(b, i) => addMeses(b, 3 * i) },
+};
+// Linhas do parcelamento em edição: { venc, valor, dEd, vEd } — dEd/vEd = data/valor digitados à mão
+let _cpPlano = [];
+
+// "30/60/90", "30, 60, 90" ou "30 60 90" → [30, 60, 90]
+function lerPrazos(txt){
+  const partes = String(txt || '').split(/[\/,;\s]+/).filter(Boolean);
+  if(!partes.length) return { erro:'Digite os prazos em dias, ex.: 30/60/90.' };
+  const dias = partes.map(Number);
+  if(dias.some(x => !Number.isInteger(x) || x < 0 || x > 3650)) return { erro:'Prazos inválidos: use dias inteiros, ex.: 30/60/90.' };
+  if(dias.length < 2) return { erro:'Informe pelo menos dois prazos, ex.: 30/60.' };
+  if(dias.length > MAX_PARC) return { erro:`No máximo ${MAX_PARC} parcelas.` };
+  for(let i = 1; i < dias.length; i++)
+    if(dias[i] <= dias[i - 1]) return { erro:'Os prazos precisam ser crescentes, ex.: 30/60/90.' };
+  return { dias };
+}
+
+// Datas pela regra escolhida, antes dos ajustes digitados
+function cpRegraParcelas(){
+  const $ = id => document.getElementById(id);
+  const base = $('cp-venc')?.value || '';
+  const modo = $('cp-parc-modo')?.value || 'mensal';
+  const n = parseInt($('cp-parc')?.value) || 0;
+  if(!base) return { modo, erro: modo === 'prazos' ? 'Informe a data da compra.' : 'Informe o 1º vencimento.' };
+  if(modo === 'prazos'){
+    const pz = lerPrazos($('cp-prazos')?.value);
+    if(pz.erro) return { modo, erro:pz.erro };
+    return { modo, base, prazos:pz.dias, datas:pz.dias.map(x => addDias(base, x)) };
+  }
+  if(n < 2 || n > MAX_PARC) return { modo, erro:`Informe de 2 a ${MAX_PARC} parcelas.` };
+  if(modo === 'dias'){
+    const k = parseInt($('cp-parc-dias')?.value) || 0;
+    if(k < 1 || k > 365) return { modo, erro:'Informe o intervalo em dias (de 1 a 365).' };
+    return { modo, base, passo:k, datas:Array.from({ length:n }, (_, i) => addDias(base, k * i)) };
+  }
+  if(modo === 'manual'){
+    // a 1ª é o campo "1º vencimento"; as outras ficam como foram digitadas (as novas: mês seguinte)
+    const datas = [base];
+    for(let i = 1; i < n; i++){
+      const ant = _cpPlano[i];
+      datas.push(ant && ant.venc ? ant.venc : addMeses(datas[i - 1], 1));
+    }
+    return { modo, base, datas };
+  }
+  const m = MODOS_PARC[modo] || MODOS_PARC.mensal;
+  return { modo, base, datas:Array.from({ length:n }, (_, i) => m.data(base, i)) };
+}
+
+// Plano final = regra + o que foi digitado. Os valores não digitados dividem o que falta
+// para fechar o total (o último ajusta os centavos); se todos foram digitados, o total é a soma.
+function cpMontarPlano(){
+  const total = parseFloat(document.getElementById('cp-val')?.value) || 0;
+  const r = cpRegraParcelas();
+  if(r.erro) return { erro:r.erro, modo:r.modo };
+  const manual = r.modo === 'manual';
+  const linhas = r.datas.map((dt, i) => {
+    const ant = _cpPlano[i] || {};
+    const dEd = !manual && !!ant.dEd && !!ant.venc;
+    return { venc: dEd ? ant.venc : dt, dEd, vEd: !!ant.vEd, valor: ant.vEd ? ant.valor : 0 };
+  });
+  const soma = +linhas.filter(l => l.vEd).reduce((a, l) => a + l.valor, 0).toFixed(2);
+  const livres = linhas.filter(l => !l.vEd);
+  let erro = '';
+  if(livres.length){
+    const resto = +(total - soma).toFixed(2);
+    if(!total) erro = 'Informe o valor total.';
+    else if(resto < livres.length * 0.01) erro = soma > 0
+      ? `As parcelas digitadas já somam ${fmtR(soma)} e não sobra valor para as outras — ajuste o total ou as parcelas.`
+      : 'O valor total é pequeno demais para esse número de parcelas.';
+    else dividirParcelas(resto, livres.length).forEach((v, i) => { livres[i].valor = v; });
+  }
+  _cpPlano = linhas;
+  if(!erro)
+    for(let i = 1; i < linhas.length; i++)
+      if(linhas[i].venc < linhas[i - 1].venc){ erro = `A parcela ${i + 1} vence antes da parcela ${i} — confira as datas.`; break; }
+  if(!erro && linhas.some(l => !(l.valor > 0))) erro = 'Toda parcela precisa ter valor maior que zero.';
+  return { ...r, linhas, total: livres.length ? total : soma, erro };
+}
+
+function cpRotuloVenc(){
+  const tipo = document.getElementById('cp-tipo')?.value || 'unica';
+  const modo = document.getElementById('cp-parc-modo')?.value || 'mensal';
+  const lbl = document.getElementById('cp-venc-label');
+  if(lbl) lbl.textContent = tipo === 'unica' ? 'Vencimento *'
+    : (tipo === 'parcelada' && modo === 'prazos') ? 'Data da compra (base dos prazos) *' : '1º Vencimento *';
+}
+function setCpParcModo(m){
+  const $ = id => document.getElementById(id);
+  if($('cp-parc-modo') && $('cp-parc-modo').value !== m) $('cp-parc-modo').value = m;
+  // trocar a regra refaz as datas; valores digitados continuam
+  if(m !== 'manual') _cpPlano.forEach(l => { l.dEd = false; });
+  const mostra = (id, ok) => { const e = $(id); if(e) e.style.display = ok ? '' : 'none'; };
+  mostra('cp-parc-dias-wrap', m === 'dias');
+  mostra('cp-prazos-wrap', m === 'prazos');
+  if($('cp-parc')) $('cp-parc').disabled = m === 'prazos';
+  if(m === 'dias' && $('cp-parc-dias') && !$('cp-parc-dias').value) $('cp-parc-dias').value = '10';
+  cpRotuloVenc();
+  updCpPreview();
+}
+function cpUsarPrazos(txt){
+  const e = document.getElementById('cp-prazos');
+  if(e) e.value = txt;
+  updCpPreview();
+}
+// Data ou valor digitado numa linha da tabela
+function cpEditarParcela(i, campo, v){
+  const l = _cpPlano[i];
+  if(!l) return;
+  const modo = document.getElementById('cp-parc-modo')?.value || 'mensal';
+  if(campo === 'venc'){
+    if(!v) return updCpPreview();
+    l.venc = v;
+    if(i === 0 && modo === 'manual'){ const b = document.getElementById('cp-venc'); if(b) b.value = v; }
+    else l.dEd = true;
+  } else {
+    const x = Math.round((parseFloat(String(v).replace(',', '.')) || 0) * 100) / 100;
+    if(x > 0){ l.valor = x; l.vEd = true; } else l.vEd = false;
+    // todas digitadas: o valor total passa a ser a soma das parcelas
+    if(_cpPlano.every(p => p.vEd)){
+      const t = document.getElementById('cp-val');
+      if(t) t.value = String(+_cpPlano.reduce((a, p) => a + p.valor, 0).toFixed(2));
+    }
+  }
+  updCpPreview();
+}
+function cpResetParcela(i){
+  const l = _cpPlano[i];
+  if(!l) return;
+  l.dEd = false; l.vEd = false;
+  if(i > 0 && document.getElementById('cp-parc-modo')?.value === 'manual') l.venc = '';   // volta para "mês seguinte"
+  updCpPreview();
+}
+
+// Prévia do parcelamento com a tabela editável. Se a tabela já existe com o mesmo número de
+// linhas, atualiza no lugar — assim o Tab entre os campos não perde o cursor.
+function cpPintarParcelas(el, pl, linhaCartao, fmtBR){
+  const n = pl.linhas.length, prim = pl.linhas[0], ult = pl.linhas[n - 1];
+  const fixo  = pl.linhas.slice(0, -1).every(l => Math.abs(l.valor - prim.valor) < 0.005);
+  const igual = fixo && Math.abs(ult.valor - prim.valor) <= 0.05;
+  const como = pl.modo === 'prazos' ? `nos prazos ${pl.prazos.join('/')} dias da compra (${fmtBR(pl.base)})`
+    : pl.modo === 'dias' ? `a cada ${pl.passo} dias`
+    : pl.modo === 'manual' ? 'com vencimentos digitados'
+    : (MODOS_PARC[pl.modo] || MODOS_PARC.mensal).desc;
+  const valorTxt = igual
+    ? `de <strong style="color:var(--green)">${fmtR(prim.valor)}</strong>${Math.abs(ult.valor - prim.valor) >= 0.005 ? ` (a última de ${fmtR(ult.valor)} ajusta os centavos)` : ''}`
+    : `<strong style="color:var(--green)">com valores diferentes</strong>`;
+  const resumo = `<strong style="color:var(--t1)">${n} parcelas</strong> ${como} ${valorTxt}, de <strong style="color:var(--t1)">${fmtBR(prim.venc)}</strong> até <strong style="color:var(--t1)">${fmtBR(ult.venc)}</strong>.`
+    + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Total: ${fmtR(pl.total)} — cada parcela vira uma conta própria.</div>`;
+  const erro = pl.erro ? `<div class="cp-pl-erro">⚠️ ${escHtml(pl.erro)}</div>` : '';
+  let cartao = '';
+  const inf = cpInfoCartao(prim.venc);
+  if(inf){
+    const comps = pl.linhas.map(l => competenciaGasto({ data:l.venc }, inf.cc));
+    const k = new Set(comps.map(c => c.ano * 12 + c.mes)).size;
+    const c1 = comps[0], cN = comps[comps.length - 1];
+    const faixa = `de ${MESES3[c1.mes]}/${c1.ano} a ${MESES3[cN.mes]}/${cN.ano}`;
+    cartao = linhaCartao(k === n ? `uma parcela por fatura, ${faixa}` : `${n} parcelas em ${k} faturas (algumas recebem mais de uma), ${faixa}`);
+  }
+  const lista = el.querySelector('.cp-pl-lista');
+  if(lista && lista.children.length === n){
+    el.querySelector('.cp-pl-resumo').innerHTML = resumo;
+    el.querySelector('.cp-pl-erro-box').innerHTML = erro;
+    el.querySelector('.cp-pl-cartao').innerHTML = cartao;
+    pl.linhas.forEach((l, i) => {
+      const lin = lista.children[i];
+      const d = lin.querySelector('.cp-pl-data'), v = lin.querySelector('.cp-pl-valor');
+      d.value = l.venc; v.value = l.valor ? l.valor.toFixed(2) : '';
+      d.classList.toggle('ed', l.dEd); v.classList.toggle('ed', l.vEd);
+      lin.querySelector('.cp-pl-reset').style.visibility = (l.dEd || l.vEd) ? '' : 'hidden';
+    });
+    return;
+  }
+  el.innerHTML = `<div class="cp-pl-resumo">${resumo}</div>
+    <div class="cp-pl"><div class="cp-pl-erro-box">${erro}</div>
+      <div class="cp-pl-cab"><span title="Parcela">Nº</span><span>Vencimento</span><span>Valor (R$)</span><span></span></div>
+      <div class="cp-pl-lista">${pl.linhas.map((l, i) => `
+        <div class="cp-pl-lin" data-i="${i}">
+          <span class="cp-pl-num">${i + 1}/${n}</span>
+          <input type="date" class="cp-pl-data${l.dEd ? ' ed' : ''}" value="${l.venc}" aria-label="Vencimento da parcela ${i + 1}" onchange="cpEditarParcela(${i},'venc',this.value)">
+          <input type="number" class="cp-pl-valor${l.vEd ? ' ed' : ''}" step="0.01" min="0.01" value="${l.valor ? l.valor.toFixed(2) : ''}" aria-label="Valor da parcela ${i + 1}" onchange="cpEditarParcela(${i},'valor',this.value)">
+          <button type="button" class="cp-pl-reset" title="Voltar ao automático" aria-label="Voltar a parcela ${i + 1} ao automático" onclick="cpResetParcela(${i})" style="visibility:${l.dEd || l.vEd ? 'visible' : 'hidden'}">↺</button>
+        </div>`).join('')}</div>
+    </div>
+    <div class="cp-pl-dica">Digite a data ou o valor de qualquer parcela: as outras se ajustam para fechar o total. Campos <b>em destaque</b> foram digitados — ↺ volta ao automático.</div>
+    <div class="cp-pl-cartao">${cartao}</div>`;
+}
+
 // Prévia do que será criado (quantas contas, valores e datas)
 function updCpPreview(){
   updCpAvisoCartao();
@@ -8690,17 +8933,11 @@ function updCpPreview(){
   }
 
   if(tipo === 'parcelada'){
-    const n = parseInt(document.getElementById('cp-parc')?.value) || 2;
-    const vals = dividirParcelas(val, n);
-    const ult  = addMeses(venc, n - 1);
-    const dif  = vals[n-1] !== vals[0] ? ` (a última de ${fmtR(vals[n-1])} ajusta os centavos)` : '';
-    el.innerHTML = `<strong style="color:var(--t1)">${n} parcelas</strong> de <strong style="color:var(--green)">${fmtR(vals[0])}</strong>${dif},`
-      + ` de ${fmtBR(venc)} até <strong style="color:var(--t1)">${fmtBR(ult)}</strong>.`
-      + `<div style="font-size:11px;color:var(--t3);margin-top:4px">Total: ${fmtR(val)} — cada parcela vira uma conta própria.</div>`;
-    if(inf){
-      const compUlt = competenciaGasto({ data:ult }, inf.cc);
-      el.innerHTML += linhaCartao(`uma parcela por fatura, de ${MESES3[inf.mes]}/${inf.ano} a ${MESES3[compUlt.mes]}/${compUlt.ano}`);
-    }
+    const pl = cpMontarPlano();
+    // nos prazos, o nº de parcelas é a quantidade de prazos
+    if(pl.modo === 'prazos' && pl.datas){ const np = document.getElementById('cp-parc'); if(np) np.value = pl.datas.length; }
+    if(!pl.linhas){ el.innerHTML = `<span style="color:var(--red)">⚠️ ${escHtml(pl.erro)}</span>`; return; }
+    cpPintarParcelas(el, pl, linhaCartao, fmtBR);
     return;
   }
 
@@ -8734,14 +8971,17 @@ function updCpAvisoCartao(){
     el.innerHTML = 'Cadastre um cartão na aba <b>Cartões</b> para usar esta opção.';
     return;
   }
-  const venc = document.getElementById('cp-venc')?.value || '';
+  let venc = document.getElementById('cp-venc')?.value || '';
   const val  = parseFloat(document.getElementById('cp-val')?.value) || 0;
   const tipo = document.getElementById('cp-tipo')?.value || 'unica';
+  let primeira = val;
+  if(tipo === 'parcelada'){
+    const pl = cpMontarPlano();
+    if(pl.linhas && pl.linhas.length){ venc = pl.linhas[0].venc; primeira = pl.linhas[0].valor; }
+  }
   const inf  = cpInfoCartao(venc);
   if(!inf){ el.innerHTML = 'Informe o vencimento para ver em qual fatura a conta entra.'; return; }
   const fmtBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
-  const primeira = tipo === 'parcelada'
-    ? dividirParcelas(val, parseInt(document.getElementById('cp-parc')?.value) || 2)[0] : val;
   const estoura = primeira > 0 && primeira > inf.livre;
   el.innerHTML = `Cobrança em ${fmtBR(venc)} → fatura de <b style="color:var(--purple)">${MESES[inf.mes]}/${inf.ano}</b>`
     + ` (vence ${fmtBR(inf.vencFat)}) · limite livre <b style="color:${estoura ? 'var(--red)' : 'var(--t1)'}">${fmtR(inf.livre)}</b>`
@@ -8839,6 +9079,9 @@ function saveConta(){
   const fimTipo = $('cp-fim-tipo')?.value || 'nunca';
   const fimAte  = $('cp-fim-data')?.value || '';
   const fimQtd  = parseInt($('cp-fim-qtd')?.value) || 0;
+  // Parcelado: datas e valores vêm do plano (regra + o que foi digitado na tabela)
+  const plano = (tipo === 'parcelada' && !editId) ? cpMontarPlano() : null;
+  if(plano && plano.erro) return falha(plano.erro);
   if(tipo === 'recorrente' && !editId){
     if(fimTipo === 'ate' && !fimAte)   return falha('Informe a data final da recorrência.');
     if(fimTipo === 'ate' && fimAte < venc) return falha('A data final deve ser depois do 1º vencimento.');
@@ -8912,12 +9155,11 @@ function saveConta(){
   };
 
   if(tipo === 'parcelada'){
-    const n = Math.max(2, parseInt($('cp-parc')?.value) || 2);
-    const vals = dividirParcelas(val, n);
+    const n = plano.linhas.length;
     const grupoId = uid();
     for(let i = 0; i < n; i++){
       const conta = {
-        id: uid(), venc: addMeses(venc, i), valor: vals[i],
+        id: uid(), venc: plano.linhas[i].venc, valor: plano.linhas[i].valor,
         desc: `${desc} (${i+1}/${n})`, cat, subcat, obs,
         rec: 'Única', dataPg: '', status: 'Pendente',
         parcela: i+1, totalParcelas: n, grupoId,
@@ -10176,6 +10418,7 @@ function saveGasto(){
   if(!_ccSel) return falha('Selecione um cartão.');
   if(!desc)   return falha('Informe a descrição da compra.');
   if(!val||val<=0) return falha('Informe um valor maior que zero.');
+  if(parc>99) return falha('Informe de 1 a 99 parcelas.');
   if(err) err.style.display='none';
   const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
   if(!c)return;

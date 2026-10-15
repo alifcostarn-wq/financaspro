@@ -4,6 +4,64 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-15] Parcelamento: quinzenal, parcelas e vencimentos digitados, prazos
+
+### 🎯 O que foi pedido
+
+Na conta a pagar parcelada: opção de **parcelas quinzenais**, **número de parcelas digitado**,
+**vencimentos digitados** e **prazos**.
+
+### 🐛 O que limitava
+
+- O número de parcelas era uma lista fixa (2x a 12x, 18x, 24x, 36x, 48x, 60x): 13x, 15x ou 20x não
+  dava para escolher.
+- As parcelas venciam sempre **mês a mês** a partir do 1º vencimento — não havia quinzenal, semanal
+  nem prazos como "30/60/90 dias".
+- Não dava para mudar a data ou o valor de uma parcela específica antes de salvar.
+
+### ✨ Implementado
+
+- **Nº de parcelas digitado:** qualquer número de 2 a 360, com sugestões rápidas ao clicar no campo.
+- **"Vencimento das parcelas"**, um campo novo com as regras:
+  - **Todo mês** (como antes, mesmo dia; dia 31 vira o último dia do mês quando preciso);
+  - **Quinzenal** (a cada 15 dias) e **Semanal** (a cada 7 dias);
+  - **A cada 2 meses** e **A cada 3 meses**;
+  - **A cada N dias** — você digita o intervalo (ex.: 10 dias);
+  - **Prazos em dias** — como no boleto, contados da **data da compra**: digite `30/60/90` (ou use
+    os atalhos 30/60/90, 30/60/90/120, 28/56/84 e "entrada + 30/60"). O nº de parcelas sai da
+    quantidade de prazos;
+  - **Digitar cada vencimento** — você escolhe a data de cada parcela.
+- **Tabela de parcelas editável na prévia:** mostra todas as parcelas com data e valor, e qualquer
+  uma pode ser alterada:
+  - **data digitada** fica, mesmo mudando o total ou o número de parcelas (trocar a regra refaz as
+    datas);
+  - **valor digitado** fica, e as **outras parcelas se ajustam** para fechar o total; se você
+    digitar o valor de todas, o **valor total passa a ser a soma**;
+  - os campos digitados ficam **em destaque**, e o **↺** volta a parcela ao automático;
+  - a tabela é atualizada no lugar: dá para ir de campo em campo com Tab sem perder o cursor.
+- **Avisos que impedem salvar errado:** parcelas fora de ordem ("A parcela 3 vence antes da
+  parcela 2"), valores digitados que passam do total, prazos inválidos ou fora de ordem, e menos
+  de 2 parcelas.
+- **No cartão:** a prévia mostra quantas faturas as parcelas ocupam — no quinzenal, algumas faturas
+  recebem duas parcelas.
+- **Compra no cartão:** o campo "Parcelas" também passou a ser digitado (1 = à vista, até 99x).
+
+### 🧪 Testes
+
+- **`test-parcelas.js` — 32 verificações:** 13 parcelas digitadas (com fim de mês), quinzenal,
+  semanal, a cada 2/3 meses, a cada N dias, prazos 30/60/90 e entrada + 30/60, prazos inválidos,
+  valores digitados (um, dois, todos), ↺, valor acima do total, datas digitadas que ficam e que
+  são refeitas ao trocar a regra, vencimentos digitados, datas fora de ordem, parcelas no cartão
+  e compra no cartão em 11x/150x.
+- Suítes existentes seguem passando — **740 verificações** no total (as contas parceladas mês a mês
+  continuam iguais).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Só muda como as **novas** contas parceladas são criadas; as já cadastradas ficam como estão.
+
+---
+
 ## [2026-10-14] Logo e ícones do FinançasPro
 
 ### 🎯 O que foi pedido
