@@ -1027,6 +1027,16 @@ body.theme-light{--pg-conta:#eda100;--pg-cartao:#2a78d6;--pg-divida:#e87ba4}
 #page-contas .cp-item .d .badge{margin-left:6px}
 #page-contas tr.cp-est td{background:repeating-linear-gradient(135deg,transparent 0 10px,var(--surface2) 10px 11px)}
 #page-contas #cp-tbody td.cp-val,#page-contas #cp-tbody .badge{white-space:nowrap}
+#page-contas td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle}
+#page-contas .cp-mais{width:32px;height:28px;border-radius:7px;border:1px solid var(--line2);background:var(--surface2);color:var(--t2);font-size:16px;font-weight:700;line-height:1;cursor:pointer;letter-spacing:1px}
+#page-contas .cp-mais:hover,#page-contas .cp-mais.on{color:var(--t1);border-color:var(--blue);background:var(--blue-dim)}
+#page-contas .cp-mais:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.cp-acoes-pop{position:fixed;z-index:400;min-width:200px;background:var(--surface1);border:1px solid var(--line2);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:2px}
+.cp-acoes-pop[hidden]{display:none}
+.cp-acoes-pop .btn{width:100%;justify-content:flex-start;text-align:left;border:none;background:transparent;color:var(--t1);font-size:12px;padding:8px 10px;border-radius:7px;font-weight:500}
+.cp-acoes-pop .btn:hover,.cp-acoes-pop .btn:focus-visible{background:var(--surface3);outline:none}
+.cp-acoes-pop .btn-green{color:var(--green);font-weight:700}
+.cp-acoes-pop .btn-red{color:var(--red);border-top:1px solid var(--line);border-radius:0 0 7px 7px;margin-top:2px}
 #page-contas #cp-tbody .tbl-actions .btn{white-space:nowrap}
 @media (max-width:1100px){
   #page-contas .cp-proj-corpo{grid-template-columns:1fr}
@@ -10799,6 +10809,64 @@ function celulaOrigemPagar(x){
 function celulaCatPagar(cat, sub){
   return `<td><span class="cat-tag" style="font-size:9px">${escHtml(cat || '—')}</span>${sub ? `<div class="cp-nota">${escHtml(sub)}</div>` : ''}</td>`;
 }
+// ── Ações da linha num botão só (⋯) ──
+// A linha guarda as ações numa lista escondida; o botão copia a lista para um menu
+// flutuante (fora da tabela, para não ser cortado pela rolagem dela).
+function acoesPagar(nome, itens){
+  const lista = itens.filter(Boolean).map(i =>
+    `<button type="button" role="menuitem" class="btn ${i.c || 'btn-ghost'} btn-xs cp-ac" onclick="${i.f}">${i.r}</button>`).join('');
+  return `<td class="tbl-actions cp-acoes">
+        <button type="button" class="cp-mais" aria-haspopup="menu" aria-expanded="false" title="Ações" aria-label="Ações de ${escAttr(nome || '')}" onclick="cpAcoes(this)">⋯</button>
+        <div class="cp-acoes-lista" hidden>${lista}</div>
+      </td>`;
+}
+let _cpAcoesBtn = null;
+function cpFecharAcoes(foco){
+  const pop = document.getElementById('cp-acoes-pop');
+  if(pop) pop.hidden = true;
+  if(_cpAcoesBtn){ _cpAcoesBtn.setAttribute('aria-expanded', 'false'); _cpAcoesBtn.classList.remove('on'); if(foco && document.contains(_cpAcoesBtn)) _cpAcoesBtn.focus(); }
+  _cpAcoesBtn = null;
+}
+function cpAcoes(btn){
+  if(_cpAcoesBtn === btn) return cpFecharAcoes(true);
+  cpFecharAcoes();
+  let pop = document.getElementById('cp-acoes-pop');
+  if(!pop){
+    pop = document.createElement('div');
+    pop.id = 'cp-acoes-pop'; pop.className = 'cp-acoes-pop'; pop.setAttribute('role', 'menu');
+    pop.addEventListener('keydown', e => {
+      const its = [...pop.querySelectorAll('button')], i = its.indexOf(document.activeElement);
+      if(e.key === 'Escape'){ e.preventDefault(); cpFecharAcoes(true); }
+      else if(e.key === 'ArrowDown'){ e.preventDefault(); its[(i + 1) % its.length].focus(); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); its[(i - 1 + its.length) % its.length].focus(); }
+      else if(e.key === 'Tab') cpFecharAcoes();
+    });
+    document.body.appendChild(pop);
+    document.addEventListener('mousedown', e => {
+      if(_cpAcoesBtn && !e.target.closest('#cp-acoes-pop') && e.target !== _cpAcoesBtn) cpFecharAcoes();
+    });
+    window.addEventListener('resize', () => cpFecharAcoes());
+    // ao rolar, o menu acompanha o botão; se o botão sai da tela, fecha
+    document.addEventListener('scroll', e => { if(_cpAcoesBtn && !(e.target.closest && e.target.closest('#cp-acoes-pop'))) cpPosAcoes(); }, true);
+  }
+  pop.innerHTML = btn.nextElementSibling.innerHTML;
+  // fecha antes de executar: a ação pode abrir um modal ou redesenhar a lista
+  pop.querySelectorAll('button').forEach(b => b.addEventListener('click', () => cpFecharAcoes(), { capture:true }));
+  pop.hidden = false;
+  _cpAcoesBtn = btn; btn.setAttribute('aria-expanded', 'true'); btn.classList.add('on');
+  cpPosAcoes();
+  const prim = pop.querySelector('button'); if(prim) prim.focus({ preventScroll:true });
+}
+// Abaixo do botão, alinhado à direita; sem espaço embaixo, abre para cima
+function cpPosAcoes(){
+  const pop = document.getElementById('cp-acoes-pop'), btn = _cpAcoesBtn;
+  if(!pop || !btn) return;
+  const r = btn.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+  if(!document.contains(btn) || r.bottom < 0 || r.top > window.innerHeight) return cpFecharAcoes();
+  const cabeEmbaixo = r.bottom + 6 + h <= window.innerHeight - 8;
+  pop.style.top  = `${Math.max(8, cabeEmbaixo ? r.bottom + 6 : r.top - h - 6)}px`;
+  pop.style.left = `${Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8))}px`;
+}
 function linhaContaPagar(x, d){
   const c = x.conta, st = x.status;
   const fat = x.tipo === 'conta-cartao' ? x.fat : null;
@@ -10826,15 +10894,12 @@ function linhaContaPagar(x, d){
         ${c.caixaNome ? `<div style="font-size:9px;color:var(--t3)">🏦 ${c.caixaNome}</div>` : ''}
       </td>
       <td><span class="badge ${fat && fat.paga ? 'bdg-green' : (stBdg[st]||'bdg-gray')}" ${fat ? 'title="Paga junto com a fatura do cartão"' : ''}>${fat ? (fat.paga ? '💳 Fatura paga' : '💳 No cartão') : st}</span></td>
-      <td class="tbl-actions">
-        ${fat
-          ? `<button class="btn btn-ghost btn-xs" onclick="abrirFaturaDaConta('${c.id}')" title="Ver a fatura do cartão">💳 Fatura</button>`
-          : st !== 'Pago'
-          ? `<button class="btn btn-green btn-xs" onclick="pagarConta('${c.id}')">✓ Pagar</button>`
-          : `<button class="btn btn-ghost btn-xs" onclick="desfazerPagamento('${c.id}')" title="Desfazer pagamento">↩</button>`}
-        <button class="btn btn-ghost btn-xs" onclick="editConta('${c.id}')" title="Editar">✎</button>
-        <button class="btn btn-red btn-xs" onclick="delConta('${c.id}')" title="Excluir">✕</button>
-      </td>
+      ${acoesPagar(c.desc, [
+        fat ? { r:'💳 Ver fatura do cartão', f:`abrirFaturaDaConta('${c.id}')` }
+          : st !== 'Pago' ? { r:'✓ Pagar', f:`pagarConta('${c.id}')`, c:'btn-green' }
+          : { r:'↩ Desfazer pagamento', f:`desfazerPagamento('${c.id}')` },
+        { r:'✎ Editar', f:`editConta('${c.id}')` },
+        { r:'✕ Excluir', f:`delConta('${c.id}')`, c:'btn-red' } ])}
     </tr>`;
 }
 function linhaFaturaPagar(x, busca){
@@ -10866,11 +10931,10 @@ function linhaFaturaPagar(x, busca){
         ${x.caixaNome ? `<div style="font-size:9px;color:var(--t3)">🏦 ${escHtml(x.caixaNome)}</div>` : ''}
       </td>
       <td><span class="badge ${stBdg}">${x.status}</span></td>
-      <td class="tbl-actions">
-        ${x.aberto ? `<button class="btn btn-green btn-xs" onclick="pagarFatura('${x.cc.id}',${x.mes},${x.ano})">✓ Pagar</button>`
-          : x.fatId ? `<button class="btn btn-ghost btn-xs" onclick="desfazerPagFat('${x.cc.id}','${x.fatId}')" title="Desfazer pagamento">↩</button>` : ''}
-        <button class="btn btn-ghost btn-xs" onclick="abrirFatura('${x.cc.id}',${x.mes},${x.ano})" title="Ver a fatura no cartão">💳 Fatura</button>
-      </td>
+      ${acoesPagar(descPagavel(x), [
+        x.aberto ? { r:'✓ Pagar fatura', f:`pagarFatura('${x.cc.id}',${x.mes},${x.ano})`, c:'btn-green' }
+          : x.fatId ? { r:'↩ Desfazer pagamento', f:`desfazerPagFat('${x.cc.id}','${x.fatId}')` } : null,
+        { r:'💳 Ver fatura no cartão', f:`abrirFatura('${x.cc.id}',${x.mes},${x.ano})` } ])}
     </tr>${aberta ? linhaItensFatura(x) : ''}`;
 }
 // Compras que compõem a fatura (abre e fecha pela própria linha)
@@ -10905,12 +10969,10 @@ function linhaDividaPagar(x){
         ${x.caixaNome ? `<div style="font-size:9px;color:var(--t3)">🏦 ${escHtml(x.caixaNome)}</div>` : ''}
       </td>
       <td><span class="badge ${stBdg}"${est ? ' title="Dívida sem parcelas cadastradas: valor estimado pela parcela mensal"' : ''}>${x.status}</span></td>
-      <td class="tbl-actions">
-        ${est ? '' : x.aberto
-          ? `<button class="btn btn-green btn-xs" onclick="pagarParcela('${x.dv.id}','${pc.id}')">✓ Pagar</button>`
-          : `<button class="btn btn-ghost btn-xs" onclick="desfazerPgDiv('${x.dv.id}','${pc.id}')" title="Desfazer pagamento">↩</button>`}
-        <button class="btn btn-ghost btn-xs" onclick="abrirDivida('${x.dv.id}')" title="Ver a dívida">📉 Dívida</button>
-      </td>
+      ${acoesPagar(x.desc, [
+        est ? null : x.aberto ? { r:'✓ Pagar parcela', f:`pagarParcela('${x.dv.id}','${pc.id}')`, c:'btn-green' }
+          : { r:'↩ Desfazer pagamento', f:`desfazerPgDiv('${x.dv.id}','${pc.id}')` },
+        { r:'📉 Ver dívida', f:`abrirDivida('${x.dv.id}')` } ])}
     </tr>`;
 }
 function cpAlternarFatura(chave){

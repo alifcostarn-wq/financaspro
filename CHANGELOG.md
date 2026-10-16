@@ -4,6 +4,41 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-16] Contas a Pagar: ações da linha num menu só (⋯)
+
+### 🎯 O que foi pedido
+
+Juntar os botões de ação de Contas a Pagar num só, que ao clicar mostra as opções, para compactar o espaço.
+
+### ✨ Implementado
+
+- Cada linha tem agora **um único botão ⋯** no lugar de 2–3 botões. Clicando, abre um **menu** com as
+  ações daquela linha, com o nome completo de cada uma:
+  - **Conta:** ✓ Pagar (ou ↩ Desfazer pagamento, se já paga), ✎ Editar, ✕ Excluir;
+  - **Conta no cartão:** 💳 Ver fatura do cartão, ✎ Editar, ✕ Excluir;
+  - **Fatura:** ✓ Pagar fatura (ou ↩ Desfazer), 💳 Ver fatura no cartão;
+  - **Parcela de dívida:** ✓ Pagar parcela (ou ↩ Desfazer), 📉 Ver dívida.
+- **Pagar** vem em destaque no topo e **Excluir** fica separado no fim, em vermelho (e continua pedindo
+  confirmação).
+- O menu abre embaixo do botão — ou para cima, quando não há espaço — sempre dentro da tela, também no
+  celular. Fecha ao escolher uma opção, ao clicar fora, no ⋯ de novo ou com **Esc**; dá para navegar
+  pelas opções com as **setas** do teclado.
+- A coluna de ações ficou estreita, sobrando mais espaço para descrição e valores.
+
+### 🧪 Testes
+
+- **`test-acoes.js` — 28 verificações** (computador e celular): um botão por linha, opções certas para
+  conta, conta paga, conta no cartão, fatura, parcela e dívida estimada, teclado (setas e Esc), fechar
+  clicando fora, Pagar abrindo o pagamento, Excluir pedindo confirmação, menu dentro da tela no fim da
+  lista e sem rolagem lateral.
+- Todas as suítes passando — **884 verificações**.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum: só muda a forma de acessar as ações.
+
+---
+
 ## [2026-10-16] Central de Relatórios: 15 relatórios analíticos, modulares e dinâmicos
 
 ### 🎯 O que foi pedido
