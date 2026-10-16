@@ -4,6 +4,82 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-16] Contas a Pagar com tudo o que há para pagar (contas, cartões e dívidas) e quanto reduz nos próximos meses
+
+### 🎯 O que foi pedido
+
+Toda conta a pagar — boleto, cartão etc. — tem que aparecer em **Contas a Pagar**, mesmo atrelada ao
+cartão, para analisar o **total de contas a pagar no mês** e saber, **para frente, quanto ele reduz**.
+
+### 🐛 O que limitava
+
+- Contas a Pagar só listava as contas cadastradas nela. Compras feitas no cartão (inclusive as
+  parceladas) e parcelas de dívidas não apareciam: o total do mês ficava menor do que o que de fato
+  sai do caixa.
+- A conta lançada no cartão aparecia, mas ficava fora do "Em Aberto" (só uma nota "+ no cartão"), sem
+  a fatura que a paga.
+- Não havia visão dos próximos meses: quanto vai sair em cada um e quando cada parcelamento termina.
+
+### ✨ Implementado
+
+- **Tudo numa lista só**, com a nova coluna **Origem** (mesma cor do gráfico):
+  - 🧾 **Contas** (boleto, PIX, débito…), como antes;
+  - 💳 **Faturas de cartão** — uma linha por fatura, no mês em que vence, com o valor da fatura (o mesmo
+    da aba Cartões). Mostra se está aberta para compras ou fechada e quantas compras e parceladas tem;
+    **▸ N compras** abre o que compõe a fatura (data, descrição, parcela 4/10, valor nesta fatura).
+    Botões **✓ Pagar** (abre o pagamento já no mês certo), **↩** desfazer e **💳 Fatura** (abre na aba Cartões);
+  - 💳 **Contas no cartão** continuam na lista, marcadas "dentro da fatura": entram no total **uma vez só**,
+    pela fatura — nada é contado em dobro;
+  - 📉 **Parcelas de dívidas** — cada parcela no seu vencimento, com **✓ Pagar** (abre a parcela certa),
+    **↩** desfazer e **📉 Dívida** (abre a dívida com as parcelas à mostra);
+  - 📉 **Dívidas sem parcelas cadastradas** (só saldo e parcela mensal, como as que vieram das planilhas)
+    entram com a **parcela mensal estimada** até o saldo acabar, marcadas "Estimada" e "sem dia definido".
+- **KPIs do mês com todas as origens:** "Total a pagar · Out/2026" (com quantas contas, faturas e
+  parcelas), Em Aberto (com quanto é de cartão), Pago, Vencidas e Vence em 7 dias.
+- **Filtro de Origem** (Contas, Cartões, Dívidas). Status, categoria e busca valem para tudo — a busca
+  acha a compra dentro da fatura e já abre a fatura.
+- **"Vence HOJE"** mostra também fatura e parcela de dívida, cada uma com o seu botão de pagar.
+- **Novo painel "Total a pagar por mês"** (12 meses, do atual em diante):
+  - destaques do **mês atual** (pago, falta e o que ficou vencido de meses anteriores), do **próximo mês**
+    e do **último mês da projeção**, com a variação — ▼ quanto reduz, em R$ e em %;
+  - **gráfico de colunas empilhadas** Contas · Cartões · Dívidas (cores testadas para daltonismo, um eixo
+    só, legenda) e a mesma informação em **Tabela**, com "vs. este mês" e o que termina em cada mês;
+  - **"Parcelamentos que terminam"**: o último mês de cada parcelamento (conta parcelada, compra parcelada
+    no cartão, dívida, recorrência com fim) e quanto deixa de sair a partir do mês seguinte;
+  - resumo em texto, por exemplo: "Até Setembro/2027 o total do mês cai de R$ 3.464,22 para R$ 1.500,00:
+    R$ 1.964,22 a menos por mês (−57%)";
+  - clicar num mês (coluna, linha da tabela ou parcelamento) leva a lista para esse mês; clicar de novo
+    volta para o ano todo.
+- **Pílula do menu** (Contas a Pagar) conta também faturas e parcelas vencidas ou a vencer em 7 dias.
+- Pagar uma fatura de outro ano (ex.: uma atrasada) já abre o modal com o ano certo.
+- Na lista, Categoria e Subcategoria passaram a dividir a mesma coluna, para caber a coluna Origem.
+
+### 🧪 Testes
+
+- **`test-pagar.js` — 73 verificações:** motor (fatura igual à da aba Cartões, fatura paga vale o que
+  foi pago, conta no cartão fora da soma e dentro da fatura, dívida estimada com o resto no último mês,
+  totais dos 12 meses, invariantes, o que termina — inclusive quinzenal, parcelada no cartão e recorrente
+  com fim), tela (KPIs, origem, linhas, compras da fatura, filtros, busca, "vence hoje", pílula,
+  destaques, gráfico, tabela, clique no mês, mês do ano seguinte), pagar e desfazer fatura e parcela pela
+  lista, tema claro, sem dados, celular e desempenho (1.200 compras + 300 contas: a tela monta em ~26 ms).
+- `test-conta-cartao.js` atualizado para a regra nova: "Em Aberto" agora é o que sai do caixa (as
+  faturas) e a pílula conta a fatura vencida — a conta no cartão continua sem contar duas vezes.
+- Os testes que recarregam a página passaram a usar um servidor HTTP local: no `file://` o Chromium às
+  vezes recarregava com o armazenamento vazio — era a causa das falhas intermitentes do teste do plano
+  de contas (agora 25 de 25).
+- Todas as suítes passando — **813 verificações**.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado é alterado: faturas, parcelas e estimativas são calculadas na hora, a partir do que já está
+cadastrado. O que muda é o que aparece na aba e nos totais:
+
+- "Em Aberto", "Vencidas" e a pílula do menu agora incluem faturas de cartão e parcelas de dívidas.
+- Faturas antigas que nunca foram registradas como pagas aparecem como **vencidas** (como já aparecem
+  na aba Cartões). Registre o pagamento delas para os totais ficarem certos.
+
+---
+
 ## [2026-10-15] Parcelamento: quinzenal, parcelas e vencimentos digitados, prazos
 
 ### 🎯 O que foi pedido
