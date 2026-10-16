@@ -1041,6 +1041,100 @@ body.theme-light{--pg-conta:#eda100;--pg-cartao:#2a78d6;--pg-divida:#e87ba4}
   #page-contas .cp-item{grid-template-columns:60px minmax(0,1fr) 72px;gap:8px;padding:6px 10px}
   #page-contas .cp-item .n{display:none}
 }
+
+/* ── Central de Relatórios ── */
+#page-rel .tgl-central{color:var(--blue)}
+#page-rel .tgl-central.active{color:var(--t1)}
+#rel-central .cr-barra{padding:14px 16px;margin-bottom:12px}
+#rel-central .cr-filtros{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+#rel-central .cr-f{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+#rel-central .cr-f select,#rel-central .cr-f input,#rel-central .cr-sel-mini,#rel-central .cr-sel-cel{background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:7px 10px;border-radius:var(--r2);font:500 12px 'Sora',sans-serif;text-transform:none;letter-spacing:0}
+#rel-central .cr-pers{display:flex;gap:12px}
+#rel-central .cr-chk{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--t2);cursor:pointer;padding-bottom:8px}
+#rel-central .cr-faixa{font-size:11px;color:var(--t3);margin-top:10px}
+#rel-central .cr-vistas{margin-bottom:12px}
+#rel-central .cr-corpo{display:grid;grid-template-columns:232px minmax(0,1fr);gap:14px;align-items:start}
+#rel-central .cr-menu{padding:10px;margin:0;position:sticky;top:12px}
+#rel-central .cr-menu-gp{font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;padding:10px 8px 4px}
+#rel-central .cr-menu-gp:first-child{padding-top:2px}
+#rel-central .cr-menu-it{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:none;background:transparent;color:var(--t2);font:500 12px 'Sora',sans-serif;padding:7px 8px;border-radius:7px;cursor:pointer}
+#rel-central .cr-menu-it:hover{background:var(--surface2);color:var(--t1)}
+#rel-central .cr-menu-it.on{background:var(--blue-dim);color:var(--t1);box-shadow:inset 2px 0 0 var(--blue)}
+#rel-central .cr-menu-it .cr-pin{margin-left:auto;font-size:10px}
+#rel-central .cr-ic{display:inline-flex;width:20px;justify-content:center;flex-shrink:0}
+#rel-central .cr-sel-cel{display:none;width:100%}
+#rel-central .cr-rel{margin:0;min-width:0}
+#rel-central .cr-cab{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
+#rel-central .cr-cab-txt{min-width:0;flex:1 1 320px}
+#rel-central .cr-cab h2,#rel-central .cr-painel-cab h2{font-size:16px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:6px}
+#rel-central .cr-cab p,#rel-central .cr-painel-cab p{font-size:11.5px;color:var(--t3);margin-top:4px;line-height:1.5}
+#rel-central .cr-cab-faixa{display:inline-block;margin-top:8px;font-size:10.5px;color:var(--t2);background:var(--surface2);border:1px solid var(--line);border-radius:20px;padding:3px 10px}
+#rel-central .cr-acoes{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#rel-central .cr-fmts{margin-bottom:0}
+#rel-central .cr-fmts .tgl{padding:5px 10px}
+#rel-central .cr-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+#rel-central .cr-kpis.mini{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+#rel-central .cr-kpi{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:11px 13px;min-width:0}
+#rel-central .cr-kpi.ruim{box-shadow:inset 3px 0 0 var(--red)}
+#rel-central .cr-kpi.bom{box-shadow:inset 3px 0 0 var(--green)}
+#rel-central .cr-kpi-l{font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+#rel-central .cr-kpi-v{font:700 18px 'JetBrains Mono',monospace;color:var(--t1);margin:5px 0 3px;letter-spacing:-.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rel-central .cr-kpis.mini .cr-kpi-v{font-size:15px}
+#rel-central .cr-kpi-s{font-size:10.5px;color:var(--t3);line-height:1.45}
+#rel-central .cr-var{font-weight:600;white-space:nowrap}
+#rel-central .cr-var.bom{color:var(--green)}
+#rel-central .cr-var.ruim{color:var(--red)}
+#rel-central .cr-var.neutro{color:var(--t3)}
+#rel-central .cr-sub-tit{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:8px}
+#rel-central .cr-graf{margin-bottom:16px}
+#rel-central .cr-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--t2);margin-bottom:6px}
+#rel-central .cr-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+#rel-central .cr-tab{margin-top:4px}
+#rel-central .cr-tabela td.num,#rel-central .cr-tabela th.num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap}
+#rel-central .cr-tabela tfoot td{font-weight:700;color:var(--t1);border-top:2px solid var(--line2);background:var(--surface2)}
+#rel-central .cr-notas{margin-top:12px;font-size:11px;color:var(--t3);line-height:1.55}
+#rel-central .cr-notas p+p{margin-top:4px}
+#rel-central .cr-aviso{font-size:11.5px;color:var(--t2);background:var(--blue-dim);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-bottom:12px}
+#rel-central .cr-vazio{font-size:12.5px;color:var(--t3);text-align:center;padding:40px 16px;line-height:1.6}
+#rel-central .cr-calor{margin-bottom:16px}
+#rel-central .cr-calor table{border-collapse:separate;border-spacing:3px;font-size:9.5px}
+#rel-central .cr-calor th{color:var(--t3);font-weight:600;padding:0 2px;white-space:nowrap;text-align:center}
+#rel-central .cr-calor tbody th{text-align:right;padding-right:6px;font-family:'JetBrains Mono',monospace}
+#rel-central .cr-calor td{width:18px;height:18px;min-width:18px;border-radius:4px;background:var(--surface2)}
+#rel-central .cr-calor td.x{background:transparent}
+#rel-central .cr-calor-esc{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);margin-top:6px}
+#rel-central .cr-calor-esc i{width:14px;height:10px;border-radius:2px;display:inline-block}
+#rel-central .cr-painel{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:12px;margin-top:12px}
+#rel-central .cr-bloco{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;background:var(--surface1);min-width:0}
+#rel-central .cr-bloco-cab{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+#rel-central .cr-bloco-tit{border:none;background:none;color:var(--t1);font:600 12.5px 'Sora',sans-serif;cursor:pointer;padding:0;text-align:left}
+#rel-central .cr-bloco-tit:hover{color:var(--blue);text-decoration:underline}
+#rel-central .cr-bloco-ac{display:flex;gap:4px}
+#rel-central .cr-bloco-ac button{border:1px solid var(--line2);background:var(--surface2);color:var(--t2);border-radius:6px;width:26px;height:24px;cursor:pointer;font-size:10px}
+#rel-central .cr-bloco-ac button:disabled{opacity:.35;cursor:default}
+#rel-central .cr-bloco .cr-vazio{padding:24px 8px}
+@media (max-width:900px){
+  #rel-central .cr-corpo{grid-template-columns:1fr}
+  #rel-central .cr-menu{display:none}
+  #rel-central .cr-sel-cel{display:block}
+  #rel-central .cr-painel{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+  #rel-central .cr-filtros{gap:10px}
+  #rel-central .cr-f{flex:1 1 calc(50% - 5px);min-width:0}
+  #rel-central .cr-f select,#rel-central .cr-f input{width:100%;min-width:0}
+  #rel-central .cr-pers{flex:1 1 100%}
+  #rel-central .cr-kpis{grid-template-columns:1fr 1fr;gap:8px}
+  #rel-central .cr-kpi-v{font-size:15px}
+  #rel-central .cr-acoes{width:100%}
+  #rel-central .cr-fmts{max-width:100%}
+}
+@media print{
+  body.cr-imprimindo *{visibility:hidden !important}
+  body.cr-imprimindo #cr-rel,body.cr-imprimindo #cr-rel *{visibility:visible !important}
+  body.cr-imprimindo #cr-rel{position:absolute;left:0;top:0;width:100%;border:none}
+  body.cr-imprimindo #cr-rel .cr-acoes{display:none !important}
+}
 </style>
 </head>
 <body>
@@ -1574,6 +1668,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     </div>
   </div>
   <div class="toggle-row">
+    <div class="tgl tgl-central" onclick="tglRel('central',this)">★ Central de Relatórios</div>
     <div class="tgl active" onclick="tglRel('anual',this)">Visão Anual</div>
     <div class="tgl" onclick="tglRel('cat',this)">Por Categoria</div>
     <div class="tgl" onclick="tglRel('despesas',this)">Despesas Pessoais</div>
@@ -1581,6 +1676,33 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="tgl" onclick="tglRel('dre-mensal',this)">DRE Mensal</div>
     <div class="tgl" onclick="tglRel('dre-semanal',this)">DRE Semanal</div>
     <div class="tgl" onclick="tglRel('dre-diario',this)">DRE Diário</div>
+  </div>
+
+  <!-- Central de Relatórios: catálogo modular, filtros comuns e painel fixável -->
+  <div id="rel-central" style="display:none">
+    <div class="card cr-barra">
+      <div class="cr-filtros">
+        <label class="cr-f"><span>Período</span><select id="cr-periodo" onchange="crSet('periodo',this.value)"></select></label>
+        <div id="cr-pers" class="cr-pers" style="display:none">
+          <label class="cr-f"><span>De</span><input type="month" id="cr-de" onchange="crSet('de',this.value)"></label>
+          <label class="cr-f"><span>Até</span><input type="month" id="cr-ate" onchange="crSet('ate',this.value)"></label>
+        </div>
+        <label class="cr-f"><span>Comparar com</span><select id="cr-comparar" onchange="crSet('comparar',this.value)">
+          <option value="anterior">Período anterior</option><option value="ano">Mesmo período do ano passado</option><option value="nenhum">Sem comparação</option>
+        </select></label>
+        <label class="cr-chk" title="Cada compra do cartão entra pela categoria dela, no mês da fatura (em vez do pagamento da fatura)"><input type="checkbox" id="cr-cartao" onchange="crSet('cartao',this.checked)"> 💳 Compras do cartão por categoria</label>
+      </div>
+      <div class="cr-faixa" id="cr-faixa"></div>
+    </div>
+    <div class="toggle-row cr-vistas" role="tablist" aria-label="Relatório ou painel">
+      <div class="tgl active" id="cr-v-rel" role="tab" tabindex="0" aria-selected="true" onclick="crSet('vista','rel')">📄 Relatório</div>
+      <div class="tgl" id="cr-v-painel" role="tab" tabindex="0" aria-selected="false" onclick="crSet('vista','painel')">📌 Meu painel (<span id="cr-v-painel-n">0</span>)</div>
+    </div>
+    <div class="cr-corpo">
+      <nav class="card cr-menu" id="cr-menu" aria-label="Relatórios disponíveis"></nav>
+      <select id="cr-sel" class="cr-sel-cel" aria-label="Relatório" onchange="crAbrir(this.value)"></select>
+      <section class="card cr-rel" id="cr-rel" aria-live="polite"></section>
+    </div>
   </div>
 
   <!-- Visão Anual -->
@@ -5500,6 +5622,788 @@ function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPo
     </div>`;
 }
 
+// ══════════════════════════════════════════════════════════════
+// ── CENTRAL DE RELATÓRIOS (modular) ──
+// Cada relatório é um módulo { id, grupo, titulo, icone, desc, formatos, montar(x) }.
+// `montar` devolve só a especificação — indicadores, gráfico, mapa de calor, tabela e
+// notas — e um único desenhista a transforma em tela: gráfico no formato escolhido,
+// tabela, CSV e impressão. "Meu painel" junta os relatórios fixados, lado a lado.
+// Período, comparação, tipo e cartão valem para todos (os que não usam, avisam).
+// ══════════════════════════════════════════════════════════════
+const _cr = { rel:'executivo', periodo:'u12', de:'', ate:'', comparar:'anterior', tipo:'Despesa', cartao:false, fmt:{}, vista:'rel' };
+const CR_PAINEL_KEY = 'fpro_rel_painel';
+const PERIODOS_CR = [['mes','Este mês'],['mesant','Mês passado'],['tri','Este trimestre'],['u3','Últimos 3 meses'],
+  ['u6','Últimos 6 meses'],['u12','Últimos 12 meses'],['ano','Este ano'],['anoant','Ano passado'],['pers','Personalizado…']];
+const TIPOS_CR = { Despesa:'Despesas', Receita:'Receitas', Investimento:'Investimentos' };
+const FORMATOS_CR = { barras:'▮ Colunas', linhas:'⟋ Linhas', area:'◢ Área', empilhado:'▤ Empilhado', barh:'☰ Barras', rosca:'◔ Rosca' };
+const GRUPOS_CR = ['Visão geral', 'Receitas e despesas', 'Pagamentos', 'Cartões e dívidas', 'Padrões de gasto'];
+
+const absMesISO = s => parseInt(s.slice(0, 4)) * 12 + parseInt(s.slice(5, 7)) - 1;   // 'AAAA-MM' → mês absoluto
+const isoMesAbs = a => `${Math.floor(a / 12)}-${String(a % 12 + 1).padStart(2, '0')}`;
+const fimDoMesAbs = a => diaSeguroISO(Math.floor(a / 12), a % 12, 31);
+const faixaAbs = (ini, fim) => ini === fim ? rotuloAbs(ini) : `${rotuloAbs(ini, true)} a ${rotuloAbs(fim, true)}`;
+const pctCR = v => (isFinite(v) ? v : 0).toFixed(1).replace('.', ',') + '%';
+
+// Período escolhido → meses absolutos (pontas incluídas)
+function periodoCR(){
+  const hj = absData(today()), base = anoRef() * 12;
+  const mk = (ini, fim) => ({ ini, fim, n:fim - ini + 1, rotulo:faixaAbs(ini, fim) });
+  switch(_cr.periodo){
+    case 'mes':    return mk(hj, hj);
+    case 'mesant': return mk(hj - 1, hj - 1);
+    case 'tri':    { const i = hj - (hj % 12) % 3; return mk(i, i + 2); }
+    case 'u3':     return mk(hj - 2, hj);
+    case 'u6':     return mk(hj - 5, hj);
+    case 'ano':    return mk(base, base + 11);
+    case 'anoant': return mk(base - 12, base - 1);
+    case 'pers': {
+      let a = /^\d{4}-\d{2}$/.test(_cr.de) ? absMesISO(_cr.de) : hj - 11;
+      let b = /^\d{4}-\d{2}$/.test(_cr.ate) ? absMesISO(_cr.ate) : hj;
+      if(a > b) [a, b] = [b, a];
+      return mk(a, Math.min(b, a + 59));   // até 5 anos
+    }
+    default:       return mk(hj - 11, hj);
+  }
+}
+function comparacaoCR(p){
+  if(_cr.comparar === 'ano')      return { ini:p.ini - 12, fim:p.fim - 12, n:p.n, rotulo:faixaAbs(p.ini - 12, p.fim - 12) };
+  if(_cr.comparar === 'anterior') return { ini:p.ini - p.n, fim:p.ini - 1, n:p.n, rotulo:faixaAbs(p.ini - p.n, p.ini - 1) };
+  return null;
+}
+
+// Contexto de cálculo compartilhado pelos relatórios (com cache dos lançamentos)
+function ctxCR(){
+  const d = gs(), p = periodoCR(), c = comparacaoCR(p), cache = {};
+  const lancs = (tipo, ini, fim) => {
+    const k = `${tipo}|${ini}|${fim}`;
+    return cache[k] || (cache[k] = lancsRC(d, ini, fim, tipo, _cr.cartao && tipo === 'Despesa'));
+  };
+  const soma = l => +l.reduce((a, x) => a + (x.valor || 0), 0).toFixed(2);
+  const total = (tipo, ini, fim) => soma(lancs(tipo, ini == null ? p.ini : ini, fim == null ? p.fim : fim));
+  const porMes = (tipo, ini, fim) => {
+    ini = ini == null ? p.ini : ini; fim = fim == null ? p.fim : fim;
+    const arr = Array(fim - ini + 1).fill(0);
+    lancs(tipo, ini, fim).forEach(l => { const i = absData(l.data) - ini; if(arr[i] != null) arr[i] += l.valor || 0; });
+    return arr.map(v => +v.toFixed(2));
+  };
+  const meses = Array.from({ length:p.n }, (_, i) => p.ini + i);
+  return { d, p, c, lancs, soma, total, porMes, meses, pal:paletaRC(), tipo:_cr.tipo, rotTipo:TIPOS_CR[_cr.tipo] };
+}
+
+// Variação para tabelas e indicadores: número + seta; a cor nunca carrega o sentido sozinha
+function varCR(atual, ant, menorMelhor){
+  if(ant == null) return { v:'', h:'<span class="cr-var neutro">—</span>' };
+  const dif = +(atual - ant).toFixed(2);
+  if(Math.abs(dif) < 0.005) return { v:0, h:'<span class="cr-var neutro">= igual</span>' };
+  const pc = ant ? dif / Math.abs(ant) * 100 : null;
+  const bom = menorMelhor ? dif < 0 : dif > 0;
+  const txt = pc == null ? 'novo' : `${dif > 0 ? '+' : '−'}${Math.abs(pc).toFixed(1).replace('.', ',')}%`;
+  return { v:pc == null ? '' : +pc.toFixed(1), h:`<span class="cr-var ${bom ? 'bom' : 'ruim'}">${dif > 0 ? '▲' : '▼'} ${txt}</span>` };
+}
+// Diferença entre percentuais, em pontos percentuais
+function varPP(atual, ant){
+  if(ant == null) return { v:'', h:'<span class="cr-var neutro">—</span>' };
+  const dif = +(atual - ant).toFixed(1);
+  if(!dif) return { v:0, h:'<span class="cr-var neutro">= igual</span>' };
+  return { v:dif, h:`<span class="cr-var ${dif > 0 ? 'bom' : 'ruim'}">${dif > 0 ? '▲ +' : '▼ −'}${Math.abs(dif).toFixed(1).replace('.', ',')} p.p.</span>` };
+}
+const celMoeda = v => ({ v:+(+v || 0).toFixed(2), h:fmtR(+v || 0), num:true });
+const celPct   = v => ({ v:+(+v || 0).toFixed(1), h:pctCR(+v || 0), num:true });
+const celNum   = v => ({ v:+v || 0, h:String(+v || 0), num:true });
+// Indicador com comparação
+const kpiCR = (rotulo, valor, sub, extra) => Object.assign({ rotulo, valor, sub:sub || '' }, extra || {});
+const subCmp = (x, atual, ant, menorMelhor, fmt) => x.c
+  ? `${varCR(atual, ant, menorMelhor).h} vs ${(fmt || fmtR)(ant)}` : '';
+
+// Categorias agrupadas de uma lista de lançamentos (ordem: maior primeiro)
+function categoriasCR(lancs){
+  return Object.values(agregarRC(lancs, '')).sort((a, b) => b.total - a.total || a.nome.localeCompare(b.nome));
+}
+
+// ── Os relatórios ──
+const RELATORIOS = [
+  { id:'executivo', grupo:'Visão geral', icone:'🧭', titulo:'Painel executivo',
+    desc:'Os números que resumem o período: receitas, despesas, resultado, poupança, contas a pagar e dívidas — comparados com o período de referência.',
+    formatos:['barras','linhas'],
+    montar(x){
+      const { p, c, d } = x;
+      const R = x.total('Receita'), D = x.total('Despesa'), I = x.total('Investimento'), res = +(R - D - I).toFixed(2);
+      const Rc = c ? x.total('Receita', c.ini, c.fim) : null, Dc = c ? x.total('Despesa', c.ini, c.fim) : null;
+      const Ic = c ? x.total('Investimento', c.ini, c.fim) : null, resC = c ? +(Rc - Dc - Ic).toFixed(2) : null;
+      const poup = R > 0 ? res / R * 100 : 0, poupC = c && Rc > 0 ? resC / Rc * 100 : null;
+      const cats = categoriasCR(x.lancs('Despesa', p.ini, p.fim));
+      const lista = pagaveis(d);
+      const a30 = lista.filter(i => { const dd = diasAte(i.venc); return i.soma && i.aberto && !i.estimado && dd !== null && dd <= 30; });
+      const venc = a30.filter(i => i.status === 'Vencida');
+      const parcDiv = +(d.divs || []).reduce((a, dv) => a + (saldoDivida(dv) > 0 ? (+dv.mensal || 0) : 0), 0).toFixed(2);
+      const recMes = R / p.n;
+      const pctN = v => pctCR(v);
+      const R12 = x.porMes('Receita'), D12 = x.porMes('Despesa'), I12 = x.porMes('Investimento');
+      const linhaInd = (nome, a, b, menor, fmt) => {
+        const f = fmt || (v => fmtR(v));
+        const vr = fmt ? varPP(a, b) : varCR(a, b, menor);
+        return [nome, { v:+(+a).toFixed(2), h:f(a), num:true }, b == null ? { v:'', h:'—', num:true } : { v:+(+b).toFixed(2), h:f(b), num:true }, { v:vr.v, h:vr.h, num:true }];
+      };
+      return {
+        kpis:[
+          kpiCR('Receitas', fmtR(R), subCmp(x, R, Rc)),
+          kpiCR('Despesas', fmtR(D), subCmp(x, D, Dc, true)),
+          kpiCR('Resultado', fmtR(res), subCmp(x, res, resC), { tom:res < 0 ? 'ruim' : 'bom' }),
+          kpiCR('Taxa de poupança', pctN(poup), c ? `${varPP(poup, poupC).h} vs ${pctN(poupC || 0)}` : 'do que entrou, quanto sobrou'),
+          kpiCR('Despesa média por mês', fmtR(D / p.n), `${p.n} ${p.n === 1 ? 'mês' : 'meses'} no período`),
+          kpiCR('Maior gasto', cats[0] ? escHtml(cats[0].nome) : '—', cats[0] ? `${fmtR(cats[0].total)} · ${pctCR(D ? cats[0].total / D * 100 : 0)} das despesas` : 'sem despesas'),
+          kpiCR('A pagar em 30 dias', fmtR(x.soma(a30)), venc.length ? `<span class="cr-var ruim">${fmtR(x.soma(venc))} já vencido</span>` : `${a30.length} conta(s), faturas e parcelas`, { tom:venc.length ? 'ruim' : '' }),
+          kpiCR('Comprometido com dívidas', recMes > 0 ? pctN(parcDiv / recMes * 100) : '—', `${fmtR(parcDiv)}/mês de parcelas · limite ${pctN(d.cfg.pct || 20)}`,
+            { tom:recMes > 0 && parcDiv / recMes * 100 > (d.cfg.pct || 20) ? 'ruim' : '' }),
+        ],
+        grafico:{ titulo:'Receitas, despesas e resultado por mês', labels:x.meses.map(a => rotuloAbs(a, true)),
+          series:[ { nome:'Receitas', dados:R12, cor:x.pal.cat[0] }, { nome:'Despesas', dados:D12, cor:x.pal.cat[1] },
+                   { nome:'Resultado', dados:R12.map((v, i) => +(v - D12[i] - I12[i]).toFixed(2)), cor:x.pal.cat[3], linha:true } ] },
+        tabela:{ titulo:'Indicadores', colunas:['Indicador', 'Período', 'Comparação', 'Variação'],
+          linhas:[ linhaInd('Receitas', R, Rc), linhaInd('Despesas', D, Dc, true), linhaInd('Investimentos', I, Ic),
+                   linhaInd('Resultado', res, resC), linhaInd('Taxa de poupança', poup, poupC, false, pctN),
+                   linhaInd('Despesa média por mês', D / p.n, c ? Dc / c.n : null, true) ] },
+        vazio:!R && !D && !I ? 'Nenhum lançamento no período.' : '',
+      };
+    } },
+
+  { id:'recdesp', grupo:'Receitas e despesas', icone:'⚖️', titulo:'Receitas × Despesas (faturamento)',
+    desc:'Quanto entrou e quanto saiu em cada mês, o resultado e a taxa de poupança.',
+    formatos:['barras','linhas','area'],
+    montar(x){
+      const R = x.porMes('Receita'), D = x.porMes('Despesa'), I = x.porMes('Investimento');
+      const res = R.map((v, i) => +(v - D[i] - I[i]).toFixed(2));
+      const tR = x.total('Receita'), tD = x.total('Despesa'), tI = x.total('Investimento'), tRes = +(tR - tD - tI).toFixed(2);
+      const pos = res.filter(v => v > 0).length;
+      const melhor = res.indexOf(Math.max(...res)), pior = res.indexOf(Math.min(...res));
+      return {
+        kpis:[
+          kpiCR('Faturamento (receitas)', fmtR(tR), x.c ? subCmp(x, tR, x.total('Receita', x.c.ini, x.c.fim)) : `média ${fmtR(tR / x.p.n)}/mês`),
+          kpiCR('Despesas', fmtR(tD), x.c ? subCmp(x, tD, x.total('Despesa', x.c.ini, x.c.fim), true) : `média ${fmtR(tD / x.p.n)}/mês`),
+          kpiCR('Resultado', fmtR(tRes), `${pos} de ${x.p.n} ${x.p.n === 1 ? 'mês' : 'meses'} no azul`, { tom:tRes < 0 ? 'ruim' : 'bom' }),
+          kpiCR('Melhor / pior mês', x.p.n > 1 ? `${rotuloAbs(x.meses[melhor], true)} / ${rotuloAbs(x.meses[pior], true)}` : '—',
+            x.p.n > 1 ? `${fmtR(res[melhor])} / ${fmtR(res[pior])}` : ''),
+        ],
+        grafico:{ labels:x.meses.map(a => rotuloAbs(a, true)),
+          series:[ { nome:'Receitas', dados:R, cor:x.pal.cat[0] }, { nome:'Despesas', dados:D, cor:x.pal.cat[1] },
+                   { nome:'Investimentos', dados:I, cor:x.pal.cat[2] }, { nome:'Resultado', dados:res, cor:x.pal.cat[3], linha:true } ] },
+        tabela:{ colunas:['Mês', 'Receitas', 'Despesas', 'Investimentos', 'Resultado', 'Poupança'],
+          linhas:x.meses.map((a, i) => [rotuloAbs(a), celMoeda(R[i]), celMoeda(D[i]), celMoeda(I[i]),
+            { v:res[i], h:`<span style="color:${res[i] < 0 ? 'var(--red)' : 'var(--t1)'}">${fmtR(res[i])}</span>`, num:true }, celPct(R[i] ? res[i] / R[i] * 100 : 0)]),
+          rodape:['Total', celMoeda(tR), celMoeda(tD), celMoeda(tI), celMoeda(tRes), celPct(tR ? tRes / tR * 100 : 0)] },
+        vazio:!tR && !tD && !tI ? 'Nenhum lançamento no período.' : '',
+      };
+    } },
+
+  { id:'periodos', grupo:'Receitas e despesas', icone:'🔀', titulo:'Comparação de períodos', usaTipo:true,
+    desc:'O período escolhido contra o de referência, categoria por categoria: o que subiu, o que caiu e quanto.',
+    formatos:['barh','barras'],
+    montar(x){
+      const c = x.c || { ini:x.p.ini - x.p.n, fim:x.p.ini - 1, n:x.p.n, rotulo:faixaAbs(x.p.ini - x.p.n, x.p.ini - 1) };
+      const A = agregarRC(x.lancs(x.tipo, x.p.ini, x.p.fim), ''), B = agregarRC(x.lancs(x.tipo, c.ini, c.fim), '');
+      const nomes = [...new Set([...Object.keys(A), ...Object.keys(B)])];
+      const v = (m, n) => m[n] ? m[n].total : 0;
+      const rows = nomes.map(n => ({ n, a:v(A, n), b:v(B, n), d:+(v(A, n) - v(B, n)).toFixed(2) }))
+        .sort((p, q) => Math.max(q.a, q.b) - Math.max(p.a, p.b));
+      const tA = somaRC(A), tB = somaRC(B), menor = x.tipo === 'Despesa';
+      const alta = [...rows].sort((p, q) => q.d - p.d)[0], queda = [...rows].sort((p, q) => p.d - q.d)[0];
+      const top = rows.slice(0, 10);
+      return {
+        aviso:x.c ? '' : 'Sem comparação escolhida: usando o período anterior de mesmo tamanho.',
+        kpis:[
+          kpiCR(`${x.rotTipo} · ${x.p.rotulo}`, fmtR(tA), varCR(tA, tB, menor).h),
+          kpiCR(`${x.rotTipo} · ${c.rotulo}`, fmtR(tB), 'período de referência'),
+          kpiCR('Diferença', `${tA - tB >= 0 ? '+' : '−'}${fmtR(Math.abs(tA - tB))}`, `${rows.length} categorias comparadas`),
+          kpiCR('Maior alta / maior queda', alta && alta.d > 0 ? escHtml(alta.n) : '—',
+            `${alta && alta.d > 0 ? '+' + fmtR(alta.d) : ''}${queda && queda.d < 0 ? ` · queda: ${escHtml(queda.n)} −${fmtR(-queda.d)}` : ''}`),
+        ],
+        grafico:{ titulo:'As 10 maiores categorias', labels:top.map(r => r.n),
+          series:[ { nome:x.p.rotulo, dados:top.map(r => r.a), cor:x.pal.serie }, { nome:c.rotulo, dados:top.map(r => r.b), cor:x.pal.anterior } ] },
+        tabela:{ colunas:['Categoria', x.p.rotulo, c.rotulo, 'Diferença', 'Variação'],
+          linhas:rows.map(r => [r.n, celMoeda(r.a), celMoeda(r.b), { v:r.d, h:`${r.d > 0 ? '+' : r.d < 0 ? '−' : ''}${fmtR(Math.abs(r.d))}`, num:true },
+            Object.assign(varCR(r.a, r.b, menor), { num:true })]),
+          rodape:['Total', celMoeda(tA), celMoeda(tB), celMoeda(tA - tB), Object.assign(varCR(tA, tB, menor), { num:true })] },
+        vazio:!rows.length ? `Nenhuma ${x.rotTipo.toLowerCase().slice(0, -1)} nos dois períodos.` : '',
+      };
+    } },
+
+  { id:'anoano', grupo:'Receitas e despesas', icone:'📅', titulo:'Comparativo entre anos', usaTipo:true,
+    desc:'Mês a mês, cada ano numa linha — para ver se você está gastando (ou faturando) mais que nos anos anteriores.',
+    formatos:['linhas','barras'],
+    montar(x){
+      const anoF = Math.floor(x.p.fim / 12);
+      const anos = [anoF - 3, anoF - 2, anoF - 1, anoF].filter(a => a === anoF || x.lancs(x.tipo, a * 12, a * 12 + 11).length);
+      // meses que ainda não chegaram ficam em branco (null), não como zero
+      const hjA = absData(today());
+      const dados = anos.map(a => x.porMes(x.tipo, a * 12, a * 12 + 11).map((v, j) => a * 12 + j > hjA ? null : v));
+      const ate = Math.min(11, hjA - anoF * 12);   // comparação justa: até o mesmo mês
+      const acum = i => +dados[i].slice(0, Math.max(0, ate) + 1).reduce((a, v) => a + (v || 0), 0).toFixed(2);
+      const n = anos.length, ult = n - 1;
+      const tot = dados.map(s => +s.reduce((a, v) => a + (v || 0), 0).toFixed(2));
+      const menor = x.tipo === 'Despesa';
+      const celAno = v => v == null ? { v:'', h:'—', num:true } : celMoeda(v);
+      const varAno = (a, b) => a == null || b == null ? { v:'', h:'—', num:true } : Object.assign(varCR(a, b, menor), { num:true });
+      return {
+        kpis:anos.slice(-3).map((a, k) => {
+          const i = n - Math.min(3, n) + k;
+          return kpiCR(`${x.rotTipo} ${a}`, fmtR(tot[i]), ate >= 0 && ate < 11
+            ? `até ${MESES3[ate]}: ${fmtR(acum(i))}${i > 0 ? ' ' + varCR(acum(i), acum(i - 1), menor).h : ''}`
+            : (i > 0 ? varCR(tot[i], tot[i - 1], menor).h + ' vs ano anterior' : 'ano completo'));
+        }),
+        grafico:{ labels:MESES3, series:anos.map((a, i) => ({ nome:String(a), dados:dados[i], cor:x.pal.cat[(a % 5 + 5) % 5] })) },
+        tabela:{ colunas:['Mês', ...anos.map(String), n > 1 ? `${anos[ult]} × ${anos[ult - 1]}` : 'Variação'],
+          linhas:MESES.map((m, j) => [m, ...dados.map(s => celAno(s[j])),
+            n > 1 ? varAno(dados[ult][j], dados[ult - 1][j]) : { v:'', h:'—' }]),
+          rodape:['Total', ...tot.map(celMoeda), n > 1 ? (ate >= 0 && ate < 11 ? Object.assign(varCR(acum(ult), acum(ult - 1), menor), { num:true, h:varCR(acum(ult), acum(ult - 1), menor).h + ` <small style="color:var(--t3)">até ${MESES3[ate]}</small>` }) : Object.assign(varCR(tot[ult], tot[ult - 1], menor), { num:true })) : { v:'', h:'—' }] },
+        notas:[`Anos com lançamentos até ${anoF} (o ano do fim do período). A comparação "até ${ate >= 0 && ate <= 11 ? MESES3[ate] : 'dez'}" usa os mesmos meses de cada ano.`],
+        vazio:!tot.some(v => v) ? `Nenhuma ${x.rotTipo.toLowerCase().slice(0, -1)} lançada nesses anos.` : '',
+      };
+    } },
+
+  { id:'projecao', grupo:'Pagamentos', icone:'🔮', titulo:'Projeção de pagamentos', semPeriodo:true,
+    desc:'Quanto vai sair do caixa em cada um dos próximos 12 meses — contas, faturas de cartão e parcelas de dívidas — e quanto isso reduz.',
+    formatos:['empilhado','linhas'],
+    montar(x){
+      const pp = paletaPagar(), pr = projecaoPagar(x.d), m = pr.meses, m0 = m[0], mN = m[m.length - 1];
+      const s3 = +m.slice(0, 3).reduce((a, k) => a + k.total, 0).toFixed(2), s12 = +m.reduce((a, k) => a + k.total, 0).toFixed(2);
+      return {
+        kpis:[
+          kpiCR(`Este mês · ${rotuloAbs(m0.abs, true)}`, fmtR(m0.total), `falta ${fmtR(m0.aberto)}${pr.atrasado ? ` · <span class="cr-var ruim">+${fmtR(pr.atrasado)} atrasado</span>` : ''}`),
+          kpiCR('Próximos 3 meses', fmtR(s3), `média ${fmtR(s3 / 3)}/mês`),
+          kpiCR('Próximos 12 meses', fmtR(s12), `média ${fmtR(s12 / 12)}/mês`),
+          kpiCR(`Em ${rotuloAbs(mN.abs, true)}`, fmtR(mN.total), `${varCR(mN.total, m0.total, true).h} vs este mês`, { tom:mN.total < m0.total ? 'bom' : '' }),
+        ],
+        grafico:{ labels:m.map(k => rotuloAbs(k.abs, true)), empilhado:true,
+          series:['conta', 'cartao', 'divida'].map(o => ({ nome:ORIGENS_PAGAR[o].rotulo, dados:m.map(k => k[o]), cor:pp[o] })) },
+        tabela:{ colunas:['Mês', 'Contas', 'Cartões', 'Dívidas', 'Total', 'vs. este mês', 'Último mês de'],
+          linhas:m.map((k, i) => [rotuloAbs(k.abs), celMoeda(k.conta), celMoeda(k.cartao), celMoeda(k.divida), celMoeda(k.total),
+            i ? Object.assign(varCR(k.total, m0.total, true), { num:true }) : { v:'', h:'—' },
+            { v:k.termina.map(t => t.nome).join(', '), h:k.termina.length ? k.termina.map(t => `${escHtml(t.nome)} (−${fmtR(t.valor)})`).join(', ') : '—' }]),
+          rodape:['Total', celMoeda(m.reduce((a, k) => a + k.conta, 0)), celMoeda(m.reduce((a, k) => a + k.cartao, 0)), celMoeda(m.reduce((a, k) => a + k.divida, 0)), celMoeda(s12), '', ''] },
+        notas:['Sempre do mês atual em diante (não usa o período). Considera o que já está lançado: contas, compras no cartão (as parceladas até a última parcela) e parcelas de dívidas.'],
+      };
+    } },
+
+  { id:'aging', grupo:'Pagamentos', icone:'⏳', titulo:'A pagar por vencimento', semPeriodo:true,
+    desc:'Tudo o que está em aberto separado por prazo: o que já venceu (e há quanto tempo) e o que vence em 7, 30, 60, 90 dias ou depois.',
+    formatos:['barh','barras'],
+    montar(x){
+      const faixas = [['Vencido há mais de 60 dias', -Infinity, -61], ['Vencido de 31 a 60 dias', -60, -31], ['Vencido de 1 a 30 dias', -30, -1],
+        ['Vence em até 7 dias', 0, 7], ['De 8 a 30 dias', 8, 30], ['De 31 a 60 dias', 31, 60], ['De 61 a 90 dias', 61, 90], ['Depois de 90 dias', 91, Infinity]];
+      const abertos = pagaveis(x.d).filter(i => i.soma && i.aberto);
+      const grupos = faixas.map(([nome, a, b]) => {
+        const it = abertos.filter(i => { const dd = diasAte(i.venc); return dd !== null && dd >= a && dd <= b; });
+        return { nome, it, total:x.soma(it), vencido:b < 0 };
+      });
+      const total = x.soma(abertos), venc = grupos.filter(g => g.vencido), aVencer = grupos.filter(g => !g.vencido);
+      const sv = +venc.reduce((a, g) => a + g.total, 0).toFixed(2);
+      return {
+        kpis:[
+          kpiCR('Total em aberto', fmtR(total), `${abertos.length} itens (contas, faturas e parcelas)`),
+          kpiCR('Já vencido', fmtR(sv), `${venc.reduce((a, g) => a + g.it.length, 0)} itens`, { tom:sv ? 'ruim' : 'bom' }),
+          kpiCR('Vence em 30 dias', fmtR(grupos[3].total + grupos[4].total), `${grupos[3].it.length + grupos[4].it.length} itens`),
+          kpiCR('Depois de 30 dias', fmtR(grupos.slice(5).reduce((a, g) => a + g.total, 0)), 'inclui parcelas futuras'),
+        ],
+        grafico:{ labels:grupos.map(g => g.nome), series:[{ nome:'Em aberto', dados:grupos.map(g => g.total), cor:x.pal.serie }] },
+        tabela:{ colunas:['Prazo', 'Itens', 'Valor', '% do aberto', 'Maiores'],
+          linhas:grupos.map(g => [g.nome, celNum(g.it.length), celMoeda(g.total), celPct(total ? g.total / total * 100 : 0),
+            { v:g.it.map(descPagavel).join(', '), h:g.it.length ? [...g.it].sort((a, b) => b.valor - a.valor).slice(0, 3).map(i => `${escHtml(descPagavel(i))} (${fmtR(i.valor)})`).join(', ') : '—' }]),
+          rodape:['Total', celNum(abertos.length), celMoeda(total), celPct(100), ''] },
+        notas:['Hoje em diante, não usa o período. Dívida sem parcelas cadastradas entra pela parcela mensal estimada.'],
+        vazio:!abertos.length ? 'Nada em aberto. 🎉' : '',
+      };
+    } },
+
+  { id:'saldo', grupo:'Visão geral', icone:'📈', titulo:'Evolução do saldo',
+    desc:'O saldo consolidado das contas no fim de cada mês — quanto o seu dinheiro cresceu ou encolheu.',
+    formatos:['area','linhas','barras'],
+    montar(x){
+      const pagos = _relFilterView === 'realizado';
+      const ini = calcSaldoAte(fimDoMesAbs(x.p.ini - 1), { somentePagos:pagos });
+      const s = x.meses.map(a => calcSaldoAte(fimDoMesAbs(a), { somentePagos:pagos }));
+      const fim = s[s.length - 1], menorI = s.indexOf(Math.min(...s)), maiorI = s.indexOf(Math.max(...s));
+      return {
+        kpis:[
+          kpiCR(`Saldo no início (${rotuloAbs(x.p.ini - 1, true)})`, fmtR(ini), pagos ? 'só o que foi pago' : 'inclui o previsto'),
+          kpiCR(`Saldo no fim (${rotuloAbs(x.p.fim, true)})`, fmtR(fim), varCR(fim, ini).h, { tom:fim < ini ? 'ruim' : 'bom' }),
+          kpiCR('Variação no período', `${fim - ini >= 0 ? '+' : '−'}${fmtR(Math.abs(fim - ini))}`, `média ${fmtR((fim - ini) / x.p.n)}/mês`),
+          kpiCR('Menor / maior saldo', `${fmtR(s[menorI])}`, `em ${rotuloAbs(x.meses[menorI], true)} · maior ${fmtR(s[maiorI])} em ${rotuloAbs(x.meses[maiorI], true)}`),
+        ],
+        grafico:{ labels:x.meses.map(a => rotuloAbs(a, true)), series:[{ nome:'Saldo no fim do mês', dados:s, cor:x.pal.serie }] },
+        tabela:{ colunas:['Mês', 'Saldo no fim do mês', 'Variação no mês'],
+          linhas:x.meses.map((a, i) => { const dv = +(s[i] - (i ? s[i - 1] : ini)).toFixed(2);
+            return [rotuloAbs(a), celMoeda(s[i]), { v:dv, h:`<span style="color:${dv < 0 ? 'var(--red)' : 'var(--t1)'}">${dv >= 0 ? '+' : '−'}${fmtR(Math.abs(dv))}</span>`, num:true }]; }) },
+        notas:[`Saldo de todas as contas bancárias (sem transferências contarem como gasto). Base: ${pagos ? '✓ Realizado' : '📋 Previsto'} — troque no topo da página.`],
+      };
+    } },
+
+  { id:'composicao', grupo:'Padrões de gasto', icone:'🍩', titulo:'Composição por categoria', usaTipo:true,
+    desc:'Para onde foi (ou de onde veio) o dinheiro: a fatia de cada categoria, a média por mês e a mudança em relação à referência.',
+    formatos:['rosca','barh'],
+    montar(x){
+      const cats = categoriasCR(x.lancs(x.tipo, x.p.ini, x.p.fim));
+      const ant = x.c ? agregarRC(x.lancs(x.tipo, x.c.ini, x.c.fim), '') : null;
+      const tot = +cats.reduce((a, g) => a + g.total, 0).toFixed(2);
+      const top = cats.slice(0, 5), resto = +cats.slice(5).reduce((a, g) => a + g.total, 0).toFixed(2);
+      const top3 = cats.slice(0, 3).reduce((a, g) => a + g.total, 0);
+      return {
+        kpis:[
+          kpiCR(`Total de ${x.rotTipo.toLowerCase()}`, fmtR(tot), x.c ? subCmp(x, tot, somaRC(ant), x.tipo === 'Despesa') : `média ${fmtR(tot / x.p.n)}/mês`),
+          kpiCR('Categorias', String(cats.length), cats.length ? `a maior é ${escHtml(cats[0].nome)}` : ''),
+          kpiCR('Maior categoria', cats[0] ? pctCR(tot ? cats[0].total / tot * 100 : 0) : '—', cats[0] ? `${escHtml(cats[0].nome)} · ${fmtR(cats[0].total)}` : ''),
+          kpiCR('Concentração nas 3 maiores', pctCR(tot ? top3 / tot * 100 : 0), 'quanto maior, mais depende de poucas categorias'),
+        ],
+        grafico:{ labels:[...top.map(g => g.nome), ...(resto > 0 ? ['Outras'] : [])],
+          series:[{ nome:x.rotTipo, cor:x.pal.serie, dados:[...top.map(g => g.total), ...(resto > 0 ? [resto] : [])],
+            cores:[...top.map((_, i) => x.pal.cat[i]), x.pal.outras] }] },
+        tabela:{ colunas:['Categoria', 'Total', '% do total', 'Média por mês', 'Lançamentos', 'vs. referência'],
+          linhas:cats.map(g => [g.nome, celMoeda(g.total), celPct(tot ? g.total / tot * 100 : 0), celMoeda(g.total / x.p.n), celNum(g.n),
+            ant ? Object.assign(varCR(g.total, ant[g.nome] ? ant[g.nome].total : 0, x.tipo === 'Despesa'), { num:true }) : { v:'', h:'—' }]),
+          rodape:['Total', celMoeda(tot), celPct(tot ? 100 : 0), celMoeda(tot / x.p.n), celNum(cats.reduce((a, g) => a + g.n, 0)), ''] },
+        vazio:!cats.length ? `Nenhuma ${x.rotTipo.toLowerCase().slice(0, -1)} no período.` : '',
+      };
+    } },
+
+  { id:'calor', grupo:'Padrões de gasto', icone:'🔥', titulo:'Mapa de calor dos gastos',
+    desc:'Em que dias você mais gasta: cada quadrado é um dia, mais escuro = mais gasto. E a média por dia da semana.',
+    formatos:['barras','linhas'],
+    montar(x){
+      const meses = x.meses.slice(-12), ini = meses[0], fim = meses[meses.length - 1];
+      const ls = x.lancs('Despesa', ini, fim);
+      const porDia = {};
+      ls.forEach(l => { porDia[l.data] = (porDia[l.data] || 0) + (l.valor || 0); });
+      const valores = meses.map(a => Array.from({ length:31 }, (_, i) => {
+        const dt = `${isoMesAbs(a)}-${String(i + 1).padStart(2, '0')}`;
+        return diaSeguroISO(Math.floor(a / 12), a % 12, i + 1) === dt ? +(porDia[dt] || 0).toFixed(2) : null;   // null = dia não existe
+      }));
+      // média por dia da semana: total do dia da semana ÷ quantas vezes ele aparece no período
+      const somaSem = Array(7).fill(0), qtdSem = Array(7).fill(0);
+      let dias = 0, semGasto = 0, maxV = 0, maxD = '';
+      const hj = today();
+      meses.forEach((a, k) => valores[k].forEach((v, i) => {
+        if(v === null) return;
+        const dt = `${isoMesAbs(a)}-${String(i + 1).padStart(2, '0')}`;
+        if(dt > hj) return;
+        const w = new Date(dt + 'T00:00:00').getDay();
+        somaSem[w] += v; qtdSem[w]++; dias++; if(!v) semGasto++;
+        if(v > maxV){ maxV = v; maxD = dt; }
+      }));
+      const mediaSem = somaSem.map((s, i) => qtdSem[i] ? +(s / qtdSem[i]).toFixed(2) : 0);
+      const wMax = mediaSem.indexOf(Math.max(...mediaSem));
+      const tot = x.soma(ls);
+      return {
+        kpis:[
+          kpiCR('Dia mais caro', maxD ? fmtDataBR(maxD) : '—', maxD ? `${fmtR(maxV)} · ${DIAS_SEMANA[new Date(maxD + 'T00:00:00').getDay()]}` : ''),
+          kpiCR('Dia da semana mais caro', maxV ? DIAS_SEMANA[wMax] : '—', maxV ? `média de ${fmtR(mediaSem[wMax])}` : ''),
+          kpiCR('Média por dia', fmtR(dias ? tot / dias : 0), `${dias} dias até hoje`),
+          kpiCR('Dias sem gastar', String(semGasto), dias ? pctCR(semGasto / dias * 100) + ' dos dias' : ''),
+        ],
+        calor:{ titulo:`Despesas por dia · ${faixaAbs(ini, fim)}`, linhas:meses.map(a => rotuloAbs(a, true)),
+          colunas:Array.from({ length:31 }, (_, i) => String(i + 1)), valores, cor:x.pal.serie },
+        grafico:{ titulo:'Média de gasto por dia da semana', labels:DIAS_SEMANA, series:[{ nome:'Média por dia', dados:mediaSem, cor:x.pal.cat[1] }] },
+        tabela:{ colunas:['Dia da semana', 'Média por dia', 'Total', 'Dias'],
+          linhas:DIAS_SEMANA.map((n, i) => [n, celMoeda(mediaSem[i]), celMoeda(somaSem[i]), celNum(qtdSem[i])]) },
+        notas:x.p.n > 12 ? ['O mapa mostra os 12 últimos meses do período.'] : [],
+        vazio:!ls.length ? 'Nenhuma despesa no período.' : '',
+      };
+    } },
+
+  { id:'formas', grupo:'Padrões de gasto', icone:'🏦', titulo:'Por conta e forma de pagamento', usaTipo:true,
+    desc:'Por qual conta bancária ou cartão o dinheiro passou — e o ticket médio de cada um.',
+    formatos:['barh','rosca'],
+    montar(x){
+      const ls = x.lancs(x.tipo, x.p.ini, x.p.fim);
+      const m = {};
+      ls.forEach(l => {
+        const k = l.caixaNome || (l.origem === 'fatura' ? 'Pagamento de fatura' : '(sem conta vinculada)');
+        const g = m[k] || (m[k] = { nome:k, total:0, n:0 }); g.total += l.valor || 0; g.n++;
+      });
+      const gs_ = Object.values(m).map(g => ({ ...g, total:+g.total.toFixed(2) })).sort((a, b) => b.total - a.total);
+      const tot = x.soma(ls), n = ls.length;
+      return {
+        kpis:[
+          kpiCR('Total', fmtR(tot), `${n} lançamentos`),
+          kpiCR('Contas e cartões usados', String(gs_.length), gs_[0] ? `mais usada: ${escHtml(gs_[0].nome)}` : ''),
+          kpiCR('Participação da maior', gs_[0] ? pctCR(tot ? gs_[0].total / tot * 100 : 0) : '—', gs_[0] ? fmtR(gs_[0].total) : ''),
+          kpiCR('Ticket médio', fmtR(n ? tot / n : 0), 'valor médio por lançamento'),
+        ],
+        grafico:{ labels:gs_.slice(0, 10).map(g => g.nome),
+          series:[{ nome:x.rotTipo, dados:gs_.slice(0, 10).map(g => g.total), cor:x.pal.serie, cores:gs_.slice(0, 10).map((_, i) => i < 5 ? x.pal.cat[i] : x.pal.outras) }] },
+        tabela:{ colunas:['Conta / forma', 'Total', '%', 'Lançamentos', 'Ticket médio'],
+          linhas:gs_.map(g => [g.nome, celMoeda(g.total), celPct(tot ? g.total / tot * 100 : 0), celNum(g.n), celMoeda(g.n ? g.total / g.n : 0)]),
+          rodape:['Total', celMoeda(tot), celPct(tot ? 100 : 0), celNum(n), celMoeda(n ? tot / n : 0)] },
+        notas:[_cr.cartao && x.tipo === 'Despesa' ? 'Com "compras no cartão" ligado, cada compra aparece no cartão em que foi feita.' : 'Ligue "compras no cartão" para ver as compras por cartão em vez do pagamento da fatura.'],
+        vazio:!ls.length ? 'Nenhum lançamento no período.' : '',
+      };
+    } },
+
+  { id:'cartoes', grupo:'Cartões e dívidas', icone:'💳', titulo:'Cartões de crédito',
+    desc:'As faturas de cada cartão mês a mês, a média, a maior fatura e quanto do limite está em uso.',
+    formatos:['empilhado','linhas','barras'],
+    montar(x){
+      const ccs = x.d.ccs || [];
+      const mapas = ccs.map(cc => faturasDoCartao(cc));
+      const serie = ccs.map((cc, k) => x.meses.map(a => {
+        const pg = (cc.faturas || []).find(f => f.status === 'Pago' && f.mes === a % 12 && (f.ano == null || f.ano === Math.floor(a / 12)));
+        return pg ? +(+pg.valor || 0).toFixed(2) : (mapas[k][a] ? mapas[k][a].valor : 0);
+      }));
+      const tots = serie.map(s => +s.reduce((a, v) => a + v, 0).toFixed(2));
+      const tot = +tots.reduce((a, v) => a + v, 0).toFixed(2);
+      const lim = ccs.reduce((a, cc) => a + (+cc.lim || 0), 0), uso = ccs.reduce((a, cc) => a + limiteUsado(cc), 0);
+      return {
+        kpis:[
+          kpiCR('Faturas no período', fmtR(tot), `média ${fmtR(tot / x.p.n)}/mês`),
+          kpiCR('Cartões', String(ccs.length), ccs.length ? `maior gasto: ${escHtml(ccs[tots.indexOf(Math.max(...tots))].nome)}` : ''),
+          kpiCR('Limite total', fmtR(lim), `${fmtR(Math.max(0, lim - uso))} livre`),
+          kpiCR('Limite em uso', pctCR(lim ? uso / lim * 100 : 0), fmtR(uso), { tom:lim && uso / lim > .8 ? 'ruim' : '' }),
+        ],
+        grafico:{ labels:x.meses.map(a => rotuloAbs(a, true)), empilhado:true,
+          series:ccs.map((cc, k) => ({ nome:cc.nome, dados:serie[k], cor:k < 5 ? x.pal.cat[k] : x.pal.outras })) },
+        tabela:{ colunas:['Cartão', 'Total no período', 'Média por mês', 'Maior fatura', 'Limite', 'Em uso', '% do limite'],
+          linhas:ccs.map((cc, k) => { const mx = Math.max(...serie[k]), u = limiteUsado(cc);
+            return [cc.nome, celMoeda(tots[k]), celMoeda(tots[k] / x.p.n),
+              { v:mx, h:mx ? `${fmtR(mx)} <small style="color:var(--t3)">${rotuloAbs(x.meses[serie[k].indexOf(mx)], true)}</small>` : '—', num:true },
+              celMoeda(+cc.lim || 0), celMoeda(u), celPct(cc.lim ? u / cc.lim * 100 : 0)]; }),
+          rodape:['Total', celMoeda(tot), celMoeda(tot / x.p.n), '', celMoeda(lim), celMoeda(uso), celPct(lim ? uso / lim * 100 : 0)] },
+        notas:['Fatura paga entra pelo valor pago; em aberto, pelo valor calculado das compras (parceladas incluídas).'],
+        vazio:!ccs.length ? 'Nenhum cartão cadastrado.' : '',
+      };
+    } },
+
+  { id:'dividas', grupo:'Cartões e dívidas', icone:'📉', titulo:'Dívidas: quitação projetada', semPeriodo:true,
+    desc:'Como o saldo devedor de cada dívida cai mês a mês até zerar, e quando cada uma termina.',
+    formatos:['empilhado','linhas'],
+    montar(x){
+      const hj = absData(today());
+      const divs = (x.d.divs || []).filter(dv => saldoDivida(dv) > 0);
+      // saldo depois de pagar as parcelas de cada mês
+      const fimDe = dv => {
+        const ps = (dv.parcelas || []).filter(p => p.status !== 'Pago' && p.venc);
+        if(ps.length) return Math.max(hj, ...ps.map(p => absData(p.venc)));
+        return dv.mensal > 0 ? hj + Math.ceil(saldoDivida(dv) / dv.mensal - 1e-9) - 1 : hj + 120;
+      };
+      const ate = Math.min(hj + 59, Math.max(hj + 5, ...divs.map(fimDe)));
+      const meses = Array.from({ length:ate - hj + 1 }, (_, i) => hj + i);
+      const saldoApos = (dv, a) => {
+        const ps = (dv.parcelas || []).filter(p => p.status !== 'Pago' && p.venc);
+        if(ps.length || (dv.parcelas || []).length) return +ps.filter(p => absData(p.venc) > a).reduce((s, p) => s + (p.valor || 0), 0).toFixed(2);
+        return +Math.max(0, saldoDivida(dv) - (+dv.mensal || 0) * (a - hj + 1)).toFixed(2);
+      };
+      const series = divs.map(dv => meses.map(a => saldoApos(dv, a)));
+      const total = +divs.reduce((a, dv) => a + saldoDivida(dv), 0).toFixed(2);
+      const mensal = +divs.reduce((a, dv) => a + (+dv.mensal || 0), 0).toFixed(2);
+      const fins = divs.map(fimDe), ultima = fins.length ? Math.max(...fins) : null, primeira = fins.length ? Math.min(...fins) : null;
+      return {
+        kpis:[
+          kpiCR('Saldo devedor', fmtR(total), `${divs.length} dívida(s) em aberto`),
+          kpiCR('Parcelas por mês', fmtR(mensal), 'soma das parcelas mensais'),
+          kpiCR('Primeira a terminar', primeira != null ? escHtml(divs[fins.indexOf(primeira)].nome) : '—', primeira != null ? `último pagamento em ${rotuloAbs(primeira, true)}` : ''),
+          kpiCR('Livre de dívidas em', ultima != null ? rotuloAbs(ultima, true) : '—', ultima != null ? `${ultima - hj + 1} meses` : 'sem dívidas', { tom:ultima == null ? 'bom' : '' }),
+        ],
+        grafico:{ labels:meses.map(a => rotuloAbs(a, true)), empilhado:true,
+          series:divs.map((dv, k) => ({ nome:dv.nome, dados:series[k], cor:k < 5 ? x.pal.cat[k] : x.pal.outras })) },
+        tabela:{ colunas:['Dívida', 'Saldo devedor', 'Parcela mensal', 'Parcelas restantes', 'Último pagamento', 'Juros'],
+          linhas:divs.map((dv, k) => { const ps = (dv.parcelas || []).filter(p => p.status !== 'Pago');
+            return [dv.nome, celMoeda(saldoDivida(dv)), celMoeda(+dv.mensal || 0),
+              { v:ps.length || (dv.mensal ? Math.ceil(saldoDivida(dv) / dv.mensal - 1e-9) : ''), h:ps.length ? String(ps.length) : (dv.mensal ? `~${Math.ceil(saldoDivida(dv) / dv.mensal - 1e-9)} (estimado)` : '—'), num:true },
+              rotuloAbs(fins[k]), dv.juros ? pctCR(dv.juros) + ' a.m.' : '—']; }),
+          rodape:['Total', celMoeda(total), celMoeda(mensal), '', ultima != null ? rotuloAbs(ultima) : '', ''] },
+        notas:['Do mês atual em diante. Dívida sem parcelas cadastradas cai pela parcela mensal até o saldo acabar (estimado).'],
+        vazio:!divs.length ? 'Nenhuma dívida em aberto. 🎉' : '',
+      };
+    } },
+
+  { id:'orcado', grupo:'Receitas e despesas', icone:'🎯', titulo:'Orçado × Realizado',
+    desc:'As metas de despesa do orçamento contra o que foi gasto, mês a mês e por categoria.',
+    formatos:['barras','linhas'],
+    montar(x){
+      const orcMes = a => {
+        const ms = metasDoMes(x.d, a % 12, Math.floor(a / 12)).filter(m => m.tipo === 'Despesa');
+        const porCat = {};
+        ms.forEach(m => { const g = porCat[m.cat] || (porCat[m.cat] = { cat:null, sub:0 }); if(m.subcat) g.sub += +m.val || 0; else g.cat = (g.cat || 0) + (+m.val || 0); });
+        const out = {}; Object.keys(porCat).forEach(k => { out[k] = porCat[k].cat != null ? porCat[k].cat : porCat[k].sub; });
+        return out;
+      };
+      const orc = x.meses.map(orcMes);
+      const O = orc.map(o => +Object.values(o).reduce((a, v) => a + v, 0).toFixed(2));
+      const Rm = x.porMes('Despesa');
+      const cats = {};
+      x.meses.forEach((a, i) => Object.entries(orc[i]).forEach(([k, v]) => { (cats[k] = cats[k] || { o:0, r:0 }).o += v; }));
+      x.lancs('Despesa', x.p.ini, x.p.fim).forEach(l => { const k = l.cat || '(sem categoria)'; (cats[k] = cats[k] || { o:0, r:0 }).r += l.valor || 0; });
+      const rows = Object.entries(cats).map(([k, g]) => ({ k, o:+g.o.toFixed(2), r:+g.r.toFixed(2) })).sort((a, b) => b.o - a.o || b.r - a.r);
+      const tO = +O.reduce((a, v) => a + v, 0).toFixed(2), tR = x.total('Despesa');
+      const estouro = rows.filter(r => r.o > 0 && r.r > r.o + 0.005);
+      return {
+        kpis:[
+          kpiCR('Orçado', fmtR(tO), `${rows.filter(r => r.o > 0).length} categorias com meta`),
+          kpiCR('Realizado', fmtR(tR), tO ? `${pctCR(tR / tO * 100)} do orçado` : 'sem metas no período', { tom:tO && tR > tO ? 'ruim' : '' }),
+          kpiCR(tR > tO ? 'Acima do orçado' : 'Abaixo do orçado', fmtR(Math.abs(tO - tR)), tR > tO ? '<span class="cr-var ruim">▲ gastou mais que o planejado</span>' : '<span class="cr-var bom">▼ dentro do planejado</span>'),
+          kpiCR('Categorias estouradas', String(estouro.length), estouro.length ? escHtml(estouro.slice(0, 3).map(r => r.k).join(', ')) : 'nenhuma 👏', { tom:estouro.length ? 'ruim' : 'bom' }),
+        ],
+        grafico:{ labels:x.meses.map(a => rotuloAbs(a, true)),
+          series:[ { nome:'Orçado', dados:O, cor:x.pal.cat[0] }, { nome:'Realizado', dados:Rm, cor:x.pal.cat[1] } ] },
+        tabela:{ colunas:['Categoria', 'Orçado', 'Realizado', 'Diferença', '% usado', 'Situação'],
+          linhas:rows.map(r => { const u = r.o ? r.r / r.o * 100 : null;
+            return [r.k, celMoeda(r.o), celMoeda(r.r), celMoeda(r.o - r.r), u == null ? { v:'', h:'—', num:true } : celPct(u),
+              { v:!r.o ? 'Sem meta' : r.r > r.o + 0.005 ? 'Estourou' : 'Dentro', h:!r.o ? '<span class="cr-var neutro">sem meta</span>' : r.r > r.o + 0.005 ? '<span class="cr-var ruim">▲ estourou</span>' : '<span class="cr-var bom">✓ dentro</span>' }]; }),
+          rodape:['Total', celMoeda(tO), celMoeda(tR), celMoeda(tO - tR), celPct(tO ? tR / tO * 100 : 0), ''] },
+        vazio:!tO && !tR ? 'Sem metas nem despesas no período.' : '',
+      };
+    } },
+
+  { id:'sazonal', grupo:'Padrões de gasto', icone:'🌦️', titulo:'Sazonalidade', usaTipo:true, semPeriodo:true,
+    desc:'Os meses do ano em que você costuma gastar (ou faturar) mais, pela média de todos os anos lançados.',
+    formatos:['barras','linhas'],
+    montar(x){
+      const todos = x.d.lancs.filter(l => l.tipo === x.tipo && l.data && l.status !== 'cancelado');
+      const anos = [...new Set(todos.map(l => getAno(l.data)))].filter(a => a > 0).sort();
+      const dados = anos.map(a => x.porMes(x.tipo, a * 12, a * 12 + 11));
+      const media = MESES.map((_, j) => { const vs = dados.map(s => s[j]).filter(v => v > 0); return vs.length ? +(vs.reduce((a, v) => a + v, 0) / vs.length).toFixed(2) : 0; });
+      const geral = media.filter(v => v > 0).reduce((a, v, _, arr) => a + v / arr.length, 0);
+      const mx = media.indexOf(Math.max(...media)), comDado = media.map((v, i) => [v, i]).filter(([v]) => v > 0);
+      const mn = comDado.length ? comDado.reduce((a, b) => b[0] < a[0] ? b : a)[1] : -1;
+      return {
+        kpis:[
+          kpiCR('Mês mais alto', media[mx] ? MESES[mx] : '—', media[mx] ? `média ${fmtR(media[mx])} · ${pctCR(geral ? (media[mx] / geral - 1) * 100 : 0)} acima da média` : ''),
+          kpiCR('Mês mais baixo', mn >= 0 ? MESES[mn] : '—', mn >= 0 ? `média ${fmtR(media[mn])}` : ''),
+          kpiCR('Média mensal', fmtR(geral), `${anos.length} ano(s) de histórico`),
+          kpiCR('Variação entre meses', mn >= 0 ? fmtR(media[mx] - media[mn]) : '—', 'diferença entre o mês mais alto e o mais baixo'),
+        ],
+        grafico:{ labels:MESES3, series:[{ nome:`Média de ${x.rotTipo.toLowerCase()}`, dados:media, cor:x.pal.serie }] },
+        tabela:{ colunas:['Mês', 'Média', 'Índice', ...anos.map(String)],
+          linhas:MESES.map((m, j) => [m, celMoeda(media[j]), { v:geral ? Math.round(media[j] / geral * 100) : '', h:geral && media[j] ? String(Math.round(media[j] / geral * 100)) : '—', num:true }, ...dados.map(s => celMoeda(s[j]))]) },
+        notas:['Índice 100 = mês igual à média; 120 = 20% acima. Usa todo o histórico (não usa o período); meses sem lançamento não entram na média.'],
+        vazio:!todos.length ? `Nenhuma ${x.rotTipo.toLowerCase().slice(0, -1)} lançada.` : '',
+      };
+    } },
+
+  { id:'pareto', grupo:'Padrões de gasto', icone:'📊', titulo:'Curva ABC (Pareto 80/20)', usaTipo:true,
+    desc:'Poucas categorias concentram a maior parte do dinheiro: a classe A soma 80%, a B os 15% seguintes e a C o resto.',
+    formatos:['barras','barh'],
+    montar(x){
+      const cats = categoriasCR(x.lancs(x.tipo, x.p.ini, x.p.fim));
+      const tot = cats.reduce((a, g) => a + g.total, 0);
+      let acum = 0;
+      const rows = cats.map(g => { const antes = acum; acum += g.total; const pa = tot ? acum / tot * 100 : 0;
+        return { ...g, pct:tot ? g.total / tot * 100 : 0, pa, classe:tot && antes / tot * 100 < 80 ? 'A' : tot && antes / tot * 100 < 95 ? 'B' : 'C' }; });
+      const A = rows.filter(r => r.classe === 'A');
+      const corC = { A:x.pal.cat[1], B:x.pal.cat[0], C:x.pal.outras };
+      return {
+        kpis:[
+          kpiCR('Classe A (80%)', `${A.length} de ${rows.length}`, `${pctCR(rows.length ? A.length / rows.length * 100 : 0)} das categorias = ${fmtR(A.reduce((a, r) => a + r.total, 0))}`),
+          kpiCR('Classe B (15%)', String(rows.filter(r => r.classe === 'B').length), 'categorias intermediárias'),
+          kpiCR('Classe C (5%)', String(rows.filter(r => r.classe === 'C').length), 'muitas categorias pequenas'),
+          kpiCR('Total', fmtR(tot), x.p.rotulo),
+        ],
+        grafico:{ labels:rows.slice(0, 15).map(r => r.nome), legendaCores:[['Classe A', corC.A], ['Classe B', corC.B], ['Classe C', corC.C]],
+          series:[{ nome:x.rotTipo, dados:rows.slice(0, 15).map(r => +r.total.toFixed(2)), cor:corC.A, coresBarras:rows.slice(0, 15).map(r => corC[r.classe]),
+            dica:rows.slice(0, 15).map(r => `Classe ${r.classe} · ${pctCR(r.pa)} acumulado`) }] },
+        tabela:{ colunas:['#', 'Categoria', 'Valor', '%', '% acumulado', 'Classe'],
+          linhas:rows.map((r, i) => [celNum(i + 1), r.nome, celMoeda(r.total), celPct(r.pct), celPct(r.pa), { v:r.classe, h:`<b>${r.classe}</b>` }]) },
+        notas:['Comece pela classe A: é onde cortar faz mais diferença.'],
+        vazio:!rows.length ? `Nenhuma ${x.rotTipo.toLowerCase().slice(0, -1)} no período.` : '',
+      };
+    } },
+];
+const relCR = id => RELATORIOS.find(r => r.id === id) || RELATORIOS[0];
+
+// ── Painel (relatórios fixados) ──
+function painelCR(){
+  try { const v = JSON.parse(localStorage.getItem(CR_PAINEL_KEY) || 'null'); return Array.isArray(v) ? v.filter(id => RELATORIOS.some(r => r.id === id)) : null; }
+  catch(_){ return null; }
+}
+const painelAtualCR = () => painelCR() || ['executivo', 'recdesp', 'projecao', 'composicao'];
+function salvarPainelCR(lista){ try { localStorage.setItem(CR_PAINEL_KEY, JSON.stringify(lista)); } catch(_){} }
+function crFixar(id){
+  const l = painelAtualCR();
+  salvarPainelCR(l.includes(id) ? l.filter(x => x !== id) : l.concat(id));
+  renderCentral();
+}
+function crMover(id, passo){
+  const l = painelAtualCR(), i = l.indexOf(id), j = i + passo;
+  if(i < 0 || j < 0 || j >= l.length) return;
+  [l[i], l[j]] = [l[j], l[i]]; salvarPainelCR(l); renderCentral();
+}
+
+// ── Controles ──
+function crSet(campo, valor){
+  if(campo === 'fmt') _cr.fmt[_cr.rel] = valor;
+  else _cr[campo] = valor;
+  if(campo === 'rel') _cr.vista = 'rel';
+  renderCentral();
+  if(campo === 'rel'){ const e = document.getElementById('cr-rel'); if(e && window.innerWidth < 769) e.scrollIntoView({ block:'start' }); }
+}
+function crAbrir(id){ _cr.rel = id; _cr.vista = 'rel'; renderCentral(); }
+
+// ── Desenho ──
+function renderCentral(){
+  const box = document.getElementById('rel-central');
+  if(!box) return;
+  const x = ctxCR();
+  // barra de filtros
+  const $ = id => document.getElementById(id);
+  if($('cr-periodo')){
+    $('cr-periodo').innerHTML = PERIODOS_CR.map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+    $('cr-periodo').value = _cr.periodo;
+  }
+  if($('cr-pers')) $('cr-pers').style.display = _cr.periodo === 'pers' ? 'flex' : 'none';
+  if($('cr-de') && _cr.periodo === 'pers'){ $('cr-de').value = isoMesAbs(x.p.ini); $('cr-ate').value = isoMesAbs(x.p.fim); }
+  if($('cr-comparar')) $('cr-comparar').value = _cr.comparar;
+  if($('cr-cartao')) $('cr-cartao').checked = _cr.cartao;
+  set('cr-faixa', `${x.p.rotulo}${x.c ? ` · comparando com ${x.c.rotulo}` : ''} · ${_relFilterView === 'realizado' ? '✓ Realizado' : '📋 Previsto'}`);
+  const painel = painelAtualCR();
+  [['cr-v-rel', 'rel'], ['cr-v-painel', 'painel']].forEach(([id, v]) => { const t = $(id); if(t){ t.classList.toggle('active', _cr.vista === v); t.setAttribute('aria-selected', _cr.vista === v); } });
+  set('cr-v-painel-n', painel.length);
+  // catálogo
+  const menu = $('cr-menu');
+  if(menu) menu.innerHTML = GRUPOS_CR.map(gp => `<div class="cr-menu-gp">${gp}</div>` + RELATORIOS.filter(r => r.grupo === gp).map(r =>
+    `<button type="button" class="cr-menu-it${_cr.vista === 'rel' && r.id === _cr.rel ? ' on' : ''}" onclick="crAbrir('${r.id}')" title="${escAttr(r.desc)}">
+      <span class="cr-ic">${r.icone}</span><span>${r.titulo}</span>${painel.includes(r.id) ? '<span class="cr-pin" title="No meu painel">📌</span>' : ''}</button>`).join('')).join('');
+  const sel = $('cr-sel');
+  if(sel){ sel.innerHTML = GRUPOS_CR.map(gp => `<optgroup label="${gp}">${RELATORIOS.filter(r => r.grupo === gp).map(r => `<option value="${r.id}">${r.icone} ${r.titulo}</option>`).join('')}</optgroup>`).join('');
+           sel.value = _cr.rel; }
+  const alvo = $('cr-rel');
+  if(!alvo) return;
+  Object.keys(CH).filter(k => k.startsWith('ch-cr-')).forEach(k => { CH[k].destroy(); delete CH[k]; });
+  if(_cr.vista === 'painel') return desenharPainelCR(alvo, x, painel);
+  const r = relCR(_cr.rel);
+  const spec = r.montar(x);
+  const fmt = r.formatos.includes(_cr.fmt[r.id]) ? _cr.fmt[r.id] : r.formatos[0];
+  alvo.innerHTML = `
+    <div class="cr-cab">
+      <div class="cr-cab-txt"><h2><span class="cr-ic">${r.icone}</span>${r.titulo}</h2><p>${r.desc}</p>
+        <div class="cr-cab-faixa">${r.semPeriodo ? 'Não usa o período' : x.p.rotulo + (x.c && !['saldo'].includes(r.id) ? ` · vs ${x.c.rotulo}` : '')}${r.usaTipo ? ' · ' + x.rotTipo : ''}</div></div>
+      <div class="cr-acoes">
+        ${r.usaTipo ? `<select class="cr-sel-mini" aria-label="Tipo" onchange="crSet('tipo',this.value)">${Object.entries(TIPOS_CR).map(([v, t]) => `<option value="${v}"${v === _cr.tipo ? ' selected' : ''}>${t}</option>`).join('')}</select>` : ''}
+        ${r.formatos.length > 1 ? `<div class="toggle-row cr-fmts" role="tablist" aria-label="Formato do gráfico">${r.formatos.map(f => `<div class="tgl${f === fmt ? ' active' : ''}" role="tab" tabindex="0" aria-selected="${f === fmt}" data-fmt="${f}" onclick="crSet('fmt','${f}')">${FORMATOS_CR[f]}</div>`).join('')}</div>` : ''}
+        <button class="btn btn-ghost btn-xs" onclick="crCSV()" title="Baixar a tabela em CSV (abre no Excel)">⬇ CSV</button>
+        <button class="btn btn-ghost btn-xs" onclick="crImprimir()" title="Imprimir ou salvar em PDF">🖨 Imprimir</button>
+        <button class="btn ${painel.includes(r.id) ? 'btn-green' : 'btn-ghost'} btn-xs" id="cr-fixar" onclick="crFixar('${r.id}')">${painel.includes(r.id) ? '📌 No painel' : '📌 Fixar no painel'}</button>
+      </div>
+    </div>
+    ${corpoCR(spec, fmt, 'ch-cr-main', false)}`;
+  desenharGraficosCR(spec, fmt, 'ch-cr-main', false);
+  box._spec = spec; box._rel = r;
+}
+
+// Indicadores + gráfico(s) + tabela + notas de uma especificação
+function corpoCR(spec, fmt, idCh, compacto){
+  if(spec.vazio) return `${spec.kpis && !compacto ? kpisCR(spec.kpis, compacto) : ''}<div class="cr-vazio">${spec.vazio}</div>`;
+  const altura = compacto ? 190 : (fmt === 'rosca' ? 300 : fmt === 'barh' ? Math.max(240, (spec.grafico ? spec.grafico.labels.length : 8) * 30 + 60) : 300);
+  return `
+    ${spec.aviso && !compacto ? `<div class="cr-aviso">ℹ️ ${spec.aviso}</div>` : ''}
+    ${kpisCR(spec.kpis || [], compacto)}
+    ${spec.calor ? calorCR(spec.calor, compacto) : ''}
+    ${spec.grafico ? `<div class="cr-graf">${spec.grafico.titulo && !compacto ? `<div class="cr-sub-tit">${spec.grafico.titulo}</div>` : ''}
+      ${spec.grafico.legendaCores ? `<div class="cr-leg">${spec.grafico.legendaCores.map(([n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>` : ''}
+      <div class="chart-box" style="height:${altura}px"><canvas id="${idCh}" role="img" aria-label="${escAttr(spec.grafico.titulo || 'Gráfico do relatório')}"></canvas></div></div>` : ''}
+    ${!compacto && spec.tabela ? tabelaCR(spec.tabela) : ''}
+    ${!compacto && (spec.notas || []).length ? `<div class="cr-notas">${spec.notas.map(n => `<p>${n}</p>`).join('')}</div>` : ''}`;
+}
+function kpisCR(kpis, compacto){
+  const ks = compacto ? kpis.slice(0, 2) : kpis;
+  return ks.length ? `<div class="cr-kpis${compacto ? ' mini' : ''}">${ks.map(k => `<div class="cr-kpi${k.tom ? ' ' + k.tom : ''}">
+      <div class="cr-kpi-l">${k.rotulo}</div><div class="cr-kpi-v">${k.valor}</div>${k.sub ? `<div class="cr-kpi-s">${k.sub}</div>` : ''}</div>`).join('')}</div>` : '';
+}
+const celHtml = c => c == null ? '' : typeof c === 'object' ? (c.h != null ? c.h : String(c.v)) : escHtml(String(c));
+const celNumQ = c => c && typeof c === 'object' && c.num;
+function tabelaCR(t){
+  return `<div class="cr-tab">${t.titulo ? `<div class="cr-sub-tit">${t.titulo}</div>` : ''}<div class="tbl-wrap"><table class="tbl cr-tabela">
+    <thead><tr>${t.colunas.map((c, i) => `<th${i && (t.linhas[0] || [])[i] && celNumQ(t.linhas[0][i]) ? ' class="num"' : ''}>${escHtml(c)}</th>`).join('')}</tr></thead>
+    <tbody>${t.linhas.map(l => `<tr>${l.map((c, i) => `<td${celNumQ(c) ? ' class="num"' : ''}${i === 0 ? ' style="color:var(--t1);font-weight:500"' : ''}>${celHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+    ${t.rodape ? `<tfoot><tr>${t.rodape.map(c => `<td${celNumQ(c) ? ' class="num"' : ''}>${celHtml(c)}</td>`).join('')}</tr></tfoot>` : ''}
+  </table></div></div>`;
+}
+// Mapa de calor em HTML: um tom só, do claro ao escuro (sequencial)
+function calorCR(h, compacto){
+  const max = Math.max(0, ...h.valores.flat().filter(v => v != null));
+  const cel = v => v == null ? '<td class="x"></td>'
+    : `<td style="${v > 0 && max ? `background:${corAlfa(h.cor, .12 + .78 * v / max)};` : ''}" title="${v ? fmtR(v) : 'sem gasto'}"></td>`;
+  return `<div class="cr-calor">${h.titulo && !compacto ? `<div class="cr-sub-tit">${h.titulo}</div>` : ''}
+    <div class="tbl-wrap"><table><thead><tr><th></th>${h.colunas.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${h.linhas.map((l, i) => `<tr><th>${l}</th>${h.valores[i].map(cel).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="cr-calor-esc"><span>menos</span>${[.12, .34, .56, .78, .9].map(a => `<i style="background:${corAlfa(h.cor, a)}"></i>`).join('')}<span>mais · máx ${fmtR(max)}</span></div></div>`;
+}
+// Chart.js a partir da especificação, no formato escolhido
+function desenharGraficosCR(spec, fmt, idCh, compacto){
+  const g = spec.grafico;
+  if(!g || spec.vazio || !document.getElementById(idCh)) return;
+  const pal = paletaRC();
+  const moeda = v => 'R$ ' + Number(v).toLocaleString('pt-BR');
+  const muitos = g.labels.length > 18;
+  if(fmt === 'rosca'){
+    const s = g.series[0];
+    mkCh(idCh, { type:'doughnut', data:{ labels:g.labels, datasets:[{ data:s.dados, backgroundColor:s.cores || g.labels.map((_, i) => i < 5 ? pal.cat[i] : pal.outras), borderColor:pal.sup, borderWidth:2 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins:{ legend:{ position:compacto ? 'bottom' : 'right', labels:{ color:pal.tick, font:{ size:11 }, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3 } },
+          tooltip:{ callbacks:{ label:c => { const t = c.dataset.data.reduce((a, v) => a + v, 0); return ` ${c.label}: ${fmtR(c.raw)} (${pctCR(t ? c.raw / t * 100 : 0)})`; } } } } } });
+    return;
+  }
+  const horiz = fmt === 'barh', linha = fmt === 'linhas' || fmt === 'area', emp = fmt === 'empilhado' || (fmt === 'barras' && g.empilhado);
+  const multi = g.series.length > 1;
+  const datasets = g.series.map((s, j) => {
+    const comoLinha = linha || (s.linha && !horiz);
+    const base = { label:s.nome, data:s.dados, order:s.linha ? 0 : 1 };
+    if(comoLinha) return Object.assign(base, { type:'line', borderColor:s.cor, backgroundColor:fmt === 'area' ? corAlfa(s.cor, multi ? .14 : .22) : s.cor,
+      fill:fmt === 'area' ? (emp ? true : 'origin') : false, tension:.3, borderWidth:2, pointRadius:muitos ? 0 : 4, pointHoverRadius:5,
+      pointBackgroundColor:s.cor, pointBorderColor:pal.sup, pointBorderWidth:2, stack:emp ? 's' : undefined });
+    return Object.assign(base, { type:'bar', backgroundColor:s.coresBarras || s.cor, borderColor:pal.sup, borderWidth:emp ? { top:2 } : 0,
+      borderRadius:emp ? 0 : 4, maxBarThickness:horiz ? 22 : 40, categoryPercentage:.72, barPercentage:.9, stack:emp ? 's' : undefined });
+  });
+  const eixoV = { stacked:emp, beginAtZero:true, ticks:{ color:pal.tick, font:{ size:10 }, callback:v => moeda(v) }, grid:{ color:pal.grid } };
+  const longos = !horiz && g.labels.some(t => String(t).length > 8);   // nomes de categoria: inclina em vez de pular
+  const eixoC = { stacked:emp, ticks:{ color:pal.tick, font:{ size:10 }, autoSkip:muitos || !longos, maxRotation:longos ? 40 : 0, autoSkipPadding:6,
+    callback:function(v){ const t = this.getLabelForValue(v); return horiz && t.length > 22 ? t.slice(0, 21) + '…' : t; } }, grid:{ display:false } };
+  mkCh(idCh, { type:'bar', data:{ labels:g.labels, datasets },
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:horiz ? 'y' : 'x',
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:multi && !g.legendaCores, labels:{ color:pal.tick, font:{ size:11 }, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:3, sort:(a, b) => a.datasetIndex - b.datasetIndex } },
+        tooltip:{ itemSort:(a, b) => a.datasetIndex - b.datasetIndex, callbacks:{ label:c => ` ${c.dataset.label}: ${fmtR(c.raw)}`,
+          afterLabel:c => { const s = g.series[c.datasetIndex]; return s && s.dica ? s.dica[c.dataIndex] : ''; },
+          footer:items => emp && items.length > 1 ? `Total: ${fmtR(items.reduce((a, i) => a + (+i.raw || 0), 0))}` : '' } } },
+      scales:horiz ? { x:eixoV, y:eixoC } : { x:eixoC, y:eixoV } } });
+}
+function desenharPainelCR(alvo, x, painel){
+  if(!painel.length){
+    alvo.innerHTML = `<div class="cr-vazio">Seu painel está vazio. Abra um relatório e toque em <b>📌 Fixar no painel</b> — os fixados aparecem aqui, lado a lado.
+      <div style="margin-top:12px"><button class="btn btn-green btn-xs" onclick="salvarPainelCR(['executivo','recdesp','projecao','composicao']);renderCentral()">Montar um painel sugerido</button></div></div>`;
+    return;
+  }
+  const specs = painel.map(id => { const r = relCR(id); return { r, spec:r.montar(x), fmt:r.formatos.includes(_cr.fmt[id]) ? _cr.fmt[id] : r.formatos[0] }; });
+  alvo.innerHTML = `<div class="cr-painel-cab"><h2>Meu painel</h2><p>${painel.length} relatório(s) fixado(s) · ${x.p.rotulo}. Use ◀ ▶ para reordenar.</p></div>
+    <div class="cr-painel">${specs.map(({ r, spec, fmt }, i) => `<div class="cr-bloco" data-rel="${r.id}">
+      <div class="cr-bloco-cab"><button type="button" class="cr-bloco-tit" onclick="crAbrir('${r.id}')" title="Abrir o relatório completo">${r.icone} ${r.titulo}</button>
+        <div class="cr-bloco-ac"><button type="button" title="Mover para antes" onclick="crMover('${r.id}',-1)" ${i ? '' : 'disabled'}>◀</button><button type="button" title="Mover para depois" onclick="crMover('${r.id}',1)" ${i < specs.length - 1 ? '' : 'disabled'}>▶</button><button type="button" title="Tirar do painel" onclick="crFixar('${r.id}')">✕</button></div></div>
+      ${corpoCR(spec, fmt, 'ch-cr-p-' + r.id, true)}</div>`).join('')}</div>`;
+  specs.forEach(({ r, spec, fmt }) => desenharGraficosCR(spec, fmt, 'ch-cr-p-' + r.id, true));
+}
+
+// ── Exportar ──
+function crCSV(){
+  const box = document.getElementById('rel-central');
+  const spec = box && box._spec, r = box && box._rel;
+  if(!spec || !spec.tabela) return;
+  const t = spec.tabela;
+  const txt = c => { const v = c && typeof c === 'object' ? c.v : c;
+    const s = typeof v === 'number' ? String(v).replace('.', ',') : String(v == null ? '' : v).replace(/<[^>]+>/g, '');
+    return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const linhas = [t.colunas, ...t.linhas, ...(t.rodape ? [t.rodape] : [])].map(l => l.map(txt).join(';'));
+  const csv = '﻿' + linhas.join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+  a.download = `financaspro-${r.id}-${isoMesAbs(periodoCR().ini)}_${isoMesAbs(periodoCR().fim)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  return csv;
+}
+function crImprimir(){
+  document.body.classList.add('cr-imprimindo');
+  const tira = () => { document.body.classList.remove('cr-imprimindo'); window.removeEventListener('afterprint', tira); };
+  window.addEventListener('afterprint', tira);
+  window.print();
+  setTimeout(tira, 1500);
+}
+
 // ── RELATÓRIOS ──
 let _relView='anual';
 const DIAS_SEMANA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5508,7 +6412,7 @@ function tglRel(v,el){
   _relView=v;
   document.querySelectorAll('#page-rel .tgl').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  const allViews=['anual','cat','despesas','fluxo','dre-mensal','dre-semanal','dre-diario'];
+  const allViews=['central','anual','cat','despesas','fluxo','dre-mensal','dre-semanal','dre-diario'];
   allViews.forEach(x=>{
     const e=document.getElementById('rel-'+x);
     if(e) e.style.display=x===v?'block':'none';
@@ -5571,6 +6475,9 @@ function renderRel(){
   if(_relView==='dre-mensal') renderDREMensal(d, ativos);
   if(_relView==='dre-semanal') renderDRESemanal(d, ativos);
   if(_relView==='dre-diario') renderDREDiario(d, ativos);
+
+  // ── Central de Relatórios ──
+  if(_relView==='central') renderCentral();
 }
 
 // ══ RELATÓRIO POR CATEGORIA ════════════════════════════════════

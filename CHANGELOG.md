@@ -4,6 +4,61 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-16] Central de Relatórios: 15 relatórios analíticos, modulares e dinâmicos
+
+### 🎯 O que foi pedido
+
+Melhorar os relatórios com **projeção de pagamentos**, **contas a pagar**, **comparação por período, meses e
+anos** de despesas e faturamento, e **mais uns 10 tipos de relatório** com gráficos analíticos em diversos
+formatos — relatórios **modulares e dinâmicos**.
+
+### ✨ Implementado
+
+Nova aba **★ Central de Relatórios** em Relatórios (as abas antigas continuam iguais).
+
+- **Filtros que valem para todos os relatórios:** período (este mês, mês passado, este trimestre, últimos
+  3/6/12 meses, este ano, ano passado ou **personalizado de/até**), **comparar com** (período anterior,
+  mesmo período do ano passado ou sem comparação), **Previsto/Realizado** (o botão do topo) e
+  **💳 compras do cartão por categoria**.
+- **15 relatórios**, em 5 grupos:
+  - *Visão geral:* **Painel executivo** (receitas, despesas, resultado, taxa de poupança, despesa média,
+    maior gasto, a pagar em 30 dias, comprometimento com dívidas — tudo com a variação) e **Evolução do saldo**.
+  - *Receitas e despesas:* **Receitas × Despesas (faturamento)** mês a mês com o resultado,
+    **Comparação de períodos** por categoria (o que subiu e o que caiu), **Comparativo entre anos** (cada ano
+    numa linha, comparando até o mesmo mês) e **Orçado × Realizado** (categorias estouradas).
+  - *Pagamentos:* **Projeção de pagamentos** dos próximos 12 meses (contas, cartões e dívidas) e **A pagar
+    por vencimento** (vencido há mais de 60, 31–60, 1–30 dias; vence em 7, 30, 60, 90 dias ou depois).
+  - *Cartões e dívidas:* **Cartões de crédito** (faturas por cartão, maior fatura, uso do limite) e
+    **Dívidas: quitação projetada** (saldo de cada dívida caindo até zerar e quando fica livre).
+  - *Padrões de gasto:* **Composição por categoria**, **Mapa de calor** (gasto por dia e média por dia da
+    semana), **Por conta e forma de pagamento** (ticket médio), **Sazonalidade** (meses que costumam pesar
+    mais, com índice) e **Curva ABC / Pareto 80/20**.
+- **Diversos formatos:** cada relatório oferece os formatos que fazem sentido para ele — colunas, linhas,
+  área, empilhado, barras horizontais, rosca e mapa de calor — e lembra o escolhido.
+- **Sempre gráfico + indicadores + tabela + notas explicativas**; cores testadas para daltonismo, um eixo
+  só, claro e escuro.
+- **Exportar:** ⬇ **CSV** (abre direto no Excel: separador `;`, decimal com vírgula) e 🖨 **Imprimir/PDF**
+  só do relatório.
+- **Meu painel (modular):** 📌 fixe os relatórios que quiser; eles aparecem lado a lado, com ◀ ▶ para
+  reordenar e ✕ para tirar. Começa com um painel sugerido e fica salvo no navegador.
+- **Celular:** o catálogo vira um seletor, indicadores em duas colunas e tabelas com rolagem própria.
+
+### 🧪 Testes
+
+- **`test-relatorios.js` — 43 verificações:** catálogo, todos os períodos e comparações, painel executivo
+  conferido contra a soma dos lançamentos, Previsto × Realizado, troca de formato (colunas, linhas, área,
+  rosca, barras, empilhado), comparação de períodos, receitas, ano a ano sem zerar meses futuros, projeção
+  igual à de Contas a Pagar, faixas de vencimento somando o aberto, dívidas zerando, curva ABC, orçado,
+  cartão por categoria, personalizado, CSV, impressão, painel (fixar, salvar, reordenar, tirar, abrir) e
+  celular. Além disso, todos os relatórios × formatos × períodos × comparações × tipos renderizados sem erro.
+- Todas as suítes passando — **856 verificações**.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum. Os relatórios só leem os dados; o único item salvo é a lista do "Meu painel" (no navegador).
+
+---
+
 ## [2026-10-16] Contas a Pagar com tudo o que há para pagar (contas, cartões e dívidas) e quanto reduz nos próximos meses
 
 ### 🎯 O que foi pedido
