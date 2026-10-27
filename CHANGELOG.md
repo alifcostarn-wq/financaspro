@@ -4,6 +4,79 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Dashboard enxuto: menos texto, cada informação num lugar só
+
+### 🎯 O que foi pedido
+
+Melhorar o **Dashboard**, que estava **muito poluído de informação e textos**.
+
+### 🐛 O que poluía
+
+- **12 cartões de números** (8 no topo e mais 4 na agenda), quase todos com uma linha de texto embaixo
+  ("vs R$ 8.064,00 mês ant.", "Caixa: … · Investimentos: … · Dívidas: …").
+- **Os mesmos avisos em três lugares:** o painel "O que fazer agora" (6 cartões, cada um com etiqueta,
+  frase, explicação e botão), a lista "Alertas" e a tabela da agenda.
+- **Três cabeçalhos:** banner de boas-vindas, título "Dashboard" e subtítulo.
+- **Tabela de compromissos** com 8 colunas e filtros, repetindo o que já está em Contas a Pagar.
+- Gráficos que pouco ajudavam: rosca de categorias com legenda ao lado (e as barras de orçamento num bloco
+  separado) e o "ritmo de gastos da semana".
+- A **"Projeção de fechamento"** multiplicava a receita do mês pelos dias do mês: com o salário recebido no
+  dia 5, projetava R$ 16.665 de receita em vez de R$ 8.064 — e mostrava +R$ 7.228 de saldo quando o mês
+  caminhava para fechar no vermelho.
+
+### ✨ Como ficou (de cima para baixo)
+
+1. **Cabeçalho único:** "Boa tarde, Alif!" e a data; à direita, Realizado/Previsto, o mês e + Lançamento.
+2. **O mês em 4 números** — Receitas, Despesas, Investido e Saldo — cada um com **uma linha só**: a variação
+   sobre o mês anterior ("▼ 16,9% vs set": verde quando é bom, vermelho quando é ruim; o valor do mês
+   anterior aparece ao passar o mouse). No modo Realizado, o saldo mostra o **previsto do mês** (com os
+   lançamentos pendentes e agendados).
+3. **Receitas e despesas do ano:** colunas com o mês escolhido em destaque; clique num mês para ver o resumo
+   dele; o saldo aparece ao passar o mouse.
+4. **Precisa de atenção:** uma lista só, em ordem de gravidade, **uma linha por assunto** — atrasos (contas,
+   faturas e parcelas juntos), o que vence em 7 dias, caixa que não cobre o mês, mês no vermelho, orçamento
+   (inclusive a categoria que **vai passar** da meta com os pendentes), tarefas atrasadas e a dica de investir.
+   Mostra 4 e "Mostrar mais"; sem nada pendente, "✓ Tudo em dia". Cada linha leva para a tela certa.
+5. **Despesas por categoria:** as 5 maiores (o resto em "Outras") em barras, com o aviso de orçamento na
+   própria categoria ("⚠ perto do limite · 97%", "▲ passou do orçamento · 103%").
+6. **Próximos pagamentos:** os 5 primeiros dos próximos 30 dias, atrasados antes, com **Pagar**; no rodapé,
+   quantos são, o total e se o caixa cobre. A lista completa continua em Contas a Pagar ("Ver todos").
+7. **Últimos lançamentos:** os 5 mais recentes.
+8. **Patrimônio** (valor, composição numa linha e o gráfico do ano — sem desenhar os meses que ainda não
+   chegaram) e **Saúde financeira** (nota, o que mais pesa e os 4 indicadores: abertos no computador,
+   recolhidos no celular).
+
+- **Celular:** uma coluna; "Precisa de atenção" logo depois dos números; o botão "+ Lançamento" do topo dá
+  lugar ao ＋ flutuante; o seletor de mês ficou legível (antes ficava espremido).
+- As cores de receitas × despesas no gráfico foram **validadas** para daltonismo e contraste nos dois temas.
+- A página ficou com **menos da metade da altura**: 1.310 px em vez de 2.843 px no computador e 2.502 px em
+  vez de 5.060 px no celular.
+
+### 🗑 O que saiu do Dashboard
+
+Banner de boas-vindas (a saudação virou o título); a segunda linha de indicadores (score, patrimônio,
+projeção e contas pendentes — viraram parte dos blocos acima); o painel "O que fazer agora" e a lista
+"Alertas" (viraram "Precisa de atenção"); a Agenda de Compromissos com tabela e filtros (completa em Contas a
+Pagar); a rosca de categorias; o ritmo de gastos da semana; e a projeção de fechamento.
+
+### 🧪 Testes
+
+- **`test-dashboard.js` — 38 verificações:** cabeçalho; blocos antigos fora; ordem dos blocos; altura da
+  página; os 4 números e suas variações (cores e detalhe do mês anterior); gráfico (cores validadas, mês em
+  destaque, saldo no detalhe, clique escolhe o mês); "Precisa de atenção" (assuntos, gravidade, valores,
+  orçamento com pendentes, clique leva a Contas a Pagar, "Mostrar mais", "Tudo em dia"); categorias e avisos
+  de orçamento; próximos pagamentos (ordem, situação, total, Pagar abre o pagamento da fatura); últimos
+  lançamentos; patrimônio; saúde; modo Previsto; mês sem movimento; celular (uma coluna, ordem, sem rolagem
+  lateral, mês legível, indicadores recolhidos); sem erros de JS.
+- **452 verificações** passando em 12 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum: muda só a tela. Os cálculos de receitas, despesas, saldo, patrimônio, saúde e compromissos são os
+mesmos de antes.
+
+---
+
 ## [2026-10-27] Efeito ao clicar no botão de lançamento e ao abrir o Novo Lançamento
 
 ### 🎯 O que foi pedido

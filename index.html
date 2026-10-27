@@ -68,6 +68,7 @@
   --theme-transition: background .25s ease, color .25s ease, border-color .25s ease;
   /* séries de gráfico validadas para daltonismo (orçado · realizado · pendente) */
   --viz-prev:#3987e5; --viz-real:#d95926; --viz-pend:#199e70;
+  --viz-rec:#16ad69; --viz-des:#b8344d;   /* receitas × despesas: validadas (faixa de luz, daltonismo, contraste) */
 }
 
 /* ── LIGHT THEME ── */
@@ -75,6 +76,7 @@ body.theme-light{
   --marca-a:#00a85e;
   --marca-b:#0891b2;
   --viz-prev:#2a78d6; --viz-real:#eb6834; --viz-pend:#1baf7a;
+  --viz-rec:#1b9c5b; --viz-des:#a3263d;
   --bg:#f0f4f8;
   --surface0:#ffffff;
   --surface1:#f7f9fc;
@@ -786,11 +788,6 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   /* KPI sub text smaller */
   .kpi-sub{font-size:9px}
 
-  /* Score card */
-  #dk-score{font-size:22px!important}
-
-  /* Dashboard ritmo detalhe */
-  #dk-ritmo-detalhe > div{flex-direction:column}
 }
 
 /* ── Small phones ── */
@@ -802,82 +799,119 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   .bn-item{min-width:44px;padding:4px 4px}
 }
 
-/* ── PAINEL O QUE FAZER AGORA ── */
-#dash-agora-wrap .agora-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:12px;
+/* ── DASHBOARD ── */
+.dash-topo{align-items:center}
+.dash-ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dash-modo{display:inline-flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);padding:2px}
+.dash-modo button{border:none;background:transparent;color:var(--t3);font:600 11px 'Sora',sans-serif;padding:6px 12px;border-radius:6px;cursor:pointer}
+.dash-modo button.on{background:var(--surface4);color:var(--t1)}
+.dash-modo button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+#dash-mes{background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:8px 12px;border-radius:var(--r2);font:12px 'Sora',sans-serif}
+.dash-kpis{margin-bottom:16px}
+.dk-nota{font-size:11px;color:var(--t3);margin-top:6px;min-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-nota .bom{color:var(--green);font-weight:600}
+.dk-nota .ruim{color:var(--red);font-weight:600}
+.dash-linha{display:grid;gap:16px;margin-bottom:16px}
+.dash-l2,.dash-l4{grid-template-columns:minmax(0,1.65fr) minmax(0,1fr)}
+.dash-l3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.dash-card{margin-bottom:0;display:flex;flex-direction:column;min-width:0}
+.dash-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dash-card-hd h2{margin:0}
+.dash-leg{display:flex;gap:12px;font-size:11px;color:var(--t2);white-space:nowrap}
+.dash-leg span{display:inline-flex;align-items:center;gap:5px}
+.dash-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.dash-leg .lg-rec{background:var(--viz-rec)}
+.dash-leg .lg-des{background:var(--viz-des)}
+.dash-link{border:none;background:none;color:var(--t3);font:600 11px 'Sora',sans-serif;cursor:pointer;padding:2px 0;white-space:nowrap}
+.dash-link:hover,.dash-link:focus-visible{color:var(--t1)}
+.dash-cont{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--surface3);color:var(--t2);font:700 11px 'Sora',sans-serif;display:inline-flex;align-items:center;justify-content:center}
+.dash-cont:empty{display:none}
+.dash-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.dash-big{font:700 20px 'JetBrains Mono',monospace;letter-spacing:-.5px;white-space:nowrap}
+.dash-graf-cresce{flex:1 1 auto;min-height:150px}   /* o gráfico ocupa a altura que o cartão tiver */
+.dash-vazio{font-size:12px;color:var(--t3);padding:18px 0;text-align:center}
+.dash-mais{border:none;background:none;color:var(--t3);font:600 11px 'Sora',sans-serif;cursor:pointer;padding:8px 8px 0}
+.dash-mais:hover{color:var(--t1)}
+/* Precisa de atenção: uma linha por assunto */
+.dk-at{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:none;border-left:3px solid transparent;background:transparent;padding:9px 8px;border-radius:0 var(--r2) var(--r2) 0;cursor:pointer;color:inherit;font:inherit}
+.dk-at + .dk-at{margin-top:4px}
+.dk-at:hover,.dk-at:focus-visible{background:var(--surface2);outline:none}
+.dk-at.urgente{border-left-color:var(--red)}
+.dk-at.atencao{border-left-color:var(--amber)}
+.dk-at.info{border-left-color:var(--blue)}
+.dk-at-ic{font-size:15px;width:22px;text-align:center;flex:none}
+.dk-at-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.dk-at-txt b{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-at-txt small{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-at-val{font:600 12px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap}
+.dk-at-ir{color:var(--t3);font-size:16px;line-height:1}
+.dk-ok{display:flex;gap:12px;align-items:center;padding:14px;border-radius:var(--r2);background:var(--green-dim)}
+.dk-ok > span{font-size:18px;color:var(--green);font-weight:700}
+.dk-ok b{display:block;font-size:13px;color:var(--t1)}
+.dk-ok small{font-size:11px;color:var(--t2)}
+/* Despesas por categoria: ranking com barra e aviso de orçamento */
+.dk-cat + .dk-cat{margin-top:12px}
+.dk-cat-l{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--t2)}
+.dk-cat-l span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dk-cat-l .mono{color:var(--t1);font-size:11.5px;white-space:nowrap}
+.dk-cat-bar{height:6px;border-radius:3px;background:var(--surface3);margin-top:5px;overflow:hidden}
+.dk-cat-bar i{display:block;height:100%;border-radius:3px;background:var(--blue)}
+.dk-cat-orc{font-size:10.5px;margin-top:4px;font-weight:600}
+.dk-cat-orc.acima{color:var(--red)}
+.dk-cat-orc.perto{color:var(--amber)}
+/* Próximos pagamentos e últimos lançamentos: listas curtas */
+.dk-px,.dk-ul{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.dk-px:first-child,.dk-ul:first-child{border-top:none;padding-top:0}
+.dk-px-data{width:36px;flex:none;text-align:center;line-height:1.15;font-size:10px;color:var(--t3)}
+.dk-px-data b{display:block;font:700 15px 'JetBrains Mono',monospace;color:var(--t1)}
+.dk-px.atrasado .dk-px-data b{color:var(--red)}
+.dk-px-txt,.dk-ul-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.dk-px-txt b,.dk-ul-txt b{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-px-txt small,.dk-ul-txt small{font-size:10.5px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-px-txt small.atraso{color:var(--red);font-weight:600}
+.dk-px-txt small.hoje{color:var(--amber);font-weight:600}
+.dk-px-val,.dk-ul-val{font:600 12px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap}
+.dk-px .btn{flex:none}
+.dk-px-tot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);font-size:11px;color:var(--t3)}
+.dk-px-tot b{color:var(--t1);font-family:'JetBrains Mono',monospace}
+.dk-px-tot .bom{color:var(--green);font-weight:600}
+.dk-px-tot .ruim{color:var(--red);font-weight:600}
+.dk-ul-val.rec{color:var(--green)}
+.dk-ul-val.des{color:var(--red)}
+.dk-ul-val.inv{color:var(--blue)}
+/* Saúde financeira: nota, o que pesa e os indicadores sob demanda */
+.dk-score{display:flex;align-items:center;gap:16px}
+.dk-score-num{white-space:nowrap}
+.dk-score-num b{font:700 34px 'JetBrains Mono',monospace;letter-spacing:-1px}
+.dk-score-num span{font-size:12px;color:var(--t3);margin-left:2px}
+.dk-score-info{flex:1;min-width:0}
+.dk-score-nota{font-size:13px;font-weight:700}
+.dk-ind{margin-top:auto;border-top:1px solid var(--line);padding-top:10px}
+.dk-score + .dk-ind{margin-top:16px}
+.dk-ind summary{cursor:pointer;font-size:11.5px;font-weight:600;color:var(--t2);list-style:none;width:max-content}
+.dk-ind summary::-webkit-details-marker{display:none}
+.dk-ind summary::before{content:'›';display:inline-block;margin-right:6px;transition:transform .15s}
+.dk-ind[open] summary::before{transform:rotate(90deg)}
+.dk-ind summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+#dash-saude{margin-top:10px}
+.dk-ind-l{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--t2)}
+.dk-ind-l .mono{white-space:nowrap}
+.dk-ind-i + .dk-ind-i{margin-top:10px}
+@media (max-width:1100px){
+  .dash-l3{grid-template-columns:1fr 1fr}
+  .dash-l3 > :first-child{grid-column:1 / -1}
 }
-#dash-agora-wrap .agora-title{
-  font-size:13px;font-weight:700;color:var(--t1);
-  display:flex;align-items:center;gap:8px;
-}
-#dash-agora-wrap .agora-title span.pulse{
-  width:8px;height:8px;border-radius:50%;background:var(--green);
-  display:inline-block;animation:ag-pulse 1.8s ease-in-out infinite;
-}
-#dash-agora-wrap .agora-title span.pulse.red{ background:var(--red); }
-@keyframes ag-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
-#dash-agora-wrap .agora-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;
-}
-#dash-agora-wrap .agora-card{
-  background:var(--surface1);border:1px solid var(--line);border-radius:var(--r);
-  padding:14px 16px;display:flex;gap:12px;align-items:flex-start;
-  cursor:pointer;transition:border-color .15s,transform .15s;position:relative;
-  overflow:hidden;
-}
-#dash-agora-wrap .agora-card:hover{transform:translateY(-2px);}
-#dash-agora-wrap .agora-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;
-}
-#dash-agora-wrap .agora-card.urgente{ border-color:var(--red); }
-#dash-agora-wrap .agora-card.urgente::before{ background:var(--red); }
-#dash-agora-wrap .agora-card.urgente:hover{ box-shadow:0 4px 20px var(--red-dim); }
-#dash-agora-wrap .agora-card.atencao{ border-color:var(--amber); }
-#dash-agora-wrap .agora-card.atencao::before{ background:var(--amber); }
-#dash-agora-wrap .agora-card.atencao:hover{ box-shadow:0 4px 20px var(--amber-dim); }
-#dash-agora-wrap .agora-card.info{ border-color:var(--blue); }
-#dash-agora-wrap .agora-card.info::before{ background:var(--blue); }
-#dash-agora-wrap .agora-card.info:hover{ box-shadow:0 4px 20px var(--blue-dim); }
-#dash-agora-wrap .agora-card.ok{ border-color:var(--green); }
-#dash-agora-wrap .agora-card.ok::before{ background:var(--green); }
-#dash-agora-wrap .agora-card.ok:hover{ box-shadow:0 4px 20px var(--green-dim); }
-#dash-agora-wrap .agora-icon{
-  font-size:22px;flex-shrink:0;width:40px;height:40px;border-radius:var(--r2);
-  display:flex;align-items:center;justify-content:center;
-}
-#dash-agora-wrap .agora-card.urgente .agora-icon{ background:var(--red-dim); }
-#dash-agora-wrap .agora-card.atencao .agora-icon{ background:var(--amber-dim); }
-#dash-agora-wrap .agora-card.info    .agora-icon{ background:var(--blue-dim); }
-#dash-agora-wrap .agora-card.ok      .agora-icon{ background:var(--green-dim); }
-#dash-agora-wrap .agora-body{ flex:1;min-width:0; }
-#dash-agora-wrap .agora-label{
-  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:3px;
-}
-#dash-agora-wrap .agora-card.urgente .agora-label{ color:var(--red); }
-#dash-agora-wrap .agora-card.atencao .agora-label{ color:var(--amber); }
-#dash-agora-wrap .agora-card.info    .agora-label{ color:var(--blue); }
-#dash-agora-wrap .agora-card.ok      .agora-label{ color:var(--green); }
-#dash-agora-wrap .agora-msg{
-  font-size:12px;color:var(--t1);font-weight:600;line-height:1.4;margin-bottom:4px;
-}
-#dash-agora-wrap .agora-sub{
-  font-size:11px;color:var(--t3);line-height:1.4;
-}
-#dash-agora-wrap .agora-action{
-  font-size:10px;font-weight:700;letter-spacing:.04em;margin-top:6px;
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 8px;border-radius:20px;
-}
-#dash-agora-wrap .agora-card.urgente .agora-action{ background:var(--red-dim);color:var(--red); }
-#dash-agora-wrap .agora-card.atencao .agora-action{ background:var(--amber-dim);color:var(--amber); }
-#dash-agora-wrap .agora-card.info    .agora-action{ background:var(--blue-dim);color:var(--blue); }
-#dash-agora-wrap .agora-card.ok      .agora-action{ background:var(--green-dim);color:var(--green); }
-#dash-agora-wrap .agora-tudo-ok{
-  background:linear-gradient(135deg,var(--green-dim),transparent);
-  border:1px solid var(--green);border-radius:var(--r);
-  padding:16px 20px;display:flex;align-items:center;gap:14px;
+@media (max-width:768px){
+  .dash-l2,.dash-l3,.dash-l4{grid-template-columns:1fr}
+  .dash-l3 > :first-child{grid-column:auto}
+  .dash-atencao-card{order:-1}
+  .dash-ctrl{width:100%}
+  .dash-ctrl .dash-novo{display:none}   /* no celular o ＋ flutuante já faz isso */
+  .dash-modo{flex:1}
+  .dash-modo button{flex:1}
+  #dash-mes{flex:1;min-width:0}
+  .dash-leg{gap:8px}
+  .dash-card-hd{flex-wrap:wrap}
 }
 
 /* ── OFX CONCILIAÇÃO ── */
@@ -1499,241 +1533,105 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 
 <!-- ───── DASHBOARD ───── -->
 <div class="page active" id="page-dash">
-  <!-- Boas-vindas -->
-  <div id="dash-welcome" style="
-    display:flex;align-items:center;gap:14px;
-    padding:16px 22px;margin-bottom:4px;
-    background:linear-gradient(135deg,var(--surface1) 0%,var(--surface2) 100%);
-    border:1px solid var(--line);border-radius:var(--r);
-    position:relative;overflow:hidden;
-  ">
-    <!-- Detalhe decorativo -->
-    <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:var(--green-dim);pointer-events:none"></div>
-    <div style="position:absolute;right:60px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:var(--cyan-dim);pointer-events:none"></div>
-    <!-- Ícone / Avatar -->
-    <div style="
-      width:44px;height:44px;border-radius:50%;flex-shrink:0;
-      background:linear-gradient(135deg,var(--green),var(--cyan));
-      display:flex;align-items:center;justify-content:center;
-      font-size:20px;box-shadow:0 4px 16px var(--green-dim);
-      position:relative;z-index:1;
-    " id="dash-welcome-avatar">👤</div>
-    <!-- Texto -->
-    <div style="position:relative;z-index:1">
-      <div style="font-size:18px;font-weight:700;color:var(--t1);letter-spacing:-.3px" id="dash-welcome-text">Bom dia!</div>
-      <div style="font-size:11px;color:var(--t3);margin-top:2px" id="dash-welcome-date"></div>
-    </div>
-  </div>
-
-  <div class="topbar">
+  <!-- Cabeçalho: saudação, data e o mês em análise -->
+  <div class="topbar dash-topo">
     <div class="topbar-left">
-      <h1>Dashboard</h1>
-      <p id="dash-sub">Resumo financeiro do mês</p>
+      <h1 id="dash-welcome-text">Olá!</h1>
+      <p id="dash-welcome-date"></p>
     </div>
-    <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <!-- Filtro Previsto / Realizado -->
-      <div style="display:flex;background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden">
-        <button id="dash-btn-prev" onclick="setDashView('previsto')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--t3)">
-          📋 Previsto
-        </button>
-        <button id="dash-btn-real" onclick="setDashView('realizado')"
-          style="padding:7px 13px;font-size:11px;font-weight:600;font-family:'Sora',sans-serif;border:none;cursor:pointer;transition:all .15s;background:var(--green-dim);color:var(--green)">
-          ✓ Realizado
-        </button>
+    <div class="topbar-right dash-ctrl">
+      <div class="dash-modo" role="group" aria-label="Quais valores mostrar">
+        <button type="button" id="dash-btn-real" class="on" aria-pressed="true" onclick="setDashView('realizado')" title="Só o que já foi pago ou recebido">Realizado</button>
+        <button type="button" id="dash-btn-prev" aria-pressed="false" onclick="setDashView('previsto')" title="Inclui também o que ainda vai ser pago ou recebido">Previsto</button>
       </div>
-      <select id="dash-mes" onchange="renderDash()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:8px 12px;border-radius:var(--r2);font-size:12px;font-family:'Sora',sans-serif">
+      <select id="dash-mes" onchange="renderDash()" aria-label="Mês do resumo">
         <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
         <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
         <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
         <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
       </select>
-      <button class="btn btn-green" onclick="openM('m-lanc',this)" style="white-space:nowrap">+ Lançamento</button>
+      <button class="btn btn-green dash-novo" onclick="openM('m-lanc',this)">+ Lançamento</button>
     </div>
   </div>
 
-  <!-- ── PAINEL: O QUE FAZER AGORA ── -->
-  <div id="dash-agora-wrap" style="margin-bottom:20px"></div>
-
-  <!-- ── LINHA 1: KPIs principais com tendência ── -->
-  <div class="kpi-grid cols4" style="margin-bottom:12px">
-    <div class="kpi g" style="position:relative">
-      <div class="kpi-label">Receitas do Mês</div>
-      <div class="kpi-val g" id="dk-rec">R$ 0</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-        <span id="dk-rec-trend" style="font-size:10px"></span>
-        <span id="dk-rec-sub" style="font-size:10px;color:var(--t3)"></span>
-      </div>
-    </div>
-    <div class="kpi r">
-      <div class="kpi-label">Despesas do Mês</div>
-      <div class="kpi-val r" id="dk-des">R$ 0</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-        <span id="dk-des-trend" style="font-size:10px"></span>
-        <span id="dk-des-sub" style="font-size:10px;color:var(--t3)"></span>
-      </div>
-    </div>
-    <div class="kpi b">
-      <div class="kpi-label">Investimentos</div>
-      <div class="kpi-val b" id="dk-inv">R$ 0</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-        <span id="dk-inv-trend" style="font-size:10px"></span>
-        <span style="font-size:10px;color:var(--t3)" id="dk-inv-pct"></span>
-      </div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Saldo Líquido</div>
-      <div class="kpi-val" id="dk-sal">R$ 0</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-        <span id="dk-sal-trend" style="font-size:10px"></span>
-        <span id="dk-sal-sub" style="font-size:10px;color:var(--t3)"></span>
-      </div>
-    </div>
+  <!-- 1. O mês em quatro números -->
+  <div class="kpi-grid cols4 dash-kpis">
+    <div class="kpi g"><div class="kpi-label">Receitas</div><div class="kpi-val g" id="dk-rec">R$ 0,00</div><div class="dk-nota" id="dk-rec-nota"></div></div>
+    <div class="kpi r"><div class="kpi-label">Despesas</div><div class="kpi-val r" id="dk-des">R$ 0,00</div><div class="dk-nota" id="dk-des-nota"></div></div>
+    <div class="kpi b"><div class="kpi-label">Investido</div><div class="kpi-val b" id="dk-inv">R$ 0,00</div><div class="dk-nota" id="dk-inv-nota"></div></div>
+    <div class="kpi"><div class="kpi-label">Saldo do mês</div><div class="kpi-val" id="dk-sal">R$ 0,00</div><div class="dk-nota" id="dk-sal-nota"></div></div>
   </div>
 
-  <!-- ── LINHA 2: Score + Patrimônio + Projeção + Contas ── -->
-  <div class="kpi-grid cols4" style="margin-bottom:20px">
-    <!-- Score de Saúde -->
-    <div class="kpi" style="background:var(--surface1);border:1px solid var(--line);cursor:pointer" onclick="go('rel',document.querySelector('.nav-btn:nth-child(2)'))">
-      <div class="kpi-label">Score de Saúde</div>
-      <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
-        <div class="kpi-val" id="dk-score" style="font-size:28px">0</div>
-        <span style="font-size:11px;color:var(--t3)">/100</span>
+  <!-- 2. Como o ano está indo e o que precisa de atenção -->
+  <div class="dash-linha dash-l2">
+    <section class="card dash-card dash-grafico">
+      <div class="dash-card-hd">
+        <h2 class="card-title">Receitas e despesas em <span id="dk-ano-lbl"></span></h2>
+        <div class="dash-leg" aria-hidden="true"><span><i class="lg-rec"></i>Receitas</span><span><i class="lg-des"></i>Despesas</span></div>
       </div>
-      <div id="dk-score-bar" style="margin-top:8px">
-        <div style="height:4px;background:var(--surface3);border-radius:2px;overflow:hidden">
-          <div id="dk-score-fill" style="height:100%;border-radius:2px;transition:width .6s ease;width:0%"></div>
-        </div>
-        <div id="dk-score-label" style="font-size:9px;margin-top:4px;color:var(--t3)"></div>
+      <div class="chart-box" style="height:224px"><canvas id="ch-dash-ano" role="img" aria-label="Receitas e despesas de cada mês do ano. Clique num mês para ver o resumo dele."></canvas></div>
+    </section>
+    <section class="card dash-card dash-atencao-card">
+      <div class="dash-card-hd">
+        <h2 class="card-title">Precisa de atenção</h2>
+        <span class="dash-cont" id="dk-at-cont"></span>
       </div>
-    </div>
-    <!-- Patrimônio Líquido -->
-    <div class="kpi c">
-      <div class="kpi-label">Patrimônio Líquido</div>
-      <div class="kpi-val c" id="dk-patrimonio">R$ 0</div>
-      <div style="font-size:10px;color:var(--t3);margin-top:4px" id="dk-patrimonio-sub"></div>
-    </div>
-    <!-- Projeção de Fechamento -->
-    <div class="kpi a">
-      <div class="kpi-label">Projeção Fechamento</div>
-      <div class="kpi-val a" id="dk-proj">R$ 0</div>
-      <div style="font-size:10px;color:var(--t3);margin-top:4px" id="dk-proj-sub"></div>
-    </div>
-    <!-- Contas + Cartão -->
-    <div class="kpi p">
-      <div class="kpi-label">Contas Pendentes</div>
-      <div class="kpi-val p" id="dk-pend">0</div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px">
-        <span style="font-size:10px;color:var(--t3)" id="dk-pend-v"></span>
-        <span style="font-size:10px;color:var(--purple)" id="dk-cc-mini"></span>
-      </div>
-    </div>
+      <div id="dash-atencao"></div>
+    </section>
   </div>
 
-  <!-- ── LINHA 3: Gráficos principais ── -->
-  <div class="g2" style="margin-bottom:16px">
-    <!-- Gráfico Receita vs Despesa 12 meses -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <span class="card-title">Receitas vs Despesas — 12 meses</span>
-          <div class="card-sub" id="dk-grafico-sub">Clique em uma barra para ver o mês</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green)"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Receita</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--red)"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Despesa</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--blue)"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block"></span>Saldo</span>
-        </div>
+  <!-- 3. Para onde foi o dinheiro, o que vem por aí e o que entrou por último -->
+  <div class="dash-linha dash-l3">
+    <section class="card dash-card">
+      <div class="dash-card-hd">
+        <h2 class="card-title">Despesas por categoria</h2>
+        <button type="button" class="dash-link" onclick="irPagina('orc')">Orçamento ›</button>
       </div>
-      <div class="chart-box" style="height:220px"><canvas id="ch-dash-ano"></canvas></div>
-    </div>
-    <!-- Evolução do Patrimônio -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Evolução do Patrimônio Líquido</span>
-        <span class="badge bdg-cyan">Anual</span>
+      <div id="dk-cats"></div>
+    </section>
+    <section class="card dash-card">
+      <div class="dash-card-hd">
+        <h2 class="card-title">Próximos pagamentos</h2>
+        <button type="button" class="dash-link" onclick="irPagina('contas')">Ver todos ›</button>
       </div>
-      <div class="chart-box" style="height:180px"><canvas id="ch-dash-patrimonio"></canvas></div>
-      <div id="dk-patrimonio-detalhe" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"></div>
-    </div>
-  </div>
-
-  <!-- ── LINHA 4: Categorias + Alertas ── -->
-  <div class="g2" style="margin-bottom:16px">
-    <!-- Despesas por Categoria com orçamento -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Despesas por Categoria</span>
-        <span id="dk-cat-mes-label" class="badge bdg-gray" style="font-size:9px"></span>
-      </div>
-      <div class="chart-box" style="height:180px"><canvas id="ch-dash-cat"></canvas></div>
-      <div id="dk-cat-orcamento" style="margin-top:12px"></div>
-    </div>
-    <!-- Saúde financeira detalhada -->
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Saúde Financeira</span>
-        <span id="dk-saude-badge" class="badge" style="font-size:9px"></span>
-      </div>
-      <div id="dash-saude" style="margin-bottom:8px"></div>
-      <div class="div" style="margin:8px 0"></div>
-      <div class="card-title" style="margin-bottom:10px;font-size:12px">Alertas</div>
-      <div id="dash-alertas"></div>
-    </div>
-  </div>
-
-  <!-- ── AGENDA DE COMPROMISSOS: contas, faturas e dívidas em um lugar só ── -->
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-header" style="flex-wrap:wrap;gap:10px">
-      <div>
-        <span class="card-title">Agenda de Compromissos</span>
-        <div class="card-sub" id="ag-sub">Contas a pagar, faturas de cartão e parcelas de dívida</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="ag-janela" onchange="renderAgenda()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
-          <option value="7">Próximos 7 dias</option>
-          <option value="30" selected>Próximos 30 dias</option>
-          <option value="60">Próximos 60 dias</option>
-          <option value="90">Próximos 90 dias</option>
-        </select>
-        <select id="ag-tipo" onchange="renderAgenda()" style="background:var(--surface2);border:1px solid var(--line2);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
-          <option value="">Todos os tipos</option>
-          <option value="conta">Contas a pagar</option>
-          <option value="fatura">Faturas de cartão</option>
-          <option value="divida">Parcelas de dívida</option>
-        </select>
-      </div>
-    </div>
-    <div class="kpi-grid cols4" style="margin-bottom:14px">
-      <div class="kpi r"><div class="kpi-label">Vencido</div><div class="kpi-val r" id="ag-k-vencido">R$ 0</div><div class="kpi-sub" id="ag-k-vencido-qt">—</div></div>
-      <div class="kpi a"><div class="kpi-label">A vencer na janela</div><div class="kpi-val a" id="ag-k-avencer">R$ 0</div><div class="kpi-sub" id="ag-k-avencer-qt">—</div></div>
-      <div class="kpi g"><div class="kpi-label">Caixa Disponível Hoje</div><div class="kpi-val g" id="ag-k-disp">R$ 0</div></div>
-      <div class="kpi b"><div class="kpi-label">Sobra Após Compromissos</div><div class="kpi-val b" id="ag-k-sobra">R$ 0</div><div class="kpi-sub" id="ag-k-sobra-sub">—</div></div>
-    </div>
-    <div class="tbl-wrap"><table class="tbl">
-      <thead><tr><th>Vencimento</th><th>Compromisso</th><th>Tipo</th><th>Categoria</th><th>Situação</th><th>Valor</th><th>Acumulado</th><th>Ação</th></tr></thead>
-      <tbody id="ag-tbody"></tbody>
-      <tfoot id="ag-tfoot"></tfoot>
-    </table></div>
-  </div>
-
-  <!-- ── LINHA 5: Últimos lançamentos + Projeção por dia ── -->
-  <div class="g2">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Últimos Lançamentos</span>
-        <button class="btn btn-ghost btn-xs" onclick="go('lanc',document.querySelectorAll('.nav-btn')[3])">Ver todos</button>
+      <div id="dk-prox"></div>
+    </section>
+    <section class="card dash-card">
+      <div class="dash-card-hd">
+        <h2 class="card-title">Últimos lançamentos</h2>
+        <button type="button" class="dash-link" onclick="irPagina('lanc')">Ver todos ›</button>
       </div>
       <div id="dash-ultimos"></div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Ritmo de Gastos — Semana Atual</span>
-        <span class="badge bdg-amber" style="font-size:9px">Esta semana</span>
+    </section>
+  </div>
+
+  <!-- 4. Longo prazo: patrimônio e saúde financeira -->
+  <div class="dash-linha dash-l4">
+    <section class="card dash-card">
+      <div class="dash-card-hd">
+        <div>
+          <h2 class="card-title">Patrimônio</h2>
+          <div class="dash-sub" id="dk-patrimonio-sub"></div>
+        </div>
+        <div class="dash-big" id="dk-patrimonio">R$ 0,00</div>
       </div>
-      <div class="chart-box" style="height:160px"><canvas id="ch-dash-semana"></canvas></div>
-      <div id="dk-ritmo-detalhe" style="margin-top:10px"></div>
-    </div>
+      <div class="chart-box dash-graf-cresce"><canvas id="ch-dash-patrimonio" role="img" aria-label="Patrimônio no fim de cada mês do ano"></canvas></div>
+    </section>
+    <section class="card dash-card dash-saude">
+      <div class="dash-card-hd"><h2 class="card-title">Saúde financeira</h2></div>
+      <div class="dk-score">
+        <div class="dk-score-num"><b id="dk-score">0</b><span>/100</span></div>
+        <div class="dk-score-info">
+          <div class="dk-score-nota" id="dk-score-label"></div>
+          <div class="prog-track"><div class="prog-fill" id="dk-score-fill" style="width:0%"></div></div>
+          <div class="dash-sub" id="dk-score-pior"></div>
+        </div>
+      </div>
+      <details class="dk-ind">
+        <summary>Indicadores</summary>
+        <div id="dash-saude"></div>
+      </details>
+    </section>
   </div>
 </div>
 
@@ -5063,10 +4961,10 @@ let _relFilterView = 'realizado'; // 'previsto' | 'realizado'
 
 function setDashView(v){
   _dashView = v;
-  const btnP = document.getElementById('dash-btn-prev');
-  const btnR = document.getElementById('dash-btn-real');
-  if(btnP){ btnP.style.background = v==='previsto'?'var(--blue-dim)':'transparent'; btnP.style.color = v==='previsto'?'var(--blue)':'var(--t3)'; }
-  if(btnR){ btnR.style.background = v==='realizado'?'var(--green-dim)':'transparent'; btnR.style.color = v==='realizado'?'var(--green)':'var(--t3)'; }
+  [['dash-btn-prev', 'previsto'], ['dash-btn-real', 'realizado']].forEach(([id, modo]) => {
+    const b = document.getElementById(id);
+    if(b){ b.classList.toggle('on', v === modo); b.setAttribute('aria-pressed', String(v === modo)); }
+  });
   renderDash();
 }
 
@@ -5085,471 +4983,282 @@ function filtrarPorView(lancs, view){
   return lancs; // previsto = todos ativos
 }
 
+// O Dashboard responde, nesta ordem: como está o mês (4 números), o que precisa de
+// atenção (uma lista só, por gravidade), para onde foi o dinheiro, o que vem por aí,
+// o que entrou por último e, no fim, a visão de longo prazo (patrimônio e saúde).
 function renderDash(){
   updDashWelcome();
   const d  = gs();
   const mes = parseInt(document.getElementById('dash-mes').value);
   const ano = d.cfg.ano || new Date().getFullYear();
-  const modoLabel = _dashView === 'realizado' ? ' · ✓ Realizado' : ' · 📋 Previsto';
-  document.getElementById('dash-sub').textContent = `${MESES[mes]} ${ano}${modoLabel}`;
+  set('dk-ano-lbl', ano);
 
   const ativosBase = d.lancs.filter(l => l.status !== 'cancelado');
   // Contas de reserva (poupança) ficam fora do resultado
   const ativos = semReservas(filtrarPorView(ativosBase, _dashView), d);
+  const soma = (lista, tipo) => lista.filter(l => l.tipo === tipo).reduce((a,l) => a + l.valor, 0);
   const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
-  const rec = ml.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
-  const des = ml.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
-  const inv = ml.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
+  const rec = soma(ml, 'Receita'), des = soma(ml, 'Despesa'), inv = soma(ml, 'Investimento');
   const sal = rec - des - inv;
 
-  // Mês anterior para tendências (respeita a virada de ano)
+  // Mês anterior, para a variação (respeita a virada de ano)
   const refAnt = mesAnterior(ano, mes);
-  const mesAnt = refAnt.mes;
   const mlAnt  = ativos.filter(l => noMesAno(l.data, refAnt.mes, refAnt.ano));
-  const recAnt = mlAnt.filter(l => l.tipo === 'Receita').reduce((a,l) => a+l.valor, 0);
-  const desAnt = mlAnt.filter(l => l.tipo === 'Despesa').reduce((a,l) => a+l.valor, 0);
-  const invAnt = mlAnt.filter(l => l.tipo === 'Investimento').reduce((a,l) => a+l.valor, 0);
+  const recAnt = soma(mlAnt, 'Receita'), desAnt = soma(mlAnt, 'Despesa'), invAnt = soma(mlAnt, 'Investimento');
   const salAnt = recAnt - desAnt - invAnt;
 
-  // ── KPIs com tendência ──
-  function trendBadge(curr, prev, inverted) {
-    if (!prev || prev === 0) return '';
-    const diff = curr - prev;
-    const pctDiff = Math.abs(diff / prev * 100).toFixed(1);
-    const up = diff >= 0;
-    const good = inverted ? !up : up; // para despesas, subir é ruim
-    const cor  = good ? 'var(--green)' : 'var(--red)';
-    const arr  = up ? '▲' : '▼';
-    return `<span style="color:${cor};font-weight:600">${arr} ${pctDiff}%</span>`;
-  }
-
-  set('dk-rec', fmtR(rec));
-  document.getElementById('dk-rec-trend').innerHTML = trendBadge(rec, recAnt, false);
-  set('dk-rec-sub', recAnt ? `vs ${fmtR(recAnt)} mês ant.` : '');
-
-  set('dk-des', fmtR(des));
-  document.getElementById('dk-des-trend').innerHTML = trendBadge(des, desAnt, true);
-  set('dk-des-sub', desAnt ? `vs ${fmtR(desAnt)} mês ant.` : '');
-
-  set('dk-inv', fmtR(inv));
-  document.getElementById('dk-inv-trend').innerHTML = trendBadge(inv, invAnt, false);
-  const salario = d.cfg.sal || 1;
-  set('dk-inv-pct', salario ? `${(inv/salario*100).toFixed(1)}% do salário` : '');
-
+  // ── 1. O mês em quatro números: uma linha só embaixo de cada, a variação sobre o mês anterior ──
+  const antCurto = MESES3[refAnt.mes].toLowerCase();
+  const nota = (id, atual, ant, subirEhBom) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.title = ant ? `${MESES[refAnt.mes]}: ${fmtR(ant)}` : '';
+    if(!ant){ el.innerHTML = '&nbsp;'; return; }
+    const dif = (atual - ant) / Math.abs(ant) * 100, sobe = dif >= 0;
+    if(Math.abs(dif) < 0.05){ el.textContent = `igual a ${antCurto}`; return; }
+    el.innerHTML = `<span class="${sobe === subirEhBom ? 'bom' : 'ruim'}">${sobe ? '▲' : '▼'} ${Math.abs(dif).toLocaleString('pt-BR', { maximumFractionDigits:1 })}%</span> vs ${antCurto}`;
+  };
+  set('dk-rec', fmtR(rec)); nota('dk-rec-nota', rec, recAnt, true);
+  set('dk-des', fmtR(des)); nota('dk-des-nota', des, desAnt, false);
+  set('dk-inv', fmtR(inv)); nota('dk-inv-nota', inv, invAnt, true);
   setC('dk-sal', fmtR(sal), sal >= 0 ? 'var(--green)' : 'var(--red)');
-  document.getElementById('dk-sal-trend').innerHTML = trendBadge(sal, salAnt, false);
-  set('dk-sal-sub', salAnt ? `vs ${fmtR(salAnt)} mês ant.` : '');
+  // No "Realizado", o saldo mostra também o previsto do mês (com o que ainda está pendente ou agendado)
+  const mlPrev = semReservas(ativosBase, d).filter(l => noMesAno(l.data, mes, ano));
+  const salPrev = soma(mlPrev, 'Receita') - soma(mlPrev, 'Despesa') - soma(mlPrev, 'Investimento');
+  const notaSal = document.getElementById('dk-sal-nota');
+  if(_dashView === 'realizado' && Math.abs(salPrev - sal) >= 0.01 && notaSal){
+    notaSal.title = 'Somando os lançamentos pendentes e agendados do mês';
+    notaSal.innerHTML = `previsto: <span class="${salPrev >= 0 ? 'bom' : 'ruim'}">${fmtR(salPrev)}</span>`;
+  } else nota('dk-sal-nota', sal, salAnt, true);
 
-  // ── Contas pendentes ──
-  // Inclui o que venceu em meses anteriores e ainda não foi pago — atraso não some
-  // do contador só porque o mês virou.
-  const pend = d.contas.filter(c => contaEmAberto(c)
-                 && (noMesAno(c.venc, mes, ano) || c.venc < today()));
-  const fatCC = d.ccs.reduce((a, c) => a + getFatAberta(c, mes, ano), 0);
-  set('dk-pend', pend.length);
-  set('dk-pend-v', fmtR(pend.reduce((a,c) => a+c.valor, 0)));
-  set('dk-cc-mini', fatCC > 0 ? `💳 ${fmtR(fatCC)}` : '');
-
-  // ── Score de Saúde Financeira (0–100) ──
-  const salDiv = d.cfg.sal > 0 ? d.divs.reduce((a,dv) => a+dv.mensal, 0) / d.cfg.sal * 100 : 0;
-  const pctDes = salario > 0 ? des / salario * 100 : 100;
-  const pctInv = salario > 0 ? inv / salario * 100 : 0;
-  const taxaPoup = rec > 0 ? sal / rec * 100 : 0;
-  const diag = scoreSaude(d, { salDiv, pctDes, pctInv, taxaPoup, sal, rec, inv, mes, ano });
-  const score = diag.score;
-
-  const scoreEl  = document.getElementById('dk-score');
-  const scoreFill = document.getElementById('dk-score-fill');
-  const scoreLbl  = document.getElementById('dk-score-label');
-  if (scoreEl) scoreEl.textContent = score;
-  const scoreColor = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : score >= 40 ? 'var(--orange, #f97316)' : 'var(--red)';
-  const scoreNota  = score >= 80 ? '😊 Excelente' : score >= 60 ? '🙂 Bom' : score >= 40 ? '😐 Atenção' : '😟 Crítico';
-  if (scoreEl)   scoreEl.style.color = scoreColor;
-  if (scoreFill) { scoreFill.style.width = score + '%'; scoreFill.style.background = scoreColor; }
-  if (scoreLbl){
-    // O score deixa de ser um número solto: mostra o que mais pesa contra
-    scoreLbl.textContent = diag.pior ? `${scoreNota} · pesa contra: ${diag.pior.label}` : scoreNota;
-    scoreLbl.title = diag.itens.length
-      ? diag.itens.map(x => `−${x.peso} ${x.label}: ${x.detalhe}`).join('\n')
-      : 'Nenhuma penalidade — todos os indicadores dentro do recomendado.';
+  // ── 2a. Receitas e despesas do ano: o mês escolhido em destaque; clique num mês para vê-lo ──
+  const recArr = [], desArr = [], invArr = [];
+  for(let m = 0; m < 12; m++){
+    const ml2 = ativos.filter(l => noMesAno(l.data, m, ano));
+    recArr.push(soma(ml2, 'Receita')); desArr.push(soma(ml2, 'Despesa')); invArr.push(soma(ml2, 'Investimento'));
   }
+  const corVar = v => getComputedStyle(document.body).getPropertyValue(v).trim();
+  const cRec = corVar('--viz-rec') || '#16ad69', cDes = corVar('--viz-des') || '#b8344d';
+  const fora = (cor, i) => i === mes ? cor : cor + '73';   // meses fora do foco: mesma cor, mais clara
+  mkCh('ch-dash-ano', {
+    type:'bar',
+    data:{ labels:MESES3, datasets:[
+      { label:'Receitas', data:recArr, backgroundColor:recArr.map((_, i) => fora(cRec, i)), borderRadius:4, maxBarThickness:18 },
+      { label:'Despesas', data:desArr, backgroundColor:desArr.map((_, i) => fora(cDes, i)), borderRadius:4, maxBarThickness:18 },
+    ]},
+    options:{
+      ...chartBase, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false },
+        tooltip:{ callbacks:{
+          title: its => `${MESES[its[0].dataIndex]} de ${ano}`,
+          label: c => ` ${c.dataset.label}: ${fmtR(c.raw)}`,
+          footer: its => { const i = its[0].dataIndex; return `Saldo: ${fmtR(recArr[i] - desArr[i] - invArr[i])}`; } } } },
+      onClick:(evt, els) => { if(els.length){ document.getElementById('dash-mes').value = els[0].index; renderDash(); } },
+      onHover:(evt, els) => { if(evt.native && evt.native.target) evt.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+    }
+  });
 
-  // ── Patrimônio Líquido ──
-  // Caixa consolidado no fim do mês exibido (motor único) + investimentos − dívidas.
+  // ── Despesas do mês por categoria e metas ──
+  // O ranking mostra o que está na tela (Realizado/Previsto); a lista de atenção compara a meta
+  // com o já pago e com o previsto, para avisar antes que o orçamento estoure.
+  const porCat = lista => { const o = {};
+    lista.filter(l => l.tipo === 'Despesa' && noMesAno(l.data, mes, ano)).forEach(l => { const c = l.cat || '—'; o[c] = (o[c] || 0) + l.valor; });
+    return o; };
+  const catM = porCat(ativos);
+  const catReal = porCat(semReservas(filtrarPorView(ativosBase, 'realizado'), d));
+  const catPrev = porCat(semReservas(ativosBase, d));
+  const metaEf = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
+
+  // ── 2b. Precisa de atenção ──
+  const hoje = new Date();
+  const mesAtual = mes === hoje.getMonth() && ano === hoje.getFullYear();
+  _dashAtencao = itensAtencaoDash(d, { mes, ano, sal, rec, inv, catReal, catPrev, metaEf, mesAtual });
+  renderAtencaoDash();
+
+  // ── 3. Para onde foi o dinheiro, o que vem por aí, o que entrou por último ──
+  renderCatsDash(catM, metaEf);
+  renderProxDash(d);
+  const ult = [...d.lancs].filter(l => l.status !== 'cancelado').sort((a,b) => b.data.localeCompare(a.data) || b.ts - a.ts).slice(0, 5);
+  document.getElementById('dash-ultimos').innerHTML = ult.length ? ult.map(l => {
+    const cls = l.tipo === 'Receita' ? 'rec' : l.tipo === 'Investimento' ? 'inv' : 'des';
+    return `<div class="dk-ul">
+      <span class="dk-ul-txt"><b>${escHtml(l.desc || '—')}</b><small>${fmtDataBR(l.data).slice(0, 5)} · ${escHtml(l.cat || '—')}</small></span>
+      <span class="dk-ul-val ${cls}">${l.tipo === 'Receita' ? '+' : '−'}${fmtR(l.valor)}</span>
+    </div>`; }).join('') : '<div class="dash-vazio">Nenhum lançamento ainda.</div>';
+
+  // ── 4a. Patrimônio: caixa consolidado no fim do mês (motor único) + investimentos − dívidas ──
   // No modo "Realizado" considera apenas o que já foi efetivado; no "Previsto", tudo.
   const fimMesDash = fimDoMes(ano, mes);
   const caixa      = calcSaldoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
   const reservas   = calcReservasAte(fimMesDash);
   const caixaLivre = +(caixa - reservas).toFixed(2);
-  const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash)
-                           .reduce((a,l) => a+l.valor, 0);
+  const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash).reduce((a,l) => a + l.valor, 0);
   const totalDiv   = d.divs.reduce((a, dv) => a + saldoDivida(dv), 0);
   const patrimonio = caixa + totalInv - totalDiv;
-
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
-  const detPat = [];
-  detPat.push(`Caixa: ${fmtR(caixaLivre)}`);
-  if (reservas !== 0)  detPat.push(`Reservas: ${fmtR(reservas)}`);
-  if (totalInv > 0)    detPat.push(`Investimentos: ${fmtR(totalInv)}`);
-  if (totalDiv > 0)    detPat.push(`Dívidas: −${fmtR(totalDiv)}`);
-  set('dk-patrimonio-sub', detPat.join(' · '));
-
-  // Detalhe patrimônio
-  const patDetalhe = document.getElementById('dk-patrimonio-detalhe');
-  if (patDetalhe) {
-    patDetalhe.innerHTML = [
-      { l: '🏦 Caixa',    txt: fmtR(caixaLivre),      c: caixaLivre >= 0 ? 'var(--green)' : 'var(--red)' },
-      ...(reservas !== 0 ? [{ l: '🔒 Reservas', txt: fmtR(reservas), c: 'var(--cyan)' }] : []),
-      { l: '📈 Invest.',  txt: fmtR(totalInv),        c: 'var(--blue)' },
-      { l: '💳 Dívidas', txt: (totalDiv>0?'−':'') + fmtR(totalDiv), c: totalDiv > 0 ? 'var(--red)' : 'var(--t3)' },
-    ].map(x => `
-      <div style="flex:1;min-width:80px;background:var(--surface2);border-radius:var(--r2);padding:8px 10px;text-align:center">
-        <div style="font-size:10px;color:var(--t3);margin-bottom:2px">${x.l}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${x.c}">${x.txt}</div>
-      </div>`).join('');
-  }
-
-  // ── Projeção de fechamento ──
-  const hoje = new Date();
-  const isMesAtual = mes === hoje.getMonth() && ano === hoje.getFullYear();
-  let projEl = document.getElementById('dk-proj');
-  let projSubEl = document.getElementById('dk-proj-sub');
-  if (isMesAtual) {
-    const diaAtual = hoje.getDate();
-    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
-    const ritmoRec = diaAtual > 0 ? rec / diaAtual : 0;
-    const ritroDes = diaAtual > 0 ? des / diaAtual : 0;
-    const projRec = ritmoRec * diasNoMes;
-    const projDes = ritroDes * diasNoMes;
-    const projSal = projRec - projDes - inv;
-    setC('dk-proj', fmtR(projSal), projSal >= 0 ? 'var(--amber)' : 'var(--red)');
-    if (projSubEl) projSubEl.textContent = `Dia ${diaAtual}/${diasNoMes} · rec. proj. ${fmtR(projRec)}`;
-  } else {
-    setC('dk-proj', fmtR(sal), sal >= 0 ? 'var(--amber)' : 'var(--red)');
-    if (projSubEl) projSubEl.textContent = 'Mês encerrado';
-  }
-
-  // ── Gráfico 12 meses com linha de saldo ──
-  const recArr=[], desArr=[], salArr=[];
-  for (let m = 0; m < 12; m++) {
-    const ml2 = ativos.filter(l => noMesAno(l.data, m, ano));
-    const r = ml2.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
-    const de= ml2.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-    const iv= ml2.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
-    recArr.push(r); desArr.push(de); salArr.push(r-de-iv);
-  }
-  mkCh('ch-dash-ano', {
-    type:'bar',
-    data:{ labels:MESES3, datasets:[
-      {label:'Receita', data:recArr, backgroundColor:'#00d97e28', borderColor:'#00d97e', borderWidth:1.5, borderRadius:4, order:2},
-      {label:'Despesa', data:desArr, backgroundColor:'#ff4d6d28', borderColor:'#ff4d6d', borderWidth:1.5, borderRadius:4, order:3},
-      {label:'Saldo',   data:salArr, type:'line', borderColor:'#4dabf7', backgroundColor:'transparent',
-        borderWidth:2, pointRadius:4, pointBackgroundColor: salArr.map(v=>v>=0?'#4dabf7':'#ff4d6d'),
-        pointBorderWidth:0, tension:.3, order:1},
-    ]},
-    options:{
-      ...chartBase, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false } },
-      onClick:(evt, els) => {
-        if (els.length) {
-          const idx = els[0].index;
-          document.getElementById('dash-mes').value = idx;
-          renderDash();
-        }
-      }
-    }
-  });
-
-  // ── Gráfico evolução patrimônio ──
-  // Patrimônio de cada mês = caixa consolidado no fim do mês + investimentos acumulados − dívidas
+  set('dk-patrimonio-sub', [`caixa ${fmtRCurto(caixaLivre)}`, reservas ? `reservas ${fmtRCurto(reservas)}` : '',
+    totalInv ? `investido ${fmtRCurto(totalInv)}` : '', totalDiv ? `dívidas −${fmtRCurto(totalDiv)}` : ''].filter(Boolean).join(' · '));
   const patArr = [];
-  for (let m = 0; m < 12; m++) {
+  for(let m = 0; m < 12; m++){
     const fimM = fimDoMes(ano, m);
+    if(_dashView === 'realizado' && fimM > fimDoMes(hoje.getFullYear(), hoje.getMonth())){ patArr.push(null); continue; }
     const caixaM = calcSaldoAte(fimM, { somentePagos: _dashView === 'realizado' });
-    const invM   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimM)
-                         .reduce((a,l) => a+l.valor, 0);
+    const invM   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimM).reduce((a,l) => a + l.valor, 0);
     patArr.push(+(caixaM + invM - totalDiv).toFixed(2));
   }
+  const cPat = corVar('--cyan') || '#22d3ee';
   mkCh('ch-dash-patrimonio', {
     type:'line',
-    data:{ labels:MESES3, datasets:[{
-      label:'Patrimônio', data:patArr,
-      borderColor:'#22d3ee', backgroundColor:'#22d3ee12',
-      borderWidth:2, fill:true, tension:.35,
-      pointRadius: patArr.map((_,i)=> i===mes ? 5 : 3),
-      pointBackgroundColor: patArr.map((_,i)=> i===mes ? '#22d3ee' : '#22d3ee88'),
-    }]},
-    options:{
-      ...chartBase, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false },
-        tooltip:{ callbacks:{ label: ctx => ' ' + fmtR(ctx.raw) } }
-      }
-    }
+    data:{ labels:MESES3, datasets:[{ label:'Patrimônio', data:patArr, borderColor:cPat, backgroundColor:cPat + '14', borderWidth:2, fill:true, tension:.35,
+      pointRadius:patArr.map((_, i) => i === mes ? 5 : 0), pointHoverRadius:5, pointBackgroundColor:cPat }] },
+    options:{ ...chartBase, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ title: its => `Fim de ${MESES[its[0].dataIndex].toLowerCase()}`, label: c => ' ' + fmtR(c.raw) } } } }
   });
 
-  // ── Gráfico categorias com barra de orçamento ──
-  const catM = {};
-  ml.filter(l => l.tipo === 'Despesa').forEach(l => { catM[l.cat] = (catM[l.cat]||0)+l.valor; });
-  const cKeys = Object.keys(catM), cVals = Object.values(catM);
-  const catLabel = document.getElementById('dk-cat-mes-label');
-  if (catLabel) catLabel.textContent = MESES[mes];
-  if (cKeys.length) {
-    mkCh('ch-dash-cat', {
-      type:'doughnut',
-      data:{ labels:cKeys, datasets:[{data:cVals, backgroundColor:CORES_CAT, borderWidth:0, hoverOffset:6}] },
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
-        plugins:{ legend:{ position:'right', labels:{ color:'#8fa3bf', font:{size:10}, boxWidth:10, padding:6 } },
-          tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${fmtR(ctx.raw)} (${(ctx.raw/cVals.reduce((a,v)=>a+v,0)*100).toFixed(1)}%)` } }
-        }
-      }
-    });
-  } else {
-    const cv = document.getElementById('ch-dash-cat');
-    if (cv) { const ctx = cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); }
+  // ── 4b. Saúde financeira: a nota, o que mais pesa e os indicadores sob demanda ──
+  const salario = d.cfg.sal || 1;
+  const salDiv = d.cfg.sal > 0 ? d.divs.reduce((a,dv) => a + dv.mensal, 0) / d.cfg.sal * 100 : 0;
+  const pctDes = salario > 0 ? des / salario * 100 : 100;
+  const pctInv = salario > 0 ? inv / salario * 100 : 0;
+  const taxaPoup = rec > 0 ? sal / rec * 100 : 0;
+  const diag = scoreSaude(d, { salDiv, pctDes, pctInv, taxaPoup, sal, rec, inv, mes, ano });
+  const score = diag.score;
+  const scoreCor  = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : score >= 40 ? 'var(--orange, #f97316)' : 'var(--red)';
+  const scoreNota = score >= 80 ? 'Excelente' : score >= 60 ? 'Bom' : score >= 40 ? 'Atenção' : 'Crítico';
+  setC('dk-score', score, scoreCor);
+  setC('dk-score-label', scoreNota, scoreCor);
+  const fill = document.getElementById('dk-score-fill');
+  if(fill){ fill.style.width = score + '%'; fill.style.background = scoreCor; }
+  const pior = document.getElementById('dk-score-pior');
+  if(pior){
+    pior.textContent = diag.pior ? `O que mais pesa: ${diag.pior.label.toLowerCase()}` : 'Nada pesando contra';
+    pior.title = diag.itens.length ? diag.itens.map(x => `−${x.peso} ${x.label}: ${x.detalhe}`).join('\n') : 'Todos os indicadores dentro do recomendado.';
   }
-
-  // Barras de orçamento por categoria
-  const orcDetalhe = document.getElementById('dk-cat-orcamento');
-  if (orcDetalhe) {
-    // Meta efetiva da categoria (respeita ano e não soma categoria + subcategoria)
-    const metaEf = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
-    const metasMes = Object.keys(metaEf);
-    if (metasMes.length && cKeys.length) {
-      const catComMeta = cKeys.filter(cat => metaEf[cat] != null);
-      if (catComMeta.length) {
-        orcDetalhe.innerHTML = '<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">vs. orçamento</div>' +
-          catComMeta.slice(0,4).map(cat => {
-            const real = catM[cat] || 0;
-            const meta = metaEf[cat] || 0;
-            const pp   = meta > 0 ? Math.min(100, real/meta*100) : 100;
-            const over = real > meta;
-            return `<div style="margin-bottom:7px">
-              <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px">
-                <span style="color:var(--t2)">${cat}</span>
-                <span class="mono" style="color:${over?'var(--red)':'var(--t2)'}">${fmtR(real)} / ${fmtR(meta)}</span>
-              </div>
-              <div class="prog-track" style="height:5px"><div class="prog-fill" style="width:${pp}%;background:${over?'var(--red)':pp>80?'var(--amber)':'var(--green)'}"></div></div>
-            </div>`;
-          }).join('');
-      } else {
-        orcDetalhe.innerHTML = '';
-      }
-    } else {
-      orcDetalhe.innerHTML = metasMes.length === 0 && cKeys.length > 0
-        ? `<div style="font-size:10px;color:var(--t4);margin-top:4px">💡 <a href="#" onclick="go('orc',document.querySelectorAll('.nav-btn')[4]);return false" style="color:var(--t3)">Defina metas de orçamento</a> para ver progresso aqui</div>`
-        : '';
-    }
-  }
-
-  // ── Saúde financeira com indicadores detalhados ──
   const indicadores = [
-    { l:'Taxa de Poupança',    v:taxaPoup,                ok:taxaPoup>=20,        max:60,  cor:'var(--green)', dica: taxaPoup>=20?'✓':'Meta: 20%+' },
-    { l:'Despesas/Salário',    v:pctDes,                  ok:pctDes<=70,          max:120, cor:'var(--amber)', dica: pctDes<=70?'✓':`${pctDes.toFixed(0)}% — ideal ≤70%` },
-    { l:'Investimentos/Sal.',  v:pctInv,                  ok:pctInv>=10,          max:50,  cor:'var(--blue)',  dica: pctInv>=10?'✓':'Meta: 10%+' },
-    { l:'Dívidas/Salário',     v:salDiv,                  ok:salDiv<=d.cfg.pct,   max:60,  cor:'var(--red)',   dica: salDiv<=d.cfg.pct?'✓':`${salDiv.toFixed(0)}% — limite ${d.cfg.pct}%` },
+    { l:'Taxa de poupança',        v:taxaPoup, ok:taxaPoup >= 20,      max:60,  meta:'20% ou mais' },
+    { l:'Despesas / salário',      v:pctDes,   ok:pctDes <= 70,        max:120, meta:'até 70%' },
+    { l:'Investimentos / salário', v:pctInv,   ok:pctInv >= 10,        max:50,  meta:'10% ou mais' },
+    { l:'Dívidas / salário',       v:salDiv,   ok:salDiv <= d.cfg.pct, max:60,  meta:`até ${d.cfg.pct}%` },
   ];
-
-  const saudeBadge = document.getElementById('dk-saude-badge');
-  if (saudeBadge) {
-    const ok = indicadores.filter(i=>i.ok).length;
-    saudeBadge.textContent = `${ok}/4 indicadores OK`;
-    saudeBadge.className = `badge ${ok>=3?'bdg-green':ok>=2?'bdg-amber':'bdg-red'}`;
-    saudeBadge.style.fontSize = '9px';
-  }
-
   document.getElementById('dash-saude').innerHTML = indicadores.map(i => `
-    <div style="margin-bottom:11px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;align-items:center">
-        <span style="color:var(--t2)">${i.l}</span>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:10px;color:var(--t3)">${i.dica}</span>
-          <span class="mono" style="color:${i.ok?'var(--green)':'var(--red)'}">${pct(i.v)}</span>
-        </div>
-      </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(100,i.v/i.max*100)}%;background:${i.ok?'var(--green)':i.cor}"></div></div>
+    <div class="dk-ind-i" title="Recomendado: ${i.meta}">
+      <div class="dk-ind-l"><span>${i.ok ? '✓' : '✗'} ${i.l}</span><span class="mono" style="color:${i.ok ? 'var(--green)' : 'var(--red)'}">${pct(i.v)}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${Math.max(0, Math.min(100, i.v / i.max * 100))}%;background:${i.ok ? 'var(--green)' : 'var(--red)'}"></div></div>
     </div>`).join('');
-
-  // ── Alertas inteligentes ──
-  const hojeD = new Date();
-  const em7   = new Date(); em7.setDate(em7.getDate()+7);
-  const alertas = [];
-
-  // Contas vencendo
-  const avencer = d.contas.filter(c => {
-    const dd = diasAte(c.venc);
-    return dd !== null && dd >= 0 && dd <= 7 && contaEmAberto(c);
-  });
-  if (avencer.length) alertas.push({ tipo:'a', msg:`⏰ ${avencer.length} conta(s) vencem em 7 dias — ${fmtR(avencer.reduce((a,c)=>a+c.valor,0))}` });
-
-  // Saldo negativo
-  if (sal < 0) alertas.push({ tipo:'r', msg:`💸 Saldo negativo em ${MESES[mes]}: ${fmtR(sal)}` });
-
-  // Comprometimento dívidas
-  if (salDiv > d.cfg.pct) alertas.push({ tipo:'r', msg:`⚠ Dívidas comprometem ${pct(salDiv)} do salário (limite: ${pct(d.cfg.pct)})` });
-
-  // Categorias estourando orçamento
-  // Compara a meta efetiva da CATEGORIA com o gasto da categoria — antes uma meta de
-  // subcategoria era comparada com o gasto da categoria inteira e gerava alerta falso
-  const metasEf = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
-  Object.entries(metasEf).forEach(([cat, meta]) => {
-    const real = (catM[cat] || 0);
-    if (!(meta > 0)) return;
-    if (real > meta) alertas.push({ tipo:'r', msg:`📊 ${cat} estourou o orçamento: ${fmtR(real)} de ${fmtR(meta)}` });
-    else if (real / meta > 0.8) alertas.push({ tipo:'a', msg:`📊 ${cat} em 80%+ do orçamento: ${fmtR(real)} de ${fmtR(meta)}` });
-  });
-
-  // Sem investimentos
-  if (inv === 0 && rec > 0) alertas.push({ tipo:'b', msg:`📈 Nenhum investimento registrado em ${MESES[mes]}` });
-
-  // Projeção negativa no mês atual
-  if (isMesAtual) {
-    const diaAtual2 = hojeD.getDate();
-    const diasNoMes2 = new Date(ano, mes+1, 0).getDate();
-    const projSal2 = (rec/diaAtual2*diasNoMes2) - (des/diaAtual2*diasNoMes2) - inv;
-    if (projSal2 < 0 && sal >= 0) alertas.push({ tipo:'a', msg:`🔮 Projeção indica saldo negativo ao fim do mês: ${fmtR(projSal2)}` });
-  }
-
-  const alertEl = document.getElementById('dash-alertas');
-  if (alertEl) alertEl.innerHTML = alertas.length
-    ? alertas.slice(0,5).map(a => `<div class="alert alert-${a.tipo}" style="margin-bottom:6px;font-size:11px">${a.msg}</div>`).join('')
-    : '<div class="alert alert-g" style="font-size:11px">✓ Nenhum alerta — finanças em ordem!</div>';
-
-  // ── Últimos lançamentos ──
-  const ult = [...d.lancs].filter(l=>l.status!=='cancelado').sort((a,b)=>b.data.localeCompare(a.data)||b.ts-a.ts).slice(0,8);
-  document.getElementById('dash-ultimos').innerHTML = ult.length ? ult.map(l => {
-    const c = l.tipo==='Receita'?'var(--green)':l.tipo==='Investimento'?'var(--blue)':'var(--red)';
-    const s = l.tipo==='Receita'?'+':'-';
-    const isCurrent = noMesAno(l.data, mes, ano);
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);${!isCurrent?'opacity:.5':''}">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.desc}</div>
-        <div style="font-size:10px;color:var(--t3);display:flex;gap:6px;align-items:center">
-          <span>${l.data}</span>
-          <span class="cat-tag" style="font-size:9px">${l.cat||'—'}</span>
-          ${l.subcat?`<span style="color:var(--t4);font-size:9px">› ${l.subcat}</span>`:''}
-        </div>
-      </div>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${c};white-space:nowrap;margin-left:12px;font-weight:600">${s}${fmtR(l.valor)}</span>
-    </div>`;
-  }).join('') : '<p style="color:var(--t3);font-size:12px;padding:12px 0;text-align:center">Nenhum lançamento ainda.</p>';
-
-  // ── Ritmo de gastos — semana atual ──
-  const DIAS_SEMANA_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const inicioDaSemana = new Date(hojeD);
-  inicioDaSemana.setDate(hojeD.getDate() - hojeD.getDay());
-  const gasSemana = Array(7).fill(0);
-  const recSemana = Array(7).fill(0);
-  ml.forEach(l => {
-    const dt = new Date(l.data+'T00:00:00');
-    const diff = Math.floor((dt - inicioDaSemana) / 86400000);
-    if (diff >= 0 && diff < 7) {
-      if (l.tipo === 'Despesa') gasSemana[diff] += l.valor;
-      if (l.tipo === 'Receita') recSemana[diff] += l.valor;
-    }
-  });
-  mkCh('ch-dash-semana', {
-    type:'bar',
-    data:{ labels: DIAS_SEMANA_PT, datasets:[
-      { label:'Despesa', data:gasSemana, backgroundColor: gasSemana.map((_,i)=>i===hojeD.getDay()?'#ff4d6d':'#ff4d6d44'), borderColor:'#ff4d6d', borderWidth:1, borderRadius:4 },
-      { label:'Receita', data:recSemana, backgroundColor: recSemana.map((_,i)=>i===hojeD.getDay()?'#00d97e':'#00d97e44'), borderColor:'#00d97e', borderWidth:1, borderRadius:4 },
-    ]},
-    options:{...chartBase, maintainAspectRatio:false, plugins:{legend:{display:false}}}
-  });
-
-  const totalSemDes = gasSemana.reduce((a,v)=>a+v,0);
-  const totalSemRec = recSemana.reduce((a,v)=>a+v,0);
-  const ritmoEl = document.getElementById('dk-ritmo-detalhe');
-  if (ritmoEl) {
-    const diasRestantes = 7 - hojeD.getDay() - 1;
-    ritmoEl.innerHTML = `
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
-          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Despesas semana</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red);margin-top:3px">${fmtR(totalSemDes)}</div>
-        </div>
-        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
-          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Receitas semana</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green);margin-top:3px">${fmtR(totalSemRec)}</div>
-        </div>
-        <div style="flex:1;min-width:100px;text-align:center;background:var(--surface2);border-radius:var(--r2);padding:8px">
-          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">Dias restantes</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--t1);margin-top:3px">${diasRestantes}</div>
-        </div>
-      </div>`;
-  }
+  // no computador há espaço: os indicadores já vêm abertos; no celular, recolhidos (a escolha do usuário é mantida)
+  const detInd = document.querySelector('#page-dash .dk-ind');
+  if(detInd && !_dashIndIni){ _dashIndIni = true; detInd.open = !!(window.matchMedia && matchMedia('(min-width: 1101px)').matches); }
 
   updSbSaldo();
-
-  // ── O QUE FAZER AGORA ──
-  renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv);
-  // ── AGENDA DE COMPROMISSOS ──
-  renderAgenda();
 }
 
+// Valor curto para linhas de resumo: R$ 72,6 mil (negativo: −R$ 1,2 mil)
+const fmtRCurto = v => (v < 0 ? '−' : '') + (Math.abs(v) >= 1000
+  ? `R$ ${(Math.abs(v) / 1000).toLocaleString('pt-BR', { maximumFractionDigits:1 })} mil`
+  : fmtR(Math.abs(v)));
 
-// ── AGENDA DE COMPROMISSOS (dashboard) ──
-// Um só lugar para ver o que vai sair do caixa, venha de onde vier.
-function renderAgenda(){
-  const d = gs();
-  const dias  = parseInt(document.getElementById('ag-janela')?.value) || 30;
-  const tipoF = document.getElementById('ag-tipo')?.value || '';
-  const limite = addDias(today(), dias);
-
-  let lista = compromissosFuturos(d, { ate:limite });
-  if(tipoF) lista = lista.filter(x => x.tipo === tipoF);
-
-  const vencidos = lista.filter(x => x.vencido);
-  const aVencer  = lista.filter(x => !x.vencido);
-  const soma = l => +l.reduce((a,x) => a + x.valor, 0).toFixed(2);
-  const totVenc = soma(vencidos), totAVencer = soma(aVencer);
-  const disp = calcDisponivelAte(today(), { somentePagos:true });
-  const sobra = +(disp - totVenc - totAVencer).toFixed(2);
-
-  set('ag-sub', `Contas a pagar, faturas de cartão e parcelas de dívida até ${fmtDataBR(limite)}`);
-  setC('ag-k-vencido', fmtR(totVenc), totVenc ? 'var(--red)' : '');
-  set('ag-k-vencido-qt', `${vencidos.length} compromisso(s)`);
-  set('ag-k-avencer', fmtR(totAVencer));
-  set('ag-k-avencer-qt', `${aVencer.length} compromisso(s)`);
-  setC('ag-k-disp', fmtR(disp), disp >= 0 ? 'var(--green)' : 'var(--red)');
-  setC('ag-k-sobra', fmtR(sobra), sobra >= 0 ? 'var(--blue)' : 'var(--red)');
-  set('ag-k-sobra-sub', sobra >= 0
-    ? 'o caixa cobre os compromissos da janela'
-    : `faltam ${fmtR(Math.abs(sobra))} para honrar tudo`);
-
-  const tb = document.getElementById('ag-tbody');
-  if(!tb) return;
-  let acum = 0;
-  tb.innerHTML = lista.length ? lista.map(x => {
-    acum += x.valor;
-    const t = TIPOS_COMPROMISSO[x.tipo];
-    const dd = diasEntreISO(today(), x.data);
-    const situacao = x.vencido
-      ? `<span class="badge bdg-red" style="font-size:9px">${Math.abs(dd)}d em atraso</span>`
-      : dd === 0 ? '<span class="badge bdg-amber" style="font-size:9px">vence hoje</span>'
-      : `<span class="badge bdg-gray" style="font-size:9px">em ${dd}d</span>`;
+// ── Precisa de atenção: uma lista só (antes eram o painel "O que fazer agora", os
+// alertas e a agenda), em ordem de gravidade, uma linha por assunto ──
+let _dashAtencao = [], _dashAtencaoTudo = false, _dashIndIni = false;
+function itensAtencaoDash(d, c){
+  const out = [], hj = today(), fimMes = fimDoMes(c.ano, c.mes);
+  const compr = compromissosFuturos(d);
+  const somaV = l => l.reduce((a, x) => a + x.valor, 0);
+  const nomes = l => l.slice(0, 2).map(x => x.desc).join(', ') + (l.length > 2 ? ` +${l.length - 2}` : '');
+  const plural = (n, um, varios) => n > 1 ? varios : um;
+  const atras = compr.filter(x => x.vencido);
+  if(atras.length) out.push({ nivel:'urgente', ic:'🔥', titulo:`${atras.length} ${plural(atras.length, 'pagamento', 'pagamentos')} em atraso`,
+    sub:nomes(atras), valor:somaV(atras), fn:`irPagina('contas')` });
+  const sem = compr.filter(x => !x.vencido && x.data <= addDias(hj, 7));
+  if(sem.length) out.push({ nivel:'atencao', ic:'⏰', titulo:`${sem.length} ${plural(sem.length, 'vence', 'vencem')} em até 7 dias`,
+    sub:nomes(sem), valor:somaV(sem), fn:`irPagina('contas')` });
+  const aSair = somaV(compr.filter(x => x.data <= fimMes));
+  const disp  = calcDisponivelAte(hj, { somentePagos:true });
+  if(aSair > 0 && aSair > disp) out.push({ nivel:'urgente', ic:'⚠️', titulo:`Faltam ${fmtR(aSair - disp)} para pagar o mês`,
+    sub:`${fmtR(aSair)} a pagar até ${fmtDataBR(fimMes)} · ${fmtR(disp)} em caixa`, fn:`irPagina('contas')` });
+  if(c.sal < 0) out.push({ nivel:'urgente', ic:'💸', titulo:`${MESES[c.mes]} está no vermelho`, valor:c.sal, fn:`irPagina('lanc')` });
+  const orc = Object.entries(c.metaEf).filter(([cat, m]) => m > 0 && (c.catPrev[cat] || 0) > m)
+    .map(([cat, m]) => ({ cat, m, real:c.catReal[cat] || 0, prev:c.catPrev[cat] || 0 }))
+    .sort((a, b) => b.prev / b.m - a.prev / a.m);
+  const pctMeta = o => `${Math.round(o.prev / o.m * 100)}%${o.real > o.m ? '' : ' com os pendentes'}`;
+  if(orc.length) out.push({ nivel:'atencao', ic:'📊',
+    titulo: orc.length > 1 ? `${orc.length} categorias acima do orçamento` : `${orc[0].cat} ${orc[0].real > orc[0].m ? 'passou' : 'vai passar'} do orçamento`,
+    sub: orc.length > 1 ? orc.slice(0, 2).map(o => `${o.cat}: ${pctMeta(o)}`).join(', ') : `${pctMeta(orc[0])} da meta de ${fmtR(orc[0].m)}`,
+    fn:`irPagina('orc')` });
+  const kb = (d.kanban || []).filter(k => k.col !== 'done' && k.due && k.due < hj);
+  if(kb.length) out.push({ nivel:'atencao', ic:'📋', titulo:`${kb.length} ${plural(kb.length, 'tarefa atrasada', 'tarefas atrasadas')}`,
+    sub:kb[0].title, fn:`irPagina('kanban')` });
+  if(c.mesAtual && c.inv === 0 && c.rec > 0) out.push({ nivel:'info', ic:'📈', titulo:`Nada investido em ${MESES[c.mes].toLowerCase()}`,
+    sub:'Que tal separar uma parte da receita?', fn:`openM('m-lanc',this)` });
+  return out;
+}
+function renderAtencaoDash(){
+  const el = document.getElementById('dash-atencao');
+  if(!el) return;
+  const itens = _dashAtencao;
+  set('dk-at-cont', itens.length ? String(itens.length) : '');
+  if(!itens.length){
+    el.innerHTML = '<div class="dk-ok"><span aria-hidden="true">✓</span><div><b>Tudo em dia</b><small>Nenhum atraso nem pendência para agora.</small></div></div>';
+    return;
+  }
+  const ver = _dashAtencaoTudo ? itens : itens.slice(0, 4);
+  el.innerHTML = ver.map(a => `<button type="button" class="dk-at ${a.nivel}" onclick="${a.fn}">
+      <span class="dk-at-ic" aria-hidden="true">${a.ic}</span>
+      <span class="dk-at-txt"><b>${escHtml(a.titulo)}</b>${a.sub ? `<small>${escHtml(a.sub)}</small>` : ''}</span>
+      ${a.valor != null ? `<span class="dk-at-val">${fmtR(a.valor)}</span>` : ''}
+      <span class="dk-at-ir" aria-hidden="true">›</span>
+    </button>`).join('')
+    + (itens.length > 4 ? `<button type="button" class="dash-mais" onclick="_dashAtencaoTudo=!_dashAtencaoTudo;renderAtencaoDash()">${_dashAtencaoTudo ? 'Mostrar menos' : `Mostrar mais ${itens.length - 4}`}</button>` : '');
+}
+// ── Despesas por categoria: as 5 maiores (o resto em "Outras"), com aviso de orçamento ──
+function renderCatsDash(catM, metaEf){
+  const el = document.getElementById('dk-cats');
+  if(!el) return;
+  const tot = Object.values(catM).reduce((a, v) => a + v, 0);
+  if(!(tot > 0)){ el.innerHTML = '<div class="dash-vazio">Nenhuma despesa neste mês.</div>'; return; }
+  const ord = Object.entries(catM).sort((a, b) => b[1] - a[1]);
+  const linhas = ord.slice(0, 5);
+  const resto = ord.slice(5).reduce((a, [, v]) => a + v, 0);
+  if(resto > 0) linhas.push([`Outras (${ord.length - 5})`, resto, true]);
+  el.innerHTML = linhas.map(([cat, v, outras]) => {
+    const meta = outras ? 0 : metaEf[cat] || 0;
+    const uso = meta > 0 ? v / meta * 100 : 0;
+    const orc = uso >= 80 ? `<div class="dk-cat-orc ${uso > 100 ? 'acima' : 'perto'}">${uso > 100 ? '▲ passou do orçamento' : '⚠ perto do limite'} · ${Math.round(uso)}%</div>` : '';
+    const dica = `${cat}: ${fmtR(v)} (${(v / tot * 100).toLocaleString('pt-BR', { maximumFractionDigits:1 })}% das despesas)${meta > 0 ? ` · orçamento ${fmtR(meta)}` : ''}`;
+    return `<div class="dk-cat" title="${escAttr(dica)}">
+      <div class="dk-cat-l"><span>${escHtml(cat)}</span><span class="mono">${fmtR(v)}</span></div>
+      <div class="dk-cat-bar"><i style="width:${Math.max(2, v / tot * 100).toFixed(1)}%"></i></div>${orc}
+    </div>`;
+  }).join('');
+}
+// ── Próximos pagamentos: os 5 primeiros dos próximos 30 dias (atrasados primeiro) e se o caixa cobre ──
+function renderProxDash(d){
+  const el = document.getElementById('dk-prox');
+  if(!el) return;
+  const hj = today(), lista = compromissosFuturos(d, { ate:addDias(hj, 30) });
+  if(!lista.length){ el.innerHTML = '<div class="dash-vazio">Nada a pagar nos próximos 30 dias. 🎉</div>'; return; }
+  const tot  = +lista.reduce((a, x) => a + x.valor, 0).toFixed(2);
+  const disp = calcDisponivelAte(hj, { somentePagos:true });
+  el.innerHTML = lista.slice(0, 5).map(x => {
+    const dd = diasEntreISO(hj, x.data), [, m, dia] = x.data.split('-');
+    const quando = x.vencido ? `<small class="atraso">${Math.abs(dd)} ${Math.abs(dd) > 1 ? 'dias' : 'dia'} em atraso</small>`
+      : dd === 0 ? '<small class="hoje">vence hoje</small>' : `<small>em ${dd} ${dd > 1 ? 'dias' : 'dia'}</small>`;
     const acao = x.tipo === 'conta'  ? `pagarConta('${x.refId}')`
                : x.tipo === 'fatura' ? `pagarFatura('${x.origemId}',${x.ccMes},${x.ccAno})`
                : `abrirPgDiv('${x.origemId}','${x.refId}')`;
-    return `<tr>
-      <td class="mono" style="color:${x.vencido ? 'var(--red)' : 'var(--t2)'}">${fmtDataBR(x.data)}</td>
-      <td style="color:var(--t1)">${x.desc}</td>
-      <td><span style="font-size:11px;color:${t.cor}">${t.icone} ${t.label}</span></td>
-      <td><span class="cat-tag" style="font-size:9px">${x.cat}</span></td>
-      <td>${situacao}</td>
-      <td class="mono" style="color:var(--red);font-weight:600">${fmtR(x.valor)}</td>
-      <td class="mono" style="color:var(--t3)">${fmtR(acum)}</td>
-      <td><button class="btn btn-green btn-xs" onclick="irEPagar('${x.tipo}', &quot;${acao.replace(/"/g,'&quot;')}&quot;)">Pagar</button></td>
-    </tr>`; }).join('')
-   : `<tr><td colspan="8" style="text-align:center;color:var(--t3);padding:24px">Nenhum compromisso em aberto até ${fmtDataBR(limite)}. 🎉</td></tr>`;
-
-  const tf = document.getElementById('ag-tfoot');
-  if(tf) tf.innerHTML = lista.length ? `<tr>
-      <td colspan="5" style="color:var(--t2);font-weight:600">Total a pagar na janela</td>
-      <td class="mono" style="color:var(--red);font-weight:700">${fmtR(totVenc + totAVencer)}</td>
-      <td colspan="2" class="mono" style="color:${sobra >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:600">
-        ${sobra >= 0 ? 'sobram ' : 'faltam '}${fmtR(Math.abs(sobra))}</td>
-    </tr>` : '';
+    return `<div class="dk-px${x.vencido ? ' atrasado' : ''}">
+      <span class="dk-px-data"><b>${dia}</b>${MESES3[+m - 1].toLowerCase()}</span>
+      <span class="dk-px-txt"><b title="${escAttr(x.desc)}">${escHtml(x.desc)}</b>${quando}</span>
+      <span class="dk-px-val">${fmtR(x.valor)}</span>
+      <button type="button" class="btn btn-ghost btn-xs" onclick="irEPagar('${x.tipo}', &quot;${acao.replace(/"/g, '&quot;')}&quot;)">Pagar</button>
+    </div>`;
+  }).join('') + `<div class="dk-px-tot">${lista.length} ${lista.length > 1 ? 'pagamentos' : 'pagamento'} até ${fmtDataBR(addDias(hj, 30)).slice(0, 5)}: <b>${fmtR(tot)}</b> · ${disp >= tot
+      ? '<span class="bom">✓ o caixa cobre</span>' : `<span class="ruim">faltam ${fmtR(tot - disp)}</span>`}</div>`;
 }
+
+
+// Vai para uma aba pelo nome, marcando o item do menu
+function irPagina(pagina){ go(pagina, document.querySelector(`.nav-btn[onclick*="'${pagina}'"]`)); }
 // Leva para a aba certa e abre o modal de pagamento de lá
 function irEPagar(tipo, acao){
   const pagina = TIPOS_COMPROMISSO[tipo].pagina;
@@ -5614,199 +5323,6 @@ function scoreSaude(d, ctx){
   const score = Math.max(0, Math.min(100, Math.round(100 - desconto)));
   const pior = itens.slice().sort((a,b) => b.peso - a.peso)[0] || null;
   return { score, itens, pior };
-}
-
-function renderAgoraDash(d, sal, rec, des, inv, mes, ano, hojeD, alertas, taxaPoup, pctDes, salDiv){
-  const wrap = document.getElementById('dash-agora-wrap');
-  if(!wrap) return;
-
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const em3  = new Date(); em3.setDate(hoje.getDate()+3);
-  const em7  = new Date(); em7.setDate(hoje.getDate()+7);
-  const MESES_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const isMesAtual = mes===new Date().getMonth() && ano===new Date().getFullYear();
-
-  const acoes = [];
-
-  // 1. Contas VENCIDAS
-  const vencidas = d.contas.filter(c=>statusConta(c)==='Vencida');
-  if(vencidas.length){
-    const total=vencidas.reduce((a,c)=>a+c.valor,0);
-    acoes.push({ nivel:'urgente', icon:'🚨', label:'Ação imediata',
-      msg:`${vencidas.length} conta${vencidas.length>1?'s':''} vencida${vencidas.length>1?'s':''}`,
-      sub:`Total em atraso: ${fmtR(total)}. Regularize para evitar juros.`,
-      acao:'Ver Contas a Pagar →',
-      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
-    });
-  }
-
-  // 2. Vencendo em até 3 dias
-  const urgentes3 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>=0 && dd<=3 && contaEmAberto(c); });
-  if(urgentes3.length){
-    const total=urgentes3.reduce((a,c)=>a+c.valor,0);
-    const nomes=urgentes3.slice(0,2).map(c=>c.desc.length>26?c.desc.slice(0,26)+'…':c.desc).join(', ');
-    acoes.push({ nivel:'urgente', icon:'⏰', label:'Vence em até 3 dias',
-      msg:`${urgentes3.length} conta${urgentes3.length>1?'s':''} urgente${urgentes3.length>1?'s':''}`,
-      sub:`${nomes}${urgentes3.length>2?` +${urgentes3.length-2} mais`:''} — ${fmtR(total)}`,
-      acao:'Pagar agora →',
-      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
-    });
-  }
-
-  // 3. Vencendo em 4–7 dias
-  const urgentes7 = d.contas.filter(c=>{ const dd=diasAte(c.venc); return dd!==null && dd>3 && dd<=7 && contaEmAberto(c); });
-  if(urgentes7.length){
-    const total=urgentes7.reduce((a,c)=>a+c.valor,0);
-    acoes.push({ nivel:'atencao', icon:'📅', label:'Vence esta semana',
-      msg:`${urgentes7.length} conta${urgentes7.length>1?'s':''} nos próximos 7 dias`,
-      sub:`Separe ${fmtR(total)} para esses pagamentos.`,
-      acao:'Ver agenda →',
-      fn:`go('contas',document.querySelectorAll('.nav-btn')[5])`
-    });
-  }
-
-  // 3b. Faturas de cartão e parcelas de dívida em aberto
-  //     (antes o painel só enxergava Contas a Pagar — cartão e dívida ficavam de fora)
-  const comprOutros = compromissosFuturos(d).filter(x => x.tipo !== 'conta');
-  const comprVencidos = comprOutros.filter(x => x.vencido);
-  if(comprVencidos.length){
-    const total = comprVencidos.reduce((a,x)=>a+x.valor,0);
-    acoes.push({ nivel:'urgente', icon:'🔥', label:'Em atraso',
-      msg:`${comprVencidos.length} compromisso${comprVencidos.length>1?'s':''} vencido${comprVencidos.length>1?'s':''}`,
-      sub:`${comprVencidos.slice(0,2).map(x=>x.desc).join(', ')}${comprVencidos.length>2?` +${comprVencidos.length-2}`:''} — ${fmtR(total)}`,
-      acao:`Ir para ${TIPOS_COMPROMISSO[comprVencidos[0].tipo].pagina==='cartoes'?'Cartões':'Dívidas'} →`,
-      fn:`go('${TIPOS_COMPROMISSO[comprVencidos[0].tipo].pagina}',null)`
-    });
-  }
-  const compr7 = comprOutros.filter(x => !x.vencido && x.data <= addDias(today(),7));
-  if(compr7.length){
-    const total = compr7.reduce((a,x)=>a+x.valor,0);
-    const fat = compr7.filter(x=>x.tipo==='fatura').length;
-    const div = compr7.filter(x=>x.tipo==='divida').length;
-    const partes = [fat?`${fat} fatura${fat>1?'s':''} de cartão`:'', div?`${div} parcela${div>1?'s':''} de dívida`:''].filter(Boolean);
-    acoes.push({ nivel:'atencao', icon:'💳', label:'Vence esta semana',
-      msg:partes.join(' e '),
-      sub:`Separe ${fmtR(total)} para esses pagamentos nos próximos 7 dias.`,
-      acao:`Ir para ${TIPOS_COMPROMISSO[compr7[0].tipo].pagina==='cartoes'?'Cartões':'Dívidas'} →`,
-      fn:`go('${TIPOS_COMPROMISSO[compr7[0].tipo].pagina}',null)`
-    });
-  }
-
-  // 3c. Compromissos do mês maiores que o caixa disponível
-  const fimMes = fimDoMes(ano, mes);
-  const aSair  = compromissosFuturos(d, { ate:fimMes }).reduce((a,x)=>a+x.valor,0);
-  const disp   = calcDisponivelAte(today(), { somentePagos:true });
-  if(aSair > 0 && aSair > disp){
-    acoes.push({ nivel:'urgente', icon:'⚠️', label:'Caixa insuficiente',
-      msg:`Faltam ${fmtR(aSair - disp)} para honrar o mês`,
-      sub:`Você tem ${fmtR(disp)} disponível e ${fmtR(aSair)} a pagar até ${fmtDataBR(fimMes)}.`,
-      acao:'Ver fluxo de caixa →',
-      fn:`go('rel',null)`
-    });
-  }
-
-  // 4. Saldo negativo
-  if(sal<0){
-    acoes.push({ nivel:'urgente', icon:'💸', label:'Saldo negativo',
-      msg:`Mês de ${MESES_PT[mes]} no vermelho`,
-      sub:`Saldo atual: ${fmtR(sal)}. Revise despesas ou registre receitas pendentes.`,
-      acao:'Ver lançamentos →',
-      fn:`go('lanc',document.querySelectorAll('.nav-btn')[3])`
-    });
-  }
-
-  // 5. Projeção negativa
-  const diaAtual=hojeD.getDate(); const diasNoMes=new Date(ano,mes+1,0).getDate();
-  if(isMesAtual && sal>=0 && rec>0 && diaAtual<diasNoMes){
-    const projSal=(rec/diaAtual*diasNoMes)-(des/diaAtual*diasNoMes)-inv;
-    if(projSal<0) acoes.push({ nivel:'atencao', icon:'🔮', label:'Projeção de fechamento',
-      msg:`Projeção: ${fmtR(projSal)} ao fim do mês`,
-      sub:`No ritmo atual o mês vai fechar no negativo. Corte gastos ou busque receita extra.`,
-      acao:'Ver relatórios →',
-      fn:`go('rel',document.querySelectorAll('.nav-btn')[2])`
-    });
-  }
-
-  // 6. Orçamentos estourados
-  const metaEfA = metasEfetivasPorCategoria(d, mes, ano, 'Despesa');
-  const metas = Object.entries(metaEfA).map(([cat,val]) => ({ cat, val })).filter(m2 => m2.val > 0);
-  const catM2={};
-  semReservas(d.lancs, d).filter(l=>l.status!=='cancelado'&&l.tipo==='Despesa'&&noMesAno(l.data,mes,ano)).forEach(l=>{catM2[l.cat]=(catM2[l.cat]||0)+l.valor;});
-  const estouradas=metas.filter(m2=>(catM2[m2.cat]||0)>m2.val);
-  if(estouradas.length){
-    const pior=estouradas.sort((a,b)=>((catM2[b.cat]||0)/b.val)-((catM2[a.cat]||0)/a.val))[0];
-    const piorPct=Math.round((catM2[pior.cat]||0)/pior.val*100);
-    acoes.push({ nivel:'atencao', icon:'📊', label:'Orçamento estourado',
-      msg:`${estouradas.length} categoria${estouradas.length>1?'s':''} acima do limite`,
-      sub:`Pior: ${pior.cat} em ${piorPct}% do orçamento. Revise seus gastos.`,
-      acao:'Ver orçamento →',
-      fn:`go('orc',document.querySelectorAll('.nav-btn')[4])`
-    });
-  }
-
-  // 7. Tarefas Kanban atrasadas
-  const kbAtrasadas=(d.kanban||[]).filter(c=>c.col!=='done'&&c.due&&new Date(c.due+'T00:00:00')<hoje);
-  if(kbAtrasadas.length){
-    acoes.push({ nivel:'atencao', icon:'📋', label:'Tarefas atrasadas',
-      msg:`${kbAtrasadas.length} tarefa${kbAtrasadas.length>1?'s':''} do Kanban em atraso`,
-      sub:`"${kbAtrasadas[0].title}"${kbAtrasadas.length>1?` e mais ${kbAtrasadas.length-1} tarefa${kbAtrasadas.length>2?'s':''}`:''}.`,
-      acao:'Ir ao Kanban →',
-      fn:`go('kanban',document.querySelectorAll('.nav-btn')[9])`
-    });
-  }
-
-  // 8. Sem investimentos
-  if(isMesAtual && inv===0 && rec>0){
-    acoes.push({ nivel:'info', icon:'📈', label:'Dica financeira',
-      msg:`Nenhum investimento em ${MESES_PT[mes]}`,
-      sub:`Recomenda-se investir ao menos 10% da renda. Que tal registrar algo?`,
-      acao:'Novo lançamento →',
-      fn:`openM('m-lanc',this)`
-    });
-  }
-
-  // 9. Taxa de poupança baixa
-  if(isMesAtual && rec>0 && taxaPoup<10 && taxaPoup>=0 && inv>0){
-    acoes.push({ nivel:'info', icon:'🐷', label:'Taxa de poupança baixa',
-      msg:`Guardando apenas ${taxaPoup.toFixed(0)}% da renda`,
-      sub:`Meta recomendada: 20%. Identifique despesas para reduzir.`,
-      acao:'Ver relatório →',
-      fn:`go('rel',document.querySelectorAll('.nav-btn')[2])`
-    });
-  }
-
-  // Render
-  if(acoes.length===0){
-    wrap.innerHTML=`<div class="agora-tudo-ok">
-      <span style="font-size:32px">✅</span>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:3px">Tudo em ordem!</div>
-        <div style="font-size:12px;color:var(--t2)">Nenhuma ação pendente para hoje. Continue assim!</div>
-      </div></div>`;
-    return;
-  }
-
-  const temUrgente=acoes.some(a=>a.nivel==='urgente');
-  wrap.innerHTML=`
-    <div class="agora-header">
-      <div class="agora-title">
-        <span class="pulse ${temUrgente?'red':''}"></span>
-        O que fazer agora
-        <span style="font-size:10px;color:var(--t3);font-weight:400;margin-left:4px">${acoes.length} ação${acoes.length!==1?'ões':''} pendente${acoes.length!==1?'s':''}</span>
-      </div>
-    </div>
-    <div class="agora-grid">
-      ${acoes.map(a=>`
-        <div class="agora-card ${a.nivel}" onclick="${a.fn}">
-          <div class="agora-icon">${a.icon}</div>
-          <div class="agora-body">
-            <div class="agora-label">${a.label}</div>
-            <div class="agora-msg">${a.msg}</div>
-            <div class="agora-sub">${a.sub}</div>
-            <div class="agora-action">${a.acao}</div>
-          </div>
-        </div>`).join('')}
-    </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════
