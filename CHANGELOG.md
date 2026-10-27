@@ -4,6 +4,50 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Botão flutuante "Novo lançamento" em todo o sistema
+
+### 🎯 O que foi pedido
+
+Criar um **botão flutuante de lançamento** na aba Lançamentos e **em todo o sistema**, no **canto inferior
+direito**.
+
+### 🐛 O que limitava
+
+- O botão **+** flutuante só existia no celular. No computador, para lançar era preciso voltar ao topo da
+  página Lançamentos ou do Dashboard.
+- Ao abrir **"Novo lançamento"** depois de salvar outro (ou de cancelar uma edição), o formulário vinha
+  com o **tipo, a descrição e o valor do anterior** já preenchidos — fácil salvar um lançamento repetido
+  sem perceber.
+
+### ✨ Implementado
+
+- **Botão flutuante ＋ em todas as telas** (Dashboard, Relatórios, Lançamentos, Orçamento, Contas a Pagar,
+  Dívidas, Cartões, Bancos, Kanban e Configurações), fixo no **canto inferior direito**:
+  - abre o **Novo Lançamento** de qualquer tela, sem sair de onde você está;
+  - no computador, ao passar o mouse (ou chegar pelo Tab), abre o nome **"Novo lançamento"**;
+  - no celular, fica logo acima da barra de navegação de baixo e respeita a área do "home" do iPhone;
+  - mesmo visual nos temas claro e escuro; não aparece na impressão; com "reduzir movimento" ligado no
+    aparelho, não anima.
+- **Espaço no fim das páginas:** dá para rolar o último conteúdo de cada tela para cima do botão — ele
+  nunca esconde a última linha de uma tabela nem um botão.
+- **Novo lançamento sempre limpo:** abre com tipo **Despesa**, data de hoje e descrição e valor em branco,
+  venha de onde vier (botão flutuante, "+ Novo Lançamento", Dashboard ou celular).
+
+### 🧪 Testes
+
+- **`test-botao-lancamento.js` — 22 verificações:** botão em todas as 10 telas, no canto certo e por
+  cima do conteúdo (computador e celular); fim de cada tela livre; nome ao passar o mouse e pelo teclado;
+  abre o Novo Lançamento limpo (depois de salvar e depois de cancelar uma edição, sem sobrescrever o
+  lançamento editado); atrás dos modais; fora da impressão; tema claro; toque no celular sem o nome ficar
+  aberto; sem rolagem lateral; sem erros de JS.
+- **403 verificações** passando em 11 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum: muda só a tela.
+
+---
+
 ## [2026-10-27] Cartões: editar as compras dentro das faturas em aberto
 
 ### 🎯 O que foi pedido

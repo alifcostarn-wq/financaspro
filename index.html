@@ -185,7 +185,7 @@ body.theme-light .logo-icon{filter:drop-shadow(0 3px 8px rgba(0,168,94,.18))}
 
 /* ── MAIN ── */
 .main{margin-left:var(--sidebar);min-height:100vh}
-.page{display:none;padding:28px 32px 40px}.page.active{display:block}
+.page{display:none;padding:28px 32px 104px}.page.active{display:block}   /* 104px: espaço do botão flutuante */
 
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
@@ -664,23 +664,35 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   font-size:8px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center;
 }
 
-/* ── FAB — quick add ── */
-.mob-fab{
-  display:none;position:fixed;bottom:72px;right:18px;z-index:85;
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,var(--green),var(--cyan));
-  box-shadow:0 4px 20px rgba(0,217,126,.4);
-  border:none;cursor:pointer;font-size:24px;color:#000;font-weight:700;
-  align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;
+/* ── Botão flutuante: novo lançamento, em todas as telas (canto inferior direito) ── */
+.fab-lanc{
+  position:fixed;right:28px;bottom:28px;z-index:85;
+  display:flex;align-items:center;height:56px;min-width:56px;padding:0 16px;
+  border:none;border-radius:28px;cursor:pointer;
+  background:linear-gradient(135deg,var(--green),var(--cyan));color:#04120b;
+  box-shadow:0 6px 22px rgba(0,217,126,.38),0 2px 6px rgba(0,0,0,.22);
+  font:700 13px 'Sora',sans-serif;letter-spacing:.01em;
+  transition:transform .2s,box-shadow .2s;
 }
-.mob-fab:active{transform:scale(.93);box-shadow:0 2px 10px rgba(0,217,126,.3)}
+.fab-lanc svg{width:24px;height:24px;flex:none;stroke-width:2.6}
+.fab-lanc .fab-txt{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .25s,opacity .2s,margin-left .25s}
+.fab-lanc:focus-visible{outline:3px solid var(--t1);outline-offset:3px}
+.fab-lanc:focus-visible .fab-txt{max-width:160px;opacity:1;margin-left:8px}
+.fab-lanc:active{transform:scale(.94);box-shadow:0 2px 10px rgba(0,217,126,.3)}
+/* no computador o nome aparece ao passar o mouse (no toque não, para não ficar "preso" aberto) */
+@media (hover:hover){
+  .fab-lanc:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,217,126,.45),0 3px 8px rgba(0,0,0,.25)}
+  .fab-lanc:hover .fab-txt{max-width:160px;opacity:1;margin-left:8px}
+}
+@media (prefers-reduced-motion:reduce){ .fab-lanc,.fab-lanc .fab-txt{transition:none} }
+@media print{ .fab-lanc{display:none !important} }
 
 /* ── Mobile page padding ── */
 @media(max-width:768px){
   /* Topbar & bottom nav */
   .mob-topbar{display:flex}
   .bottom-nav{display:block}
-  .mob-fab{display:flex}
+  .fab-lanc{right:18px;bottom:calc(72px + env(safe-area-inset-bottom,0px));height:52px;min-width:52px;padding:0 14px}
 
   /* Sidebar becomes drawer */
   .sidebar{
@@ -691,7 +703,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 
   /* Main shifts for topbar + bottom nav */
   .main{margin-left:0;padding-top:56px;padding-bottom:72px}
-  .page{padding:16px 14px 24px}
+  .page{padding:16px 14px 76px}
 
   /* KPI grids */
   .kpi-grid.cols4,.kpi-grid.cols5,.kpi-grid.cols6{grid-template-columns:1fr 1fr}
@@ -780,7 +792,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 @media(max-width:380px){
   .kpi-grid.cols4,.kpi-grid.cols5,.kpi-grid.cols6{grid-template-columns:1fr 1fr}
   .kpi-val{font-size:14px}
-  .page{padding:12px 10px 20px}
+  .page{padding:12px 10px 76px}
   .bottom-nav-inner{gap:0}
   .bn-item{min-width:44px;padding:4px 4px}
 }
@@ -1370,8 +1382,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </nav>
 
-<!-- ═══ FAB ═══ -->
-<button class="mob-fab" onclick="openM('m-lanc')" title="Novo lançamento" aria-label="Novo lançamento">＋</button>
+<!-- ═══ Botão flutuante: novo lançamento (todas as telas) ═══ -->
+<button type="button" class="fab-lanc" id="fab-lanc" onclick="openM('m-lanc')" aria-label="Novo lançamento">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  <span class="fab-txt">Novo lançamento</span>
+</button>
 
 
 <script>
@@ -4548,6 +4563,9 @@ function openM(id){
     document.getElementById('btn-salvar-lanc').textContent = 'Salvar Lançamento';
     document.getElementById('l-edit-id').value = '';
     document.getElementById('l-data').value = today();
+    document.getElementById('l-tipo').value = 'Despesa';
+    document.getElementById('l-desc').value = '';
+    document.getElementById('l-valor').value = '';
     document.getElementById('l-obs').value = '';
     document.getElementById('l-pago').value = 'Pago';
     updLancCats();
