@@ -84,7 +84,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('o modal cresce a partir do botão (canto inferior direito, começando do tamanho dele)', await p.evaluate(animModal => {
     const t = eval(animModal)(), m = /translate\((-?\d+)px, (-?\d+)px\) scale\(([\d.]+)\)/.exec(t) || [];
     return [+m[1] > 300, +m[2] > 200, +m[3] > 0 && +m[3] < .15].join('|'); }, animModal.toString()), 'true|true|true');
-  eq('os campos entram em cascata', await p.evaluate(() => [...document.querySelectorAll('#m-lanc .modal-bd > .form-grid')]
+  eq('os campos entram em cascata', await p.evaluate(() => [...document.querySelectorAll('#m-lanc .modal-bd > .form-grid')].filter(e => e.getClientRects().length)
     .map(e => e.getAnimations()[0]?.effect.getTiming().delay).join(',')), '150,190,230,270,310');
   await p.mouse.move(400, 300); await p.waitForTimeout(800);
   eq('no fim: modal no centro, nada animando, onda removida', await p.evaluate(() => { const ov = document.getElementById('m-lanc'), r = ov.querySelector('.modal').getBoundingClientRect();

@@ -829,6 +829,39 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .dash-sub{font-size:11px;color:var(--t3);margin-top:3px}
 .dash-big{font:700 20px 'JetBrains Mono',monospace;letter-spacing:-.5px;white-space:nowrap}
 .dash-graf-cresce{flex:1 1 auto;min-height:150px}   /* o gráfico ocupa a altura que o cartão tiver */
+/* ── Investimentos: aplicação e resgate ── */
+.l-inv-dica{font-size:11.5px;color:var(--t2);background:var(--blue-dim);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-bottom:12px;line-height:1.45}
+.l-rend-ajuda{font-size:11px;color:var(--t3);align-self:end;line-height:1.4;padding-bottom:4px}
+.inv-link{border:none;background:none;padding:0;color:var(--blue);font:600 10px 'Sora',sans-serif;cursor:pointer}
+.inv-link:hover,.inv-link:focus-visible{text-decoration:underline}
+.inv-revisar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--blue-dim);border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:var(--r2);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--t2)}
+.inv-revisar b{color:var(--t1)}
+.inv-rev-l{display:grid;grid-template-columns:22px 78px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 4px;border-top:1px solid var(--line);font-size:12px;color:var(--t2)}
+.inv-rev-l:first-child{border-top:none}
+.inv-rev-l b{color:var(--t1);font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inv-rev-l small{font-size:10.5px;color:var(--t3)}
+.inv-rev-de{font-size:11px;white-space:nowrap}
+.inv-rev-de s{color:var(--t3)}
+.inv-rev-de em{font-style:normal;font-weight:700;color:var(--blue)}
+.inv-rev-v{font:600 12px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap}
+.cart-tot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.cart-tot div{background:var(--surface2);border-radius:var(--r2);padding:10px 12px}
+.cart-tot small{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.cart-tot b{font:700 15px 'JetBrains Mono',monospace;color:var(--t1)}
+.cart-l{display:grid;grid-template-columns:minmax(0,1fr) 100px 100px 110px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--t2)}
+.cart-l.cab{border-top:none;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.cart-l .mono{text-align:right;white-space:nowrap}
+.cart-l .saldo{color:var(--t1);font-weight:700}
+.cart-l small{display:block;font-size:10.5px;color:var(--t3)}
+.cart-sub{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px}
+@media (max-width:768px){
+  .inv-rev-l{grid-template-columns:22px minmax(0,1fr) auto;row-gap:2px}
+  .inv-rev-l .inv-rev-data{display:none}
+  .inv-rev-l .inv-rev-de{grid-column:2 / 3}
+  .cart-l{grid-template-columns:minmax(0,1fr) 92px}
+  .cart-l .ap,.cart-l .rs{display:none}
+  .cart-tot{grid-template-columns:1fr}
+}
 .dash-vazio{font-size:12px;color:var(--t3);padding:18px 0;text-align:center}
 .dash-mais{border:none;background:none;color:var(--t3);font:600 11px 'Sora',sans-serif;cursor:pointer;padding:8px 8px 0}
 .dash-mais:hover{color:var(--t1)}
@@ -879,6 +912,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .dk-ul-val.rec{color:var(--green)}
 .dk-ul-val.des{color:var(--red)}
 .dk-ul-val.inv{color:var(--blue)}
+.dk-ul-val.resg{color:var(--purple)}
 /* Saúde financeira: nota, o que pesa e os indicadores sob demanda */
 .dk-score{display:flex;align-items:center;gap:16px}
 .dk-score-num{white-space:nowrap}
@@ -920,6 +954,8 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 #m-ofx .ofx-status-badge.duplicado{background:var(--amber-dim);color:var(--amber)}
 #m-ofx .ofx-status-badge.conciliado{background:var(--blue-dim);color:var(--blue)}
 #m-ofx .ofx-row-dup td{opacity:.55}
+#m-ofx .ofx-tipo{background:var(--surface3);border:1px solid var(--line2);color:var(--t1);padding:4px 6px;border-radius:6px;font:11px 'Sora',sans-serif;max-width:190px}
+#m-ofx .ofx-tipo.inv{border-color:var(--blue);color:var(--blue)}
 #m-ofx .ofx-kpi{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:12px;text-align:center}
 #m-ofx .ofx-kpi-val{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
 #m-ofx .ofx-kpi-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
@@ -2011,8 +2047,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   <div class="kpi-grid cols4">
     <div class="kpi g"><div class="kpi-label">Receitas do Mês</div><div class="kpi-val g" id="lk-rec">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
     <div class="kpi r"><div class="kpi-label">Despesas do Mês</div><div class="kpi-val r" id="lk-des">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
-    <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div><div class="kpi-sub">receitas − despesas − investimentos</div></div>
-    <div class="kpi b"><div class="kpi-label">Investimentos</div><div class="kpi-val b" id="lk-inv">R$ 0</div></div>
+    <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div><div class="kpi-sub">receitas − despesas − investido</div></div>
+    <div class="kpi b"><div class="kpi-label">Investido no mês</div><div class="kpi-val b" id="lk-inv">R$ 0</div><div class="kpi-sub"><span id="lk-inv-sub">aplicações − resgates</span> · <button type="button" class="inv-link" onclick="abrirCarteira(this)">Ver carteira ›</button></div></div>
   </div>
 
   <!-- Saldo: disponível e reservas, separados -->
@@ -2033,6 +2069,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div style="font-size:10px;color:var(--t3);margin-top:4px">disponível + reservas</div>
     </div>
   </div>
+  <div class="inv-revisar" id="l-inv-revisar" role="status" style="display:none"></div>
   <div class="card">
     <div class="card-header">
       <span class="card-title">Extrato</span>
@@ -2053,7 +2090,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         </div>
         <select id="l-fil-tipo" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os tipos</option>
-          <option>Receita</option><option>Despesa</option><option>Investimento</option><option>Transferência</option>
+          <option>Receita</option><option>Despesa</option><option value="Investimento">Investimento (aplicação)</option><option value="Resgate">Resgate de investimento</option><option>Transferência</option>
         </select>
         <select id="l-fil-visao" onchange="renderLanc()" title="Separa o que compõe o resultado do que está em contas de reserva" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="resultado">📈 Resultado (sem reservas)</option>
@@ -2110,7 +2147,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           </div>
           <div style="width:1px;height:32px;background:var(--line)"></div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Investimentos</span>
+            <span style="font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Investido (líquido)</span>
             <span id="l-sel-inv" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--blue)">R$ 0,00</span>
           </div>
           <div style="width:1px;height:32px;background:var(--line)"></div>
@@ -2904,7 +2941,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <thead>
               <tr>
                 <th style="width:32px"><input type="checkbox" id="ofx-check-all" onchange="ofxToggleAll(this.checked)" title="Selecionar todos"></th>
-                <th>Data</th><th>Descrição OFX</th><th>Valor</th><th>Status</th><th>Ação</th>
+                <th>Data</th><th>Descrição OFX</th><th>Valor</th><th>Status</th><th>Lançar como</th>
               </tr>
             </thead>
             <tbody id="ofx-tbody"></tbody>
@@ -2938,10 +2975,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Data *</label><input type="date" id="l-data"></div>
         <div class="fg"><label>Tipo *</label>
-          <select id="l-tipo" onchange="updLancCats()">
+          <select id="l-tipo" onchange="updLancTipo()">
             <option value="Receita">Receita</option>
             <option value="Despesa" selected>Despesa</option>
-            <option value="Investimento">Investimento</option>
+            <option value="Investimento">Investimento (aplicação)</option>
+            <option value="Resgate">Resgate de investimento</option>
           </select>
         </div>
       </div>
@@ -2952,6 +2990,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div class="form-grid" style="margin-bottom:12px">
         <div class="fg"><label>Descrição *</label><input type="text" id="l-desc" placeholder="Ex: Conta de energia maio"></div>
       </div>
+      <div class="l-inv-dica" id="l-inv-dica" style="display:none"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Valor *</label><input type="number" id="l-valor" step="0.01" min="0" placeholder="0,00"></div>
         <div class="fg"><label>Caixa / Conta *</label>
@@ -2959,6 +2998,11 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="">— Selecione a conta —</option>
           </select>
         </div>
+      </div>
+      <div class="form-grid cols2" id="l-rend-row" style="margin-bottom:12px;display:none">
+        <div class="fg"><label>Desse valor, quanto é rendimento? <span style="font-weight:400;color:var(--t3)">(opcional)</span></label>
+          <input type="number" id="l-rend" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="l-rend-ajuda"><span>O lucro entra como <b>receita</b> (Rendimentos); o resto volta como resgate e diminui o que está investido.</span></div>
       </div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Status</label>
@@ -3566,6 +3610,39 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </div>
 
+<!-- Modal: revisar investimentos lançados como receita/despesa -->
+<div class="overlay" id="m-inv-revisar" style="display:none" onclick="cmoOut(event,'m-inv-revisar')">
+  <div class="modal" style="max-width:720px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2>Corrigir investimentos</h2>
+        <div class="card-sub">Parecem <b>aplicação</b> ou <b>resgate</b>, mas estão contados como despesa ou receita. Marque o que corrigir.</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-inv-revisar')">✕</button>
+    </div>
+    <div class="modal-bd"><div id="inv-rev-lista"></div></div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="dispensarRevisarInvest()">Não são investimentos</button>
+      <button class="btn btn-ghost" onclick="closeM('m-inv-revisar')">Agora não</button>
+      <button class="btn btn-green" id="inv-rev-ok" onclick="aplicarRevisarInvest()">Corrigir selecionados</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: carteira de investimentos -->
+<div class="overlay" id="m-carteira" style="display:none" onclick="cmoOut(event,'m-carteira')">
+  <div class="modal" style="max-width:680px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2>Seus investimentos</h2><div class="card-sub">O que está aplicado: aplicações − resgates, por categoria</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-carteira')">✕</button>
+    </div>
+    <div class="modal-bd"><div id="carteira-corpo"></div></div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-carteira')">Fechar</button>
+      <button class="btn btn-ghost" onclick="closeM('m-carteira');novoLancTipo('Resgate',this)">↙ Resgatar</button>
+      <button class="btn btn-green" onclick="closeM('m-carteira');novoLancTipo('Investimento',this)">↗ Aplicar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Gasto no Cartão -->
 <div class="overlay" id="m-gasto" style="display:none" onclick="cmoOut(event,'m-gasto')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -3883,7 +3960,7 @@ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Ag
 const MESES3 = MESES.map(m=>m.slice(0,3));
 const CATS_PADRAO = {
   Receita: {
-    'Receitas': ['Pro-Labore','Dividendos','Vendas','Outras Receitas']
+    'Receitas': ['Pro-Labore','Dividendos','Rendimentos','Vendas','Outras Receitas']
   },
   Despesa: {
     'Moradia':     ['Aluguel','Prestação / Financiamento','Condomínio','Água','Luz','Gás','Internet','Telefone Fixo','Plano de Celular','TV por Assinatura','IPTU','Seguro Residencial','Reforma / Manutenção','Móveis','Eletrodomésticos','Eletrônicos','Decoração','Jardinagem','Dedetização','Outras Moradias'],
@@ -3927,6 +4004,8 @@ const PAPEIS_PADRAO = {
   pagamentoDivida:   { tipo:'Despesa',      cat:'Serviços & Financeiro', sub:'Pagamento de Dívida', rotulo:'pagamento de parcela de dívida' },
   outrasDespesas:    { tipo:'Despesa',      cat:'Outras Despesas',       rotulo:'despesa sem categoria e importação OFX' },
   receitaPadrao:     { tipo:'Receita',      cat:'Receitas',              rotulo:'receita importada por OFX' },
+  rendimentos:       { tipo:'Receita',      cat:'Receitas', sub:'Rendimentos', rotulo:'rendimento de investimento (lucro no resgate)' },
+  investimentoPadrao:{ tipo:'Investimento', cat:'Investimentos',         rotulo:'aplicação ou resgate importado por OFX' },
 };
 const CATS = {};
 const CLASSE_DESPESA = {};
@@ -3984,7 +4063,7 @@ function papelSub(nome){
 function refsCategoria(d){
   const out = [];
   const add = (o, tipo, fonte, semSub) => { if(o && o.cat) out.push({ o, tipo, fonte, semSub:!!semSub }); };
-  (d.lancs || []).forEach(l => { if(l.tipo && l.tipo !== 'Transferência') add(l, l.tipo, 'lanc'); });
+  (d.lancs || []).forEach(l => { if(l.tipo && l.tipo !== 'Transferência') add(l, tipoDasCats(l.tipo), 'lanc'); });
   (d.contas || []).forEach(c => add(c, 'Despesa', 'conta'));
   (d.orcs || []).forEach(o => add(o, o.tipo, 'meta'));
   (d.ccs || []).forEach(cc => {
@@ -3994,7 +4073,7 @@ function refsCategoria(d){
   // Movimentação espelhada de lançamento segue o lançamento; transferência não tem categoria
   (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
     if(m.refLancId || isTransfMov(m)) return;
-    const tipo = m.tipo === 'entrada' ? 'Receita' : ((CATS.Investimento || {})[m.cat] ? 'Investimento' : 'Despesa');
+    const tipo = ehCatInvest(m.cat) ? 'Investimento' : m.tipo === 'entrada' ? 'Receita' : 'Despesa';
     add(m, tipo, 'banco');
   }));
   return out;
@@ -4318,10 +4397,45 @@ function calcReservasAte(dataISO){
 function isTransfMov(m){
   return !!m.transfGrupo || (m.cat || '').includes('Transferência');
 }
+// ── INVESTIMENTOS ──
+// Aplicação (tipo "Investimento") e resgate (tipo "Resgate") só mudam o dinheiro de lugar:
+// saem do caixa ou voltam para ele, mas não são despesa nem receita. O lucro informado
+// no resgate entra como receita, num lançamento à parte (Receitas › Rendimentos).
+const ehMovInvest = t => t === 'Investimento' || t === 'Resgate';
+// Valor com sinal para o que ficou investido: aplicação soma, resgate subtrai
+const valorInvestido = l => !l ? 0 : l.tipo === 'Investimento' ? (l.valor || 0) : l.tipo === 'Resgate' ? -(l.valor || 0) : 0;
+const investidoLiquido = lista => +lista.reduce((a, l) => a + valorInvestido(l), 0).toFixed(2);
+// Entra no caixa? Receita e resgate entram; despesa e aplicação saem
+const entraNoCaixa = t => t === 'Receita' || t === 'Resgate';
+// O resgate usa as mesmas categorias da aplicação
+function tipoDasCats(t){ return t === 'Resgate' ? 'Investimento' : t; }
+// Categoria de investimento? (classifica as movimentações feitas direto em Bancos)
+const ehCatInvest = cat => !!cat && Object.prototype.hasOwnProperty.call(CATS.Investimento || {}, cat);
+
+// Aplicação e resgate pelo histórico do banco ("APLICACAO RDB", "RES APLIC AUT", "RESGATE CDB"…).
+// Rendimento, dividendo e JCP são ganho de verdade: continuam receita.
+const semAcento = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const RX_INV_GANHO   = /rendimento|dividend|\bjcp\b|juros\s+s\/?\s*cap|provento/i;
+const RX_INV_RESGATE = /\b(resg|resgate|res\.?\s*aplic|venda\s+(de\s+)?(titulo|tesouro|cdb|lci|lca|cri|cra|debenture))/i;
+const RX_INV_APLIC   = /\b(aplic|apl\.?\s|aporte|invest|compra\s+(de\s+)?(titulo|tesouro|cdb|lci|lca|cri|cra|debenture)|tesouro\s+direto|previdencia|poupanca)/i;
+function tipoInvestDoHistorico(texto, entrada){
+  const m = semAcento(texto);
+  if(entrada) return !RX_INV_GANHO.test(m) && RX_INV_RESGATE.test(m) ? 'Resgate' : null;
+  return RX_INV_APLIC.test(m) ? 'Investimento' : null;
+}
+// Subcategoria provável pelo produto citado no histórico (só se existir no plano de contas)
+function subcatInvestDoHistorico(texto){
+  const m = semAcento(texto).toLowerCase(), subs = subcats('Investimento', papel('investimentoPadrao'));
+  const regras = [[/tesouro/, 'Tesouro Direto'], [/\blc[ia]\b/, 'LCI & LCA'], [/poupanca/, 'Poupança'], [/previd/, 'Previdência Privada'],
+                  [/fundo|\bfii\b/, 'Fundos'], [/cdb|rdb|\bcri\b|\bcra\b|debenture/, 'Renda Fixa']];
+  const r = regras.find(([rx, nome]) => rx.test(m) && subs.includes(nome));
+  return r ? r[1] : '';
+}
+
 // Efeito de um lançamento sobre o caixa
 function efeitoLanc(l){
   if(!l || l.status === 'cancelado' || l.tipo === 'Transferência') return 0;
-  if(l.tipo === 'Receita') return l.valor || 0;
+  if(l.tipo === 'Receita' || l.tipo === 'Resgate') return l.valor || 0;
   if(l.tipo === 'Despesa' || l.tipo === 'Investimento') return -(l.valor || 0);
   return 0;
 }
@@ -4471,6 +4585,7 @@ function openM(id, origem){
     document.getElementById('l-tipo').value = 'Despesa';
     document.getElementById('l-desc').value = '';
     document.getElementById('l-valor').value = '';
+    document.getElementById('l-rend').value = '';
     document.getElementById('l-obs').value = '';
     document.getElementById('l-pago').value = 'Pago';
     updLancCats();
@@ -4910,10 +5025,12 @@ function updSbSaldo(){
 
 // ── CATEGORIES ──
 function allCats(tipo){
+  tipo = tipoDasCats(tipo);
   if(!CATS[tipo])return[];
   return Object.keys(CATS[tipo]);
 }
 function subcats(tipo,cat){
+  tipo = tipoDasCats(tipo);
   if(!CATS[tipo]||!CATS[tipo][cat])return[];
   return CATS[tipo][cat];
 }
@@ -4998,13 +5115,15 @@ function renderDash(){
   const ativos = semReservas(filtrarPorView(ativosBase, _dashView), d);
   const soma = (lista, tipo) => lista.filter(l => l.tipo === tipo).reduce((a,l) => a + l.valor, 0);
   const ml  = ativos.filter(l => noMesAno(l.data, mes, ano));
-  const rec = soma(ml, 'Receita'), des = soma(ml, 'Despesa'), inv = soma(ml, 'Investimento');
+  const rec = soma(ml, 'Receita'), des = soma(ml, 'Despesa');
+  // Investido = aplicações − resgates: nenhum dos dois é despesa ou receita
+  const aplic = soma(ml, 'Investimento'), resg = soma(ml, 'Resgate'), inv = aplic - resg;
   const sal = rec - des - inv;
 
   // Mês anterior, para a variação (respeita a virada de ano)
   const refAnt = mesAnterior(ano, mes);
   const mlAnt  = ativos.filter(l => noMesAno(l.data, refAnt.mes, refAnt.ano));
-  const recAnt = soma(mlAnt, 'Receita'), desAnt = soma(mlAnt, 'Despesa'), invAnt = soma(mlAnt, 'Investimento');
+  const recAnt = soma(mlAnt, 'Receita'), desAnt = soma(mlAnt, 'Despesa'), invAnt = soma(mlAnt, 'Investimento') - soma(mlAnt, 'Resgate');
   const salAnt = recAnt - desAnt - invAnt;
 
   // ── 1. O mês em quatro números: uma linha só embaixo de cada, a variação sobre o mês anterior ──
@@ -5021,10 +5140,14 @@ function renderDash(){
   set('dk-rec', fmtR(rec)); nota('dk-rec-nota', rec, recAnt, true);
   set('dk-des', fmtR(des)); nota('dk-des-nota', des, desAnt, false);
   set('dk-inv', fmtR(inv)); nota('dk-inv-nota', inv, invAnt, true);
+  if(resg){   // com resgate no mês, a linha mostra o que entrou e o que saiu do investimento
+    const ni = document.getElementById('dk-inv-nota');
+    if(ni){ ni.textContent = `aplicou ${fmtRCurto(aplic)} · resgatou ${fmtRCurto(resg)}`; ni.title = `Aplicações: ${fmtR(aplic)} · resgates: ${fmtR(resg)}`; }
+  }
   setC('dk-sal', fmtR(sal), sal >= 0 ? 'var(--green)' : 'var(--red)');
   // No "Realizado", o saldo mostra também o previsto do mês (com o que ainda está pendente ou agendado)
   const mlPrev = semReservas(ativosBase, d).filter(l => noMesAno(l.data, mes, ano));
-  const salPrev = soma(mlPrev, 'Receita') - soma(mlPrev, 'Despesa') - soma(mlPrev, 'Investimento');
+  const salPrev = soma(mlPrev, 'Receita') - soma(mlPrev, 'Despesa') - soma(mlPrev, 'Investimento') + soma(mlPrev, 'Resgate');
   const notaSal = document.getElementById('dk-sal-nota');
   if(_dashView === 'realizado' && Math.abs(salPrev - sal) >= 0.01 && notaSal){
     notaSal.title = 'Somando os lançamentos pendentes e agendados do mês';
@@ -5035,7 +5158,7 @@ function renderDash(){
   const recArr = [], desArr = [], invArr = [];
   for(let m = 0; m < 12; m++){
     const ml2 = ativos.filter(l => noMesAno(l.data, m, ano));
-    recArr.push(soma(ml2, 'Receita')); desArr.push(soma(ml2, 'Despesa')); invArr.push(soma(ml2, 'Investimento'));
+    recArr.push(soma(ml2, 'Receita')); desArr.push(soma(ml2, 'Despesa')); invArr.push(soma(ml2, 'Investimento') - soma(ml2, 'Resgate'));
   }
   const corVar = v => getComputedStyle(document.body).getPropertyValue(v).trim();
   const cRec = corVar('--viz-rec') || '#16ad69', cDes = corVar('--viz-des') || '#b8344d';
@@ -5072,7 +5195,7 @@ function renderDash(){
   // ── 2b. Precisa de atenção ──
   const hoje = new Date();
   const mesAtual = mes === hoje.getMonth() && ano === hoje.getFullYear();
-  _dashAtencao = itensAtencaoDash(d, { mes, ano, sal, rec, inv, catReal, catPrev, metaEf, mesAtual });
+  _dashAtencao = itensAtencaoDash(d, { mes, ano, sal, rec, inv, aplic, catReal, catPrev, metaEf, mesAtual });
   renderAtencaoDash();
 
   // ── 3. Para onde foi o dinheiro, o que vem por aí, o que entrou por último ──
@@ -5080,10 +5203,10 @@ function renderDash(){
   renderProxDash(d);
   const ult = [...d.lancs].filter(l => l.status !== 'cancelado').sort((a,b) => b.data.localeCompare(a.data) || b.ts - a.ts).slice(0, 5);
   document.getElementById('dash-ultimos').innerHTML = ult.length ? ult.map(l => {
-    const cls = l.tipo === 'Receita' ? 'rec' : l.tipo === 'Investimento' ? 'inv' : 'des';
+    const cls = l.tipo === 'Receita' ? 'rec' : l.tipo === 'Investimento' ? 'inv' : l.tipo === 'Resgate' ? 'resg' : 'des';
     return `<div class="dk-ul">
       <span class="dk-ul-txt"><b>${escHtml(l.desc || '—')}</b><small>${fmtDataBR(l.data).slice(0, 5)} · ${escHtml(l.cat || '—')}</small></span>
-      <span class="dk-ul-val ${cls}">${l.tipo === 'Receita' ? '+' : '−'}${fmtR(l.valor)}</span>
+      <span class="dk-ul-val ${cls}">${entraNoCaixa(l.tipo) ? '+' : '−'}${fmtR(l.valor)}</span>
     </div>`; }).join('') : '<div class="dash-vazio">Nenhum lançamento ainda.</div>';
 
   // ── 4a. Patrimônio: caixa consolidado no fim do mês (motor único) + investimentos − dívidas ──
@@ -5092,18 +5215,20 @@ function renderDash(){
   const caixa      = calcSaldoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
   const reservas   = calcReservasAte(fimMesDash);
   const caixaLivre = +(caixa - reservas).toFixed(2);
-  const totalInv   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimMesDash).reduce((a,l) => a + l.valor, 0);
+  const totalInv   = investidoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
   const totalDiv   = d.divs.reduce((a, dv) => a + saldoDivida(dv), 0);
   const patrimonio = caixa + totalInv - totalDiv;
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
-  set('dk-patrimonio-sub', [`caixa ${fmtRCurto(caixaLivre)}`, reservas ? `reservas ${fmtRCurto(reservas)}` : '',
-    totalInv ? `investido ${fmtRCurto(totalInv)}` : '', totalDiv ? `dívidas −${fmtRCurto(totalDiv)}` : ''].filter(Boolean).join(' · '));
+  const subPat = document.getElementById('dk-patrimonio-sub');
+  if(subPat) subPat.innerHTML = [`caixa ${fmtRCurto(caixaLivre)}`, reservas ? `reservas ${fmtRCurto(reservas)}` : '',
+    totalInv ? `<button type="button" class="inv-link" onclick="abrirCarteira(this)" title="Ver a carteira">investido ${fmtRCurto(totalInv)}</button>` : '',
+    totalDiv ? `dívidas −${fmtRCurto(totalDiv)}` : ''].filter(Boolean).join(' · ');
   const patArr = [];
   for(let m = 0; m < 12; m++){
     const fimM = fimDoMes(ano, m);
     if(_dashView === 'realizado' && fimM > fimDoMes(hoje.getFullYear(), hoje.getMonth())){ patArr.push(null); continue; }
     const caixaM = calcSaldoAte(fimM, { somentePagos: _dashView === 'realizado' });
-    const invM   = ativos.filter(l => l.tipo === 'Investimento' && l.data <= fimM).reduce((a,l) => a + l.valor, 0);
+    const invM   = investidoAte(fimM, { somentePagos: _dashView === 'realizado' });
     patArr.push(+(caixaM + invM - totalDiv).toFixed(2));
   }
   const cPat = corVar('--cyan') || '#22d3ee';
@@ -5119,9 +5244,9 @@ function renderDash(){
   const salario = d.cfg.sal || 1;
   const salDiv = d.cfg.sal > 0 ? d.divs.reduce((a,dv) => a + dv.mensal, 0) / d.cfg.sal * 100 : 0;
   const pctDes = salario > 0 ? des / salario * 100 : 100;
-  const pctInv = salario > 0 ? inv / salario * 100 : 0;
+  const pctInv = salario > 0 ? Math.max(0, inv) / salario * 100 : 0;
   const taxaPoup = rec > 0 ? sal / rec * 100 : 0;
-  const diag = scoreSaude(d, { salDiv, pctDes, pctInv, taxaPoup, sal, rec, inv, mes, ano });
+  const diag = scoreSaude(d, { salDiv, pctDes, pctInv, taxaPoup, sal, rec, inv:Math.max(0, inv), mes, ano });
   const score = diag.score;
   const scoreCor  = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : score >= 40 ? 'var(--orange, #f97316)' : 'var(--red)';
   const scoreNota = score >= 80 ? 'Excelente' : score >= 60 ? 'Bom' : score >= 40 ? 'Atenção' : 'Crítico';
@@ -5188,7 +5313,10 @@ function itensAtencaoDash(d, c){
   const kb = (d.kanban || []).filter(k => k.col !== 'done' && k.due && k.due < hj);
   if(kb.length) out.push({ nivel:'atencao', ic:'📋', titulo:`${kb.length} ${plural(kb.length, 'tarefa atrasada', 'tarefas atrasadas')}`,
     sub:kb[0].title, fn:`irPagina('kanban')` });
-  if(c.mesAtual && c.inv === 0 && c.rec > 0) out.push({ nivel:'info', ic:'📈', titulo:`Nada investido em ${MESES[c.mes].toLowerCase()}`,
+  const revisar = candidatosInvest(d).length;
+  if(revisar) out.push({ nivel:'info', ic:'🔎', titulo:`${revisar} ${plural(revisar, 'movimentação parece', 'movimentações parecem')} investimento`,
+    sub:'Estão contadas como receita ou despesa — revise e corrija', fn:`abrirRevisarInvest(this)` });
+  if(c.mesAtual && !c.aplic && c.rec > 0) out.push({ nivel:'info', ic:'📈', titulo:`Nada investido em ${MESES[c.mes].toLowerCase()}`,
     sub:'Que tal separar uma parte da receita?', fn:`openM('m-lanc',this)` });
   return out;
 }
@@ -6137,7 +6265,7 @@ function renderRel(){
   const mData=MESES.map((_,m)=>({
     r :ativos.filter(l=>l.tipo==='Receita'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
     de:ativos.filter(l=>l.tipo==='Despesa'     &&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
-    i :ativos.filter(l=>l.tipo==='Investimento'&&getMes(l.data)===m).reduce((a,l)=>a+l.valor,0),
+    i :investidoLiquido(ativos.filter(l=>getMes(l.data)===m)),   // aplicações − resgates
   }));
 
   // ── Visão Anual ──
@@ -6235,7 +6363,9 @@ function comparacaoRC(p, modo){
 function lancsRC(d, ini, fim, tipo, cartao){
   const ativos = d.lancs.filter(l => l.status !== 'cancelado');
   let base = semReservas(filtrarPorView(ativos, _relFilterView), d)
-    .filter(l => l.tipo === tipo && l.data && absData(l.data) >= ini && absData(l.data) <= fim);
+    .filter(l => (l.tipo === tipo || (tipo === 'Investimento' && l.tipo === 'Resgate')) && l.data && absData(l.data) >= ini && absData(l.data) <= fim);
+  // Investimentos = aplicações − resgates: o resgate entra com valor negativo (não é receita)
+  if(tipo === 'Investimento') base = base.map(l => l.tipo === 'Resgate' ? { ...l, valor:-(l.valor || 0) } : l);
   if(cartao && tipo === 'Despesa'){
     base = base.filter(l => l.origem !== 'fatura');
     for(let a = ini; a <= fim; a++) base = base.concat(parcelasComoLancs(d, a % 12, Math.floor(a / 12)));
@@ -7294,10 +7424,11 @@ function getCashFlowForMonth(d, mes, ativosParam) {
   const ativos = ativosParam || semReservas(filtrarPorView(d.lancs.filter(l => l.status !== 'cancelado'), _relFilterView), d);
   const ml = ativos.filter(l => noMesAno(l.data, mes, ano));
 
-  // Fluxo de lançamentos
+  // Fluxo de lançamentos (aplicação e resgate não são despesa nem receita)
   const lancRec = ml.filter(l => l.tipo === 'Receita').reduce((a, l) => a + l.valor, 0);
   const lancDes = ml.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
   const lancInv = ml.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
+  const lancResg = ml.filter(l => l.tipo === 'Resgate').reduce((a, l) => a + l.valor, 0);
 
   // Movimentações bancárias do mês que NÃO vieram de um lançamento (mov.refLancId),
   // para o mesmo dinheiro não ser contado duas vezes, e sem transferências internas.
@@ -7311,18 +7442,24 @@ function getCashFlowForMonth(d, mes, ativosParam) {
     movsMes.push(m);
     });
   });
-  const bkEnt = movsMes.filter(m => m.tipo === 'entrada').reduce((a, m) => a + m.val, 0);
-  const bkSai = movsMes.filter(m => m.tipo === 'saida').reduce((a, m) => a + m.val, 0);
+  // Movimentação de Bancos com categoria de investimento é aplicação (saída) ou resgate (entrada):
+  // antes toda entrada virava receita e toda saída virava despesa
+  const movInv = movsMes.filter(m => ehCatInvest(m.cat)), movRes = movsMes.filter(m => !ehCatInvest(m.cat));
+  const somaM = (l, t) => l.filter(m => m.tipo === t).reduce((a, m) => a + m.val, 0);
+  const bkEnt = somaM(movRes, 'entrada'), bkSai = somaM(movRes, 'saida');
+  const bkInv = somaM(movInv, 'saida'),   bkResg = somaM(movInv, 'entrada');
 
   // Receitas totais (lançamentos + bancário não duplicado)
-  const recCats = {}, desCats = {}, invCats = {};
+  const recCats = {}, desCats = {}, invCats = {}, resgCats = {};
   ml.filter(l => l.tipo === 'Receita').forEach(l => { recCats[l.cat] = (recCats[l.cat] || 0) + l.valor; });
   ml.filter(l => l.tipo === 'Despesa').forEach(l => { desCats[l.cat] = (desCats[l.cat] || 0) + l.valor; });
   ml.filter(l => l.tipo === 'Investimento').forEach(l => { invCats[l.cat] = (invCats[l.cat] || 0) + l.valor; });
+  ml.filter(l => l.tipo === 'Resgate').forEach(l => { resgCats[l.cat] = (resgCats[l.cat] || 0) + l.valor; });
+  movInv.forEach(m => { const o = m.tipo === 'saida' ? invCats : resgCats; o[m.cat] = (o[m.cat] || 0) + m.val; });
 
   // Movimentações bancárias avulsas agrupadas por categoria para o DRE
   const bkEntCats = {}, bkSaiCats = {};
-  movsMes.forEach(m => {
+  movRes.forEach(m => {
     const cat = m.cat || 'Outras Movimentações';
     if (m.tipo === 'entrada') bkEntCats[cat] = (bkEntCats[cat] || 0) + m.val;
     if (m.tipo === 'saida')   bkSaiCats[cat] = (bkSaiCats[cat] || 0) + m.val;
@@ -7331,7 +7468,7 @@ function getCashFlowForMonth(d, mes, ativosParam) {
   // Saldo consolidado no fim do mês (motor único de saldo)
   const saldoBancos = calcSaldoAte(fimDoMes(ano, mes), { somentePagos: _relFilterView === 'realizado' });
 
-  return { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos };
+  return { ml, recCats, desCats, invCats, resgCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, lancResg, bkEnt, bkSai, bkInv, bkResg, saldoBancos };
 }
 
 function renderDREMensal(d, ativos) {
@@ -7339,7 +7476,7 @@ function renderDREMensal(d, ativos) {
   const ano = d.cfg.ano || new Date().getFullYear();
   document.getElementById('dre-m-titulo').textContent = MESES[mes] + ' ' + ano;
 
-  const { ml, recCats, desCats, invCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, bkEnt, bkSai, saldoBancos } = getCashFlowForMonth(d, mes, ativos);
+  const { ml, recCats, desCats, invCats, resgCats, bkEntCats, bkSaiCats, lancRec, lancDes, lancInv, lancResg, bkEnt, bkSai, bkInv, bkResg, saldoBancos } = getCashFlowForMonth(d, mes, ativos);
 
   // Mescla lançamentos + movimentações bancárias avulsas (as espelhadas já foram excluídas)
   const allRecCats = { ...recCats };
@@ -7349,14 +7486,16 @@ function renderDREMensal(d, ativos) {
 
   const totRec = lancRec + bkEnt;
   const totDes = lancDes + bkSai;
-  const totInv = lancInv;
+  const totInv = lancInv + bkInv;          // aplicações
+  const totResg = lancResg + bkResg;       // resgates
+  const invLiq = totInv - totResg;         // o que ficou investido no mês
   const lucroOp = totRec - totDes;
-  const result  = lucroOp - totInv;
+  const result  = lucroOp - invLiq;
   const margem  = totRec > 0 ? lucroOp / totRec * 100 : 0;
   // Saldo de abertura = saldo consolidado no fim do mês anterior
   const refAntDre     = mesAnterior(ano, mes);
   const saldoAnterior = calcSaldoAte(fimDoMes(refAntDre.ano, refAntDre.mes), { somentePagos: _relFilterView === 'realizado' });
-  const fluxoLiquido  = totRec - totDes - totInv;
+  const fluxoLiquido  = totRec + totResg - totDes - totInv;
 
   let html = '';
 
@@ -7441,20 +7580,22 @@ function renderDREMensal(d, ativos) {
     </div>`).join('')}
   </div>`;
 
-  // ── 3. Investimentos ──
-  if (totInv > 0) {
-    html += dreSeparator('3. Aplicações e Investimentos');
-    Object.entries(invCats).sort((a, b) => b[1] - a[1]).forEach(([cat, val]) => { html += dreRow(cat, -val, '', 1); });
-    html += dreTotal('(=) Total Investido', -totInv);
+  // ── 3. Investimentos: aplicação e resgate ficam fora de receitas e despesas ──
+  if (totInv > 0 || totResg > 0) {
+    html += dreSeparator('3. Aplicações e Resgates de Investimentos');
+    Object.entries(invCats).sort((a, b) => b[1] - a[1]).forEach(([cat, val]) => { html += dreRow(`(−) Aplicação · ${cat}`, -val, '', 1); });
+    Object.entries(resgCats).sort((a, b) => b[1] - a[1]).forEach(([cat, val]) => { html += dreRow(`(+) Resgate · ${cat}`, val, '', 1); });
+    html += dreTotal('(=) Investido no mês (aplicações − resgates)', -invLiq);
     html += dreTotal('(=) Resultado Final após Investimentos', result, true);
   }
 
   // ── 4. Fluxo de Caixa (Demonstrativo) ──
   html += dreSeparator('4. Demonstrativo de Fluxo de Caixa');
   html += dreRow(`Saldo Inicial (fim de ${MESES[refAntDre.mes]}${refAntDre.ano !== ano ? '/' + refAntDre.ano : ''})`, saldoAnterior);
-  html += dreRow('(+) Entradas do Período', totRec);
-  html += dreRow('(-) Saídas do Período', -totDes);
-  if (totInv > 0) html += dreRow('(-) Investimentos', -totInv);
+  html += dreRow('(+) Receitas do Período', totRec);
+  if (totResg > 0) html += dreRow('(+) Resgates de investimentos', totResg);
+  html += dreRow('(-) Despesas do Período', -totDes);
+  if (totInv > 0) html += dreRow('(-) Aplicações em investimentos', -totInv);
   html += dreTotal('(=) Fluxo Líquido do Período', fluxoLiquido);
   html += dreTotal(`(=) Saldo Final (fim de ${MESES[mes]})`, saldoAnterior + fluxoLiquido, true);
   if ((d.bancos || []).length > 0) {
@@ -7492,10 +7633,12 @@ function renderDRESemanal(d, ativos) {
     const semLancs = ml.filter(l => { const dd = parseInt(l.data.split('-')[2]); return dd >= s.ini && dd <= s.fim; });
     const r  = semLancs.filter(l => l.tipo === 'Receita').reduce((a, l) => a + l.valor, 0);
     const de = semLancs.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
-    const i  = semLancs.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
+    let i  = semLancs.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
+    let rg = semLancs.filter(l => l.tipo === 'Resgate').reduce((a, l) => a + l.valor, 0);
 
     // Movimentações bancárias avulsas da semana
-    // (ignora as espelhadas de lançamentos e as transferências entre contas)
+    // (ignora as espelhadas de lançamentos e as transferências entre contas;
+    //  com categoria de investimento, é aplicação ou resgate — não receita/despesa)
     let bkEnt = 0, bkSai = 0;
     (d.bancos || []).forEach(b => {
       if (contaEhReserva(b)) return;        // conta de reserva não entra no resultado
@@ -7504,6 +7647,7 @@ function renderDRESemanal(d, ativos) {
         if (m.refLancId || isTransfMov(m)) return;
         const dd = parseInt(m.data.split('-')[2]);
         if (dd < s.ini || dd > s.fim) return;
+        if (ehCatInvest(m.cat)){ if (m.tipo === 'entrada') rg += m.val; else if (m.tipo === 'saida') i += m.val; return; }
         if (m.tipo === 'entrada') bkEnt += m.val;
         if (m.tipo === 'saida')   bkSai += m.val;
       });
@@ -7516,9 +7660,9 @@ function renderDRESemanal(d, ativos) {
       desSubcats[k] = (desSubcats[k] || 0) + l.valor;
     });
 
-    const totalEnt = r + bkEnt;
-    const totalSai = de + bkSai + i;   // investimento também sai do caixa
-    return { ...s, r, de, i, bkEnt, bkSai, totalEnt, totalSai, res: r - de, resTotal: totalEnt - totalSai, desSubcats };
+    const totalEnt = r + bkEnt + rg;   // o resgate volta para o caixa (não é receita)
+    const totalSai = de + bkSai + i;   // a aplicação sai do caixa (não é despesa)
+    return { ...s, r, de, i, rg, bkEnt, bkSai, totalEnt, totalSai, res: r - de, resTotal: totalEnt - totalSai, desSubcats };
   });
 
   // Gráfico com barras agrupadas
@@ -7549,7 +7693,8 @@ function renderDRESemanal(d, ativos) {
 
     // Entradas
     html += dreRow('(+) Receitas (Lançamentos)', s.r, '', 1);
-    if (s.bkEnt > 0) html += dreRow('(+) Entradas Bancárias', s.bkEnt, '', 1);
+    if (s.bkEnt > 0) html += dreRow('(+) Receitas Bancárias', s.bkEnt, '', 1);
+    if (s.rg > 0) html += dreRow('(+) Resgates de investimentos', s.rg, '', 1);
     html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
       <span style="font-size:11px;color:var(--green);font-weight:600">  Total Entradas</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)">${fmtR(s.totalEnt)}</span>
@@ -7566,29 +7711,29 @@ function renderDRESemanal(d, ativos) {
         </div>`;
       });
     }
-    if (s.bkSai > 0) html += dreRow('(-) Saídas Bancárias', -s.bkSai, '', 1);
+    if (s.bkSai > 0) html += dreRow('(-) Despesas Bancárias', -s.bkSai, '', 1);
+    if (s.i > 0) html += dreRow('(-) Aplicações em investimentos', -s.i, '', 1);
     html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
       <span style="font-size:11px;color:var(--red);font-weight:600">  Total Saídas</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)">${fmtR(s.totalSai)}</span>
     </div>`;
 
-    if (s.i > 0) html += dreRow('(-) Investimentos', -s.i, '', 1);
     html += dreTotal(`Resultado da ${s.label.split('(')[0].trim()}`, s.resTotal);
     html += `<div style="display:flex;justify-content:flex-end;font-size:10px;color:var(--t3);padding:4px 0 8px 0">
       Saldo acumulado no mês: <strong style="font-family:'JetBrains Mono',monospace;margin-left:6px;color:${acumSaldo>=0?'var(--blue)':'var(--red)'}">${fmtR(acumSaldo)}</strong>
     </div>`;
   });
 
-  // Totalizador do mês
-  const totEntradas = totMesR + totMesBkEnt;
-  const totSaidas   = totMesDe + totMesBkSai;
+  // Totalizador do mês (dinheiro que entrou e saiu, como nas semanas)
+  const totEntradas = semData.reduce((a, s) => a + s.totalEnt, 0);
+  const totSaidas   = semData.reduce((a, s) => a + s.totalSai, 0);
   html += `<div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-top:8px">
     <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Consolidado do Mês — ${MESES[mes]} ${ano}</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
       ${[
         ['Total Entradas', fmtR(totEntradas), 'var(--green)'],
         ['Total Saídas',   fmtR(totSaidas),   'var(--red)'],
-        ['Investimentos',  fmtR(semData.reduce((a,s)=>a+s.i,0)), 'var(--blue)'],
+        ['Investido (líquido)', fmtR(semData.reduce((a,s)=>a+s.i-s.rg,0)), 'var(--blue)'],
         ['Resultado Final',fmtR(totEntradas - totSaidas), (totEntradas-totSaidas)>=0?'var(--green)':'var(--red)'],
       ].map(([l,v,c])=>`<div style="text-align:center;background:var(--surface3);border-radius:var(--r2);padding:10px">
         <div style="font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px">${l}</div>
@@ -7620,6 +7765,7 @@ function renderDREDiario(d, ativos) {
     const r  = dl.filter(l => l.tipo === 'Receita').reduce((a, l) => a + l.valor, 0);
     const de = dl.filter(l => l.tipo === 'Despesa').reduce((a, l) => a + l.valor, 0);
     const i  = dl.filter(l => l.tipo === 'Investimento').reduce((a, l) => a + l.valor, 0);
+    const rg = dl.filter(l => l.tipo === 'Resgate').reduce((a, l) => a + l.valor, 0);
 
     // Movimentações bancárias do dia — exclui movs que têm lançamento ativo vinculado (já contados acima)
     let bkEnt = 0, bkSai = 0;
@@ -7634,7 +7780,7 @@ function renderDREDiario(d, ativos) {
       });
     });
 
-    const totalEnt = r + bkEnt;
+    const totalEnt = r + rg + bkEnt;   // resgate volta para o caixa
     const totalSai = de + bkSai + i;
     const resDia   = totalEnt - totalSai;
     acum += resDia;
@@ -7679,7 +7825,7 @@ function renderDREDiario(d, ativos) {
                   <span style="color:var(--t2)">${l.desc}</span>
                   ${l.cat ? `<span class="cat-tag" style="font-size:9px;margin-left:6px">${l.cat}${l.subcat ? ' › ' + l.subcat : ''}</span>` : ''}
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${l.tipo==='Receita'?'var(--green)':'var(--red)'}">${l.tipo==='Receita'?'+':'-'}${fmtRs(l.valor)}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${entraNoCaixa(l.tipo)?'var(--green)':'var(--red)'}">${entraNoCaixa(l.tipo)?'+':'-'}${fmtRs(l.valor)}</span>
               </div>`).join('')}
           </div>
         </td>
@@ -7725,6 +7871,147 @@ function updLancCats(){
   const t=document.getElementById('l-tipo')?.value||'Despesa';
   const el=document.getElementById('l-cat');
   if(el){el.innerHTML=allCats(t).map(c=>`<option>${c}</option>`).join('');updLancSubcats();}
+  updLancInvest();
+}
+function updLancTipo(){ updLancCats(); }
+// Abre o Novo Lançamento já como aplicação ou resgate
+function novoLancTipo(tipo, origem){
+  openM('m-lanc', origem);
+  const sel = document.getElementById('l-tipo');
+  if(sel){ sel.value = tipo; updLancTipo(); }
+}
+
+// ── Carteira: o que está aplicado = aplicações − resgates, por categoria › subcategoria ──
+// Junta lançamentos (aplicação/resgate) e movimentações feitas direto em Bancos com
+// categoria de investimento. Sem cotação: são os valores aplicados, não o valor de mercado.
+function movsInvestimento(d, opts){
+  d = d || gs();
+  const o = opts || {}, out = [];
+  (d.lancs || []).forEach(l => {
+    if(l.status === 'cancelado' || !ehMovInvest(l.tipo)) return;
+    if(o.somentePagos && l.pago && l.pago !== 'Pago') return;
+    out.push({ data:l.data, desc:l.desc, cat:l.cat || '—', subcat:l.subcat || '', v:valorInvestido(l), tipo:l.tipo });
+  });
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if(m.refLancId || isTransfMov(m) || !ehCatInvest(m.cat)) return;
+    const aplic = m.tipo === 'saida';
+    out.push({ data:m.data, desc:m.desc, cat:m.cat, subcat:m.subcat || '', v:aplic ? (m.val || 0) : -(m.val || 0), tipo:aplic ? 'Investimento' : 'Resgate' });
+  }));
+  return out.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+}
+// Quanto está investido até a data (entra no patrimônio)
+function investidoAte(dataISO, opts){
+  const t = movsInvestimento(gs(), opts).reduce((a, m) => a + (!dataISO || m.data <= dataISO ? m.v : 0), 0);
+  return +t.toFixed(2);
+}
+function abrirCarteira(origem){ renderCarteira(); openM('m-carteira', origem); }
+function renderCarteira(){
+  const el = document.getElementById('carteira-corpo');
+  if(!el) return;
+  const movs = movsInvestimento(gs(), { somentePagos:true });
+  if(!movs.length){ el.innerHTML = '<div class="dash-vazio">Nenhuma aplicação ainda. Use “↗ Aplicar” para registrar a primeira.</div>'; return; }
+  const g = {};
+  movs.forEach(m => {
+    const k = m.cat + '›' + m.subcat;
+    const x = g[k] || (g[k] = { cat:m.cat, sub:m.subcat, ap:0, rs:0 });
+    if(m.v >= 0) x.ap += m.v; else x.rs -= m.v;
+  });
+  const linhas = Object.values(g).map(x => ({ ...x, saldo:+(x.ap - x.rs).toFixed(2) })).sort((a, b) => b.saldo - a.saldo);
+  const ap = linhas.reduce((a, x) => a + x.ap, 0), rs = linhas.reduce((a, x) => a + x.rs, 0);
+  el.innerHTML = `<div class="cart-tot">
+      <div><small>Aplicado</small><b>${fmtR(ap)}</b></div>
+      <div><small>Resgatado</small><b>${fmtR(rs)}</b></div>
+      <div><small>Investido hoje</small><b style="color:var(--blue)">${fmtR(ap - rs)}</b></div>
+    </div>
+    <div class="cart-l cab"><span>Categoria</span><span class="mono ap">Aplicado</span><span class="mono rs">Resgatado</span><span class="mono">Investido</span></div>
+    ${linhas.map(x => `<div class="cart-l"><span>${escHtml(x.sub || x.cat)}${x.sub ? `<small>${escHtml(x.cat)}</small>` : ''}</span>
+      <span class="mono ap">${fmtR(x.ap)}</span><span class="mono rs">${x.rs ? fmtR(x.rs) : '—'}</span><span class="mono saldo">${fmtR(x.saldo)}</span></div>`).join('')}
+    <div class="cart-sub">Últimas movimentações</div>
+    ${movs.slice(0, 6).map(m => `<div class="dk-ul"><span class="dk-ul-txt"><b>${escHtml(m.desc || '—')}</b><small>${fmtDataBR(m.data)} · ${m.tipo === 'Resgate' ? 'resgate' : 'aplicação'}${m.subcat ? ' · ' + escHtml(m.subcat) : ''}</small></span>
+      <span class="dk-ul-val ${m.v >= 0 ? 'inv' : 'resg'}">${m.v >= 0 ? '↗ ' : '↙ '}${fmtR(Math.abs(m.v))}</span></div>`).join('')}
+    <div class="dash-sub" style="margin-top:12px">São os valores aplicados e resgatados, sem o rendimento. O lucro informado num resgate fica em Receitas › Rendimentos.</div>`;
+}
+
+// ── Correção do que entrou errado antes (resgate como receita, aplicação como despesa) ──
+// Sugere pelo histórico; só muda o que o usuário confirmar. O que ele desmarcar não volta.
+let _invRev = [];
+function candidatosInvest(d){
+  d = d || gs();
+  const fora = new Set(d.invNaoSao || []), out = [];
+  (d.lancs || []).forEach(l => {
+    if(l.status === 'cancelado' || (l.tipo !== 'Receita' && l.tipo !== 'Despesa') || fora.has('l:' + l.id)) return;
+    if(['conta', 'fatura', 'divida'].includes(l.origem) || l.refResgateId) return;   // gerados pelo sistema
+    const para = tipoInvestDoHistorico(`${l.desc || ''} ${l.subcat || ''}`, l.tipo === 'Receita');
+    if(para) out.push({ k:'l:' + l.id, fonte:'lanc', id:l.id, data:l.data, desc:l.desc, valor:l.valor, de:l.tipo, para });
+  });
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if(m.refLancId || isTransfMov(m) || ehCatInvest(m.cat) || fora.has('m:' + m.id)) return;
+    const para = tipoInvestDoHistorico(m.desc || '', m.tipo === 'entrada');
+    if(para) out.push({ k:'m:' + m.id, fonte:'mov', id:m.id, bancoId:b.id, banco:b.nome, data:m.data, desc:m.desc, valor:m.val,
+      de:m.tipo === 'entrada' ? 'Receita' : 'Despesa', para });
+  }));
+  return out.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
+}
+function renderAvisoRevisarInvest(){
+  const el = document.getElementById('l-inv-revisar');
+  if(!el) return;
+  const n = candidatosInvest().length;
+  el.style.display = n ? 'flex' : 'none';
+  el.innerHTML = n ? `<span>🔎 <b>${n} ${n > 1 ? 'movimentações parecem' : 'movimentação parece'} aplicação ou resgate de investimento</b>, mas ${n > 1 ? 'estão contadas' : 'está contada'} como despesa ou receita.</span>
+    <button type="button" class="btn btn-ghost btn-xs" onclick="abrirRevisarInvest(this)">Revisar</button>` : '';
+}
+function abrirRevisarInvest(origem){
+  _invRev = candidatosInvest();
+  const ROT = { Receita:'Receita', Despesa:'Despesa', Investimento:'Aplicação', Resgate:'Resgate' };
+  const el = document.getElementById('inv-rev-lista');
+  if(el) el.innerHTML = _invRev.length ? _invRev.map((c, i) => `<label class="inv-rev-l">
+      <input type="checkbox" checked data-i="${i}" aria-label="Corrigir ${escAttr(c.desc || '')}">
+      <span class="inv-rev-data mono">${fmtDataBR(c.data)}</span>
+      <span><b title="${escAttr(c.desc || '')}">${escHtml(c.desc || '—')}</b><small>${c.fonte === 'mov' ? `Bancos · ${escHtml(c.banco || '')}` : 'Lançamento'}</small></span>
+      <span class="inv-rev-de"><s>${ROT[c.de]}</s> → <em>${ROT[c.para]}</em></span>
+      <span class="inv-rev-v">${fmtR(c.valor)}</span>
+    </label>`).join('') : '<div class="dash-vazio">Nada para corrigir. 🎉</div>';
+  openM('m-inv-revisar', origem);
+}
+function aplicarRevisarInvest(){
+  const marcados = [...document.querySelectorAll('#inv-rev-lista input:checked')].map(x => _invRev[+x.dataset.i]).filter(Boolean);
+  const d = gs(), cat = papel('investimentoPadrao');
+  marcados.forEach(c => {
+    const sub = subcatInvestDoHistorico(c.desc);
+    if(c.fonte === 'lanc'){
+      const l = d.lancs.find(x => x.id === c.id);
+      if(!l) return;
+      l.tipo = c.para; l.cat = cat; l.subcat = sub;
+      l.obs = [l.obs, `corrigido: era ${c.de === 'Receita' ? 'receita' : 'despesa'}`].filter(Boolean).join(' · ');
+      // a movimentação espelhada no banco acompanha a categoria (a direção do dinheiro não muda)
+      (d.bancos || []).forEach(b => (b.movs || []).forEach(m => { if(m.refLancId === l.id || (l.refMovId && m.id === l.refMovId)){ m.cat = cat; m.subcat = sub; } }));
+    } else {
+      const b = (d.bancos || []).find(x => x.id === c.bancoId), m = b && (b.movs || []).find(x => x.id === c.id);
+      if(m){ m.cat = cat; m.subcat = sub; }
+    }
+  });
+  d.invNaoSao = [...new Set([...(d.invNaoSao || []), ..._invRev.filter(c => !marcados.includes(c)).map(c => c.k)])];
+  ss(d); closeM('m-inv-revisar'); refreshAll();
+}
+function dispensarRevisarInvest(){
+  const d = gs();
+  d.invNaoSao = [...new Set([...(d.invNaoSao || []), ..._invRev.map(c => c.k)])];
+  ss(d); closeM('m-inv-revisar'); refreshAll();
+}
+// Aplicação e resgate: uma linha explicando que não é despesa/receita; no resgate novo, o campo do rendimento
+function updLancInvest(){
+  const $ = x => document.getElementById(x);
+  const t = $('l-tipo')?.value || 'Despesa', novo = !$('l-edit-id')?.value;
+  const dica = $('l-inv-dica');
+  if(dica){
+    dica.style.display = ehMovInvest(t) ? 'block' : 'none';
+    dica.innerHTML = t === 'Investimento'
+      ? '↗ <b>Aplicação:</b> o dinheiro sai da conta e vai para o investimento. <b>Não é despesa</b> — continua no seu patrimônio.'
+      : t === 'Resgate' ? '↙ <b>Resgate:</b> o dinheiro volta do investimento para a conta. <b>Não é receita</b> — só o lucro, se você informar, conta como receita.' : '';
+  }
+  const linha = $('l-rend-row');
+  if(linha) linha.style.display = t === 'Resgate' && novo ? 'grid' : 'none';
+  if(t !== 'Resgate' && $('l-rend')) $('l-rend').value = '';
 }
 function saveLanc(){
   const editId  = document.getElementById('l-edit-id')?.value;
@@ -7749,6 +8036,14 @@ function saveLanc(){
     else if(!valor) document.getElementById('l-valor')?.focus();
     return;
   }
+  // Resgate com lucro: o lucro vira uma receita à parte; o resgate fica só com o que foi aplicado
+  const rend = tipo === 'Resgate' && !editId ? Math.max(0, parseFloat(document.getElementById('l-rend')?.value) || 0) : 0;
+  if(rend && rend >= valor){
+    const errEl = document.getElementById('l-lanc-err');
+    if(errEl){ errEl.textContent = '⚠️ O rendimento precisa ser menor que o valor resgatado.'; errEl.style.display = 'block'; }
+    document.getElementById('l-rend')?.focus();
+    return;
+  }
   const errEl2 = document.getElementById('l-lanc-err');
   if(errEl2) errEl2.style.display='none';
   const d = gs();
@@ -7762,9 +8057,15 @@ function saveLanc(){
       if(caixaId && pago==='Pago') lancToCaixa(l,d);
     }
   } else {
-    const nl={id:uid(),data,tipo,cat,subcat,desc,valor,caixaId,caixaNome,pago,obs,ts:Date.now(),status:'ativo'};
+    const nl={id:uid(),data,tipo,cat,subcat,desc,valor:+(valor - rend).toFixed(2),caixaId,caixaNome,pago,obs,ts:Date.now(),status:'ativo'};
     d.lancs.push(nl);
     if(caixaId && pago==='Pago') lancToCaixa(nl,d);
+    if(rend){
+      const rl={id:uid(),data,tipo:'Receita',cat:papel('rendimentos'),subcat:papelSub('rendimentos'),desc:`Rendimento — ${desc}`,valor:+rend.toFixed(2),
+        caixaId,caixaNome,pago,obs:'Lucro informado no resgate',ts:Date.now()+1,status:'ativo',refResgateId:nl.id};
+      d.lancs.push(rl);
+      if(caixaId && pago==='Pago') lancToCaixa(rl,d);
+    }
   }
   ss(d); closeM('m-lanc'); refreshAll();
 }
@@ -7775,7 +8076,7 @@ function lancToCaixa(l,d){
   if(!bc) return;
   bc.movs=(bc.movs||[]).filter(m=>m.refLancId!==l.id);
   bc.movs.push({id:uid(),data:l.data,val:l.valor,desc:l.desc,cat:l.cat,
-    forma:'Lançamento',tipo:l.tipo==='Receita'?'entrada':'saida',refLancId:l.id,ts:Date.now()});
+    forma:'Lançamento',tipo:entraNoCaixa(l.tipo)?'entrada':'saida',refLancId:l.id,ts:Date.now()});
 }
 
 // Atualiza todas as views abertas após qualquer mudança
@@ -7809,8 +8110,8 @@ function openLancOps(id){
   const d = gs();
   const l = d.lancs.find(x=>x.id===id);
   if(!l) return;
-  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)'};
-  const bdgMap = {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue'};
+  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Resgate:'var(--purple)'};
+  const bdgMap = {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Resgate:'bdg-purple'};
   const elDesc  = document.getElementById('lo-desc');
   const elData  = document.getElementById('lo-data');
   const elValor = document.getElementById('lo-valor');
@@ -7821,7 +8122,7 @@ function openLancOps(id){
   if(!modal) return;
   if(elDesc)  elDesc.textContent = l.desc;
   if(elData)  elData.textContent = l.data + (l.caixaNome ? ' · '+l.caixaNome : '');
-  if(elValor){ elValor.textContent = (l.tipo==='Receita'?'+':'-')+fmtRs(l.valor); elValor.style.color = cTipo[l.tipo]||'var(--t1)'; }
+  if(elValor){ elValor.textContent = (entraNoCaixa(l.tipo)?'+':'-')+fmtRs(l.valor); elValor.style.color = cTipo[l.tipo]||'var(--t1)'; }
   if(elBadge) elBadge.innerHTML = `<span class="badge ${bdgMap[l.tipo]||'bdg-gray'}" style="font-size:9px">${l.tipo}</span>`;
   if(elAcoes) elAcoes.style.display = 'flex';
   if(elConf)  elConf.style.display  = 'none';
@@ -7886,8 +8187,8 @@ function delLanc(id){
   const d = gs();
   const l = d.lancs.find(x=>x.id===id);
   if(!l) return;
-  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)'};
-  const bdgMap = {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue'};
+  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Resgate:'var(--purple)'};
+  const bdgMap = {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Resgate:'bdg-purple'};
   const elDesc  = document.getElementById('lo-desc');
   const elData  = document.getElementById('lo-data');
   const elValor = document.getElementById('lo-valor');
@@ -7898,7 +8199,7 @@ function delLanc(id){
   if(!modal) return;
   if(elDesc)  elDesc.textContent = l.desc;
   if(elData)  elData.textContent = l.data;
-  if(elValor){ elValor.textContent = (l.tipo==='Receita'?'+':'-')+fmtRs(l.valor); elValor.style.color = cTipo[l.tipo]||'var(--t1)'; }
+  if(elValor){ elValor.textContent = (entraNoCaixa(l.tipo)?'+':'-')+fmtRs(l.valor); elValor.style.color = cTipo[l.tipo]||'var(--t1)'; }
   if(elBadge) elBadge.innerHTML = `<span class="badge ${bdgMap[l.tipo]||'bdg-gray'}" style="font-size:9px">${l.tipo}</span>`;
   if(elAcoes) elAcoes.style.display = 'none';
   if(elConf)  elConf.style.display  = 'block';
@@ -7938,6 +8239,7 @@ function initLancAnoOpts(){
 }
 
 function renderLanc(){
+  renderAvisoRevisarInvest();
   const d = gs();
   const anoF    = document.getElementById('l-fil-ano')?.value;
   const mesF    = document.getElementById('l-fil-mes')?.value;
@@ -7985,8 +8287,12 @@ function renderLanc(){
   const ativos = semReservas(d.lancs.filter(l=>getMes(l.data)===kpiMes && l.status!=='cancelado' && l.data.slice(0,4)===kpiAno), d);
   const rec = ativos.filter(l=>l.tipo==='Receita').reduce((a,l)=>a+l.valor,0);
   const des = ativos.filter(l=>l.tipo==='Despesa').reduce((a,l)=>a+l.valor,0);
-  const inv = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+  // Investido no mês = aplicações − resgates (nenhum dos dois é despesa ou receita)
+  const aplic = ativos.filter(l=>l.tipo==='Investimento').reduce((a,l)=>a+l.valor,0);
+  const resg  = ativos.filter(l=>l.tipo==='Resgate').reduce((a,l)=>a+l.valor,0);
+  const inv = aplic - resg;
   set('lk-rec',fmtR(rec)); set('lk-des',fmtR(des)); set('lk-inv',fmtR(inv));
+  set('lk-inv-sub', resg ? `aplicou ${fmtR(aplic)} · resgatou ${fmtR(resg)}` : 'aplicações − resgates');
   setC('lk-sal',fmtR(rec-des-inv),(rec-des-inv)>=0?'var(--green)':'var(--red)');
 
   // ── Saldos (motor único) ──
@@ -8043,13 +8349,13 @@ function renderLanc(){
   if(!items.length){ tbody.innerHTML=''; if(empty) empty.style.display='block'; return; }
   if(empty) empty.style.display='none';
 
-  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Transferência:'var(--cyan)'};
+  const cTipo  = {Receita:'var(--green)',Despesa:'var(--red)',Investimento:'var(--blue)',Resgate:'var(--purple)',Transferência:'var(--cyan)'};
   const ORIGEM_LANC = {
     conta:  { rotulo:'📋 conta a pagar',   dica:'Pago pela tela Contas a Pagar — para desfazer o pagamento, use aquela tela' },
     fatura: { rotulo:'💳 fatura do cartão', dica:'Pagamento de fatura registrado na tela Cartões de Crédito' },
     divida: { rotulo:'📉 parcela de dívida', dica:'Pagamento de parcela registrado na tela Dívidas' },
   };
-  const bdgTipo= {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Transferência:'bdg-cyan'};
+  const bdgTipo= {Receita:'bdg-green',Despesa:'bdg-red',Investimento:'bdg-blue',Resgate:'bdg-purple',Transferência:'bdg-cyan'};
   const idsRes = idsReserva(d);   // contas de reserva: marcadas na lista, mas fora dos KPIs
 
   const stBadge = l => {
@@ -8078,7 +8384,7 @@ function renderLanc(){
     const isCanceled  = l.status==='cancelado';
     const isTransf    = l.tipo==='Transferência';
     const valorColor  = isTransf ? 'var(--cyan)' : (cTipo[l.tipo]||'var(--t1)');
-    const valorPrefix = isTransf ? (l.transfDir==='saida'?'↑':l.transfDir==='entrada'?'↓':'⇄') : (l.tipo==='Receita'?'+':'-');
+    const valorPrefix = isTransf ? (l.transfDir==='saida'?'↑':l.transfDir==='entrada'?'↓':'⇄') : (entraNoCaixa(l.tipo)?'+':'-');
 
     // Saldo em caixa desta linha
     const info   = saldoMap[l.id];
@@ -8167,13 +8473,14 @@ function updLancSel(){
     const tipo = row?.dataset.tipo  || '';
     const val  = parseFloat(row?.dataset.valor) || 0;
     if(row?.dataset.reserva === 'true'){
-      res += (tipo === 'Receita' ? val : -val);
+      res += (entraNoCaixa(tipo) ? val : -val);
       nRes++;
       return;
     }
     if(tipo === 'Receita')      rec += val;
     else if(tipo === 'Despesa') des += val;
     else if(tipo === 'Investimento') inv += val;
+    else if(tipo === 'Resgate') inv -= val;      // resgate diminui o investido; não é receita
     // Transferências não entram no saldo líquido
   });
   const liq = rec - des - inv;
@@ -8347,11 +8654,13 @@ function consolidarOrcamento(d, mes, ano, comCartao){
     if(m.subcat) sub(g, m.subcat).meta = m; else g.metaCat = m;
   });
   lancs.forEach(l => {
-    if(!TIPOS_ORC.includes(l.tipo)) return;
-    const g = pega(l.tipo, l.cat || (l.tipo === 'Despesa' ? papel('outrasDespesas') : l.tipo));
+    // Resgate conta na meta de investimento, para menos (investido = aplicado − resgatado)
+    const tipo = tipoDasCats(l.tipo), v = l.tipo === 'Resgate' ? -(l.valor || 0) : (l.valor || 0);
+    if(!TIPOS_ORC.includes(tipo)) return;
+    const g = pega(tipo, l.cat || (tipo === 'Despesa' ? papel('outrasDespesas') : tipo));
     const pago = efetivadoL(l);
-    if(pago){ g.real += l.valor || 0; g.qtd++; } else g.pend += l.valor || 0;
-    if(l.subcat && g.subs[l.subcat]){ if(pago) g.subs[l.subcat].real += l.valor || 0; else g.subs[l.subcat].pend += l.valor || 0; }
+    if(pago){ g.real += v; g.qtd++; } else g.pend += v;
+    if(l.subcat && g.subs[l.subcat]){ if(pago) g.subs[l.subcat].real += v; else g.subs[l.subcat].pend += v; }
   });
   // Conta a pagar em aberto no mês também é dinheiro comprometido na categoria
   contasPend.forEach(c => {
@@ -12660,7 +12969,7 @@ function movimentacoesDaConta(c, d) {
     .map(l => ({
       id: 'lnc-' + l.id, data: l.data, val: l.valor, desc: l.desc,
       cat: l.cat || '—', forma: 'Lançamento', ts: l.ts || 0,
-      tipo: l.tipo === 'Receita' ? 'entrada' : 'saida',
+      tipo: entraNoCaixa(l.tipo) ? 'entrada' : 'saida',
       origemLanc: true, refLancId: l.id
     }));
   return proprias.concat(doLanc);
@@ -13243,10 +13552,12 @@ function openMBkMov(tipo) {
   document.getElementById('btn-salvar-mov').className = isEnt ? 'btn btn-green' : 'btn btn-red';
   // Categorias do plano de contas (antes era uma lista própria, desligada do resto)
   const catEl = document.getElementById('bm-cat');
+  // Categoria de investimento: na saída é aplicação, na entrada é resgate — nenhum dos dois é despesa/receita
   if (catEl) catEl.innerHTML = isEnt
-    ? allCats('Receita').map(c => `<option data-t="Receita">${c}</option>`).join('')
+    ? `<optgroup label="Receitas">${allCats('Receita').map(c => `<option data-t="Receita">${c}</option>`).join('')}</optgroup>`
+      + `<optgroup label="Resgate de investimento (não é receita)">${allCats('Investimento').map(c => `<option data-t="Investimento">${c}</option>`).join('')}</optgroup>`
     : `<optgroup label="Despesas">${allCats('Despesa').map(c => `<option data-t="Despesa">${c}</option>`).join('')}</optgroup>`
-      + `<optgroup label="Investimentos">${allCats('Investimento').map(c => `<option data-t="Investimento">${c}</option>`).join('')}</optgroup>`;
+      + `<optgroup label="Aplicação em investimento (não é despesa)">${allCats('Investimento').map(c => `<option data-t="Investimento">${c}</option>`).join('')}</optgroup>`;
   updBmSubcat();
   document.getElementById('bm-data').value = today();
   document.getElementById('bm-val').value = '';
@@ -14409,6 +14720,11 @@ function ofxRenderTabela(){
     const cor  = tipo==='entrada' ? 'var(--green)' : 'var(--red)';
     const sinal= tipo==='entrada' ? '+' : '-';
     const rowCls = isDup ? 'ofx-row-dup' : '';
+    // Aplicação/resgate reconhecidos pelo histórico; dá para trocar antes de importar
+    if(!t.tipoLanc){ t.tipoInvAuto = tipoInvestDoHistorico(t.memo, tipo === 'entrada'); t.tipoLanc = t.tipoInvAuto || (tipo === 'entrada' ? 'Receita' : 'Despesa'); }
+    const opcoes = tipo === 'entrada' ? [['Receita', 'Receita'], ['Resgate', 'Resgate de investimento']] : [['Despesa', 'Despesa'], ['Investimento', 'Aplicação em investimento']];
+    const selTipo = `<select class="ofx-tipo${ehMovInvest(t.tipoLanc) ? ' inv' : ''}" ${isDup ? 'disabled' : ''} onchange="_ofxTransacoes[${i}].tipoLanc=this.value;this.classList.toggle('inv',ehMovInvest(this.value))" title="${t.tipoInvAuto ? 'Reconhecido pelo histórico do extrato' : ''}">`
+      + opcoes.map(([v, r]) => `<option value="${v}"${t.tipoLanc === v ? ' selected' : ''}>${r}</option>`).join('') + '</select>';
 
     return `<tr class="${rowCls}" data-idx="${i}">
       <td><input type="checkbox" ${t._sel&&!isDup?'checked':''} ${isDup?'disabled':''} onchange="_ofxTransacoes[${i}]._sel=this.checked"></td>
@@ -14416,7 +14732,7 @@ function ofxRenderTabela(){
       <td style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(t.memo)}">${escH(t.memo)}</td>
       <td style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:${cor};white-space:nowrap">${sinal}${fmtR(t.val)}</td>
       <td>${statusLabel}</td>
-      <td style="font-size:10px;color:var(--t3)">${t.tipo||'—'}</td>
+      <td>${selTipo}</td>
     </tr>`;
   }).join('');
 
@@ -14462,12 +14778,17 @@ function ofxImportar(){
     if(movsExist.has(chave)){ ignoradas++; return; }
 
     const tipo = t.sinal >= 0 ? 'entrada' : 'saida';
-    const cat  = tipo==='entrada' ? papel('receitaPadrao') : papel('outrasDespesas');
+    const permitidos = tipo === 'entrada' ? ['Receita', 'Resgate'] : ['Despesa', 'Investimento'];
+    const tipoLanc = permitidos.includes(t.tipoLanc) ? t.tipoLanc
+      : (tipoInvestDoHistorico(t.memo, tipo === 'entrada') || permitidos[0]);
+    const invest = ehMovInvest(tipoLanc);
+    const cat  = invest ? papel('investimentoPadrao') : tipo==='entrada' ? papel('receitaPadrao') : papel('outrasDespesas');
+    const subcat = invest ? subcatInvestDoHistorico(t.memo) : 'Importado OFX';
 
     // Cria movimento bancário
     const mov = {
       id: uid(), data: t.data, val: t.val,
-      desc: t.memo, cat, tipo,
+      desc: t.memo, cat, subcat, tipo,
       forma: 'OFX', ts: Date.now(), fitid: t.fitid||''
     };
     banco.movs = banco.movs || [];
@@ -14476,8 +14797,8 @@ function ofxImportar(){
     // Cria lançamento vinculado
     const lanc = {
       id: uid(), data: t.data,
-      tipo: tipo==='entrada' ? 'Receita' : 'Despesa',
-      cat, subcat: 'Importado OFX',
+      tipo: tipoLanc,
+      cat, subcat,
       desc: t.memo.length > 60 ? t.memo.slice(0,60)+'…' : t.memo,
       valor: t.val,
       caixaId: banco.id, caixaNome: banco.nome,

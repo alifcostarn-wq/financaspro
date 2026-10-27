@@ -4,6 +4,83 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Investimentos: aplicação não é despesa, resgate não é receita
+
+### 🎯 O que foi pedido
+
+Corrigir e melhorar a parte de **investimento**: o dinheiro que volta de um investimento entrava como
+**receita**, e o que era investido aparecia nas **despesas**.
+
+### 🐛 O que estava errado
+
+- **Não existia "resgate".** Para registrar o dinheiro voltando do investimento, só dava para lançar uma
+  Receita: a receita do mês ficava inflada e o patrimônio contava o mesmo dinheiro duas vezes (no caixa e
+  como "investido").
+- **DRE (Relatórios → DRE mensal, semanal e diário):** as movimentações feitas direto em Bancos entravam
+  assim: toda entrada como receita e toda saída como despesa — inclusive aplicação e resgate. Exemplo: uma
+  aplicação de R$ 700 em RDB aparecia em "Despesas Operacionais" e um resgate de R$ 300 em "Receitas Brutas".
+- **Importação de extrato (OFX):** todo crédito virava Receita e todo débito virava Despesa — "APLICACAO
+  RDB", "RES APLIC AUT", "RESGATE CDB" do banco entravam como despesa e receita.
+- **Bancos → Nova entrada** só oferecia categorias de receita.
+
+### ✨ Implementado
+
+- **Novo tipo "Resgate de investimento"** no lançamento, ao lado de "Investimento (aplicação)":
+  - usa as categorias de investimento (Tesouro Direto, Renda Fixa, LCI & LCA…);
+  - o dinheiro volta para a conta, mas **não é receita** — e diminui o que está investido;
+  - campo opcional **"Desse valor, quanto é rendimento?"**: o lucro vira uma receita à parte
+    (Receitas › Rendimentos) e o resto fica como resgate;
+  - o formulário explica: "Aplicação: não é despesa" / "Resgate: não é receita".
+- **Investimento fica fora de receitas e despesas em todas as telas:**
+  - **Dashboard:** "Investido" = aplicações − resgates (no mês com resgate: "aplicou R$ X · resgatou R$ Y");
+    saldo do mês certo; patrimônio sem contar o resgate em dobro — e somando também o que foi aplicado
+    pela tela Bancos;
+  - **Lançamentos:** "Investido no mês" (líquido), filtro e selo "Resgate", rodapé da seleção;
+  - **DRE mensal:** seção própria "Aplicações e Resgates de Investimentos" (por categoria) e "Investido no
+    mês"; no fluxo de caixa, resgates e aplicações em linhas próprias;
+  - **DRE semanal e diário:** receitas, resgates, despesas e aplicações separados;
+  - **Central de Relatórios e relatório anual:** investimentos líquidos; receitas sem resgate;
+  - **Orçamento:** o resgate desconta da meta de investimento.
+- **Bancos:** Nova entrada → "Resgate de investimento (não é receita)"; Nova saída → "Aplicação em
+  investimento (não é despesa)". Movimentação com categoria de investimento conta como aplicação ou resgate.
+- **Importação de extrato (OFX):**
+  - reconhece aplicação e resgate pelo histórico do banco (aplicação, aplic. automática, resgate,
+    res. aplic., CDB, RDB, LCI/LCA, Tesouro, poupança, previdência…); rendimento, dividendo e JCP
+    continuam receita;
+  - nova coluna **"Lançar como"** para conferir ou trocar cada linha antes de importar;
+  - subcategoria sugerida pelo produto (Tesouro Direto, Renda Fixa…).
+- **Corrigir o que entrou errado antes:** aviso em Lançamentos (e em "Precisa de atenção" no Dashboard)
+  quando há receitas ou despesas com cara de resgate ou aplicação. A revisão mostra cada uma ("Receita →
+  Resgate", "Despesa → Aplicação"), **corrige só o que você marcar** e não sugere de novo o que você
+  desmarcar ou disser que não é investimento.
+- **Seus investimentos (carteira):** aplicado, resgatado e investido hoje, por categoria › subcategoria,
+  com as últimas movimentações e os atalhos ↗ Aplicar e ↙ Resgatar. Abre em "Ver carteira" (Lançamentos)
+  e em "investido" no patrimônio (Dashboard).
+- **Plano de contas:** subcategoria "Rendimentos" em Receitas (no plano padrão) e dois papéis do sistema
+  (rendimento de investimento; aplicação ou resgate importado por OFX).
+
+### 🧪 Testes
+
+- **`test-investimentos.js` — 41 verificações:** DRE (movimentações de Bancos classificadas; receitas e
+  despesas sem investimento; seção de investimentos; caixa igual); revisão (sugestões, aviso, "Precisa de
+  atenção", corrige só o marcado, o desmarcado não volta); Dashboard e DRE depois da correção; resgate novo
+  (categorias, dica, rendimento separado, validação, caixa e conta); Lançamentos (números, filtro, selo);
+  aplicação; edição de resgate; carteira e patrimônio; Central de Relatórios, Orçamento, relatório anual e
+  plano de contas; Bancos; OFX (sugestão, troca manual e importação); celular; sem erros de JS.
+- `test-botao-lancamento.js`: a linha do rendimento, escondida, não entra na animação.
+- **493 verificações** passando em 13 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+- **Movimentações de Bancos com categoria de investimento** passam a contar como aplicação/resgate no DRE
+  (antes eram despesa/receita).
+- **Lançamentos antigos só mudam quando você confirma na revisão:** valor e data ficam iguais; mudam o tipo e
+  a categoria, e a observação registra "corrigido: era receita/despesa".
+- O **patrimônio** passa a somar o que foi aplicado pela tela Bancos e a descontar os resgates.
+- O **saldo de caixa** não muda em nenhum caso: o dinheiro é o mesmo, só a classificação ficou certa.
+
+---
+
 ## [2026-10-27] Dashboard enxuto: menos texto, cada informação num lugar só
 
 ### 🎯 O que foi pedido
