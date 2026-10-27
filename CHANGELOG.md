@@ -4,6 +4,87 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Cartões: fatura fechada (informação e opção de fechar) e para qual fatura vai cada compra
+
+### 🎯 O que foi pedido
+
+Na parte de cartão de crédito, colocar a **opção e a informação de fatura fechada** e, ao lançar uma
+compra, **mostrar para qual fatura ela vai**.
+
+### 🐛 O que limitava
+
+- A situação da fatura só aparecia como uma palavra pequena na tabela: não havia um lugar dizendo qual
+  fatura já fechou, qual está aberta e até quando.
+- Se o banco fechasse a fatura em outro dia (fim de semana, feriado), não dava para acertar — as compras
+  desses dias iam para a fatura errada. Cartão sem dia de fechamento nunca fechava.
+- Ao lançar a compra, a fatura de destino aparecia numa linha discreta no rodapé do formulário, e não
+  dava para escolher outra.
+- O indicador "Fatura Aberta" do detalhe do cartão continuava com esse nome mesmo quando a fatura do mês
+  escolhido já tinha fechado ou vencido. Em Contas a Pagar, fatura de cartão sem dia de fechamento
+  aparecia como "fechada".
+
+### ✨ Implementado
+
+- **Painel "Ciclo da fatura"** no cartão selecionado:
+  - 🔒 **Fatura fechada** (a pagar, vencida ou paga): mês, valor, quando fechou e o vencimento — com
+    ✓ Pagar e 👁 Ver compras;
+  - 🟢 **Fatura aberta**: onde entram as compras de hoje, o valor até agora e em quantos dias ela fecha —
+    com 🔒 **Fechar fatura**;
+  - ⭐ **Melhor dia de compra**: o dia seguinte ao fechamento, a fatura em que a compra cai e quantos dias
+    até pagar;
+  - aviso de **faturas mais antigas vencidas sem pagamento**, para não sumirem de vista.
+- **Fechar a fatura à mão** — quando o banco fecha em outro dia ou o cartão não tem dia de fechamento:
+  - escolha o último dia de compras da fatura (atalhos "até ontem", "até hoje" e "dia do cartão");
+  - a prévia mostra o que fica na fatura, para onde vão as próximas compras e **quais compras já
+    lançadas mudam de fatura**;
+  - validação: o fechamento não pode invadir a fatura anterior nem a seguinte, nem passar do vencimento;
+  - **📅 Ajustar fechamento** e **↺ Voltar ao automático** a qualquer momento; o fechamento feito à mão
+    aparece marcado **"à mão"**;
+  - disponível também em **Faturas do Ano** (menu ⋯ com Ver compras, Pagar/Desfazer, Fechar/Ajustar e
+    Voltar ao automático) e na **Fatura Detalhada**.
+- **Ao lançar uma compra**, a caixa **"Esta compra vai para a fatura de …"** mostra:
+  - a situação da fatura (aberta, 🔒 fechada ou ✓ paga), o fechamento e o vencimento;
+  - o valor das parcelas e de qual fatura até qual ("3x de R$ 200,00 · da fatura de Novembro/2026 até a
+    de Janeiro/2027");
+  - por que ela vai para essa fatura ("A fatura de Outubro/2026 já fechou em 03/10/2026");
+  - aviso quando a fatura já está fechada ou paga, e o **limite livre depois da compra** (em vermelho se
+    passar do limite);
+  - a mesma informação aparece embaixo da data e no botão: **"Registrar na fatura de Nov/26"**.
+- **Lançar na fatura:** campo para escolher outra fatura (a anterior ou as próximas), para quando o banco
+  lança a compra em outro mês. A escolha fica marcada "à mão" em Compras e pode voltar para a automática
+  ao editar.
+- **Conta a pagar no cartão:** o aviso diz se a fatura está aberta (e quando fecha), já fechada ou já paga.
+- **Detalhe do cartão:** o indicador da fatura mostra o mês e a situação (ex.: "Fatura Out/26 · ⚠ Vencida");
+  o cartão mostra a situação com ícone (🔒 Fechada, ⚠ Vencida, ✓ Paga).
+- **Contas a Pagar:** fatura de cartão sem dia de fechamento aparece como aberta (antes, "fechada"), e o
+  fechamento à mão aparece na linha da fatura.
+
+### 🧪 Testes
+
+- O ambiente de trabalho foi reiniciado e apagou os testes que ficavam fora do repositório. Recuperei
+  6 suítes pelo histórico (Contas a Pagar, menu de ações, relatórios, conta no cartão, menu lateral e
+  calculadora) e, a partir de agora, os testes ficam **no repositório, na pasta `tests/`** — fora do site
+  publicado (`.vercelignore`). Para rodar tudo: `node tests/rodar.js`.
+- **`test-cartao-base.js` — 24 verificações**, escritas antes da mudança para garantir que o que já
+  existia continua igual: fatura de cada compra (inclusive no dia do fechamento e em cartão que fecha no
+  mês anterior ao vencimento), valores, situação, limite, próximo vencimento, telas, lançar/editar/excluir
+  compra e pagar/desfazer fatura.
+- **`test-fatura-fechada.js` — 55 verificações:** ciclo da fatura (fechada, aberta e melhor dia) em três
+  tipos de cartão, painel, fechar à mão com compra mudando de fatura, validações, ajustar, voltar ao
+  automático, cartão sem dia de fechamento, destino da compra (aberta, fechada, paga, parcelada, limite
+  estourado), escolher outra fatura, conta no cartão e celular.
+- **`smoke.js`:** passa por todas as páginas e abre todos os modais, no computador e no celular, sem erro.
+- **347 verificações** passando. As demais suítes antigas não estavam no histórico e não puderam ser
+  recuperadas.
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado muda sozinho: sem fechamento à mão nem fatura escolhida, tudo funciona exatamente como antes
+(é o que o teste de base confere). Os recursos novos só gravam algo quando usados — `fechamentos` no
+cartão e `fatura` na compra.
+
+---
+
 ## [2026-10-16] Contas a Pagar: ações da linha num menu só (⋯)
 
 ### 🎯 O que foi pedido

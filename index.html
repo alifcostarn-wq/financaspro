@@ -1027,10 +1027,57 @@ body.theme-light{--pg-conta:#eda100;--pg-cartao:#2a78d6;--pg-divida:#e87ba4}
 #page-contas .cp-item .d .badge{margin-left:6px}
 #page-contas tr.cp-est td{background:repeating-linear-gradient(135deg,transparent 0 10px,var(--surface2) 10px 11px)}
 #page-contas #cp-tbody td.cp-val,#page-contas #cp-tbody .badge{white-space:nowrap}
-#page-contas td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle}
-#page-contas .cp-mais{width:32px;height:28px;border-radius:7px;border:1px solid var(--line2);background:var(--surface2);color:var(--t2);font-size:16px;font-weight:700;line-height:1;cursor:pointer;letter-spacing:1px}
-#page-contas .cp-mais:hover,#page-contas .cp-mais.on{color:var(--t1);border-color:var(--blue);background:var(--blue-dim)}
-#page-contas .cp-mais:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle}
+.cp-mais{width:32px;height:28px;border-radius:7px;border:1px solid var(--line2);background:var(--surface2);color:var(--t2);font-size:16px;font-weight:700;line-height:1;cursor:pointer;letter-spacing:1px}
+.cp-mais:hover,.cp-mais.on{color:var(--t1);border-color:var(--blue);background:var(--blue-dim)}
+.cp-mais:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* ── Cartão: ciclo da fatura, fechamento à mão e destino da compra ── */
+.cc-ciclo{padding:16px 18px}
+.cc-ciclo-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.cc-ciclo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cc-ct{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);padding:12px 14px;min-width:0;box-shadow:inset 3px 0 0 var(--line2)}
+.cc-ct.fechada{box-shadow:inset 3px 0 0 var(--blue)}
+.cc-ct.vencida{box-shadow:inset 3px 0 0 var(--red)}
+.cc-ct.paga{box-shadow:inset 3px 0 0 var(--green)}
+.cc-ct.aberta{box-shadow:inset 3px 0 0 var(--purple)}
+.cc-ct.melhor{box-shadow:inset 3px 0 0 var(--cyan)}
+.cc-ct-lbl{font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.cc-ct-tit{font-size:14px;font-weight:700;color:var(--t1);margin-top:6px}
+.cc-ct-val{font:700 18px 'JetBrains Mono',monospace;color:var(--purple);margin:2px 0 4px;letter-spacing:-.5px}
+.cc-ct-val small{font:500 10px 'Sora',sans-serif;color:var(--t3);letter-spacing:0}
+.cc-ct-sub{font-size:11px;color:var(--t2);line-height:1.5}
+.cc-ct-sub b{color:var(--t1)}
+.cc-ct-sub .atraso{color:var(--red);font-weight:600}
+.cc-ct-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.cc-ciclo-alerta{margin-top:10px;font-size:11.5px;color:var(--t2);background:var(--red-dim);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+.cc-ciclo-alerta b{color:var(--red)}
+.cc-ciclo-alerta span{display:inline-flex;align-items:center;gap:6px}
+.cc-man{display:inline-block;font:600 9px 'Sora',sans-serif;color:var(--amber);background:var(--amber-dim);border:1px solid var(--line2);border-radius:20px;padding:1px 6px;margin-left:4px;vertical-align:1px}
+.fatdet-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.g-data-fat{font-size:10.5px;color:var(--purple);margin-top:5px;min-height:14px}
+.g-dest{border:1px solid var(--line2);border-radius:var(--r2);padding:12px 14px;background:var(--surface2);box-shadow:inset 3px 0 0 var(--purple);font-size:12px;color:var(--t2);line-height:1.55}
+.g-dest.st-fechada{box-shadow:inset 3px 0 0 var(--blue)}
+.g-dest.st-paga{box-shadow:inset 3px 0 0 var(--green)}
+.g-dest-top{display:flex;gap:10px;align-items:center}
+.g-dest-ic{font-size:20px}
+.g-dest-lbl{font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.g-dest-fat{font-size:16px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g-dest-det{margin-top:6px}
+.g-dest-val b{color:var(--t1)}
+.g-dest-val.vazio{color:var(--t3)}
+.g-dest-nota{margin-top:6px;font-size:11px;color:var(--t3)}
+.g-dest-nota.aviso{color:var(--amber)}
+.g-dest-lim{margin-top:6px;font-size:11px;color:var(--t3)}
+.g-dest-lim b{color:var(--t1)}
+.g-dest-lim.estoura,.g-dest-lim.estoura b{color:var(--red)}
+.g-dest-vazio{background:var(--surface2);border:1px dashed var(--line2);border-radius:var(--r2);padding:11px 14px;color:var(--t3);font-size:12px}
+.ff-atalhos{display:flex;gap:6px;flex-wrap:wrap}
+.ff-atalhos button{border:1px solid var(--line2);background:var(--surface2);color:var(--t2);font:600 10.5px 'Sora',sans-serif;padding:4px 10px;border-radius:20px;cursor:pointer}
+.ff-atalhos button:hover{color:var(--t1);border-color:var(--blue)}
+#ff-prev div+div{margin-top:4px}
+.ff-muda{color:var(--amber)}
+.ff-muda ul{margin:4px 0 0 18px;color:var(--t2)}
+@media (max-width:900px){ .cc-ciclo-grid{grid-template-columns:1fr} }
 .cp-acoes-pop{position:fixed;z-index:400;min-width:200px;background:var(--surface1);border:1px solid var(--line2);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:2px}
 .cp-acoes-pop[hidden]{display:none}
 .cp-acoes-pop .btn{width:100%;justify-content:flex-start;text-align:left;border:none;background:transparent;color:var(--t1);font-size:12px;padding:8px 10px;border-radius:7px;font-weight:500}
@@ -2462,6 +2509,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 
   <div id="cc-detalhe" style="display:none">
+    <!-- Ciclo da fatura: a que fechou, a que está aberta e o melhor dia de compra -->
+    <div class="card cc-ciclo" id="cc-ciclo" aria-live="polite"></div>
     <div class="g2" style="margin-bottom:16px">
       <div class="card">
         <div class="card-header">
@@ -2473,7 +2522,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="kpi-grid cols2" style="margin-bottom:16px">
           <div class="kpi b"><div class="kpi-label">Limite Total</div><div class="kpi-val b" id="cc-d-lim">R$ 0</div></div>
           <div class="kpi g"><div class="kpi-label">Disponível</div><div class="kpi-val g" id="cc-d-disp">R$ 0</div></div>
-          <div class="kpi p"><div class="kpi-label">Fatura Aberta</div><div class="kpi-val p" id="cc-d-fat">R$ 0</div></div>
+          <div class="kpi p"><div class="kpi-label" id="cc-d-fat-lbl">Fatura</div><div class="kpi-val p" id="cc-d-fat">R$ 0</div></div>
           <div class="kpi r"><div class="kpi-label">Vence em</div><div class="kpi-val r" id="cc-d-venc">—</div></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:4px">
@@ -2507,7 +2556,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <thead><tr><th>Competência</th><th>Fechamento</th><th>Vencimento</th><th>Valor</th><th>Pago em</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="cc-fat-tbody"></tbody>
         </table></div>
-        <div style="font-size:10px;color:var(--t3);margin-top:8px">💡 A competência é o mês de vencimento da fatura. Compras feitas depois do fechamento entram na fatura seguinte.</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:8px">💡 A competência é o mês de vencimento da fatura. Compras feitas depois do fechamento entram na fatura seguinte. Se o banco fechar a fatura em outro dia, use <b>⋯ → Fechar fatura</b>.</div>
       </div>
       <div id="cc-fatura-view" style="display:none">
         <div class="fatdet-hd">
@@ -2519,6 +2568,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <div><div class="kpi-label">Total da fatura</div><div class="mono" id="cc-fatdet-total" style="color:var(--purple);font-size:18px;font-weight:700">R$ 0</div></div>
             <div><div class="kpi-label">Pagamento</div><div class="mono" id="cc-fatdet-pago" style="color:var(--t2);font-size:12px">—</div></div>
             <div><span class="badge bdg-gray" id="cc-fatdet-st">—</span></div>
+            <div class="fatdet-acts" id="cc-fatdet-acts"></div>
           </div>
         </div>
         <div class="tbl-wrap"><table class="tbl">
@@ -3587,7 +3637,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <input type="hidden" id="g-edit-id">
       <div id="g-err" class="form-err" style="display:none"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Data da Compra *</label><input type="date" id="g-data" onchange="updGastoPreview()"></div>
+        <div class="fg"><label>Data da Compra *</label><input type="date" id="g-data" onchange="updGastoPreview()"><div class="g-data-fat" id="g-data-fat" aria-hidden="true"></div></div>
         <div class="fg"><label>Valor Total *</label><input type="number" id="g-val" step="0.01" min="0" placeholder="0,00" oninput="updGastoPreview()"></div>
       </div>
       <div class="form-grid" style="margin-bottom:12px">
@@ -3597,17 +3647,42 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <div class="fg"><label>Categoria</label><select id="g-cat" onchange="updGastoSubcat()"></select></div>
         <div class="fg"><label>Subcategoria</label><select id="g-subcat"><option value="">—</option></select></div>
       </div>
-      <div class="form-grid">
+      <div class="form-grid cols2">
         <div class="fg"><label for="g-parc">Parcelas (1 = à vista)</label>
           <input type="number" id="g-parc" min="1" max="99" step="1" value="1" list="g-parc-sugestoes" placeholder="1 = à vista" oninput="updGastoPreview()">
           <datalist id="g-parc-sugestoes"><option value="1"><option value="2"><option value="3"><option value="4"><option value="5"><option value="6"><option value="10"><option value="12"><option value="18"><option value="24"></datalist>
         </div>
+        <div class="fg"><label for="g-fatura">Lançar na fatura</label>
+          <select id="g-fatura" onchange="gEscolherFatura(this.value)"><option value="">Automática (pela data)</option></select>
+        </div>
       </div>
-      <div id="g-preview" class="cp-preview" style="margin-top:12px"></div>
+      <div id="g-preview" style="margin-top:12px" aria-live="polite"></div>
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeM('m-gasto')">Cancelar</button>
       <button class="btn btn-green" id="btn-salvar-gasto" onclick="saveGasto()">Registrar Gasto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: fechar a fatura (ou ajustar o fechamento) à mão -->
+<div class="overlay" id="m-fech-fat" style="display:none" onclick="cmoOut(event,'m-fech-fat')">
+  <div class="modal" style="max-width:500px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2 id="ff-titulo">Fechar fatura</h2><div style="font-size:11px;color:var(--t3);margin-top:2px" id="ff-sub">—</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-fech-fat')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="ff-err" class="form-err" style="display:none"></div>
+      <div class="fg" style="margin-bottom:8px"><label for="ff-ate">Último dia de compras nesta fatura</label>
+        <input type="date" id="ff-ate" oninput="updFechPreview()" onchange="updFechPreview()"></div>
+      <div class="ff-atalhos" id="ff-atalhos"></div>
+      <div id="ff-prev" class="cp-preview" style="margin-top:12px" aria-live="polite"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="ff-auto" style="display:none;margin-right:auto" onclick="reabrirFatura()">↺ Voltar ao automático</button>
+      <button class="btn btn-ghost" onclick="closeM('m-fech-fat')">Cancelar</button>
+      <button class="btn btn-green" id="ff-salvar" onclick="salvarFechamento()">🔒 Fechar fatura</button>
     </div>
   </div>
 </div>
@@ -10017,8 +10092,9 @@ function updCpAvisoCartao(){
   if(!inf){ el.innerHTML = 'Informe o vencimento para ver em qual fatura a conta entra.'; return; }
   const fmtBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
   const estoura = primeira > 0 && primeira > inf.livre;
+  const fi = infoFatura(inf.cc, inf.mes, inf.ano);
   el.innerHTML = `Cobrança em ${fmtBR(venc)} → fatura de <b style="color:var(--purple)">${MESES[inf.mes]}/${inf.ano}</b>`
-    + ` (vence ${fmtBR(inf.vencFat)}) · limite livre <b style="color:${estoura ? 'var(--red)' : 'var(--t1)'}">${fmtR(inf.livre)}</b>`
+    + ` (${fi.paga ? '✓ já paga' : fi.fechada ? '🔒 já fechada' : 'aberta' + (fi.ate ? ', fecha ' + fmtBR(fi.ate) : '')} · vence ${fmtBR(inf.vencFat)}) · limite livre <b style="color:${estoura ? 'var(--red)' : 'var(--t1)'}">${fmtR(inf.livre)}</b>`
     + (estoura ? ` <span style="color:var(--red)">— a cobrança passa do limite livre</span>` : '');
 }
 
@@ -10504,7 +10580,7 @@ function pagaveis(d){
         status:pg ? 'Pago' : (venc < hj ? 'Vencida' : 'Pendente'),
         valor:+((pg ? pg.valor : calc) || 0).toFixed(2), previsto:calc,
         aberto:!pg, soma:true, dataPg:pg ? (pg.dataPg || '') : '', caixaNome:pg ? (pg.caixaNome || '') : '',
-        cc, mes, ano, fatId:pg ? pg.id : '', fech:dataFechFatura(cc, mes, ano), itens:mapa[abs].itens });
+        cc, mes, ano, fatId:pg ? pg.id : '', fech:dataFechFatura(cc, mes, ano), fechManual:!!fechamentoManual(cc, mes, ano), itens:mapa[abs].itens });
     });
   });
 
@@ -10908,8 +10984,8 @@ function linhaFaturaPagar(x, busca){
     || (!!busca && x.itens.some(i => (i.g.desc || '').toLowerCase().includes(busca))));
   const nParc = x.itens.filter(i => i.total > 1).length;
   const nContas = x.itens.filter(i => i.g.refContaId).length;
-  const fase = !x.aberto ? '' : x.fech && x.fech >= today()
-    ? `aberta para compras · fecha ${fmtDataBR(x.fech)}` : `fechada${x.fech ? ' em ' + fmtDataBR(x.fech) : ''}`;
+  const fase = !x.aberto ? '' : !x.fech ? 'aberta · sem dia de fechamento' : x.fech >= today()
+    ? `aberta para compras · fecha ${fmtDataBR(x.fech)}${x.fechManual ? ' (ajustado à mão)' : ''}` : `fechada em ${fmtDataBR(x.fech)}${x.fechManual ? ' (à mão)' : ''}`;
   const det = [nParc ? `${nParc} parcelada${nParc > 1 ? 's' : ''}` : '',
                nContas ? `${nContas} conta${nContas > 1 ? 's' : ''} a pagar` : ''].filter(Boolean).join(' · ');
   const difPg = !x.aberto && x.previsto > 0 && Math.abs(x.valor - x.previsto) > 0.005
@@ -11486,7 +11562,24 @@ const diasEntreISO=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00
 function dataVencFatura(c, mes, ano){ return diaSeguroISO(ano, mes, (c&&c.venc)||10); }
 // Fechamento da fatura: quando o dia de fechamento é igual ou posterior ao de vencimento,
 // a fatura daquele mês fecha ainda no mês anterior.
+// ── Fechamento à mão ──
+// O banco às vezes fecha a fatura em outro dia (fim de semana, feriado) e há cartão sem dia de
+// fechamento cadastrado. "Fechar fatura" guarda, por competência, o último dia de compras dela:
+//   cc.fechamentos['AAAA-MM'] = { ate:'AAAA-MM-DD' (último dia de compras), em:'AAAA-MM-DD' (quando foi fechada) }
+// Mesmo sentido do dia de fechamento do cartão: compras até `ate` ficam nela; depois, na seguinte.
+const RX_COMP_FAT = /^\d{4}-(0[1-9]|1[0-2])$/;
+const chaveCompFat = (mes, ano) => { const a = parseInt(ano) * 12 + parseInt(mes); return `${Math.floor(a / 12)}-${String(a % 12 + 1).padStart(2, '0')}`; };
+const compDaChaveFat = k => ({ mes:parseInt(k.slice(5, 7)) - 1, ano:parseInt(k.slice(0, 4)) });
+function fechamentoManual(c, mes, ano){
+  const f = c && c.fechamentos && c.fechamentos[chaveCompFat(mes, ano)];
+  return f && /^\d{4}-\d{2}-\d{2}$/.test(f.ate || '') ? f : null;
+}
+const temFechManual = c => !!(c && c.fechamentos && Object.values(c.fechamentos).some(f => f && f.ate));
+
+// Fechamento da fatura de uma competência: último dia de compras que entram nela ('' = sem data)
 function dataFechFatura(c, mes, ano){
+  const man=fechamentoManual(c, mes, ano);
+  if(man) return man.ate;
   const fech=parseInt(c&&c.fech)||0;
   if(!fech) return '';
   const venc=parseInt(c&&c.venc)||31;
@@ -11494,15 +11587,65 @@ function dataFechFatura(c, mes, ano){
 }
 // Competência da 1ª parcela de uma compra: a primeira fatura que ainda não havia fechado
 // na data da compra. Compra feita depois do fechamento entra na fatura seguinte.
+// A fatura escolhida à mão na compra (g.fatura = 'AAAA-MM') vale mais que a data.
 function competenciaGasto(g, c){
+  if(g && RX_COMP_FAT.test(g.fatura || '')) return compDaChaveFat(g.fatura);
   const base={mes:getMes(g.data), ano:getAno(g.data)};
-  if(!c || !parseInt(c.fech) || !g.data) return base;
+  if(!c || !g.data || (!parseInt(c.fech) && !temFechManual(c))) return base;
   for(let i=0;i<3;i++){
     const abs=base.ano*12+base.mes+i, m=abs%12, a=Math.floor(abs/12);
     const df=dataFechFatura(c,m,a);
-    if(df && df>=g.data) return {mes:m, ano:a};
+    if(!df) return {mes:m, ano:a};            // cartão sem dia de fechamento: só fecha à mão
+    if(df>=g.data) return {mes:m, ano:a};
   }
   return base;
+}
+
+// Tudo o que a tela precisa de uma fatura: datas, se já fechou (e se foi à mão), situação e valor
+function infoFatura(c, mes, ano){
+  const abs = parseInt(ano) * 12 + parseInt(mes);
+  mes = abs % 12; ano = Math.floor(abs / 12);
+  const man = fechamentoManual(c, mes, ano);
+  const ate = dataFechFatura(c, mes, ano);
+  const pg = (c.faturas || []).find(f => f.status === 'Pago' && f.mes === mes && (f.ano == null || f.ano === ano)) || null;
+  return { mes, ano, abs, chave:chaveCompFat(mes, ano), rotulo:`${MESES[mes]}/${ano}`, curto:`${MESES3[mes]}/${String(ano).slice(2)}`,
+    ate, manual:!!man, fechadaEm:man ? man.em || '' : '', fechada:!!ate && ate < today(),
+    venc:dataVencFatura(c, mes, ano), paga:!!pg, pg, valor:getFaturaMes(c, mes, ano), status:statusFatura(c, mes, ano) };
+}
+// Hoje: a fatura que recebe as compras (aberta), a anterior (fechada) e o melhor dia de compra
+function cicloCartao(c){
+  const ab = competenciaGasto({ data:today() }, c);
+  const aberta = infoFatura(c, ab.mes, ab.ano);
+  const anterior = infoFatura(c, ab.mes - 1, ab.ano);
+  const seguinte = infoFatura(c, ab.mes + 1, ab.ano);
+  // melhor dia de compra: o dia seguinte ao fechamento (a compra cai na fatura que vence mais longe)
+  let melhorDia = '', faturaMelhor = null;
+  if(anterior.ate && addDias(anterior.ate, 1) === today()){ melhorDia = today(); faturaMelhor = aberta; }
+  else if(aberta.ate){ melhorDia = addDias(aberta.ate, 1); faturaMelhor = seguinte; }
+  return { aberta, anterior, seguinte, melhorDia, faturaMelhor, prazo:melhorDia ? diasEntreISO(melhorDia, faturaMelhor.venc) : null };
+}
+// Para qual fatura vai uma compra: a automática (data × fechamento) ou a escolhida à mão
+function destinoCompra(c, data, parc, escolhida, ignorarId){
+  if(!c || !/^\d{4}-\d{2}-\d{2}$/.test(data || '')) return null;
+  const n = Math.max(1, parseInt(parc) || 1);
+  const auto = competenciaGasto({ data }, c);
+  const manual = RX_COMP_FAT.test(escolhida || '') && escolhida !== chaveCompFat(auto.mes, auto.ano);
+  const k = manual ? compDaChaveFat(escolhida) : auto;
+  const inf = infoFatura(c, k.mes, k.ano), ult = infoFatura(c, k.mes + n - 1, k.ano);
+  const anterior = infoFatura(c, auto.mes - 1, auto.ano);    // a que fechou antes da automática
+  const outros = ignorarId ? { ...c, gastos:(c.gastos || []).filter(g => g.id !== ignorarId) } : c;
+  const livre = +((+c.lim || 0) - limiteUsado(outros)).toFixed(2);
+  return { inf, ult, n, auto:infoFatura(c, auto.mes, auto.ano), manual, anterior, livre };
+}
+// Faturas que a compra pode receber: a automática, a anterior e as duas seguintes
+function opcoesFaturaCompra(c, data){
+  if(!c || !/^\d{4}-\d{2}-\d{2}$/.test(data || '')) return [];
+  const a = competenciaGasto({ data }, c);
+  return [-1, 0, 1, 2].map(i => {
+    const inf = infoFatura(c, a.mes + i, a.ano);
+    const est = inf.paga ? 'paga' : i === 0 ? (inf.fechada ? 'fechada' : 'aberta') : inf.fechada ? 'fechada' : i > 0 ? 'próxima' : 'anterior';
+    return { chave:inf.chave, rotulo:`${inf.rotulo} · ${est}`, auto:i === 0, inf };
+  });
 }
 // Valor da parcela de um gasto que cai na fatura do mês/ano informado (0 se não há parcela nele).
 // Uma compra em 10x lançada em março pesa nas faturas de março até dezembro — e não só na de março.
@@ -11735,7 +11878,7 @@ function renderCartoes(){
       <div class="cc-bot">
         <div><div class="cc-name-text">${c.nome}</div><div style="font-size:10px;opacity:.5;margin-top:2px">Limite: ${fmtR(c.lim)}</div></div>
         <div style="text-align:right">
-          <div class="cc-fatura-label">${MESES3[mes]}/${String(anoCC).slice(2)} · ${st}</div>
+          <div class="cc-fatura-label">${MESES3[mes]}/${String(anoCC).slice(2)} · ${ROT_ST_FAT[st] || st}</div>
           <div class="cc-fatura-val">${fmtR(fat)}</div>
         </div>
       </div>
@@ -11791,7 +11934,10 @@ function selectCC(id){
   const usado=limiteUsado(c);
   const disp=Math.max(0,c.lim-usado);
   const pctU=c.lim>0?Math.min(100,usado/c.lim*100):0;
-  set('cc-d-lim',fmtR(c.lim));set('cc-d-disp',fmtR(disp));set('cc-d-fat',fmtR(fat));
+  // a fatura da competência escolhida, com a situação (aberta, fechada, vencida ou paga)
+  const infC=infoFatura(c,mes,anoCC);
+  set('cc-d-fat-lbl',`Fatura ${infC.curto} · ${ROT_ST_FAT[infC.status]||infC.status}`);
+  set('cc-d-lim',fmtR(c.lim));set('cc-d-disp',fmtR(disp));set('cc-d-fat',fmtR(infC.paga?(+infC.pg.valor||0):fat));
   const dv=dataVencFatura(c,mes,anoCC);
   const diff=diasEntreISO(today(),dv);
   set('cc-d-venc',`${dv.slice(8)}/${dv.slice(5,7)} · ${diff===0?'hoje':diff>0?'em '+diff+'d':Math.abs(diff)+'d atrás'}`);
@@ -11841,37 +11987,118 @@ function selectCC(id){
         <span class="sum-val" style="color:var(--t1);font-weight:600">${fmtR(media6)}</span>
       </div>`;
 
+  renderCicloCartao(c);
   renderTabelaFaturas(c, anoCC);
   renderFaturaDetalhe(c, mes, anoCC);
   renderTabelaGastos(c);
+}
+
+const ROT_ST_FAT = { Pago:'✓ Paga', Aberta:'Aberta', Fechada:'🔒 Fechada', Vencida:'⚠ Vencida', 'Sem movimento':'Sem movimento' };
+const BDG_ST_FAT = { Pago:'bdg-green', Aberta:'bdg-purple', Fechada:'bdg-blue', Vencida:'bdg-red', 'Sem movimento':'bdg-gray' };
+// Fechamento em palavras: "Fecha em 03/11", "Fechou em 03/10", "Fechada à mão em 27/10 · compras até 26/10"
+function textoFechInf(inf){
+  if(!inf.ate) return 'Sem dia de fechamento';
+  const d = fmtDataBR(inf.ate);
+  if(inf.manual) return inf.fechada
+    ? `Fechada à mão${inf.fechadaEm ? ' em ' + fmtDataBR(inf.fechadaEm) : ''} · compras até ${d}`
+    : `Fecha em ${d} (ajustado à mão)`;
+  return inf.fechada ? `Fechou em ${d}` : inf.ate === today() ? `Fecha hoje (${d})` : `Fecha em ${d}`;
+}
+const diasRel = iso => { const n = diasEntreISO(today(), iso); return n === 0 ? 'hoje' : n > 0 ? `em ${n} dia${n > 1 ? 's' : ''}` : `há ${-n} dia${-n > 1 ? 's' : ''}`; };
+
+// Ciclo da fatura do cartão: a que fechou, a que está aberta (onde entram as compras de hoje)
+// e o melhor dia de compra — com fechar/ajustar à mão quando o banco fecha em outro dia
+function renderCicloCartao(c){
+  const el = document.getElementById('cc-ciclo');
+  if(!el) return;
+  const k = cicloCartao(c), an = k.anterior, ab = k.aberta, temDia = !!parseInt(c.fech);
+  const bt = (txt, fn, cls, tit) => `<button type="button" class="btn ${cls || 'btn-ghost'} btn-xs" onclick="${fn}"${tit ? ` title="${escAttr(tit)}"` : ''}>${txt}</button>`;
+  const ver = inf => bt('👁 Ver compras', `verFatura(${inf.mes},${inf.ano})`);
+  // a anterior: fechada (a pagar, vencida ou paga)
+  const anFechada = an.fechada || an.paga || an.status === 'Vencida';
+  const anCls = an.paga ? 'paga' : an.status === 'Vencida' ? 'vencida' : 'fechada';
+  const anLbl = !anFechada ? 'Fatura anterior' : an.paga ? '✓ Fatura fechada · paga' : an.status === 'Vencida' ? '⚠ Fatura fechada · vencida' : '🔒 Fatura fechada · a pagar';
+  const anVal = an.paga ? (+an.pg.valor || 0) : an.valor;
+  const anSub = [textoFechInf(an),
+    an.paga ? `paga em ${fmtDataBR(an.pg.dataPg)}` : an.valor > 0
+      ? `vence ${fmtDataBR(an.venc)} <span class="${an.status === 'Vencida' ? 'atraso' : ''}">(${an.status === 'Vencida' ? 'venceu ' : ''}${diasRel(an.venc)})</span>`
+      : `vence ${fmtDataBR(an.venc)} · sem compras`].join(' · ');
+  // a aberta: recebe as compras de hoje
+  const abSub = (ab.ate
+      ? `${textoFechInf(ab)}${ab.ate !== today() ? ` (${diasRel(ab.ate)})` : ''}`
+      : 'Sem dia de fechamento: feche à mão quando o banco avisar')
+    + ` · vence ${fmtDataBR(ab.venc)}`;
+  // faturas mais antigas que a fechada, vencidas e sem pagamento: não somem de vista quando o ciclo anda
+  const atrasadas = [];
+  for(let i = 2; i <= 12; i++){ const inf = infoFatura(c, ab.mes - i, ab.ano); if(inf.status === 'Vencida') atrasadas.push(inf); }
+  const melhor = k.melhorDia
+    ? `<div class="cc-ct-tit">${fmtDataBR(k.melhorDia)}${k.melhorDia === today() ? ' · hoje' : ` · ${diasRel(k.melhorDia)}`}</div>
+       <div class="cc-ct-sub">Compras a partir desse dia entram na fatura de <b>${k.faturaMelhor.rotulo}</b>, que vence ${fmtDataBR(k.faturaMelhor.venc)} — até <b>${k.prazo} dias</b> para pagar.</div>`
+    : `<div class="cc-ct-sub" style="margin-top:6px">Cadastre o dia de fechamento do cartão para saber o melhor dia de compra.</div>
+       <div class="cc-ct-acts">${bt('✎ Cadastrar dia de fechamento', `editCC('${c.id}')`)}</div>`;
+  el.innerHTML = `
+    <div class="cc-ciclo-hd">
+      <div><span class="card-title">Ciclo da fatura</span><div class="card-sub">${escHtml(c.nome)} · hoje, ${fmtDataBR(today())}${temDia ? ` · fecha todo dia ${c.fech}, vence todo dia ${c.venc}` : ` · vence todo dia ${c.venc}`}</div></div>
+    </div>
+    <div class="cc-ciclo-grid">
+      <div class="cc-ct ${anFechada ? anCls : ''}" id="cc-ct-fechada">
+        <div class="cc-ct-lbl">${anLbl}</div>
+        <div class="cc-ct-tit">${an.rotulo}</div>
+        <div class="cc-ct-val">${fmtR(anVal)}</div>
+        <div class="cc-ct-sub">${anSub}</div>
+        <div class="cc-ct-acts">
+          ${!an.paga && an.valor > 0 ? bt('✓ Pagar', `pagarFatura('${c.id}',${an.mes},${an.ano})`, 'btn-green') : ''}
+          ${ver(an)}
+          ${!an.paga && an.manual ? bt('↺ Reabrir', `reabrirFatura('${c.id}',${an.mes},${an.ano})`, '', 'Desfazer o fechamento feito à mão') : ''}
+        </div>
+      </div>
+      <div class="cc-ct aberta" id="cc-ct-aberta">
+        <div class="cc-ct-lbl">🟢 Fatura aberta · as compras de hoje entram nela</div>
+        <div class="cc-ct-tit">${ab.rotulo}</div>
+        <div class="cc-ct-val">${fmtR(ab.valor)} <small>até agora</small></div>
+        <div class="cc-ct-sub">${abSub}</div>
+        <div class="cc-ct-acts">
+          ${ab.paga ? '' : bt('🔒 Fechar fatura', `abrirFechamento('${c.id}',${ab.mes},${ab.ano})`, '', 'O banco fechou a fatura? Feche aqui: as próximas compras vão para a fatura seguinte')}
+          ${ver(ab)}
+          ${ab.manual ? bt('↺ Automático', `reabrirFatura('${c.id}',${ab.mes},${ab.ano})`) : ''}
+        </div>
+      </div>
+      <div class="cc-ct melhor" id="cc-ct-melhor">
+        <div class="cc-ct-lbl">⭐ Melhor dia de compra</div>
+        ${melhor}
+      </div>
+    </div>
+    ${atrasadas.length ? `<div class="cc-ciclo-alerta" role="status">⚠️ <b>${atrasadas.length === 1 ? '1 fatura mais antiga vencida' : atrasadas.length + ' faturas mais antigas vencidas'} sem pagamento:</b>
+      ${atrasadas.slice(0, 3).map(i => `<span>${i.rotulo} (${fmtR(i.valor)}) ${bt('✓ Pagar', `pagarFatura('${c.id}',${i.mes},${i.ano})`, 'btn-green')}</span>`).join('')}
+      ${atrasadas.length > 3 ? `<span>e mais ${atrasadas.length - 3} em “Faturas do Ano”</span>` : ''}</div>` : ''}`;
 }
 
 // Faturas do ano: as 12 competências, com o que foi calculado e o que foi pago
 function renderTabelaFaturas(c, anoCC){
   const ftbody=document.getElementById('cc-fat-tbody');
   if(!ftbody) return;
-  const stBdg={Pago:'bdg-green','Aberta':'bdg-purple','Fechada':'bdg-blue','Vencida':'bdg-red','Sem movimento':'bdg-gray'};
+  const abertaAbs=cicloCartao(c).aberta.abs;
   const linhas=[];
   for(let m=0;m<12;m++){
-    const valor=getFaturaMes(c,m,anoCC);
+    const inf=infoFatura(c,m,anoCC);
     const f=(c.faturas||[]).find(x=>x.mes===m&&(x.ano==null||x.ano===anoCC));
-    if(valor<=0 && !f) continue;
-    const st=statusFatura(c,m,anoCC);
+    if(inf.valor<=0 && !f && !inf.manual) continue;
     const pago=f&&f.status==='Pago';
+    const fechar=!pago && !inf.fechada && !inf.manual && inf.abs===abertaAbs;
     linhas.push(`<tr${m===ccMes()?' style="background:var(--surface2)"':''}>
       <td style="color:var(--t1)">${MESES[m]}/${anoCC}</td>
-      <td class="mono" style="color:var(--t3)">${fmtDataBR(dataFechFatura(c,m,anoCC))}</td>
-      <td class="mono" style="color:var(--t3)">${fmtDataBR(dataVencFatura(c,m,anoCC))}</td>
-      <td class="mono" style="color:var(--purple)">${fmtR(pago?f.valor:valor)}</td>
+      <td class="mono" style="color:var(--t3)">${inf.ate?fmtDataBR(inf.ate):'—'}${inf.manual?` <span class="cc-man" title="Fechamento definido à mão${inf.fechadaEm?' em '+fmtDataBR(inf.fechadaEm):''}">à mão</span>`:''}</td>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(inf.venc)}</td>
+      <td class="mono" style="color:var(--purple)">${fmtR(pago?f.valor:inf.valor)}</td>
       <td class="mono" style="color:var(--t3)">${pago?fmtDataBR(f.dataPg):'—'}</td>
-      <td><span class="badge ${stBdg[st]||'bdg-gray'}">${st}</span></td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-xs" title="Ver compras da fatura" onclick="verFatura(${m},${anoCC})">👁</button>
-        ${pago
-          ? `<button class="btn btn-ghost btn-xs" title="Desfazer pagamento" onclick="desfazerPagFat('${c.id}','${f.id}')">↺</button>
-             <button class="btn btn-red btn-xs" title="Excluir registro de pagamento" onclick="delFat('${c.id}','${f.id}')">✕</button>`
-          : (valor>0?`<button class="btn btn-green btn-xs" title="Pagar fatura" onclick="pagarFatura('${c.id}',${m},${anoCC})">Pagar</button>`:'')}
-      </td>
+      <td><span class="badge ${BDG_ST_FAT[inf.status]||'bdg-gray'}">${ROT_ST_FAT[inf.status]||inf.status}</span></td>
+      ${acoesPagar(`fatura de ${MESES[m]}/${anoCC}`, [
+        { r:'👁 Ver compras', f:`verFatura(${m},${anoCC})` },
+        pago ? { r:'↩ Desfazer pagamento', f:`desfazerPagFat('${c.id}','${f.id}')` }
+          : inf.valor>0 ? { r:'✓ Pagar fatura', f:`pagarFatura('${c.id}',${m},${anoCC})`, c:'btn-green' } : null,
+        pago ? null : { r:fechar ? '🔒 Fechar fatura' : '📅 Ajustar fechamento', f:`abrirFechamento('${c.id}',${m},${anoCC})` },
+        !pago && inf.manual ? { r:'↺ Voltar ao fechamento automático', f:`reabrirFatura('${c.id}',${m},${anoCC})` } : null,
+        pago ? { r:'✕ Excluir registro de pagamento', f:`delFat('${c.id}','${f.id}')`, c:'btn-red' } : null ])}
     </tr>`);
   }
   ftbody.innerHTML=linhas.length?linhas.join('')
@@ -11886,14 +12113,16 @@ function renderFaturaDetalhe(c, mes, anoCC){
   const st=statusFatura(c,mes,anoCC);
   const f=(c.faturas||[]).find(x=>x.mes===mes&&(x.ano==null||x.ano===anoCC)&&x.status==='Pago');
   set('cc-fatdet-titulo',`Fatura de ${MESES[mes]}/${anoCC}`);
-  set('cc-fatdet-sub',`Fecha em ${fmtDataBR(dataFechFatura(c,mes,anoCC))} · Vence em ${fmtDataBR(dataVencFatura(c,mes,anoCC))} · ${parcelas.length} item(ns)`);
+  const inf=infoFatura(c,mes,anoCC);
+  set('cc-fatdet-sub',`${textoFechInf(inf)} · Vence em ${fmtDataBR(inf.venc)} · ${parcelas.length} item(ns)`);
+  const acts=document.getElementById('cc-fatdet-acts');
+  if(acts) acts.innerHTML=inf.paga?'':
+    `<button type="button" class="btn btn-ghost btn-xs" onclick="abrirFechamento('${c.id}',${mes},${anoCC})">${!inf.fechada&&!inf.manual&&inf.abs===cicloCartao(c).aberta.abs?'🔒 Fechar fatura':'📅 Ajustar fechamento'}</button>`
+    +(inf.manual?`<button type="button" class="btn btn-ghost btn-xs" onclick="reabrirFatura('${c.id}',${mes},${anoCC})">↺ Automático</button>`:'');
   set('cc-fatdet-total',fmtR(total));
   set('cc-fatdet-pago',f?`${fmtR(f.valor)} em ${fmtDataBR(f.dataPg)}`:'—');
   const bdg=document.getElementById('cc-fatdet-st');
-  if(bdg){
-    const cls={Pago:'bdg-green','Aberta':'bdg-purple','Fechada':'bdg-blue','Vencida':'bdg-red','Sem movimento':'bdg-gray'};
-    bdg.className='badge '+(cls[st]||'bdg-gray'); bdg.textContent=st;
-  }
+  if(bdg){ bdg.className='badge '+(BDG_ST_FAT[st]||'bdg-gray'); bdg.textContent=ROT_ST_FAT[st]||st; }
   if(!tb) return;
   tb.innerHTML=parcelas.length?parcelas.map(p=>`<tr>
       <td class="mono" style="color:var(--t3)">${fmtDataBR(p.g.data)}</td>
@@ -11923,7 +12152,7 @@ function renderTabelaGastos(c){
       <td style="color:var(--t1)">${g.desc}${g.refContaId?' <span class="badge bdg-gray" style="font-size:8px" title="Lançada em Contas a Pagar — edite por lá">📄 Conta a pagar</span>':''}</td>
       <td><span class="cat-tag" style="font-size:9px">${g.cat||'—'}</span></td>
       <td style="color:var(--t3)">${n>1?`${n}x`:'À vista'}</td>
-      <td class="mono" style="color:var(--t3)">${MESES3[comp.mes]}/${String(comp.ano).slice(2)}</td>
+      <td class="mono" style="color:var(--t3)">${MESES3[comp.mes]}/${String(comp.ano).slice(2)}${g.fatura?' <span class="cc-man" title="Fatura escolhida à mão no lançamento">à mão</span>':''}</td>
       <td class="mono" style="color:var(--t1)">${fmtR(g.val)}</td>
       <td class="mono" style="color:var(--purple)">${fmtR(dividirParcelas(g.val||0,n)[0])}</td>
       <td style="white-space:nowrap">
@@ -11954,8 +12183,10 @@ function tglCC(v,el){
 }
 
 // ── Gasto no cartão ──
+let _gFatura='';   // fatura escolhida à mão no modal de compra ('' = automática, pela data)
 function resetModalGasto(){
   const $=x=>document.getElementById(x);
+  _gFatura='';
   if($('g-edit-id')) $('g-edit-id').value='';
   if($('m-gasto-titulo')) $('m-gasto-titulo').textContent='Registrar Gasto no Cartão';
   if($('btn-salvar-gasto')) $('btn-salvar-gasto').textContent='Registrar Gasto';
@@ -11984,22 +12215,62 @@ function updGastoSubcat(){
   const subs=subcats('Despesa',cat);
   el.innerHTML='<option value="">—</option>'+subs.map(s=>`<option>${s}</option>`).join('');
 }
-// Prévia: em qual fatura a compra cai e qual o valor de cada parcela
+function gEscolherFatura(v){ _gFatura=v||''; updGastoPreview(); }
+// Destino da compra: para qual fatura ela vai, se essa fatura está aberta, fechada ou paga,
+// as parcelas e o limite que sobra — atualizado a cada campo
 function updGastoPreview(){
   const el=document.getElementById('g-preview');
   if(!el) return;
+  const $=x=>document.getElementById(x);
   const d=gs(); const c=d.ccs.find(cc=>cc.id===_ccSel);
-  const data=document.getElementById('g-data')?.value||'';
-  const val=parseFloat(document.getElementById('g-val')?.value)||0;
-  const parc=Math.max(1,parseInt(document.getElementById('g-parc')?.value)||1);
-  if(!c||!data||!val){ el.innerHTML='<span style="color:var(--t3)">Informe data e valor para ver em qual fatura a compra entra.</span>'; return; }
-  const comp=competenciaGasto({data,parc},c);
-  const vals=dividirParcelas(val,parc);
-  const ultAbs=comp.ano*12+comp.mes+parc-1;
-  el.innerHTML=`<b style="color:var(--t1)">${parc>1?`${parc}x de ${fmtR(vals[0])}`:fmtR(val)}</b>
-    · entra na fatura de <b style="color:var(--purple)">${MESES[comp.mes]}/${comp.ano}</b>
-    (vence ${fmtDataBR(dataVencFatura(c,comp.mes,comp.ano))})
-    ${parc>1?` · última parcela em <b style="color:var(--purple)">${MESES[ultAbs%12]}/${Math.floor(ultAbs/12)}</b>`:''}`;
+  const data=$('g-data')?.value||'';
+  const val=parseFloat($('g-val')?.value)||0;
+  const parc=Math.max(1,parseInt($('g-parc')?.value)||1);
+  const editId=$('g-edit-id')?.value||'';
+  const sel=$('g-fatura'), dica=$('g-data-fat'), btn=$('btn-salvar-gasto');
+  const ops=opcoesFaturaCompra(c,data), auto=ops.find(o=>o.auto);
+  if(sel){
+    const fora=_gFatura&&RX_COMP_FAT.test(_gFatura)&&!ops.some(o=>o.chave===_gFatura)&&c
+      ? [{chave:_gFatura, rotulo:`${infoFatura(c,compDaChaveFat(_gFatura).mes,compDaChaveFat(_gFatura).ano).rotulo} · escolhida`}] : [];
+    sel.innerHTML=auto
+      ? `<option value="">Automática — ${auto.inf.rotulo}</option>`+[...ops,...fora].map(o=>`<option value="${o.chave}">${o.rotulo}</option>`).join('')
+      : '<option value="">Automática (pela data)</option>';
+    sel.value=auto&&_gFatura&&_gFatura!==auto.chave?_gFatura:'';
+  }
+  const dst=destinoCompra(c,data,parc,sel?sel.value:_gFatura,editId);
+  if(!dst){
+    el.innerHTML='<div class="g-dest-vazio">Informe a data da compra para ver em qual fatura ela entra.</div>';
+    if(dica) dica.textContent='';
+    if(btn&&!editId) btn.textContent='Registrar Gasto';
+    return;
+  }
+  const est=dst.inf.paga?'paga':dst.inf.fechada?'fechada':'aberta';
+  if(dica) dica.textContent=`💳 fatura de ${dst.inf.curto} · ${est}`;
+  el.innerHTML=htmlDestinoCompra(dst,val);
+  if(btn&&!editId) btn.textContent=`Registrar na fatura de ${dst.inf.curto}`;
+}
+function htmlDestinoCompra(dst,val){
+  const { inf, ult, n, anterior, manual, livre }=dst;
+  const est=inf.paga?['paga','✓ paga','bdg-green']:inf.fechada?['fechada','🔒 fechada','bdg-blue']:['aberta','aberta','bdg-purple'];
+  const vals=val>0?dividirParcelas(val,n):null;
+  const notas=[];
+  if(manual) notas.push(`<div class="g-dest-nota">✋ Fatura escolhida à mão — pela data, a compra iria para a de ${dst.auto.rotulo}.</div>`);
+  else if(anterior.ate) notas.push(`<div class="g-dest-nota">ℹ️ A fatura de ${anterior.rotulo} ${anterior.fechada?'já fechou':'fecha'} em ${fmtDataBR(anterior.ate)}: compras depois disso entram na de ${inf.rotulo}.</div>`);
+  if(inf.paga) notas.push(`<div class="g-dest-nota aviso">⚠️ Esta fatura já foi paga (${fmtR(+inf.pg.valor||0)} em ${fmtDataBR(inf.pg.dataPg)}): a compra entra nela, mas o pagamento registrado continua o mesmo.</div>`);
+  else if(inf.fechada) notas.push(`<div class="g-dest-nota aviso">🔒 Esta fatura já está fechada${manual?'':': a compra foi feita até o dia do fechamento, por isso entra nela'}.</div>`);
+  if(vals){
+    const depois=+(livre-val).toFixed(2);
+    notas.push(`<div class="g-dest-lim${depois<0?' estoura':''}">Limite livre depois desta compra: <b>${fmtR(depois)}</b>${depois<0?' — passa do limite do cartão':''}</div>`);
+  }
+  return `<div class="g-dest st-${est[0]}">
+      <div class="g-dest-top"><span class="g-dest-ic" aria-hidden="true">💳</span>
+        <div><div class="g-dest-lbl">Esta compra vai para a fatura de</div>
+          <div class="g-dest-fat">${inf.rotulo} <span class="badge ${est[2]}">${est[1]}</span></div></div></div>
+      <div class="g-dest-det">${textoFechInf(inf)} · vence ${fmtDataBR(inf.venc)}</div>
+      ${vals?`<div class="g-dest-val"><b>${n>1?`${n}x de ${fmtR(vals[0])}`:`À vista: ${fmtR(val)}`}</b>${n>1?` · da fatura de ${inf.rotulo} até a de ${ult.rotulo}`:''}</div>`
+            :'<div class="g-dest-val vazio">Informe o valor para ver as parcelas.</div>'}
+      ${notas.join('\n      ')}
+    </div>`;
 }
 function editGasto(ccId,gId){
   const d=gs(); const c=d.ccs.find(x=>x.id===ccId);
@@ -12020,6 +12291,7 @@ function editGasto(ccId,gId){
   updGastoSubcat();
   if(g.subcat) $('g-subcat').value=g.subcat;
   $('g-parc').value=String(Math.max(1,parseInt(g.parc)||1));
+  _gFatura=g.fatura||'';
   updGastoPreview();
 }
 function saveGasto(){
@@ -12041,11 +12313,16 @@ function saveGasto(){
   const d=gs();const c=d.ccs.find(cc=>cc.id===_ccSel);
   if(!c)return;
   c.gastos=c.gastos||[];
+  // fatura escolhida à mão: só fica guardada se for diferente da automática (pela data)
+  const auto=competenciaGasto({data},c);
+  const fatura=RX_COMP_FAT.test(_gFatura)&&_gFatura!==chaveCompFat(auto.mes,auto.ano)?_gFatura:'';
   if(editId){
     const g=c.gastos.find(x=>x.id===editId);
-    if(g) Object.assign(g,{data,val,desc,cat,subcat,parc,editadoEm:new Date().toISOString()});
+    if(g){ Object.assign(g,{data,val,desc,cat,subcat,parc,editadoEm:new Date().toISOString()}); if(fatura) g.fatura=fatura; else delete g.fatura; }
   } else {
-    c.gastos.push({id:uid(),data,val,desc,cat,subcat,parc,ts:Date.now()});
+    const g={id:uid(),data,val,desc,cat,subcat,parc,ts:Date.now()};
+    if(fatura) g.fatura=fatura;
+    c.gastos.push(g);
   }
   ss(d);closeM('m-gasto');renderCartoes();refreshAll();
 }
@@ -12058,6 +12335,101 @@ function delGasto(ccId,gId){
   if(!confirm(`Excluir a compra "${g.desc}" de ${fmtR(g.val)}${n>1?` (${n}x)`:''}?\n\nAs parcelas serão removidas das faturas.`)) return;
   c.gastos=c.gastos.filter(x=>x.id!==gId);
   ss(d);renderCartoes();refreshAll();
+}
+
+// ── Fechar a fatura à mão (ou ajustar o dia do fechamento) ──
+let _ffAlvo=null;   // { ccId, mes, ano }
+// Fechamento pelo dia do cartão, sem o ajuste à mão
+function dataFechAuto(c, mes, ano){ return dataFechFatura({ ...c, fechamentos:{} }, mes, ano); }
+function abrirFechamento(ccId, mes, ano){
+  const c=(gs().ccs||[]).find(x=>x.id===ccId);
+  if(!c) return;
+  const inf=infoFatura(c,mes,ano);
+  _ffAlvo={ ccId:c.id, mes:inf.mes, ano:inf.ano };
+  openM('m-fech-fat');
+  const $=x=>document.getElementById(x), hj=today(), ontem=addDias(hj,-1);
+  const fechar=!inf.fechada&&!inf.manual;
+  const ant=dataFechFatura(c,inf.mes-1,inf.ano);
+  set('ff-titulo', fechar?'🔒 Fechar fatura':'📅 Ajustar fechamento');
+  set('ff-sub', `${c.nome} · fatura de ${inf.rotulo} · vence ${fmtDataBR(inf.venc)}`);
+  // fechar agora: as compras de hoje já vão para a próxima — a não ser que a fatura tenha começado hoje
+  $('ff-ate').value=fechar?(ant&&ontem<=ant?hj:ontem):(inf.ate||ontem);
+  const auto=dataFechAuto(c,inf.mes,inf.ano);
+  const dm=iso=>fmtDataBR(iso).slice(0,5);
+  $('ff-atalhos').innerHTML=[[`Até ontem (${dm(ontem)})`,ontem],[`Até hoje (${dm(hj)})`,hj],auto?[`Dia do cartão (${dm(auto)})`,auto]:null]
+    .filter(Boolean).map(([t,v])=>`<button type="button" onclick="document.getElementById('ff-ate').value='${v}';updFechPreview()">${t}</button>`).join('');
+  $('ff-auto').style.display=inf.manual?'':'none';
+  $('ff-auto').textContent=parseInt(c.fech)?`↺ Voltar ao dia ${c.fech} do cartão`:'↺ Reabrir fatura';
+  $('ff-salvar').textContent=fechar?'🔒 Fechar fatura':'Salvar fechamento';
+  const err=$('ff-err'); if(err) err.style.display='none';
+  updFechPreview();
+}
+function validarFechamento(c, inf, ate){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ate||'')) return 'Informe o último dia de compras desta fatura.';
+  const ant=infoFatura(c,inf.mes-1,inf.ano), seg=infoFatura(c,inf.mes+1,inf.ano);
+  if(ant.ate&&ate<=ant.ate) return `A fatura de ${ant.rotulo} vai até ${fmtDataBR(ant.ate)}: escolha um dia depois disso.`;
+  if(!ant.ate&&ate<diaSeguroISO(inf.ano,inf.mes-1,1)) return 'Escolha uma data mais perto do vencimento desta fatura.';
+  if(ate>=inf.venc) return `O fechamento precisa ser antes do vencimento (${fmtDataBR(inf.venc)}).`;
+  if(seg.ate&&ate>=seg.ate) return `A fatura de ${seg.rotulo} fecha em ${fmtDataBR(seg.ate)}: escolha um dia antes disso.`;
+  return '';
+}
+function simularFechamento(c, mes, ano, ate){
+  const sim=JSON.parse(JSON.stringify(c));
+  sim.fechamentos={ ...(sim.fechamentos||{}), [chaveCompFat(mes,ano)]:{ ate, em:today() } };
+  return sim;
+}
+// Prévia: o que fica nesta fatura, para onde vão as próximas compras e o que muda de fatura
+function updFechPreview(){
+  const el=document.getElementById('ff-prev');
+  if(!el||!_ffAlvo) return;
+  const c=(gs().ccs||[]).find(x=>x.id===_ffAlvo.ccId);
+  if(!c) return;
+  const inf=infoFatura(c,_ffAlvo.mes,_ffAlvo.ano);
+  const ate=document.getElementById('ff-ate').value;
+  const erro=validarFechamento(c,inf,ate);
+  if(erro){ el.innerHTML=`<span style="color:var(--red)">⚠️ ${erro}</span>`; return; }
+  const sim=simularFechamento(c,inf.mes,inf.ano,ate);
+  const fica=parcelasDaFatura(sim,inf.mes,inf.ano);
+  const total=getFaturaMes(sim,inf.mes,inf.ano);
+  const seg=infoFatura(sim,inf.mes+1,inf.ano);
+  const absK=k=>k.ano*12+k.mes;
+  const muda=(c.gastos||[]).map(g=>({ g, de:competenciaGasto(g,c), para:competenciaGasto(g,sim) })).filter(x=>absK(x.de)!==absK(x.para));
+  el.innerHTML=`
+    <div>Ficam nesta fatura as compras feitas até <b>${fmtDataBR(ate)}</b>: <b style="color:var(--purple)">${fmtR(total)}</b> (${fica.length} ${fica.length===1?'item':'itens'}).</div>
+    <div>A partir de <b>${fmtDataBR(addDias(ate,1))}</b>, as compras vão para a fatura de <b>${seg.rotulo}</b> (vence ${fmtDataBR(seg.venc)}).</div>
+    <div>${ate<today()?'🔒 A fatura fica <b>fechada</b>.':`A fatura continua <b>aberta</b> até ${fmtDataBR(ate)}.`}</div>
+    ${muda.length?`<div class="ff-muda">↪ ${muda.length===1?'1 compra já lançada muda':muda.length+' compras já lançadas mudam'} de fatura:
+      <ul>${muda.slice(0,5).map(x=>`<li>${escHtml(x.g.desc||'Compra')} (${fmtDataBR(x.g.data)}, ${fmtR(x.g.val)}) → ${MESES[x.para.mes]}/${x.para.ano}</li>`).join('')}${muda.length>5?`<li>e mais ${muda.length-5}</li>`:''}</ul></div>`:''}`;
+}
+function salvarFechamento(){
+  if(!_ffAlvo) return;
+  const $=x=>document.getElementById(x);
+  const d=gs(); const c=(d.ccs||[]).find(x=>x.id===_ffAlvo.ccId);
+  if(!c) return;
+  const inf=infoFatura(c,_ffAlvo.mes,_ffAlvo.ano);
+  const ate=$('ff-ate').value;
+  const erro=validarFechamento(c,inf,ate);
+  const err=$('ff-err');
+  if(erro){ if(err){ err.textContent='⚠️ '+erro; err.style.display='block'; } return; }
+  c.fechamentos=c.fechamentos||{};
+  if(ate===dataFechAuto(c,inf.mes,inf.ano)) delete c.fechamentos[inf.chave];   // igual ao dia do cartão: volta ao automático
+  else c.fechamentos[inf.chave]={ ate, em:today() };
+  if(!Object.keys(c.fechamentos).length) delete c.fechamentos;
+  ss(d); closeM('m-fech-fat'); renderCartoes(); refreshAll();
+}
+// Desfaz o fechamento à mão: a fatura volta ao dia do cartão (ou fica aberta, se o cartão não tem dia)
+function reabrirFatura(ccId, mes, ano){
+  if(ccId==null){ if(!_ffAlvo) return; ({ ccId, mes, ano }=_ffAlvo); }
+  const d=gs(); const c=(d.ccs||[]).find(x=>x.id===ccId);
+  const inf=c&&infoFatura(c,mes,ano);
+  if(!inf||!inf.manual) return;
+  const auto=dataFechAuto(c,inf.mes,inf.ano);
+  if(!confirm(`Voltar a fatura de ${inf.rotulo} ao fechamento automático?\n\n${auto?`Ela passa a fechar no dia do cartão (${fmtDataBR(auto)}).`:'Ela volta a ficar aberta (o cartão não tem dia de fechamento).'} As compras voltam para a fatura certa pela data.`)) return;
+  delete c.fechamentos[inf.chave];
+  if(!Object.keys(c.fechamentos).length) delete c.fechamentos;
+  ss(d);
+  const m=document.getElementById('m-fech-fat'); if(m&&m.style.display!=='none') closeM('m-fech-fat');
+  renderCartoes(); refreshAll();
 }
 
 // ── Pagamento de fatura ──
