@@ -159,7 +159,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('painel: pagar e ver a fechada', r.botoesFechada, '✓ Pagar,👁 Ver compras');
   eq('cartão sem dia de fechamento', r.painelSemDia, 'Sem dia de fechamento: feche à mão quando o banco avisar · vence 15/10/2026 / Cadastre o dia de fechamento do cartão para saber o melhor dia de compra. / true');
   eq('cartão mostra a situação com ícone', r.visual, 'Out/26 · ⚠ Vencida');
-  eq('fatura detalhada: fechamento e botão', r.fatdet, 'Fecha em 03/11/2026 · Vence em 10/11/2026 · 3 item(ns) / 🔒 Fechar fatura');
+  eq('fatura detalhada: fechamento e botões', r.fatdet, 'Fecha em 03/11/2026 · Vence em 10/11/2026 · 3 item(ns) / + Adicionar compra🔒 Fechar fatura');
   eq('modal: fechar até ontem', r.modal, 'true|🔒 Fechar fatura|2026-10-26|Nubank · fatura de Novembro/2026 · vence 10/11/2026');
   eq('atalhos de data', r.atalhos, 'Até ontem (26/10),Até hoje (27/10),Dia do cartão (03/11)');
   eq('prévia: até ontem', r.prevOntem, 'Ficam nesta fatura as compras feitas até 26/10/2026: R$ 490,00 (3 itens). A partir de 27/10/2026, as compras vão para a fatura de Dezembro/2026 (vence 10/12/2026). 🔒 A fatura fica fechada.');

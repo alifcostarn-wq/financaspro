@@ -1025,6 +1025,9 @@ body.theme-light{--pg-conta:#eda100;--pg-cartao:#2a78d6;--pg-divida:#e87ba4}
 #page-contas .cp-item .n{color:var(--t3);font-family:'JetBrains Mono',monospace}
 #page-contas .cp-item .d{color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #page-contas .cp-item .d .badge{margin-left:6px}
+#page-contas .cp-itens.editavel .cp-item{grid-template-columns:78px minmax(0,1fr) 64px 96px 28px}
+#page-contas .cp-item-ed{border:1px solid var(--line2);background:var(--surface2);color:var(--t2);width:26px;height:24px;border-radius:6px;cursor:pointer;font-size:12px;line-height:1}
+#page-contas .cp-item-ed:hover{color:var(--t1);border-color:var(--blue);background:var(--blue-dim)}
 #page-contas tr.cp-est td{background:repeating-linear-gradient(135deg,transparent 0 10px,var(--surface2) 10px 11px)}
 #page-contas #cp-tbody td.cp-val,#page-contas #cp-tbody .badge{white-space:nowrap}
 td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle}
@@ -1054,6 +1057,17 @@ td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle
 .cc-ciclo-alerta span{display:inline-flex;align-items:center;gap:6px}
 .cc-man{display:inline-block;font:600 9px 'Sora',sans-serif;color:var(--amber);background:var(--amber-dim);border:1px solid var(--line2);border-radius:20px;padding:1px 6px;margin-left:4px;vertical-align:1px}
 .fatdet-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cc-fat-trava{font-size:11px;color:var(--t3)}
+.cc-fatdet-ed{cursor:pointer}
+.cc-fatdet-ed:hover td{background:var(--surface2)}
+.cc-fatdet-ed:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+td.cc-trava{width:44px;text-align:center;color:var(--t3)}
+.cc-fat-aviso{align-items:center;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--t2);background:var(--blue-dim);border:1px solid var(--line);border-radius:var(--r2);padding:8px 12px;margin-bottom:12px}
+.cc-fat-aviso b{color:var(--t1)}
+.cc-fat-aviso-x{margin-left:auto;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:12px}
+.g-edit-ctx{font-size:11px;color:var(--t3);margin-top:3px}
+.g-dest-nota.muda{color:var(--blue)}
+.g-excluir{margin-right:auto;color:var(--red) !important}
 .g-data-fat{font-size:10.5px;color:var(--purple);margin-top:5px;min-height:14px}
 .g-dest{border:1px solid var(--line2);border-radius:var(--r2);padding:12px 14px;background:var(--surface2);box-shadow:inset 3px 0 0 var(--purple);font-size:12px;color:var(--t2);line-height:1.55}
 .g-dest.st-fechada{box-shadow:inset 3px 0 0 var(--blue)}
@@ -1095,8 +1109,12 @@ td.cp-acoes{display:table-cell;width:44px;text-align:right;vertical-align:middle
   #page-contas .cp-tile-val{font-size:18px}
   #page-contas .cp-filtros{justify-content:flex-start;width:100%}
   #page-contas .cp-filtros select,#page-contas .cp-filtros input{flex:1 1 calc(50% - 4px);min-width:0;width:auto !important}
-  #page-contas .cp-item{grid-template-columns:60px minmax(0,1fr) 72px;gap:8px;padding:6px 10px}
-  #page-contas .cp-item .n{display:none}
+  /* a lista de compras acompanha a tela mesmo com a tabela rolando de lado: valor e ✎ ficam à vista */
+  #page-contas .tbl-wrap{container-type:inline-size}
+  #page-contas .cp-itens{position:sticky;left:12px;width:calc(100cqw - 24px)}
+  #page-contas .cp-item{grid-template-columns:48px minmax(0,1fr) 80px;gap:8px;padding:6px 10px}
+  #page-contas .cp-itens.editavel .cp-item{grid-template-columns:48px minmax(0,1fr) 80px 28px}
+  #page-contas .cp-item .n,#page-contas .cp-item .ano{display:none}
 }
 
 /* ── Central de Relatórios ── */
@@ -2571,8 +2589,9 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <div class="fatdet-acts" id="cc-fatdet-acts"></div>
           </div>
         </div>
+        <div class="cc-fat-aviso" id="cc-fatdet-aviso" role="status" style="display:none"></div>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Compra em</th><th>Descrição</th><th>Categoria</th><th>Parcela</th><th>Valor da Compra</th><th>Nesta Fatura</th></tr></thead>
+          <thead><tr><th>Compra em</th><th>Descrição</th><th>Categoria</th><th>Parcela</th><th>Valor da Compra</th><th>Nesta Fatura</th><th></th></tr></thead>
           <tbody id="cc-fatdet-tbody"></tbody>
           <tfoot id="cc-fatdet-tfoot"></tfoot>
         </table></div>
@@ -3632,7 +3651,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- Modal: Gasto no Cartão -->
 <div class="overlay" id="m-gasto" style="display:none" onclick="cmoOut(event,'m-gasto')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><h2 id="m-gasto-titulo">Registrar Gasto no Cartão</h2><button class="btn btn-ghost btn-xs" onclick="closeM('m-gasto')">✕</button></div>
+    <div class="modal-hd"><div><h2 id="m-gasto-titulo">Registrar Gasto no Cartão</h2><div class="g-edit-ctx" id="g-edit-ctx" style="display:none"></div></div><button class="btn btn-ghost btn-xs" onclick="closeM('m-gasto')">✕</button></div>
     <div class="modal-bd">
       <input type="hidden" id="g-edit-id">
       <div id="g-err" class="form-err" style="display:none"></div>
@@ -3659,6 +3678,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div id="g-preview" style="margin-top:12px" aria-live="polite"></div>
     </div>
     <div class="modal-ft">
+      <button class="btn btn-ghost g-excluir" id="g-excluir" style="display:none" onclick="excluirGastoDoModal()">✕ Excluir compra</button>
       <button class="btn btn-ghost" onclick="closeM('m-gasto')">Cancelar</button>
       <button class="btn btn-green" id="btn-salvar-gasto" onclick="saveGasto()">Registrar Gasto</button>
     </div>
@@ -11014,14 +11034,17 @@ function linhaFaturaPagar(x, busca){
     </tr>${aberta ? linhaItensFatura(x) : ''}`;
 }
 // Compras que compõem a fatura (abre e fecha pela própria linha)
+// Na fatura em aberto (não paga), cada compra tem ✎ para editar ali mesmo
 function linhaItensFatura(x){
-  return `<tr class="cp-itens-row"><td colspan="8"><div class="cp-itens">
-      <div class="cp-item cab"><span>Compra</span><span>Descrição</span><span class="n">Parcela</span><span class="v">Nesta fatura</span></div>
+  const ed = !!x.aberto;
+  return `<tr class="cp-itens-row"><td colspan="8"><div class="cp-itens${ed ? ' editavel' : ''}">
+      <div class="cp-item cab"><span>Compra</span><span>Descrição</span><span class="n">Parcela</span><span class="v">Nesta fatura</span>${ed ? '<span></span>' : ''}</div>
       ${x.itens.map(i => `<div class="cp-item">
-        <span class="mono" style="color:var(--t3)">${fmtDataBR(i.g.data)}</span>
+        <span class="mono" style="color:var(--t3)">${fmtDataBR(i.g.data).replace(/(\/\d{4})$/, '<span class="ano">$1</span>')}</span>
         <span class="d">${escHtml(i.g.desc || '—')}${i.g.refContaId ? '<span class="badge bdg-gray" style="font-size:8px">📄 conta a pagar</span>' : ''}</span>
         <span class="n">${i.total > 1 ? `${i.num}/${i.total}${i.num === i.total ? ' · última' : ''}` : 'à vista'}</span>
         <span class="v">${fmtR(i.valor)}</span>
+        ${ed ? `<button type="button" class="cp-item-ed" onclick="editGasto('${x.cc.id}','${i.g.id}')" title="${i.g.refContaId ? 'Editar conta a pagar' : 'Editar compra'}" aria-label="Editar ${escAttr(i.g.desc || 'compra')}">✎</button>` : ''}
       </div>`).join('')}
     </div></td></tr>`;
 }
@@ -12116,28 +12139,107 @@ function renderFaturaDetalhe(c, mes, anoCC){
   const inf=infoFatura(c,mes,anoCC);
   set('cc-fatdet-sub',`${textoFechInf(inf)} · Vence em ${fmtDataBR(inf.venc)} · ${parcelas.length} item(ns)`);
   const acts=document.getElementById('cc-fatdet-acts');
-  if(acts) acts.innerHTML=inf.paga?'':
-    `<button type="button" class="btn btn-ghost btn-xs" onclick="abrirFechamento('${c.id}',${mes},${anoCC})">${!inf.fechada&&!inf.manual&&inf.abs===cicloCartao(c).aberta.abs?'🔒 Fechar fatura':'📅 Ajustar fechamento'}</button>`
-    +(inf.manual?`<button type="button" class="btn btn-ghost btn-xs" onclick="reabrirFatura('${c.id}',${mes},${anoCC})">↺ Automático</button>`:'');
+  if(acts) acts.innerHTML=inf.paga
+    ? `<span class="cc-fat-trava">🔒 Para editar as compras, desfaça o pagamento</span>`
+      +(f?`<button type="button" class="btn btn-ghost btn-xs" onclick="desfazerPagFat('${c.id}','${f.id}')">↩ Desfazer pagamento</button>`:'')
+    : `<button type="button" class="btn btn-green btn-xs" onclick="novaCompraNaFatura('${c.id}',${mes},${anoCC})" title="Lançar uma compra nesta fatura">+ Adicionar compra</button>`
+      +`<button type="button" class="btn btn-ghost btn-xs" onclick="abrirFechamento('${c.id}',${mes},${anoCC})">${!inf.fechada&&!inf.manual&&inf.abs===cicloCartao(c).aberta.abs?'🔒 Fechar fatura':'📅 Ajustar fechamento'}</button>`
+      +(inf.manual?`<button type="button" class="btn btn-ghost btn-xs" onclick="reabrirFatura('${c.id}',${mes},${anoCC})">↺ Automático</button>`:'');
+  // aviso da última compra movida (com desfazer), na fatura de onde ela saiu ou para onde foi
+  const av=document.getElementById('cc-fatdet-aviso');
+  if(av){
+    const mv=_ccUltimaMov&&_ccUltimaMov.ccId===c.id&&(_ccUltimaMov.de===inf.chave||_ccUltimaMov.para===inf.chave)?_ccUltimaMov:null;
+    av.style.display=mv?'flex':'none';
+    const ini=mv?compDaChaveFat(mv.para).ano*12+compDaChaveFat(mv.para).mes:0, nome=mv?`“${escHtml(mv.desc||'Compra')}”`:'';
+    av.innerHTML=mv?`<span>↪ ${mv.n>1
+        ? `${nome} ${mv.volta?'voltou às faturas automáticas: de':'agora vai da fatura de'} <b>${rotuloAbs(ini)}</b> ${mv.volta?'até':'até a de'} <b>${rotuloAbs(ini+mv.n-1)}</b>.`
+        : `${nome} ${mv.volta?'voltou para a fatura automática':'foi para a fatura'} de <b>${rotuloAbs(ini)}</b>.`}</span>
+      <button type="button" class="btn btn-ghost btn-xs" onclick="desfazerMovCompra()">↩ Desfazer</button>
+      <button type="button" class="cc-fat-aviso-x" onclick="fecharAvisoMov()" aria-label="Fechar aviso">✕</button>`:'';
+  }
   set('cc-fatdet-total',fmtR(total));
   set('cc-fatdet-pago',f?`${fmtR(f.valor)} em ${fmtDataBR(f.dataPg)}`:'—');
   const bdg=document.getElementById('cc-fatdet-st');
   if(bdg){ bdg.className='badge '+(BDG_ST_FAT[st]||'bdg-gray'); bdg.textContent=ROT_ST_FAT[st]||st; }
   if(!tb) return;
-  tb.innerHTML=parcelas.length?parcelas.map(p=>`<tr>
-      <td class="mono" style="color:var(--t3)">${fmtDataBR(p.g.data)}</td>
-      <td style="color:var(--t1)">${p.g.desc}${p.g.refContaId?' <span class="badge bdg-gray" style="font-size:8px" title="Lançada em Contas a Pagar">📄 Conta a pagar</span>':''}</td>
-      <td><span class="cat-tag" style="font-size:9px">${p.g.cat||'—'}</span></td>
+  // fatura em aberto (não paga): cada compra pode ser editada, passada para a próxima fatura ou excluída
+  // (na parcelada, todas as parcelas andam juntas)
+  const editavel=!inf.paga;
+  tb.innerHTML=parcelas.length?parcelas.map(p=>{
+    const g=p.g, espelho=!!g.refContaId;
+    const auto=competenciaGasto({data:g.data},c), k=competenciaGasto(g,c), nP=Math.max(1,parseInt(g.parc)||1);
+    const faixa=a=>nP>1?`${rotuloAbs(a,true)} a ${rotuloAbs(a+nP-1,true)}`:rotuloAbs(a,true);
+    const acoes=editavel?acoesPagar(g.desc,[
+      { r:espelho?'✎ Editar conta a pagar':'✎ Editar compra', f:`editGasto('${c.id}','${g.id}')` },
+      espelho?null:{ r:`${nP>1?'↪ Adiar as parcelas um mês':'↪ Passar para a próxima fatura'} (${faixa(k.ano*12+k.mes+1)})`, f:`moverCompraFatura('${c.id}','${g.id}',1)` },
+      !espelho&&g.fatura?{ r:`${nP>1?'↺ Voltar às faturas automáticas':'↺ Voltar para a fatura automática'} (${faixa(auto.ano*12+auto.mes)})`, f:`moverCompraFatura('${c.id}','${g.id}','auto')` }:null,
+      { r:espelho?'✕ Excluir conta a pagar':'✕ Excluir compra', f:`delGasto('${c.id}','${g.id}')`, c:'btn-red' } ])
+      :'<td class="cc-trava" title="Fatura paga: desfaça o pagamento para editar">🔒</td>';
+    return `<tr${editavel?` class="cc-fatdet-ed" tabindex="0" title="Clique para editar" onclick="if(!event.target.closest('.cp-acoes')) editGasto('${c.id}','${g.id}')" onkeydown="if(event.key==='Enter'&&event.target===this) editGasto('${c.id}','${g.id}')"`:''}>
+      <td class="mono" style="color:var(--t3)">${fmtDataBR(g.data)}</td>
+      <td style="color:var(--t1)">${escHtml(g.desc||'—')}${espelho?' <span class="badge bdg-gray" style="font-size:8px" title="Lançada em Contas a Pagar">📄 Conta a pagar</span>':''}${g.fatura?' <span class="cc-man" title="Fatura escolhida à mão">à mão</span>':''}</td>
+      <td><span class="cat-tag" style="font-size:9px">${escHtml(g.cat||'—')}</span></td>
       <td style="color:var(--t3)">${p.total>1?`${p.num}/${p.total}`:'À vista'}</td>
-      <td class="mono" style="color:var(--t3)">${fmtR(p.g.val)}</td>
+      <td class="mono" style="color:var(--t3)">${fmtR(g.val)}</td>
       <td class="mono" style="color:var(--purple)">${fmtR(p.valor)}</td>
-    </tr>`).join('')
-   :`<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhuma compra nesta fatura.</td></tr>`;
+      ${acoes}
+    </tr>`;}).join('')
+   :`<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px">Nenhuma compra nesta fatura.${editavel?` <a href="#" onclick="event.preventDefault();novaCompraNaFatura('${c.id}',${mes},${anoCC})">Adicionar compra</a>`:''}</td></tr>`;
   const tf=document.getElementById('cc-fatdet-tfoot');
   if(tf) tf.innerHTML=parcelas.length?`<tr>
       <td colspan="5" style="text-align:right;color:var(--t2);font-weight:600">Total da fatura</td>
       <td class="mono" style="color:var(--purple);font-weight:700">${fmtR(total)}</td>
+      <td></td>
     </tr>`:'';
+}
+
+// Passa a compra para a fatura seguinte (na parcelada, todas as parcelas andam um mês) ou volta à automática
+let _ccUltimaMov=null;   // { ccId, gId, antes, desc, n, de, para, volta }
+function moverCompraFatura(ccId, gId, passo){
+  const d=gs(); const c=(d.ccs||[]).find(x=>x.id===ccId);
+  const g=c&&(c.gastos||[]).find(x=>x.id===gId);
+  if(!g||g.refContaId) return;            // conta no cartão segue o vencimento da conta
+  const auto=competenciaGasto({data:g.data},c), atual=competenciaGasto(g,c);
+  const alvoAbs=passo==='auto'?auto.ano*12+auto.mes:atual.ano*12+atual.mes+(parseInt(passo)||0);
+  const chave=chaveCompFat(alvoAbs%12,Math.floor(alvoAbs/12));
+  const antes=g.fatura||'';
+  if(chave===chaveCompFat(auto.mes,auto.ano)) delete g.fatura; else g.fatura=chave;
+  _ccUltimaMov={ ccId, gId, antes, desc:g.desc, n:Math.max(1,parseInt(g.parc)||1), de:chaveCompFat(ccMes(),ccAno()), para:chave, volta:passo==='auto' };
+  ss(d); renderCartoes(); refreshAll();
+}
+function desfazerMovCompra(){
+  const mv=_ccUltimaMov; _ccUltimaMov=null;
+  if(!mv) return;
+  const d=gs(); const c=(d.ccs||[]).find(x=>x.id===mv.ccId);
+  const g=c&&(c.gastos||[]).find(x=>x.id===mv.gId);
+  if(g){ if(mv.antes) g.fatura=mv.antes; else delete g.fatura; ss(d); }
+  renderCartoes(); refreshAll();
+}
+function fecharAvisoMov(){ _ccUltimaMov=null; const av=document.getElementById('cc-fatdet-aviso'); if(av) av.style.display='none'; }
+// Nova compra já apontada para uma fatura (a automática pela data, se for a mesma)
+function novaCompraNaFatura(ccId, mes, ano){
+  const c=(gs().ccs||[]).find(x=>x.id===ccId);
+  if(!c) return;
+  _ccSel=ccId;
+  openM('m-gasto');
+  const inf=infoFatura(c,mes,ano), auto=competenciaGasto({data:today()},c);
+  _gFatura=inf.chave===chaveCompFat(auto.mes,auto.ano)?'':inf.chave;
+  set('m-gasto-titulo',`Nova compra · fatura de ${inf.rotulo}`);
+  updGastoPreview();
+}
+// Faturas já pagas entre as parcelas de uma compra (do mês absoluto `ini`, `n` parcelas)
+function faturasPagasNoIntervalo(c, ini, n){
+  const out=[];
+  for(let i=0;i<n;i++){ const inf=infoFatura(c,ini+i,0); if(inf.paga) out.push(inf); }
+  return out;
+}
+function excluirGastoDoModal(){
+  const id=document.getElementById('g-edit-id')?.value;
+  if(!id||!_ccSel) return;
+  const qtd=()=>((gs().ccs||[]).find(x=>x.id===_ccSel)?.gastos||[]).length;
+  const antes=qtd();
+  delGasto(_ccSel,id);
+  if(qtd()<antes) closeM('m-gasto');
 }
 
 function renderTabelaGastos(c){
@@ -12184,9 +12286,12 @@ function tglCC(v,el){
 
 // ── Gasto no cartão ──
 let _gFatura='';   // fatura escolhida à mão no modal de compra ('' = automática, pela data)
+let _gOrig=null;  // na edição: { abs (1ª fatura de hoje), n, pagas } — de onde a compra sai
 function resetModalGasto(){
   const $=x=>document.getElementById(x);
-  _gFatura='';
+  _gFatura=''; _gOrig=null;
+  const ctxE=$('g-edit-ctx'); if(ctxE){ ctxE.style.display='none'; ctxE.textContent=''; }
+  const exE=$('g-excluir'); if(exE) exE.style.display='none';
   if($('g-edit-id')) $('g-edit-id').value='';
   if($('m-gasto-titulo')) $('m-gasto-titulo').textContent='Registrar Gasto no Cartão';
   if($('btn-salvar-gasto')) $('btn-salvar-gasto').textContent='Registrar Gasto';
@@ -12246,18 +12351,28 @@ function updGastoPreview(){
   }
   const est=dst.inf.paga?'paga':dst.inf.fechada?'fechada':'aberta';
   if(dica) dica.textContent=`💳 fatura de ${dst.inf.curto} · ${est}`;
-  el.innerHTML=htmlDestinoCompra(dst,val);
+  // na edição: para onde a compra vai e se ela mexe em fatura já paga
+  const extras=[];
+  if(editId&&_gOrig){
+    if(dst.inf.abs!==_gOrig.abs) extras.push(`<div class="g-dest-nota muda">↪ Ao salvar, a compra sai da fatura de ${rotuloAbs(_gOrig.abs)} e vai para a de ${dst.inf.rotulo}.</div>`);
+    if(_gOrig.pagas.length) extras.push(`<div class="g-dest-nota aviso">⚠️ Esta compra tem parcela em fatura já paga (${_gOrig.pagas.join(', ')}): mudar valor, data ou parcelas também muda o que aparece nela — o pagamento registrado continua o mesmo.</div>`);
+  }
+  const outrasPagas=faturasPagasNoIntervalo(c,dst.inf.abs+1,dst.n-1).map(i=>i.curto);   // a 1ª já tem aviso próprio
+  if(outrasPagas.length&&!(editId&&_gOrig&&_gOrig.pagas.length)) extras.push(`<div class="g-dest-nota aviso">⚠️ Há parcelas em fatura já paga: ${outrasPagas.join(', ')}.</div>`);
+  // a compra já está nessa fatura paga: o aviso da edição já diz isso
+  el.innerHTML=htmlDestinoCompra(dst,val,extras,!!(editId&&_gOrig&&_gOrig.pagas.includes(dst.inf.curto)));
   if(btn&&!editId) btn.textContent=`Registrar na fatura de ${dst.inf.curto}`;
 }
-function htmlDestinoCompra(dst,val){
+function htmlDestinoCompra(dst,val,extras,jaNaPaga){
   const { inf, ult, n, anterior, manual, livre }=dst;
   const est=inf.paga?['paga','✓ paga','bdg-green']:inf.fechada?['fechada','🔒 fechada','bdg-blue']:['aberta','aberta','bdg-purple'];
   const vals=val>0?dividirParcelas(val,n):null;
   const notas=[];
   if(manual) notas.push(`<div class="g-dest-nota">✋ Fatura escolhida à mão — pela data, a compra iria para a de ${dst.auto.rotulo}.</div>`);
   else if(anterior.ate) notas.push(`<div class="g-dest-nota">ℹ️ A fatura de ${anterior.rotulo} ${anterior.fechada?'já fechou':'fecha'} em ${fmtDataBR(anterior.ate)}: compras depois disso entram na de ${inf.rotulo}.</div>`);
-  if(inf.paga) notas.push(`<div class="g-dest-nota aviso">⚠️ Esta fatura já foi paga (${fmtR(+inf.pg.valor||0)} em ${fmtDataBR(inf.pg.dataPg)}): a compra entra nela, mas o pagamento registrado continua o mesmo.</div>`);
+  if(inf.paga){ if(!jaNaPaga) notas.push(`<div class="g-dest-nota aviso">⚠️ Esta fatura já foi paga (${fmtR(+inf.pg.valor||0)} em ${fmtDataBR(inf.pg.dataPg)}): a compra entra nela, mas o pagamento registrado continua o mesmo.</div>`); }
   else if(inf.fechada) notas.push(`<div class="g-dest-nota aviso">🔒 Esta fatura já está fechada${manual?'':': a compra foi feita até o dia do fechamento, por isso entra nela'}.</div>`);
+  if(extras&&extras.length) notas.push(...extras);
   if(vals){
     const depois=+(livre-val).toFixed(2);
     notas.push(`<div class="g-dest-lim${depois<0?' estoura':''}">Limite livre depois desta compra: <b>${fmtR(depois)}</b>${depois<0?' — passa do limite do cartão':''}</div>`);
@@ -12281,7 +12396,7 @@ function editGasto(ccId,gId){
   openM('m-gasto');
   const $=x=>document.getElementById(x);
   $('g-edit-id').value=g.id;
-  $('m-gasto-titulo').textContent='Editar Gasto do Cartão';
+  $('m-gasto-titulo').textContent='Editar compra';
   $('btn-salvar-gasto').textContent='Salvar Alterações';
   $('g-data').value=g.data||today();
   $('g-val').value=g.val||'';
@@ -12292,6 +12407,13 @@ function editGasto(ccId,gId){
   if(g.subcat) $('g-subcat').value=g.subcat;
   $('g-parc').value=String(Math.max(1,parseInt(g.parc)||1));
   _gFatura=g.fatura||'';
+  // de onde a compra sai: a fatura (ou as faturas das parcelas) em que ela está hoje
+  const k=competenciaGasto(g,c), nP=Math.max(1,parseInt(g.parc)||1), ini=k.ano*12+k.mes;
+  _gOrig={ abs:ini, n:nP, pagas:faturasPagasNoIntervalo(c,ini,nP).map(i=>i.curto) };
+  const ctxE=$('g-edit-ctx');
+  if(ctxE){ ctxE.style.display='block';
+    ctxE.textContent=nP>1?`Hoje: ${nP}x, da fatura de ${rotuloAbs(ini)} até a de ${rotuloAbs(ini+nP-1)}`:`Hoje na fatura de ${rotuloAbs(ini)}`; }
+  const exE=$('g-excluir'); if(exE) exE.style.display='';
   updGastoPreview();
 }
 function saveGasto(){

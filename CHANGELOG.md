@@ -4,6 +4,71 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Cartões: editar as compras dentro das faturas em aberto
+
+### 🎯 O que foi pedido
+
+Criar a opção de **editar as compras dentro das faturas em aberto**.
+
+### 🐛 O que limitava
+
+- A **Fatura Detalhada** só listava as compras: para corrigir uma, era preciso ir na aba Compras e achá-la
+  na lista do ano.
+- Não havia como passar uma compra para a fatura seguinte sem abrir a edição e escolher a fatura à mão.
+- Ao editar, o formulário não dizia em que fatura a compra estava, nem avisava que ela ia mudar de fatura
+  ou que mexia numa fatura já paga.
+- Em **Contas a Pagar**, a lista de compras da fatura era só leitura. No celular, essa lista ficava mais
+  larga que a tela: o valor sumia à direita e a data invadia a descrição.
+
+### ✨ Implementado
+
+- **Fatura Detalhada (Cartões)** — em toda fatura **ainda não paga** (aberta, fechada ou vencida):
+  - **clique (ou Enter) numa compra** para editar;
+  - **menu ⋯** em cada compra:
+    - ✎ **Editar compra**;
+    - ↪ **Passar para a próxima fatura (Dez/26)** — na compra parcelada, **Adiar as parcelas um mês**,
+      mostrando o novo intervalo (ex.: "Nov/26 a Jan/27");
+    - ↺ **Voltar para a fatura automática** (quando a fatura foi escolhida à mão);
+    - ✕ **Excluir compra** (com confirmação);
+  - depois de mover, um aviso diz para onde a compra foi, com **↩ Desfazer**;
+  - compra com fatura escolhida à mão aparece marcada **"à mão"**;
+  - botão **+ Adicionar compra**, já apontado para aquela fatura (inclusive faturas futuras);
+  - conta a pagar lançada no cartão: Editar e Excluir abrem a própria conta. Ela segue o vencimento da
+    conta, por isso não tem "passar para a próxima".
+- **Fatura paga fica travada** na Fatura Detalhada: 🔒 em cada compra e o aviso "Para editar as compras,
+  desfaça o pagamento", com **↩ Desfazer pagamento** ali mesmo.
+- **Formulário de edição da compra:**
+  - título **"Editar compra"** e, embaixo, onde ela está hoje ("Hoje na fatura de Novembro/2026" ou
+    "Hoje: 3x, da fatura de Outubro/2026 até a de Dezembro/2026");
+  - ao mudar data, parcelas ou fatura: **"↪ Ao salvar, a compra sai da fatura de Novembro/2026 e vai para
+    a de Dezembro/2026"**;
+  - aviso quando a compra tem parcela em fatura já paga (o pagamento registrado não muda) — um aviso só,
+    sem repetir o da fatura paga;
+  - botão **✕ Excluir compra** no próprio formulário.
+- **Contas a Pagar:** na lista de compras de uma fatura em aberto, cada compra ganhou **✎** para editar
+  ali mesmo (fatura paga continua só leitura). No celular, a lista agora cabe na tela e acompanha a
+  rolagem lateral da tabela — valor e ✎ sempre à vista, data curta (dd/mm).
+
+### 🧪 Testes
+
+- **`test-editar-compras.js` — 34 verificações:** compras editáveis e menu na fatura aberta; clique e
+  Enter abrem a edição; salvar atualiza o total e continua na fatura; mudar a data avisa a troca de
+  fatura; passar para a próxima, desfazer e voltar à automática (à vista e parcelada); avisos de fatura
+  paga sem repetição; fatura paga travada e desfazer pagamento; excluir pelo menu e pelo formulário;
+  adicionar compra na fatura aberta e numa futura; conta a pagar no cartão; ✎ em Contas a Pagar;
+  celular (tabela, formulário e lista de compras com a tabela rolada de lado); sem erros de JS.
+- `test-fatura-fechada.js` atualizado: o cabeçalho da fatura agora tem "+ Adicionar compra".
+- **381 verificações** passando em 10 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum dado muda sozinho. Passar uma compra para outra fatura grava só a fatura escolhida na própria
+compra — o mesmo campo `fatura` de "Lançar na fatura" — e voltar ao automático apaga esse campo. A trava
+de fatura paga vale na Fatura Detalhada; pela aba Compras a edição continua como antes, agora com o aviso
+de parcela em fatura já paga.
+
+---
+
 ## [2026-10-27] Cartões: fatura fechada (informação e opção de fechar) e para qual fatura vai cada compra
 
 ### 🎯 O que foi pedido
