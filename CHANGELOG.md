@@ -4,6 +4,52 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-27] Efeito ao clicar no botão de lançamento e ao abrir o Novo Lançamento
+
+### 🎯 O que foi pedido
+
+Adicionar um **efeito ao clicar no botão** flutuante e **ao abrir o modal de lançamento**.
+
+### ✨ Implementado
+
+- **Ao apertar o botão ＋:** uma **onda de luz** sai do ponto do toque (pelo teclado, do centro) e o
+  **＋ dá um giro**.
+- **O modal "nasce" do botão:** o Novo Lançamento cresce a partir do botão até o centro da tela — começa
+  redondo e do tamanho do botão, como se o botão virasse o formulário — enquanto o fundo escurece. Em
+  seguida o título, cada linha de campos e os botões **entram em cascata**, de cima para baixo.
+- **O botão some enquanto o modal está aberto** e **volta com um pequeno "pop"** ao fechar (por Cancelar,
+  ✕, Salvar ou clique fora).
+- O mesmo crescimento vale para os outros botões de lançamento: **"+ Novo Lançamento"** (Lançamentos),
+  **"+ Lançamento"** (Dashboard), o **＋ do topo no celular** e o atalho "Novo lançamento →" do painel
+  *O que fazer agora* — o modal cresce a partir do botão clicado.
+- Rápido (menos de meio segundo) e só visual: o formulário já pode ser usado desde o primeiro instante.
+  Com **"reduzir movimento"** ligado no aparelho, não há onda nem crescimento — o modal só aparece.
+
+### 🐛 Corrigido
+
+- **Clique duplo** no botão de lançamento abria e fechava o modal na hora (o 2º clique caía no fundo
+  escuro, que fecha o modal). Agora o clique fora só fecha depois de 0,4 s da abertura — vale para todos
+  os modais.
+- Dois trechos antigos que "embrulham" a função de abrir modais passavam adiante só o primeiro dado;
+  agora repassam todos (era o que impedia o modal de saber de qual botão ele veio).
+- A calculadora 🧮 aberta durante a animação ficaria fora do lugar: agora a animação termina na hora e a
+  calculadora aparece junto do campo, como sempre.
+
+### 🧪 Testes
+
+- **`test-botao-lancamento.js` — 33 verificações** (11 novas): onda, giro e botão escondido ao clicar;
+  modal crescendo a partir do botão (canto inferior direito) e do "+ Novo Lançamento" do topo; aberto sem
+  botão, sobe do centro; campos em cascata; no fim, modal no centro e nada animando; botão volta ao
+  fechar; onda do centro pelo teclado; clique duplo (rápido e lento); calculadora no lugar certo durante o
+  efeito; "reduzir movimento".
+- **414 verificações** passando em 11 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+Nenhum: muda só a tela.
+
+---
+
 ## [2026-10-27] Botão flutuante "Novo lançamento" em todo o sistema
 
 ### 🎯 O que foi pedido

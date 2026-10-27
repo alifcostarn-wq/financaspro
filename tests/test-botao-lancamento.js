@@ -73,6 +73,51 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
     $('l-desc').value = 'Mercado'; $('l-valor').value = '80'; $('l-caixa').value = 'bk'; saveLanc(); });
   eq('salvar cria outro e não mexe no editado', await p.evaluate(() => gs().lancs.map(l => `${l.tipo}:${l.desc}:${l.valor}`).sort().join(',')), 'Despesa:Mercado:80,Receita:Salário:5000');
 
+  // ── efeito ao clicar e ao abrir ──
+  const animModal = () => { const a = document.querySelector('#m-lanc .modal').getAnimations().find(x => x.effect.getKeyframes()[0].transform);
+    return a ? a.effect.getKeyframes()[0].transform : ''; };
+  await p.evaluate(() => go('lanc', document.querySelector('.nav-btn[onclick*="\'lanc\'"]')));
+  await p.waitForTimeout(750);   // sem onda de cliques anteriores
+  await p.click('#fab-lanc');
+  eq('clique: onda de luz, o + gira e o botão some', await p.evaluate(() => { const f = document.getElementById('fab-lanc');
+    return [f.querySelectorAll('.fab-onda').length, f.querySelector('svg').getAnimations().length, f.classList.contains('fab-aberto')].join('|'); }), '1|1|true');
+  eq('o modal cresce a partir do botão (canto inferior direito, começando do tamanho dele)', await p.evaluate(animModal => {
+    const t = eval(animModal)(), m = /translate\((-?\d+)px, (-?\d+)px\) scale\(([\d.]+)\)/.exec(t) || [];
+    return [+m[1] > 300, +m[2] > 200, +m[3] > 0 && +m[3] < .15].join('|'); }, animModal.toString()), 'true|true|true');
+  eq('os campos entram em cascata', await p.evaluate(() => [...document.querySelectorAll('#m-lanc .modal-bd > .form-grid')]
+    .map(e => e.getAnimations()[0]?.effect.getTiming().delay).join(',')), '150,190,230,270,310');
+  await p.mouse.move(400, 300); await p.waitForTimeout(800);
+  eq('no fim: modal no centro, nada animando, onda removida', await p.evaluate(() => { const ov = document.getElementById('m-lanc'), r = ov.querySelector('.modal').getBoundingClientRect();
+    return [Math.abs(r.left + r.width / 2 - document.documentElement.clientWidth / 2) <= 1, ov.getAnimations({ subtree:true }).length, document.querySelectorAll('.fab-onda').length].join('|'); }), 'true|0|0');
+  await p.evaluate(() => closeM('m-lanc'));
+  const voltando = await p.evaluate(() => document.getElementById('fab-lanc').classList.contains('fab-aberto'));
+  await p.waitForTimeout(450);
+  eq('fechou: o botão volta', voltando + '|' + await p.evaluate(() => { const f = document.getElementById('fab-lanc'); return getComputedStyle(f).opacity + '|' + Math.round(f.getBoundingClientRect().width); }), 'false|1|56');
+  // pelos outros botões de lançamento, o modal cresce a partir deles
+  await p.click('#page-lanc .topbar-right .btn-green');
+  eq('pelo "+ Novo Lançamento" do topo: cresce a partir dele (em cima, à direita)', await p.evaluate(animModal => {
+    const m = /translate\((-?\d+)px, (-?\d+)px\)/.exec(eval(animModal)()) || []; return [+m[1] > 300, +m[2] < -200].join('|'); }, animModal.toString()), 'true|true');
+  await p.evaluate(() => closeM('m-lanc'));
+  eq('aberto sem botão: sobe do centro', await p.evaluate(animModal => { openM('m-lanc'); const t = eval(animModal)(); closeM('m-lanc'); return t.startsWith('translateY(16px)'); }, animModal.toString()), true);
+  // clique duplo (rápido ou lento) não abre e fecha na hora; clicar fora depois continua fechando
+  const fabPos = await p.evaluate(() => { const r = document.getElementById('fab-lanc').getBoundingClientRect(); return { x:r.left + r.width / 2, y:r.top + r.height / 2 }; });
+  await p.mouse.move(fabPos.x, fabPos.y); await p.waitForTimeout(400);
+  await p.mouse.dblclick(fabPos.x, fabPos.y); await p.waitForTimeout(100);
+  const dbl1 = await p.evaluate(() => getComputedStyle(document.getElementById('m-lanc')).display);
+  await p.evaluate(() => closeM('m-lanc')); await p.mouse.move(400, 300); await p.waitForTimeout(500);
+  await p.mouse.click(fabPos.x, fabPos.y); await p.waitForTimeout(220); await p.mouse.click(fabPos.x, fabPos.y); await p.waitForTimeout(100);
+  const dbl2 = await p.evaluate(() => getComputedStyle(document.getElementById('m-lanc')).display);
+  await p.waitForTimeout(400); await p.mouse.click(fabPos.x, fabPos.y); await p.waitForTimeout(100);
+  eq('clique duplo não fecha o modal na hora; clicar fora depois fecha', [dbl1, dbl2, await p.evaluate(() => getComputedStyle(document.getElementById('m-lanc')).display)].join('|'), 'flex|flex|none');
+  await p.mouse.move(400, 300); await p.waitForTimeout(450);
+  // a calculadora aberta no meio do efeito fica no mesmo lugar de quando ele acaba
+  const calcNoMeio = await p.evaluate(() => { openM('m-lanc', document.getElementById('fab-lanc')); abrirCalc('l-valor');
+    const c = document.getElementById('calc-pop'); return [document.querySelector('#m-lanc .modal').getAnimations().length, c.style.left, c.style.top].join('|'); });
+  await p.waitForTimeout(700);
+  eq('calculadora aberta durante o efeito: no lugar certo', calcNoMeio, await p.evaluate(() => { posicionarCalc(); const c = document.getElementById('calc-pop');
+    const r = ['0', c.style.left, c.style.top].join('|'); fecharCalc(); closeM('m-lanc'); return r; }));
+  await p.waitForTimeout(400);
+
   // teclado: com a tela recém-aberta, o 1º Tab já chega ao botão (mostra o nome) e Enter abre
   await p.reload({ waitUntil:'load' }); await p.waitForTimeout(400);
   await p.mouse.move(400, 300);
@@ -82,6 +127,8 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('teclado: o 1º Tab chega ao botão e mostra o nome', `${foco}|${tabs}|` + await p.evaluate(() => getComputedStyle(document.querySelector('#fab-lanc .fab-txt')).opacity), 'fab-lanc|1|1');
   await p.keyboard.press('Enter');
   eq('teclado: Enter abre o Novo Lançamento', (await form(p)).split('|').slice(0, 2).join('|'), 'flex|Novo Lançamento');
+  eq('teclado: a onda sai do centro do botão', await p.evaluate(() => { const f = document.getElementById('fab-lanc'), o = f.querySelector('.fab-onda'), r = f.getBoundingClientRect(), d = parseFloat(o.style.width);
+    return [Math.abs(parseFloat(o.style.left) + d / 2 - r.width / 2) <= 1, Math.abs(parseFloat(o.style.top) + d / 2 - r.height / 2) <= 1].join('|'); }), 'true|true');
   await p.evaluate(() => closeM('m-lanc'));
 
   // impressão: o botão não sai no papel
@@ -89,7 +136,8 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('não aparece na impressão', await p.evaluate(() => getComputedStyle(document.getElementById('fab-lanc')).display), 'none');
   await p.emulateMedia({ media:'screen' });
   // tema claro: mesmo lugar
-  await p.evaluate(() => { if(!document.body.classList.contains('theme-light')) toggleTheme(); });
+  await p.evaluate(() => { document.activeElement && document.activeElement.blur(); if(!document.body.classList.contains('theme-light')) toggleTheme(); });
+  await p.waitForTimeout(350);
   eq('tema claro: mesmo lugar e tamanho', (await posicoes(p)).split(' ').filter(x => x.startsWith('lanc:')).join(''), 'lanc:28,28,56x56,true');
 
   // ── celular (toque) ──
@@ -106,6 +154,13 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   await m.evaluate(() => closeM('m-lanc')); await m.waitForTimeout(350);
   eq('celular: depois do toque o botão continua só com o +', await m.evaluate(() => Math.round(document.getElementById('fab-lanc').getBoundingClientRect().width)), 52);
   eq('celular: sem rolagem lateral', await m.evaluate(() => document.documentElement.scrollWidth), 390);
+
+  // "reduzir movimento" ligado no aparelho: sem onda e sem crescer, o modal só aparece
+  const rm = await novaPagina({ viewport:{ width:1366, height:900 }, reducedMotion:'reduce' });
+  await rm.click('#fab-lanc');
+  eq('"reduzir movimento": sem onda nem crescimento', await rm.evaluate(() => [document.querySelectorAll('.fab-onda').length,
+    document.querySelector('#m-lanc .modal').getAnimations().length, document.getElementById('m-lanc').getAnimations().length,
+    getComputedStyle(document.getElementById('m-lanc')).display].join('|')), '0|0|1|flex');
 
   eq('sem erros de JS', errs.join(' ; '), '');
   let ok=0; T.forEach(t=>{ if(t.ok) ok++; console.log((t.ok?'✓ ':'✗ ')+t.n+(t.ok?'':`  → obtido: ${t.g} | esperado: ${t.e}`)); });
