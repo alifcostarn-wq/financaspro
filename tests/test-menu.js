@@ -98,7 +98,7 @@ const estado = p => p.evaluate(() => {
   eq('Enter navega', r.enterNavega, 'orc|true');
   eq('Sair dentro do menu', r.sair, 'true|true|true');
   eq('expandir: salva e mostra nomes', r.expandiu, 'false|aberto|true');
-  eq('nomes de todos os itens', r.labels, 'Dashboard,Relatórios,Lançamentos,Orçamento,Contas a Pagar,Dívidas,Cartões de Crédito,Contas Bancárias,Kanban,Configurações,Sair');
+  eq('nomes de todos os itens', r.labels, 'Dashboard,Relatórios,Lançamentos,Orçamento,Contas a Pagar,Dívidas,Cartões de Crédito,Contas Bancárias,Investimentos,Kanban,Configurações,Sair');
   // largura ganha
   await p.evaluate(() => alternarMenu()); await p.waitForTimeout(300);
   eq('recolhido: conteúdo ganha 172px', await estado(p), 'true|68|68');

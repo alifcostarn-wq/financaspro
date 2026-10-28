@@ -69,6 +69,7 @@
   /* séries de gráfico validadas para daltonismo (orçado · realizado · pendente) */
   --viz-prev:#3987e5; --viz-real:#d95926; --viz-pend:#199e70;
   --viz-rec:#16ad69; --viz-des:#b8344d;   /* receitas × despesas: validadas (faixa de luz, daltonismo, contraste) */
+  --viz-aplic:#3987e5; --viz-juros:#16ad69; /* investimentos: dinheiro aplicado × juros (validadas, idem) */
 }
 
 /* ── LIGHT THEME ── */
@@ -77,6 +78,7 @@ body.theme-light{
   --marca-b:#0891b2;
   --viz-prev:#2a78d6; --viz-real:#eb6834; --viz-pend:#1baf7a;
   --viz-rec:#1b9c5b; --viz-des:#a3263d;
+  --viz-aplic:#2a78d6; --viz-juros:#1b9c5b;
   --bg:#f0f4f8;
   --surface0:#ffffff;
   --surface1:#f7f9fc;
@@ -844,23 +846,146 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .inv-rev-de s{color:var(--t3)}
 .inv-rev-de em{font-style:normal;font-weight:700;color:var(--blue)}
 .inv-rev-v{font:600 12px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap}
-.cart-tot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.cart-tot div{background:var(--surface2);border-radius:var(--r2);padding:10px 12px}
-.cart-tot small{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
-.cart-tot b{font:700 15px 'JetBrains Mono',monospace;color:var(--t1)}
-.cart-l{display:grid;grid-template-columns:minmax(0,1fr) 100px 100px 110px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--t2)}
-.cart-l.cab{border-top:none;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
-.cart-l .mono{text-align:right;white-space:nowrap}
-.cart-l .saldo{color:var(--t1);font-weight:700}
-.cart-l small{display:block;font-size:10.5px;color:var(--t3)}
-.cart-sub{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px}
 @media (max-width:768px){
   .inv-rev-l{grid-template-columns:22px minmax(0,1fr) auto;row-gap:2px}
   .inv-rev-l .inv-rev-data{display:none}
   .inv-rev-l .inv-rev-de{grid-column:2 / 3}
-  .cart-l{grid-template-columns:minmax(0,1fr) 92px}
-  .cart-l .ap,.cart-l .rs{display:none}
-  .cart-tot{grid-template-columns:1fr}
+}
+/* ── Aba Investimentos ── */
+.inv-kpis{margin-bottom:16px}
+.inv-ctrl{flex-wrap:wrap}
+.inv-avisos:empty{display:none}
+.inv-aviso{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface1);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:var(--r2);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--t2)}
+.inv-aviso.info{border-left-color:var(--blue)}
+.inv-aviso b{color:var(--t1)}
+.inv-aviso > span{flex:1 1 260px}
+.inv-avisos{margin-bottom:6px}
+.inv-card{margin-bottom:16px}
+.inv-hd-dir{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.inv-sel{background:var(--surface2);border:1px solid var(--line2);color:var(--t1);border-radius:var(--r3);padding:4px 8px;font:600 11px 'Sora',sans-serif}
+.dash-leg .lg-rendeu,.dash-leg .lg-juros{background:var(--viz-juros)}
+.dash-leg .lg-arender{background:color-mix(in srgb,var(--viz-juros) 35%,transparent)}
+.dash-leg .lg-aplic{background:var(--viz-aplic)}
+/* lista de aplicações: uma linha por aplicação, clicável */
+.ia-l{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.05fr) 112px 124px 124px 96px 110px;grid-template-areas:"nome taxa ap val rend mes venc";
+  gap:12px;align-items:center;width:100%;padding:10px 8px;border:none;border-top:1px solid var(--line);background:transparent;color:var(--t2);font:inherit;font-size:12px;text-align:left;border-radius:0}
+.ia-l .c-nome{grid-area:nome}.ia-l .c-taxa{grid-area:taxa}.ia-l .c-ap{grid-area:ap}.ia-l .c-val{grid-area:val}
+.ia-l .c-rend{grid-area:rend}.ia-l .c-mes{grid-area:mes}.ia-l .c-venc{grid-area:venc}
+button.ia-l{cursor:pointer;transition:background .1s}
+button.ia-l:hover,button.ia-l:focus-visible{background:var(--surface2);outline:none}
+button.ia-l:focus-visible{box-shadow:inset 3px 0 0 var(--blue)}
+.ia-l.cab{border-top:none;padding-top:0;font-size:9.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.ia-l > span{min-width:0}
+.ia-l b{display:block;color:var(--t1);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ia-l small{display:block;font-size:10.5px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.ia-l .n{text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ia-l .n small{font-family:'Sora',sans-serif}
+.ia-l .pos{color:var(--green)}
+.ia-l .neg{color:var(--red)}
+.ia-l b.alerta{color:var(--amber)}
+.ia-l.tot{border-top:1px solid var(--line2)}
+.ia-l.tot b{font-weight:700}
+.ia-sem b{color:var(--t2)}
+.ia-sem .btn{white-space:nowrap}
+.ia-enc{margin-top:6px;border-top:1px solid var(--line)}
+.ia-enc summary{cursor:pointer;font-size:11px;font-weight:600;color:var(--t3);padding:10px 8px 6px;list-style-position:inside}
+.ia-enc summary:hover{color:var(--t1)}
+.ia-enc .ia-l{opacity:.8}
+.ia-vazio{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:22px 12px;color:var(--t3);font-size:12px}
+.ia-vazio b{color:var(--t1);font-size:13px}
+.ia-vazio span{max-width:440px}
+/* juros por mês, composição e projeção */
+.inv-resumo{font-size:11.5px;color:var(--t2);margin-top:10px;line-height:1.6}
+.inv-resumo b{color:var(--t1);font-family:'JetBrains Mono',monospace;font-weight:600}
+.inv-tab{margin-top:8px}
+.inv-tab summary{cursor:pointer;font-size:11px;font-weight:600;color:var(--t3);padding:4px 0;width:max-content}
+.inv-tab summary:hover,.inv-tab summary:focus-visible{color:var(--t1)}
+.inv-tab .tbl-wrap{margin-top:6px}
+.inv-tbl td small{display:block;font-size:10px;color:var(--t3)}
+.inv-tbl .n{text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-variant-numeric:tabular-nums}
+.inv-tbl .pos{color:var(--green)}
+.inv-tbl tfoot td{font-weight:700;color:var(--t1);border-top:1px solid var(--line2);border-bottom:none}
+.dk-cat-l small{color:var(--t3);font-size:10px;margin-left:4px}
+.inv-isento{margin-top:14px}
+.ip-ctrl{display:grid;grid-template-columns:repeat(3,minmax(0,210px));gap:12px;margin-bottom:16px}
+.ip-num{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.ip-num > div{background:var(--surface2);border-radius:var(--r2);padding:10px 12px;min-width:0}
+.ip-num small{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ip-num b{display:block;font:700 15px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ip-num b.pos{color:var(--green)}
+.ip-num em{display:block;font-style:normal;font-size:10.5px;color:var(--t3);margin-top:2px}
+.ip-num .ip-destaque b{font:700 22px 'Sora',sans-serif;letter-spacing:-.4px}
+.ip-sub{font-size:12px;font-weight:600;color:var(--t1);margin:18px 0 4px}
+.ip-nota{margin-top:10px;line-height:1.55}
+/* detalhe da aplicação */
+.ad-num{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.ad-num > div{background:var(--surface2);border-radius:var(--r2);padding:10px 12px;min-width:0}
+.ad-num small{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ad-num b{display:block;font:700 14px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-num b.pos{color:var(--green)}.ad-num b.neg{color:var(--red)}
+.ad-num em{display:block;font-style:normal;font-size:10.5px;color:var(--t3);margin-top:2px}
+.ad-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin-bottom:16px}
+.ad-info > div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.ad-info span{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.ad-info b{font-size:13px;color:var(--t1);font-weight:600}
+.ad-info b.alerta{color:var(--amber)}
+.ad-info small{font-size:11px;color:var(--t3)}
+.ad-hist-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ad-hist-hd .inv-link{text-transform:none;letter-spacing:0}
+.ad-mov{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.ad-mov:first-child{border-top:none}
+.ad-mov-ic{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none;background:var(--surface3);color:var(--t2)}
+.ad-mov.ap .ad-mov-ic{background:var(--blue-dim);color:var(--blue)}
+.ad-mov.rs .ad-mov-ic{background:var(--purple-dim);color:var(--purple)}
+.ad-mov.rc .ad-mov-ic{background:var(--green-dim);color:var(--green)}
+.ad-mov-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.ad-mov-txt b{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-mov-txt small{font-size:10.5px;color:var(--t3)}
+.ad-mov-v{font:600 12px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap}
+.ad-mov-x{border:none;background:none;color:var(--t3);cursor:pointer;font-size:12px;padding:4px 6px;border-radius:6px}
+.ad-mov-x:hover,.ad-mov-x:focus-visible{color:var(--red);background:var(--red-dim)}
+.ad-ft{flex-wrap:wrap}
+.ad-ft .ad-excluir{margin-right:auto;color:var(--red)}
+/* cadastro */
+.af-equiv{font-size:11px;color:var(--t3);margin:0 0 12px;min-height:15px}
+.af-equiv b{color:var(--t1)}
+.af-opc{font-weight:400;color:var(--t3)}
+.af-check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin-bottom:14px;cursor:pointer;width:max-content}
+.af-modo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.af-modo label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line2);border-radius:var(--r2);cursor:pointer;background:var(--surface2)}
+.af-modo label:has(input:checked){border-color:var(--green);background:var(--green-dim)}
+.af-modo input{margin-top:2px;accent-color:var(--green)}
+.af-modo b{display:block;font-size:12px;color:var(--t1)}
+.af-modo small{display:block;font-size:10.5px;color:var(--t3);margin-top:1px}
+.af-mais summary{cursor:pointer;font-size:11px;font-weight:600;color:var(--t3);padding:4px 0;width:max-content}
+.af-mais summary:hover{color:var(--t1)}
+/* no lançamento: aplicação, estimativa do rendimento e resgate total */
+.l-rend-est{font-size:11px;color:var(--t3);margin:-4px 0 10px;min-height:0}
+.l-rend-est:empty{display:none}
+.l-rend-est b{color:var(--t1)}
+.l-resg-total-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);margin:-2px 0 12px;cursor:pointer;width:max-content}
+@media (max-width:1100px){
+  .ia-l{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 112px 120px 112px;grid-template-areas:"nome taxa ap val rend"}
+  .ia-l .c-mes,.ia-l .c-venc{display:none}
+  .ip-num{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ip-num .ip-destaque{grid-column:1 / -1}
+}
+@media (max-width:768px){
+  .inv-ctrl .btn{flex:1 1 auto}
+  .ia-l{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"nome val" "taxa rend";row-gap:4px;column-gap:10px;padding:10px 4px}
+  .ia-l.cab{display:none}
+  .ia-l .c-ap{display:none}
+  .ia-l .c-taxa small{display:none}
+  .ia-sem .c-taxa .btn{padding:3px 8px}
+  .ip-ctrl{grid-template-columns:1fr 1fr}
+  .ip-ctrl .fg:first-child{grid-column:1 / -1}
+  .ad-num{grid-template-columns:1fr 1fr}
+  .ad-info{grid-template-columns:1fr}
+  .af-modo{grid-template-columns:1fr}
+  .inv-hd-dir{justify-content:flex-start}
+  .tbl.inv-tbl{min-width:0}
+  .inv-tbl .c-hoje,.inv-tbl .c-ir,.inv-tbl .c-em{display:none}
+  .inv-tbl th,.inv-tbl td{padding:8px 6px}
 }
 .dash-vazio{font-size:12px;color:var(--t3);padding:18px 0;text-align:center}
 .dash-mais{border:none;background:none;color:var(--t3);font:600 11px 'Sora',sans-serif;cursor:pointer;padding:8px 8px 0}
@@ -1527,6 +1652,10 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M7 3v4M17 3v4"/></svg>
     Contas Bancárias
   </div>
+  <div class="nav-btn" onclick="go('invest',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+    Investimentos
+  </div>
   <div class="nav-section">Organização</div>
   <div class="nav-btn" onclick="go('kanban',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/></svg>
@@ -2048,7 +2177,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
     <div class="kpi g"><div class="kpi-label">Receitas do Mês</div><div class="kpi-val g" id="lk-rec">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
     <div class="kpi r"><div class="kpi-label">Despesas do Mês</div><div class="kpi-val r" id="lk-des">R$ 0</div><div class="kpi-sub">sem contas de reserva</div></div>
     <div class="kpi"><div class="kpi-label">Saldo Líquido</div><div class="kpi-val" id="lk-sal">R$ 0</div><div class="kpi-sub">receitas − despesas − investido</div></div>
-    <div class="kpi b"><div class="kpi-label">Investido no mês</div><div class="kpi-val b" id="lk-inv">R$ 0</div><div class="kpi-sub"><span id="lk-inv-sub">aplicações − resgates</span> · <button type="button" class="inv-link" onclick="abrirCarteira(this)">Ver carteira ›</button></div></div>
+    <div class="kpi b"><div class="kpi-label">Investido no mês</div><div class="kpi-val b" id="lk-inv">R$ 0</div><div class="kpi-sub"><span id="lk-inv-sub">aplicações − resgates</span> · <button type="button" class="inv-link" onclick="irPagina('invest')">Ver investimentos ›</button></div></div>
   </div>
 
   <!-- Saldo: disponível e reservas, separados -->
@@ -2790,6 +2919,85 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </div>
 
+<!-- ───── INVESTIMENTOS ───── -->
+<div class="page" id="page-invest">
+  <div class="topbar">
+    <div class="topbar-left"><h1>Investimentos</h1><p>Suas aplicações, quanto rendem por mês e quanto podem render</p></div>
+    <div class="topbar-right inv-ctrl">
+      <button class="btn btn-ghost" onclick="abrirInvTaxas(this)">Taxas de referência</button>
+      <button class="btn btn-ghost" onclick="novoLancTipo('Resgate', this)">↙ Resgatar</button>
+      <button class="btn btn-green" onclick="abrirAtivoForm(null, this)">+ Nova aplicação</button>
+    </div>
+  </div>
+
+  <!-- 1. A carteira em quatro números -->
+  <div class="kpi-grid cols4 inv-kpis">
+    <div class="kpi c"><div class="kpi-label">Valor atual</div><div class="kpi-val c" id="ik-valor">R$ 0,00</div><div class="dk-nota" id="ik-valor-nota"></div></div>
+    <div class="kpi b"><div class="kpi-label">Total aplicado</div><div class="kpi-val b" id="ik-aplic">R$ 0,00</div><div class="dk-nota" id="ik-aplic-nota"></div></div>
+    <div class="kpi g"><div class="kpi-label">Rendimento acumulado</div><div class="kpi-val g" id="ik-rend">R$ 0,00</div><div class="dk-nota" id="ik-rend-nota"></div></div>
+    <div class="kpi g"><div class="kpi-label">Juros por mês</div><div class="kpi-val g" id="ik-mes">R$ 0,00</div><div class="dk-nota" id="ik-mes-nota"></div></div>
+  </div>
+
+  <div class="inv-avisos" id="inv-avisos"></div>
+
+  <!-- 2. Aplicações -->
+  <section class="card inv-card">
+    <div class="dash-card-hd">
+      <div><h2 class="card-title">Aplicações</h2><div class="dash-sub" id="inv-taxas-lbl"></div></div>
+    </div>
+    <div class="ia-lista" id="inv-lista"></div>
+  </section>
+
+  <!-- 3. Juros de cada mês e onde está o dinheiro -->
+  <div class="dash-linha dash-l2">
+    <section class="card dash-card">
+      <div class="dash-card-hd">
+        <div><h2 class="card-title">Juros por mês</h2><div class="dash-sub" id="inv-rm-sub"></div></div>
+        <div class="inv-hd-dir">
+          <div class="dash-leg" aria-hidden="true"><span><i class="lg-rendeu"></i>Rendeu</span><span><i class="lg-arender"></i>A render</span></div>
+          <select id="inv-ano" class="inv-sel" onchange="renderInvRendimentos()" aria-label="Ano dos juros por mês"></select>
+        </div>
+      </div>
+      <div id="inv-rm-box">
+        <div class="chart-box" style="height:230px"><canvas id="ch-inv-mes" role="img" aria-label="Juros de cada mês do ano: o que já rendeu e o que ainda deve render. A tabela abaixo traz os mesmos valores."></canvas></div>
+        <div class="inv-resumo" id="inv-rm-resumo"></div>
+        <details class="inv-tab"><summary>Ver em tabela</summary><div id="inv-rm-tabela"></div></details>
+      </div>
+      <div class="dash-vazio" id="inv-rm-vazio" style="display:none">Cadastre uma aplicação com a taxa para ver os juros de cada mês.</div>
+    </section>
+    <section class="card dash-card">
+      <div class="dash-card-hd"><h2 class="card-title">Onde está o dinheiro</h2></div>
+      <div id="inv-comp"></div>
+    </section>
+  </div>
+
+  <!-- 4. Projeção de lucro -->
+  <section class="card inv-card">
+    <div class="dash-card-hd">
+      <div><h2 class="card-title">Projeção de lucro</h2><div class="dash-sub">Quanto suas aplicações podem render, nas taxas de hoje</div></div>
+      <div class="dash-leg" aria-hidden="true"><span><i class="lg-aplic"></i>Dinheiro aplicado</span><span><i class="lg-juros"></i>Juros</span></div>
+    </div>
+    <div class="ip-ctrl">
+      <div class="fg"><label for="inv-pz">Prazo</label>
+        <select id="inv-pz" onchange="renderInvProjecao()">
+          <option value="6">6 meses</option><option value="12" selected>1 ano</option><option value="24">2 anos</option><option value="36">3 anos</option>
+          <option value="60">5 anos</option><option value="120">10 anos</option><option value="240">20 anos</option>
+        </select></div>
+      <div class="fg"><label for="inv-ap">Aporte por mês</label><input type="number" id="inv-ap" min="0" step="50" placeholder="0,00" oninput="renderInvProjecao()"></div>
+      <div class="fg"><label for="inv-tx">Taxa dos aportes (% ao ano)</label><input type="number" id="inv-tx" min="0" step="0.1" oninput="renderInvProjecao()"></div>
+    </div>
+    <div id="inv-proj-box">
+      <div class="ip-num" id="inv-proj-num"></div>
+      <div class="chart-box" style="height:240px"><canvas id="ch-inv-proj" role="img" aria-label="Projeção: dinheiro aplicado e juros acumulados ao longo do prazo. A tabela abaixo traz os mesmos valores."></canvas></div>
+      <details class="inv-tab"><summary>Ver em tabela</summary><div id="inv-proj-serie"></div></details>
+      <h3 class="ip-sub">Por aplicação</h3>
+      <div id="inv-proj-tab"></div>
+      <p class="dash-sub ip-nota">Estimativa com as taxas de referência de hoje. No vencimento, considera o dinheiro reaplicado na mesma taxa. O IR segue a tabela regressiva da renda fixa (22,5% até 6 meses, 15% depois de 2 anos). LCI, LCA, CRI, CRA e poupança são isentos. Renda variável e previdência seguem regras próprias e ficam de fora.</p>
+    </div>
+    <div class="dash-vazio" id="inv-proj-vazio" style="display:none">Cadastre uma aplicação ou informe um aporte por mês para ver a projeção.</div>
+  </section>
+</div>
+
 <!-- ───── KANBAN ───── -->
 <div class="page" id="page-kanban">
   <div class="topbar">
@@ -2973,7 +3181,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <input type="hidden" id="l-edit-id">
       <div id="l-lanc-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Data *</label><input type="date" id="l-data"></div>
+        <div class="fg"><label>Data *</label><input type="date" id="l-data" onchange="updLancRendEst()"></div>
         <div class="fg"><label>Tipo *</label>
           <select id="l-tipo" onchange="updLancTipo()">
             <option value="Receita">Receita</option>
@@ -2985,14 +3193,17 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       </div>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Categoria *</label><select id="l-cat" onchange="updLancSubcats()"></select></div>
-        <div class="fg"><label>Subcategoria</label><select id="l-subcat"></select></div>
+        <div class="fg"><label>Subcategoria</label><select id="l-subcat" onchange="updLancAtivo()"></select></div>
+      </div>
+      <div class="form-grid" id="l-ativo-row" style="margin-bottom:12px;display:none">
+        <div class="fg"><label for="l-ativo">Aplicação</label><select id="l-ativo" onchange="updLancAtivo(true)"></select></div>
       </div>
       <div class="form-grid" style="margin-bottom:12px">
         <div class="fg"><label>Descrição *</label><input type="text" id="l-desc" placeholder="Ex: Conta de energia maio"></div>
       </div>
       <div class="l-inv-dica" id="l-inv-dica" style="display:none"></div>
       <div class="form-grid cols2" style="margin-bottom:12px">
-        <div class="fg"><label>Valor *</label><input type="number" id="l-valor" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="fg"><label>Valor *</label><input type="number" id="l-valor" step="0.01" min="0" placeholder="0,00" oninput="updLancRendEst()"></div>
         <div class="fg"><label>Caixa / Conta *</label>
           <select id="l-caixa">
             <option value="">— Selecione a conta —</option>
@@ -3004,6 +3215,8 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <input type="number" id="l-rend" step="0.01" min="0" placeholder="0,00"></div>
         <div class="l-rend-ajuda"><span>O lucro entra como <b>receita</b> (Rendimentos); o resto volta como resgate e diminui o que está investido.</span></div>
       </div>
+      <div class="l-rend-est" id="l-rend-est" aria-live="polite"></div>
+      <label class="l-resg-total-row" id="l-resg-total-row" style="display:none"><input type="checkbox" id="l-resg-total" onchange="marcarResgateTotal()"> Resgatei tudo: a aplicação acaba aqui</label>
       <div class="form-grid cols2" style="margin-bottom:12px">
         <div class="fg"><label>Status</label>
           <select id="l-pago">
@@ -3627,18 +3840,128 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </div>
 
-<!-- Modal: carteira de investimentos -->
-<div class="overlay" id="m-carteira" style="display:none" onclick="cmoOut(event,'m-carteira')">
-  <div class="modal" style="max-width:680px" onclick="event.stopPropagation()">
+<!-- Modal: uma aplicação (detalhe) -->
+<div class="overlay" id="m-ativo" style="display:none" onclick="cmoOut(event,'m-ativo')">
+  <div class="modal" style="max-width:660px" onclick="event.stopPropagation()">
     <div class="modal-hd">
-      <div><h2>Seus investimentos</h2><div class="card-sub">O que está aplicado: aplicações − resgates, por categoria</div></div>
-      <button class="btn btn-ghost btn-xs" onclick="closeM('m-carteira')">✕</button>
+      <div><h2 id="ad-titulo">Aplicação</h2><div class="card-sub" id="ad-sub"></div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-ativo')" aria-label="Fechar">✕</button>
     </div>
-    <div class="modal-bd"><div id="carteira-corpo"></div></div>
+    <div class="modal-bd" id="ad-corpo"></div>
+    <div class="modal-ft ad-ft">
+      <button class="btn btn-ghost ad-excluir" onclick="excluirAtivo()">Excluir</button>
+      <button class="btn btn-ghost" onclick="editarAtivoAtual(this)">Editar</button>
+      <button class="btn btn-ghost" onclick="abrirInvSaldo(null, this)">Atualizar saldo</button>
+      <button class="btn btn-ghost" onclick="resgatarAtivo(null, this)">↙ Resgatar</button>
+      <button class="btn btn-green" onclick="aportarAtivo(null, this)">↗ Aportar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: cadastrar / editar aplicação -->
+<div class="overlay" id="m-ativo-form" style="display:none" onclick="cmoOut(event,'m-ativo-form')">
+  <div class="modal" style="max-width:620px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2 id="af-titulo">Nova aplicação</h2><div class="card-sub" id="af-sub"></div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-ativo-form')" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-bd">
+      <input type="hidden" id="af-id"><input type="hidden" id="af-grupo">
+      <div id="af-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label for="af-produto">Produto *</label><select id="af-produto" onchange="afProduto()"></select></div>
+        <div class="fg"><label for="af-inst">Banco ou corretora</label><input type="text" id="af-inst" placeholder="Ex.: Banco Inter"></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="fg"><label for="af-nome">Nome *</label><input type="text" id="af-nome" placeholder="Ex.: CDB Banco Inter 2028"></div>
+      </div>
+      <div class="form-grid cols2" style="margin-bottom:6px">
+        <div class="fg"><label for="af-idx">Rentabilidade *</label><select id="af-idx" onchange="afIdx()"></select></div>
+        <div class="fg" id="af-taxa-fg"><label for="af-taxa" id="af-taxa-lbl">Percentual do CDI</label><input type="number" id="af-taxa" step="0.01" min="0" oninput="afEquiv()"></div>
+      </div>
+      <div class="af-equiv" id="af-equiv" aria-live="polite"></div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label for="af-inicio">Data da aplicação *</label><input type="date" id="af-inicio"></div>
+        <div class="fg"><label for="af-venc">Vencimento <span class="af-opc">(opcional)</span></label><input type="date" id="af-venc"></div>
+      </div>
+      <label class="af-check"><input type="checkbox" id="af-isento"> Isento de imposto de renda</label>
+      <div id="af-valor-box">
+        <div class="af-modo" role="radiogroup" aria-label="Como registrar">
+          <label><input type="radio" name="af-modo" value="nova" checked onchange="afModo()"><span><b>Estou aplicando agora</b><small>o dinheiro sai de uma conta</small></span></label>
+          <label><input type="radio" name="af-modo" value="existente" onchange="afModo()"><span><b>Já tenho essa aplicação</b><small>não mexe no saldo das contas</small></span></label>
+        </div>
+        <div class="form-grid cols2" style="margin-bottom:12px">
+          <div class="fg"><label for="af-valor" id="af-valor-lbl">Valor aplicado *</label><input type="number" id="af-valor" step="0.01" min="0" placeholder="0,00"></div>
+          <div class="fg" id="af-conta-fg"><label for="af-conta">Sai da conta *</label><select id="af-conta"></select></div>
+          <div class="fg" id="af-atual-fg" style="display:none"><label for="af-atual">Quanto vale hoje <span class="af-opc">(opcional)</span></label><input type="number" id="af-atual" step="0.01" min="0" placeholder="0,00"></div>
+        </div>
+      </div>
+      <div id="af-base-box" style="display:none">
+        <div class="form-grid cols2" style="margin-bottom:12px">
+          <div class="fg"><label for="af-base">Já estava aplicado (antes do sistema)</label><input type="number" id="af-base" step="0.01" min="0"></div>
+          <div class="fg"><label for="af-base-data">Desde</label><input type="date" id="af-base-data"></div>
+        </div>
+      </div>
+      <details class="af-mais">
+        <summary>Categoria e observação</summary>
+        <div class="form-grid cols2" style="margin:10px 0 12px">
+          <div class="fg"><label for="af-cat">Categoria</label><select id="af-cat" onchange="afSubcats()"></select></div>
+          <div class="fg"><label for="af-subcat">Subcategoria</label><select id="af-subcat"></select></div>
+        </div>
+        <div class="form-grid"><div class="fg"><label for="af-obs">Observação</label><input type="text" id="af-obs" placeholder="Opcional"></div></div>
+      </details>
+    </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeM('m-carteira')">Fechar</button>
-      <button class="btn btn-ghost" onclick="closeM('m-carteira');novoLancTipo('Resgate',this)">↙ Resgatar</button>
-      <button class="btn btn-green" onclick="closeM('m-carteira');novoLancTipo('Investimento',this)">↗ Aplicar</button>
+      <button class="btn btn-ghost" onclick="closeM('m-ativo-form')">Cancelar</button>
+      <button class="btn btn-green" id="af-salvar" onclick="salvarAtivo()">Salvar aplicação</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: atualizar o saldo de uma aplicação -->
+<div class="overlay" id="m-inv-saldo" style="display:none" onclick="cmoOut(event,'m-inv-saldo')">
+  <div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2>Atualizar saldo</h2><div class="card-sub" id="is-sub"></div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-inv-saldo')" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="is-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
+      <p class="card-sub" style="margin:0 0 12px">Informe o valor bruto que aparece no app do banco ou da corretora. Dali em diante, o sistema volta a estimar pela taxa.</p>
+      <div class="form-grid cols2" style="margin-bottom:8px">
+        <div class="fg"><label for="is-data">Data *</label><input type="date" id="is-data" onchange="invSaldoDica()"></div>
+        <div class="fg"><label for="is-valor">Valor *</label><input type="number" id="is-valor" step="0.01" min="0" placeholder="0,00"></div>
+      </div>
+      <div class="af-equiv" id="is-dica"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-inv-saldo')">Cancelar</button>
+      <button class="btn btn-green" onclick="salvarInvSaldo()">Salvar saldo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: taxas de referência dos investimentos -->
+<div class="overlay" id="m-inv-taxas" style="display:none" onclick="cmoOut(event,'m-inv-taxas')">
+  <div class="modal" style="max-width:480px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2>Taxas de referência</h2><div class="card-sub">Usadas no valor de hoje, nos juros do mês e nas projeções</div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-inv-taxas')" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div id="it-err" class="alert alert-r" style="display:none;margin-bottom:12px"></div>
+      <div class="form-grid cols2" style="margin-bottom:12px">
+        <div class="fg"><label for="it-cdi">CDI (% ao ano)</label><input type="number" id="it-cdi" step="0.01" min="0"></div>
+        <div class="fg"><label for="it-selic">Selic (% ao ano)</label><input type="number" id="it-selic" step="0.01" min="0"></div>
+        <div class="fg"><label for="it-ipca">IPCA (% em 12 meses)</label><input type="number" id="it-ipca" step="0.01" min="0"></div>
+        <div class="fg"><label for="it-tr">TR (% ao mês)</label><input type="number" id="it-tr" step="0.01" min="0"></div>
+      </div>
+      <p class="card-sub" style="margin:0">Atualizadas em <b id="it-data">—</b>. A Selic e o CDI estão no site do Banco Central; o IPCA, no do IBGE.
+        <button type="button" class="inv-link" onclick="restaurarInvTaxas()">Usar os valores de 28/10/2026</button></p>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-inv-taxas')">Cancelar</button>
+      <button class="btn btn-green" onclick="salvarInvTaxas()">Salvar taxas</button>
     </div>
   </div>
 </div>
@@ -4553,7 +4876,7 @@ function go(p,el){
   document.getElementById('page-'+p).classList.add('active');
   if(el)el.classList.add('active');
   _page=p;
-  const fns={dash:renderDash,rel:renderRel,lanc:renderLanc,orc:renderOrc,contas:renderContas,dividas:renderDividas,cartoes:renderCartoes,bancos:renderBancos,cfg:renderCfg,kanban:renderKanban};
+  const fns={dash:renderDash,rel:renderRel,lanc:renderLanc,orc:renderOrc,contas:renderContas,dividas:renderDividas,cartoes:renderCartoes,bancos:renderBancos,cfg:renderCfg,kanban:renderKanban,invest:renderInvest};
   if(p==='lanc') initLancAnoOpts();
   if(fns[p])fns[p]();
   updSbSaldo();
@@ -4586,6 +4909,8 @@ function openM(id, origem){
     document.getElementById('l-desc').value = '';
     document.getElementById('l-valor').value = '';
     document.getElementById('l-rend').value = '';
+    document.getElementById('l-ativo').value = '';
+    document.getElementById('l-resg-total').checked = false;
     document.getElementById('l-obs').value = '';
     document.getElementById('l-pago').value = 'Pago';
     updLancCats();
@@ -5215,20 +5540,20 @@ function renderDash(){
   const caixa      = calcSaldoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
   const reservas   = calcReservasAte(fimMesDash);
   const caixaLivre = +(caixa - reservas).toFixed(2);
-  const totalInv   = investidoAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
+  const totalInv   = valorInvestimentosAte(fimMesDash, { somentePagos: _dashView === 'realizado' });
   const totalDiv   = d.divs.reduce((a, dv) => a + saldoDivida(dv), 0);
   const patrimonio = caixa + totalInv - totalDiv;
   setC('dk-patrimonio', fmtR(patrimonio), patrimonio >= 0 ? 'var(--cyan)' : 'var(--red)');
   const subPat = document.getElementById('dk-patrimonio-sub');
   if(subPat) subPat.innerHTML = [`caixa ${fmtRCurto(caixaLivre)}`, reservas ? `reservas ${fmtRCurto(reservas)}` : '',
-    totalInv ? `<button type="button" class="inv-link" onclick="abrirCarteira(this)" title="Ver a carteira">investido ${fmtRCurto(totalInv)}</button>` : '',
+    totalInv ? `<button type="button" class="inv-link" onclick="irPagina('invest')" title="Ver os investimentos">investido ${fmtRCurto(totalInv)}</button>` : '',
     totalDiv ? `dívidas −${fmtRCurto(totalDiv)}` : ''].filter(Boolean).join(' · ');
   const patArr = [];
   for(let m = 0; m < 12; m++){
     const fimM = fimDoMes(ano, m);
     if(_dashView === 'realizado' && fimM > fimDoMes(hoje.getFullYear(), hoje.getMonth())){ patArr.push(null); continue; }
     const caixaM = calcSaldoAte(fimM, { somentePagos: _dashView === 'realizado' });
-    const invM   = investidoAte(fimM, { somentePagos: _dashView === 'realizado' });
+    const invM   = valorInvestimentosAte(fimM, { somentePagos: _dashView === 'realizado' });
     patArr.push(+(caixaM + invM - totalDiv).toFixed(2));
   }
   const cPat = corVar('--cyan') || '#22d3ee';
@@ -5313,6 +5638,9 @@ function itensAtencaoDash(d, c){
   const kb = (d.kanban || []).filter(k => k.col !== 'done' && k.due && k.due < hj);
   if(kb.length) out.push({ nivel:'atencao', ic:'📋', titulo:`${kb.length} ${plural(kb.length, 'tarefa atrasada', 'tarefas atrasadas')}`,
     sub:kb[0].title, fn:`irPagina('kanban')` });
+  const hjAt = today(), vencidas = ativosInv(d).filter(a => a.vencimento && a.vencimento <= hjAt && situacaoAtivo(a, d, hjAt).venceu);
+  if(vencidas.length) out.push({ nivel:'info', ic:'⏰', titulo:`${vencidas.length} ${plural(vencidas.length, 'aplicação venceu', 'aplicações venceram')}`,
+    sub:`${nomes(vencidas.map(a => ({ desc:a.nome })))} — registre o resgate`, fn:`irPagina('invest')` });
   const revisar = candidatosInvest(d).length;
   if(revisar) out.push({ nivel:'info', ic:'🔎', titulo:`${revisar} ${plural(revisar, 'movimentação parece', 'movimentações parecem')} investimento`,
     sub:'Estão contadas como receita ou despesa — revise e corrija', fn:`abrirRevisarInvest(this)` });
@@ -7875,61 +8203,921 @@ function updLancCats(){
 }
 function updLancTipo(){ updLancCats(); }
 // Abre o Novo Lançamento já como aplicação ou resgate
-function novoLancTipo(tipo, origem){
+function novoLancTipo(tipo, origem, ativoId){
   openM('m-lanc', origem);
   const sel = document.getElementById('l-tipo');
   if(sel){ sel.value = tipo; updLancTipo(); }
+  if(ativoId) escolherAtivoNoLanc(ativoId, tipo);
 }
 
-// ── Carteira: o que está aplicado = aplicações − resgates, por categoria › subcategoria ──
-// Junta lançamentos (aplicação/resgate) e movimentações feitas direto em Bancos com
-// categoria de investimento. Sem cotação: são os valores aplicados, não o valor de mercado.
+// ── Aplicações e resgates: lançamentos e movimentações feitas direto em Bancos com categoria de investimento ──
+// São os valores aplicados (sem rendimento). ativoId liga o movimento a uma aplicação da aba Investimentos.
 function movsInvestimento(d, opts){
   d = d || gs();
   const o = opts || {}, out = [];
   (d.lancs || []).forEach(l => {
     if(l.status === 'cancelado' || !ehMovInvest(l.tipo)) return;
     if(o.somentePagos && l.pago && l.pago !== 'Pago') return;
-    out.push({ data:l.data, desc:l.desc, cat:l.cat || '—', subcat:l.subcat || '', v:valorInvestido(l), tipo:l.tipo });
+    out.push({ data:l.data, desc:l.desc, cat:l.cat || '—', subcat:l.subcat || '', v:valorInvestido(l), tipo:l.tipo, ativoId:l.ativoId || '', lancId:l.id });
   });
   (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
     if(m.refLancId || isTransfMov(m) || !ehCatInvest(m.cat)) return;
     const aplic = m.tipo === 'saida';
-    out.push({ data:m.data, desc:m.desc, cat:m.cat, subcat:m.subcat || '', v:aplic ? (m.val || 0) : -(m.val || 0), tipo:aplic ? 'Investimento' : 'Resgate' });
+    out.push({ data:m.data, desc:m.desc, cat:m.cat, subcat:m.subcat || '', v:aplic ? (m.val || 0) : -(m.val || 0), tipo:aplic ? 'Investimento' : 'Resgate',
+      ativoId:m.ativoId || '', movId:m.id, bancoId:b.id });
   }));
   return out.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
 }
-// Quanto está investido até a data (entra no patrimônio)
+// Quanto foi aplicado menos o resgatado até a data (sem rendimento)
 function investidoAte(dataISO, opts){
   const t = movsInvestimento(gs(), opts).reduce((a, m) => a + (!dataISO || m.data <= dataISO ? m.v : 0), 0);
   return +t.toFixed(2);
 }
-function abrirCarteira(origem){ renderCarteira(); openM('m-carteira', origem); }
-function renderCarteira(){
-  const el = document.getElementById('carteira-corpo');
-  if(!el) return;
-  const movs = movsInvestimento(gs(), { somentePagos:true });
-  if(!movs.length){ el.innerHTML = '<div class="dash-vazio">Nenhuma aplicação ainda. Use “↗ Aplicar” para registrar a primeira.</div>'; return; }
-  const g = {};
-  movs.forEach(m => {
-    const k = m.cat + '›' + m.subcat;
-    const x = g[k] || (g[k] = { cat:m.cat, sub:m.subcat, ap:0, rs:0 });
-    if(m.v >= 0) x.ap += m.v; else x.rs -= m.v;
+
+// ══════════════════════════════════════════════════════════════
+// ── ABA INVESTIMENTOS: aplicações, juros de cada mês e projeção de lucro ──
+// Uma aplicação (d.invAtivos) guarda produto, rentabilidade e vencimento. O dinheiro continua
+// nos lançamentos de aplicação e resgate (com ativoId): caixa, DRE e relatórios não mudam.
+// O valor de hoje é estimado pela taxa a partir do que foi aplicado e resgatado e recomeça
+// do saldo que o usuário informar (extrato do banco ou da corretora). As taxas de referência
+// (CDI, Selic, IPCA, TR) são premissas editáveis: tudo aqui é estimativa.
+// ══════════════════════════════════════════════════════════════
+const INV_CFG_PADRAO = { cdi:13.65, selic:13.75, ipca:4.58, tr:0.17, atualizadoEm:'2026-10-28' };
+const invCfg = d => ({ ...INV_CFG_PADRAO, ...(((d || gs()).invCfg) || {}) });
+const ativosInv = d => (d || gs()).invAtivos || [];
+// Produto → rentabilidade sugerida, isenção de IR e subcategoria do plano de contas
+const INV_PRODUTOS = [
+  { p:'CDB',                   g:'Renda fixa',     idx:'cdi',      taxa:100, sub:'Renda Fixa' },
+  { p:'LCI',                   g:'Renda fixa',     idx:'cdi',      taxa:90,  sub:'LCI & LCA', isento:true },
+  { p:'LCA',                   g:'Renda fixa',     idx:'cdi',      taxa:90,  sub:'LCI & LCA', isento:true },
+  { p:'Tesouro Selic',         g:'Renda fixa',     idx:'selic',    taxa:0,   sub:'Tesouro Direto' },
+  { p:'Tesouro Prefixado',     g:'Renda fixa',     idx:'pre',                sub:'Tesouro Direto' },
+  { p:'Tesouro IPCA+',         g:'Renda fixa',     idx:'ipca',               sub:'Tesouro Direto' },
+  { p:'Poupança',              g:'Renda fixa',     idx:'poupanca',           sub:'Poupança', isento:true },
+  { p:'Debênture',             g:'Renda fixa',     idx:'ipca',               sub:'Renda Fixa' },
+  { p:'CRI / CRA',             g:'Renda fixa',     idx:'ipca',               sub:'Renda Fixa', isento:true },
+  { p:'Fundo de investimento', g:'Fundos',         idx:'cdi',      taxa:100, sub:'Fundos' },
+  { p:'Previdência',           g:'Previdência',    idx:'cdi',      taxa:100, sub:'Previdência Privada', irProprio:true },
+  { p:'Ações',                 g:'Renda variável', idx:'livre',              sub:'Renda Variável', irProprio:true },
+  { p:'FII',                   g:'Renda variável', idx:'livre',              sub:'Renda Variável', irProprio:true },
+  { p:'ETF',                   g:'Renda variável', idx:'livre',              sub:'Renda Variável', irProprio:true },
+  { p:'Criptomoedas',          g:'Renda variável', idx:'livre',              sub:'Renda Variável', irProprio:true },
+  { p:'Outro',                 g:'Outros',         idx:'pre',                sub:'' },
+];
+const invProduto = p => INV_PRODUTOS.find(x => x.p === p) || INV_PRODUTOS[INV_PRODUTOS.length - 1];
+const numBR = (v, casas = 2) => (+v || 0).toLocaleString('pt-BR', { maximumFractionDigits:casas });
+const INV_IDX = {
+  cdi:      { nome:'% do CDI',                       campo:'Percentual do CDI',                rot:t => `${numBR(t)}% do CDI` },
+  pre:      { nome:'Prefixado (% ao ano)',           campo:'Taxa (% ao ano)',                  rot:t => `${numBR(t)}% a.a.` },
+  ipca:     { nome:'IPCA + taxa',                    campo:'Juro acima do IPCA (% ao ano)',    rot:t => `IPCA + ${numBR(t)}%` },
+  selic:    { nome:'Selic + taxa',                   campo:'Acima da Selic (% ao ano)',        rot:t => +t ? `Selic + ${numBR(t, 4)}%` : 'Selic' },
+  poupanca: { nome:'Regra da poupança',              campo:'',                                 rot:() => 'Poupança' },
+  livre:    { nome:'Sem taxa fixa (renda variável)', campo:'Retorno esperado (% ao ano)',      rot:() => 'Renda variável' },
+};
+const rotuloTaxa = a => (INV_IDX[a.indexador] || INV_IDX.pre).rot(a.taxa);
+
+// Taxa anual (fração) nas premissas atuais. Renda variável só tem taxa na projeção (o retorno esperado).
+function taxaAnualAtivo(a, cfg, projecao){
+  const t = +a.taxa || 0, pc = x => (+x || 0) / 100;
+  switch(a.indexador){
+    case 'cdi':   return Math.pow(1 + (Math.pow(1 + pc(cfg.cdi), 1 / 252) - 1) * pc(t), 252) - 1;   // % do CDI, dia a dia
+    case 'selic': return (1 + pc(cfg.selic)) * (1 + pc(t)) - 1;
+    case 'pre':   return pc(t);
+    case 'ipca':  return (1 + pc(cfg.ipca)) * (1 + pc(t)) - 1;
+    case 'poupanca': {   // Selic acima de 8,5%: 0,5% ao mês + TR; senão 70% da Selic + TR
+      const m = cfg.selic > 8.5 ? 0.005 : Math.pow(1 + 0.7 * pc(cfg.selic), 1 / 12) - 1;
+      return Math.pow((1 + m) * (1 + pc(cfg.tr)), 12) - 1;
+    }
+    default: return projecao ? pc(t) : 0;
+  }
+}
+const taxaMensal = r => Math.pow(1 + r, 1 / 12) - 1;
+
+// Imposto de renda da renda fixa: tabela regressiva pelo tempo aplicado; IOF só nos primeiros 30 dias
+const aliquotaIR = dias => dias <= 180 ? 22.5 : dias <= 360 ? 20 : dias <= 720 ? 17.5 : 15;
+const IOF_30 = [96,93,90,86,83,80,76,73,70,66,63,60,56,53,50,46,43,40,36,33,30,26,23,20,16,13,10,6,3,0];
+const aliquotaIOF = dias => dias >= 30 ? 0 : IOF_30[Math.min(29, Math.max(0, dias - 1))];
+const pagaIR = a => !a.isento && !invProduto(a.produto).irProprio;
+
+// O que aconteceu com a aplicação, em ordem: aplicações, resgates (com o lucro informado no
+// resgate), saldos informados e o encerramento
+function eventosAtivo(a, d, opts){
+  const o = opts || {}, ev = [];
+  const conta = l => l.status !== 'cancelado' && (!o.somentePagos || !l.pago || l.pago === 'Pago');
+  if(a.base && +a.base.valor > 0) ev.push({ data:a.base.data || a.inicio, tipo:'aporte', v:+a.base.valor, base:true, desc:'Valor que já estava aplicado' });
+  (d.lancs || []).forEach(l => {
+    if(l.ativoId !== a.id || !conta(l)) return;
+    if(l.tipo === 'Investimento') ev.push({ data:l.data, tipo:'aporte', v:l.valor || 0, desc:l.desc, lancId:l.id });
+    else if(l.tipo === 'Resgate'){
+      const lucro = (d.lancs || []).filter(r => r.refResgateId === l.id && conta(r)).reduce((s, r) => s + (r.valor || 0), 0);
+      ev.push({ data:l.data, tipo:'resgate', v:(l.valor || 0) + lucro, lucro, desc:l.desc, lancId:l.id });
+    }
   });
-  const linhas = Object.values(g).map(x => ({ ...x, saldo:+(x.ap - x.rs).toFixed(2) })).sort((a, b) => b.saldo - a.saldo);
-  const ap = linhas.reduce((a, x) => a + x.ap, 0), rs = linhas.reduce((a, x) => a + x.rs, 0);
-  el.innerHTML = `<div class="cart-tot">
-      <div><small>Aplicado</small><b>${fmtR(ap)}</b></div>
-      <div><small>Resgatado</small><b>${fmtR(rs)}</b></div>
-      <div><small>Investido hoje</small><b style="color:var(--blue)">${fmtR(ap - rs)}</b></div>
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => {
+    if(m.ativoId !== a.id || m.refLancId || isTransfMov(m)) return;
+    ev.push({ data:m.data, tipo:m.tipo === 'saida' ? 'aporte' : 'resgate', v:m.val || 0, lucro:0, desc:m.desc, movId:m.id });
+  }));
+  (a.saldos || []).forEach(s => ev.push({ data:s.data, tipo:'saldo', v:+s.valor || 0, saldoId:s.id, desc:'Saldo informado' }));
+  if(a.encerradoEm) ev.push({ data:a.encerradoEm, tipo:'fim', v:0, desc:'Aplicação encerrada' });
+  const ordem = { aporte:0, resgate:1, saldo:2, fim:3 };
+  return ev.filter(e => e.data).sort((x, y) => x.data.localeCompare(y.data) || ordem[x.tipo] - ordem[y.tipo]);
+}
+
+// Valor (V) e principal ainda aplicado (P) em cada data pedida (em ordem crescente). Entre um
+// evento e outro o valor rende pela taxa (dias corridos/365), até o vencimento — na projeção,
+// segue rendendo (o dinheiro é reaplicado na mesma taxa). O resgate tira do principal a mesma
+// proporção que tira do valor. Cada ponto traz o que entrou (ap), saiu (rs) e o acerto (aj)
+// feito pelos saldos informados no intervalo.
+function serieAtivo(a, d, datas, opts){
+  const o = opts || {}, cfg = o.cfg || invCfg(d);
+  const r = taxaAnualAtivo(a, cfg, o.projecao), ev = o.eventos || eventosAtivo(a, d, o);
+  const venc = !o.projecao && a.vencimento ? a.vencimento : null;
+  let V = 0, P = 0, t = null, i = 0, fim = false;
+  const cresce = ate => {
+    if(t && V > 0 && r && !fim){
+      const lim = venc && ate > venc ? venc : ate;
+      if(lim > t) V *= Math.pow(1 + r, diasEntreISO(t, lim) / 365);
+    }
+    if(!t || ate > t) t = ate;
+  };
+  return datas.map(dt => {
+    let ap = 0, rs = 0, aj = 0;
+    while(i < ev.length && ev[i].data <= dt){
+      const e = ev[i++];
+      cresce(e.data);
+      if(e.tipo === 'aporte'){ V += e.v; P += e.v; ap += e.v; fim = false; }
+      else if(e.tipo === 'resgate'){
+        const parte = V > 0 ? Math.min(1, e.v / V) : 1;
+        P = Math.max(0, P * (1 - parte)); V = Math.max(0, V - e.v); rs += e.v;
+      }
+      else if(e.tipo === 'saldo'){ aj += e.v - V; V = e.v; fim = false; }
+      else if(e.tipo === 'fim'){ aj -= V; V = 0; P = 0; fim = true; }
+    }
+    cresce(dt);
+    return { data:dt, V:+V.toFixed(2), P:+P.toFixed(2), ap, rs, aj };
+  });
+}
+// Data média das aplicações (pesada pelo valor): o prazo do IR conta a partir dela
+function dataMediaAplic(ev){
+  let s = 0, w = 0;
+  ev.forEach(e => { if(e.tipo === 'aporte' && e.v > 0){ s += new Date(e.data + 'T00:00:00').getTime() * e.v; w += e.v; } });
+  if(!w) return '';
+  const dt = new Date(s / w);
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+}
+// Como está a aplicação na data: valor, aplicado, rendimento, juros por mês, IR se resgatar e situação
+function situacaoAtivo(a, d, hojeISO, cfg){
+  cfg = cfg || invCfg(d);
+  const ev = eventosAtivo(a, d, { somentePagos:true });
+  const s = serieAtivo(a, d, [hojeISO], { cfg, eventos:ev })[0];
+  const r = taxaAnualAtivo(a, cfg);
+  const saiu = ev.some(e => e.data <= hojeISO && (e.tipo === 'resgate' || e.tipo === 'fim'));
+  const ativa = s.V > 0.005 || !saiu;
+  const venceu = s.V > 0.005 && !!a.vencimento && a.vencimento <= hojeISO;
+  const ultimo = ev.filter(e => e.data <= hojeISO).pop();
+  const informado = ultimo && ultimo.tipo === 'saldo' ? ultimo.data : '';
+  const jurosMes = s.V > 0 && !venceu ? s.V * taxaMensal(r) : 0;
+  const media = dataMediaAplic(ev), dias = media ? Math.max(0, diasEntreISO(media, hojeISO)) : 0;
+  const ganho = s.V - s.P;
+  let iof = 0, ir = 0;
+  if(pagaIR(a) && ganho > 0){ iof = ganho * aliquotaIOF(dias) / 100; ir = (ganho - iof) * aliquotaIR(dias) / 100; }
+  const soma = tipo => +ev.filter(e => e.tipo === tipo && e.data <= hojeISO).reduce((x, e) => x + e.v, 0).toFixed(2);
+  const fimEv = ev.filter(e => e.tipo === 'fim' || e.tipo === 'resgate').pop();
+  return { a, ev, V:s.V, P:s.P, ganho:+ganho.toFixed(2), pct:s.P > 0 ? ganho / s.P * 100 : 0, r, jurosMes:+jurosMes.toFixed(2),
+    ativa, venceu, informado, media, dias, iof:+iof.toFixed(2), ir:+ir.toFixed(2), liquido:+(s.V - iof - ir).toFixed(2),
+    aportado:soma('aporte'), resgatado:soma('resgate'), encerradaEm:!ativa && fimEv ? fimEv.data : '' };
+}
+// Aplicações e resgates que não estão ligados a nenhuma aplicação cadastrada (lançamentos antigos,
+// Bancos, extrato): por categoria › subcategoria, pelo valor aplicado (sem rendimento)
+function gruposSemAtivo(d, ateISO){
+  const ids = new Set(ativosInv(d).map(a => a.id)), g = {};
+  movsInvestimento(d, { somentePagos:true }).forEach(m => {
+    if((m.ativoId && ids.has(m.ativoId)) || (ateISO && m.data > ateISO)) return;
+    const k = m.cat + '›' + m.subcat;
+    const x = g[k] || (g[k] = { k, cat:m.cat, sub:m.subcat, ap:0, rs:0, n:0, inicio:m.data, itens:[] });
+    if(m.v >= 0) x.ap += m.v; else x.rs -= m.v;
+    x.n++; x.itens.push(m);
+    if(m.data < x.inicio) x.inicio = m.data;
+  });
+  return Object.values(g).map(x => ({ ...x, saldo:+(x.ap - x.rs).toFixed(2) })).sort((a, b) => b.saldo - a.saldo);
+}
+// Quanto valem os investimentos na data (entra no patrimônio): as aplicações cadastradas pelo valor
+// estimado ou informado; o resto pelo que foi aplicado menos o resgatado
+function valorInvestimentosAte(dataISO, opts){
+  const d = gs(), o = opts || {}, cfg = invCfg(d), ids = new Set();
+  let t = 0;
+  ativosInv(d).forEach(a => { ids.add(a.id); t += serieAtivo(a, d, [dataISO], { cfg, somentePagos:o.somentePagos })[0].V; });
+  movsInvestimento(d, o).forEach(m => { if(!(m.ativoId && ids.has(m.ativoId)) && m.data <= dataISO) t += m.v; });
+  return +t.toFixed(2);
+}
+// Receita que veio de investimento: lucro informado no resgate, rendimento ligado a uma aplicação
+// ou lançado em Receitas › Rendimentos
+const ehRendimentoInvest = l => l.tipo === 'Receita' && (!!l.ativoId || !!l.refResgateId ||
+  (!!papelSub('rendimentos') && l.cat === papel('rendimentos') && l.subcat === papelSub('rendimentos')));
+
+// Juros de cada mês do ano: o que já rendeu (até hoje) e o que ainda deve render (depois de hoje).
+// Rendimento do período = variação do valor − aplicações + resgates (inclui o acerto pelos saldos informados).
+function rendimentosMensais(d, ano, hojeISO){
+  const cfg = invCfg(d), M = Array.from({ length:12 }, () => ({ rendeu:0, previsto:0, ajuste:0, recebido:0, por:{} }));
+  const pts = [fimDoMes(ano - 1, 11)];
+  for(let m = 0; m < 12; m++){
+    const fm = fimDoMes(ano, m);
+    if(hojeISO > pts[pts.length - 1] && hojeISO < fm) pts.push(hojeISO);
+    pts.push(fm);
+  }
+  ativosInv(d).forEach(a => {
+    const s = serieAtivo(a, d, pts, { cfg, somentePagos:true });
+    for(let k = 1; k < pts.length; k++){
+      const g = s[k].V - s[k - 1].V - s[k].ap + s[k].rs, m = getMes(pts[k]);
+      if(Math.abs(g) < 0.005) continue;
+      if(pts[k - 1] >= hojeISO) M[m].previsto += g;
+      else { M[m].rendeu += g; M[m].ajuste += s[k].aj; }
+      M[m].por[a.id] = (M[m].por[a.id] || 0) + g;
+    }
+  });
+  (d.lancs || []).forEach(l => {
+    if(l.status === 'cancelado' || (l.pago && l.pago !== 'Pago') || !ehRendimentoInvest(l) || getAno(l.data) !== ano) return;
+    M[getMes(l.data)].recebido += l.valor || 0;
+  });
+  M.forEach(x => ['rendeu', 'previsto', 'ajuste', 'recebido'].forEach(k => { x[k] = +x[k].toFixed(2); }));
+  return M;
+}
+// Taxa média da carteira (% ao ano, pesada pelo valor); sem aplicações com taxa, 100% do CDI
+function taxaMediaCarteira(d, hojeISO){
+  const cfg = invCfg(d);
+  let s = 0, w = 0;
+  ativosInv(d).forEach(a => {
+    const r = taxaAnualAtivo(a, cfg, true), v = situacaoAtivo(a, d, hojeISO, cfg).V;
+    if(r > 0 && v > 0){ s += r * v; w += v; }
+  });
+  return +((w ? s / w : taxaAnualAtivo({ indexador:'cdi', taxa:100 }, cfg)) * 100).toFixed(2);
+}
+const addMesesISO = (iso, n) => { const [y, m, dd] = iso.split('-').map(Number); return diaSeguroISO(y, m - 1 + n, dd); };
+// Projeção: cada aplicação continua rendendo na sua taxa (no vencimento, reaplicada na mesma taxa) e
+// os aportes mensais rendem na taxa escolhida. IR estimado sobre os juros do período (tabela regressiva).
+function projetarInvest(d, o){
+  const cfg = invCfg(d), hoje = o.hoje, meses = Math.max(1, o.meses | 0), aporte = Math.max(0, +o.aporte || 0);
+  const rAp = Math.max(0, +o.taxaAportes || 0) / 100;
+  const datas = Array.from({ length:meses }, (_, k) => addMesesISO(hoje, k + 1)), fim = datas[meses - 1];
+  const linhas = ativosInv(d).map(a => situacaoAtivo(a, d, hoje, cfg)).filter(s => s.ativa && s.V > 0).map(s => {
+    const r = taxaAnualAtivo(s.a, cfg, true);
+    const em = dt => s.V * Math.pow(1 + r, diasEntreISO(hoje, dt) / 365);
+    const vf = em(fim), juros = vf - s.V;
+    const ir = pagaIR(s.a) && juros > 0 ? juros * aliquotaIR(diasEntreISO(s.media || hoje, fim)) / 100 : 0;
+    return { id:s.a.id, nome:s.a.nome, hoje:s.V, fim:vf, juros, ir, r, em, isento:!!s.a.isento, irProprio:!!invProduto(s.a.produto).irProprio };
+  });
+  const semTaxa = gruposSemAtivo(d, hoje).reduce((x, g) => x + Math.max(0, g.saldo), 0);
+  // aportes: um por mês, a partir do mês que vem
+  const aportesEm = dt => datas.reduce((x, dd) => dd <= dt ? x + aporte * Math.pow(1 + rAp, diasEntreISO(dd, dt) / 365) : x, 0);
+  let jurosAp = 0, irAp = 0;
+  if(aporte) datas.forEach(dd => {
+    const j = aporte * Math.pow(1 + rAp, diasEntreISO(dd, fim) / 365) - aporte;
+    jurosAp += j; irAp += j > 0 ? j * aliquotaIR(diasEntreISO(dd, fim)) / 100 : 0;
+  });
+  const hojeTot = linhas.reduce((x, l) => x + l.hoje, 0) + semTaxa;
+  const serie = datas.map((dt, k) => {
+    const total = linhas.reduce((x, l) => x + l.em(dt), 0) + semTaxa + aportesEm(dt);
+    const aplicado = hojeTot + aporte * (k + 1);
+    return { data:dt, aplicado:+aplicado.toFixed(2), juros:+(total - aplicado).toFixed(2), total:+total.toFixed(2) };
+  });
+  const juros = linhas.reduce((x, l) => x + l.juros, 0) + jurosAp, ir = linhas.reduce((x, l) => x + l.ir, 0) + irAp;
+  const fimAp = aporte * meses + jurosAp;
+  const rendaMes = linhas.reduce((x, l) => x + l.fim * taxaMensal(l.r), 0) + fimAp * taxaMensal(rAp);
+  return { hoje, fim, datas, serie, linhas, semTaxa, hojeTot, aporte, rAp,
+    aportes:{ total:aporte * meses, juros:jurosAp, ir:irAp, fim:fimAp },
+    total:serie[meses - 1].total, juros, ir, liquido:juros - ir, rendaMes };
+}
+
+// ── Tela: Investimentos ──
+const corTema = v => getComputedStyle(document.body).getPropertyValue(v).trim();
+const fmtEixoR = v => { const a = Math.abs(v); return (v < 0 ? '−' : '') + (a >= 1000 ? `R$ ${numBR(a / 1000, 1)} mil` : `R$ ${numBR(a, 0)}`); };
+const mesAnoCurto = iso => `${MESES3[getMes(iso)].toLowerCase()}/${String(getAno(iso)).slice(2)}`;
+const sinalR = v => (v < 0 ? '−' : '+') + fmtR(Math.abs(v));
+const sinalPct = v => `${v < 0 ? '−' : '+'}${numBR(Math.abs(v), 1)}%`;
+function prazoTxt(dias){
+  if(dias < 31) return dias === 1 ? '1 dia' : `${Math.max(0, dias)} dias`;
+  const meses = Math.round(dias / 30.44);
+  if(meses < 12) return meses === 1 ? '1 mês' : `${meses} meses`;
+  const anos = Math.floor(meses / 12), resto = meses % 12;
+  return `${anos} ${anos > 1 ? 'anos' : 'ano'}${resto ? ` e ${resto} ${resto > 1 ? 'meses' : 'mês'}` : ''}`;
+}
+// Linha vertical que acompanha o ponteiro (o leitor mira a data, não a linha)
+const invCrosshair = { id:'invCrosshair', afterDatasetsDraw(ch){
+  const at = ch.tooltip && ch.tooltip.getActiveElements ? ch.tooltip.getActiveElements() : [];
+  if(!at.length) return;
+  const x = Math.round(at[0].element.x) + .5, { top, bottom } = ch.chartArea, c = ch.ctx;
+  c.save(); c.strokeStyle = corTema('--line2') || '#2d3a50'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(x, top); c.lineTo(x, bottom); c.stroke(); c.restore();
+} };
+// Dica dos gráficos: valor primeiro, nome depois; série marcada por um traço da cor
+const dicaInv = cores => ({ usePointStyle:true,
+  callbacks:{ labelPointStyle:() => ({ pointStyle:'line', rotation:0 }),
+    labelColor:c => ({ borderColor:cores[c.datasetIndex], backgroundColor:cores[c.datasetIndex], borderWidth:3 }) } });
+
+let _invAtivoId = null, _invGrupos = [];
+function renderInvest(){
+  const d = gs(), hj = today(), cfg = invCfg(d);
+  const sits = ativosInv(d).map(a => situacaoAtivo(a, d, hj, cfg));
+  const ativas = sits.filter(s => s.ativa).sort((a, b) => b.V - a.V);
+  const encerradas = sits.filter(s => !s.ativa).sort((a, b) => (b.encerradaEm || '').localeCompare(a.encerradaEm || ''));
+  _invGrupos = gruposSemAtivo(d, hj).filter(g => g.saldo > 0.005);
+  const semTot = _invGrupos.reduce((x, g) => x + g.saldo, 0);
+  const V = ativas.reduce((x, s) => x + s.V, 0) + semTot, P = ativas.reduce((x, s) => x + s.P, 0) + semTot;
+  const ganho = V - P, jm = ativas.reduce((x, s) => x + s.jurosMes, 0), n = ativas.length + _invGrupos.length;
+  // ── os quatro números ──
+  set('ik-valor', fmtR(V));
+  set('ik-valor-nota', !n ? '' : ativas.some(s => s.r > 0 && !s.informado) ? 'estimado pelas taxas' : 'pelos saldos informados');
+  set('ik-aplic', fmtR(P));
+  set('ik-aplic-nota', n ? `em ${n} ${n > 1 ? 'aplicações' : 'aplicação'}` : '');
+  setC('ik-rend', P || V ? sinalR(ganho) : fmtR(0), ganho < 0 ? 'var(--red)' : '');
+  const nr = document.getElementById('ik-rend-nota');
+  if(nr) nr.innerHTML = P > 0 ? `<span class="${ganho >= 0 ? 'bom' : 'ruim'}">${sinalPct(ganho / P * 100)}</span> sobre o aplicado` : '';
+  set('ik-mes', fmtR(jm));
+  set('ik-mes-nota', jm ? `≈ ${fmtRCurto(jm * 12)} por ano` : '');
+  const lbl = document.getElementById('inv-taxas-lbl');
+  if(lbl) lbl.innerHTML = `Estimado com CDI ${numBR(cfg.cdi)}% · Selic ${numBR(cfg.selic)}% · IPCA ${numBR(cfg.ipca)}% <button type="button" class="inv-link" onclick="abrirInvTaxas(this)">Alterar</button>`;
+  renderInvAvisos(d, ativas, cfg);
+  renderInvLista(ativas, encerradas, { V, P, ganho, jm });
+  renderInvComposicao(ativas, V);
+  renderInvRendimentos();
+  renderInvProjecao();
+}
+function renderInvAvisos(d, ativas, cfg){
+  const el = document.getElementById('inv-avisos');
+  if(!el) return;
+  const out = [];
+  ativas.filter(s => s.venceu).forEach(s => out.push(`<div class="inv-aviso"><span>⏰ <b>${escHtml(s.a.nome)}</b> venceu em ${fmtDataBR(s.a.vencimento)}. O dinheiro costuma voltar para a conta: registre o resgate para tirá-lo da carteira.</span>
+    <button type="button" class="btn btn-ghost btn-xs" data-id="${escAttr(s.a.id)}" onclick="resgatarAtivo(this.dataset.id, this, true)">Registrar resgate</button></div>`));
+  const nRev = candidatosInvest(d).length;
+  if(nRev) out.push(`<div class="inv-aviso info"><span>🔎 <b>${nRev} ${nRev > 1 ? 'movimentações parecem' : 'movimentação parece'} investimento</b>, mas ${nRev > 1 ? 'estão contadas' : 'está contada'} como receita ou despesa.</span>
+    <button type="button" class="btn btn-ghost btn-xs" onclick="abrirRevisarInvest(this)">Revisar</button></div>`);
+  if(diasEntreISO(cfg.atualizadoEm, today()) > 45) out.push(`<div class="inv-aviso info"><span>As taxas de referência são de <b>${fmtDataBR(cfg.atualizadoEm)}</b>. Confira se o CDI, a Selic ou o IPCA mudaram.</span>
+    <button type="button" class="btn btn-ghost btn-xs" onclick="abrirInvTaxas(this)">Atualizar</button></div>`);
+  el.innerHTML = out.join('');
+}
+function renderInvLista(ativas, encerradas, tot){
+  const el = document.getElementById('inv-lista');
+  if(!el) return;
+  const hj = today();
+  if(!ativas.length && !_invGrupos.length && !encerradas.length){
+    el.innerHTML = `<div class="ia-vazio"><b>Nenhuma aplicação ainda</b>
+      <span>Cadastre cada investimento com a taxa (ex.: 110% do CDI) e o vencimento para ver quanto vale hoje, quanto rende por mês e quanto pode render.</span>
+      <button type="button" class="btn btn-green btn-sm" onclick="abrirAtivoForm(null, this)">+ Cadastrar aplicação</button></div>`;
+    return;
+  }
+  const cab = `<div class="ia-l cab" aria-hidden="true"><span class="c-nome">Aplicação</span><span class="c-taxa">Rentabilidade</span><span class="c-ap n">Aplicado</span>
+    <span class="c-val n">Valor atual</span><span class="c-rend n">Rendimento</span><span class="c-mes n">Juros/mês</span><span class="c-venc">Vencimento</span></div>`;
+  const linha = s => {
+    const a = s.a;
+    const eq = a.indexador === 'livre' ? (s.informado ? 'pelo saldo informado' : 'informe o saldo') : a.indexador !== 'pre' && s.r > 0 ? `≈ ${numBR(s.r * 100)}% ao ano` : '';
+    const vencSub = !a.vencimento ? 'sem vencimento' : s.venceu ? 'venceu' : `em ${prazoTxt(diasEntreISO(hj, a.vencimento))}`;
+    return `<button type="button" class="ia-l" data-id="${escAttr(a.id)}" onclick="abrirAtivo(this.dataset.id, this)">
+      <span class="c-nome"><b>${escHtml(a.nome)}</b><small>${escHtml([a.produto, a.instituicao].filter(Boolean).join(' · '))}</small></span>
+      <span class="c-taxa"><b>${escHtml(rotuloTaxa(a))}</b><small>${eq}</small></span>
+      <span class="c-ap n">${fmtR(s.P)}</span>
+      <span class="c-val n"><b>${fmtR(s.V)}</b><small>${s.informado ? 'informado em ' + fmtDataBR(s.informado).slice(0, 5) : s.r > 0 ? 'estimado' : 'aplicado'}</small></span>
+      <span class="c-rend n"><b class="${s.ganho < 0 ? 'neg' : s.ganho > 0 ? 'pos' : ''}">${s.ganho ? sinalR(s.ganho) : fmtR(0)}</b><small>${s.P > 0 && s.ganho ? sinalPct(s.pct) : ''}</small></span>
+      <span class="c-mes n">${s.jurosMes ? fmtR(s.jurosMes) : '—'}</span>
+      <span class="c-venc"><b class="${s.venceu ? 'alerta' : ''}">${a.vencimento ? fmtDataBR(a.vencimento) : '—'}</b><small>${vencSub}</small></span>
+    </button>`;
+  };
+  const linhaSem = (g, i) => `<div class="ia-l ia-sem">
+      <span class="c-nome"><b>${escHtml(g.sub || g.cat)}</b><small>${g.n} ${g.n > 1 ? 'movimentações' : 'movimentação'} sem taxa cadastrada</small></span>
+      <span class="c-taxa"><button type="button" class="btn btn-ghost btn-xs" onclick="abrirAtivoForm(null, this, ${i})">Cadastrar taxa</button></span>
+      <span class="c-ap n">${fmtR(g.saldo)}</span>
+      <span class="c-val n"><b>${fmtR(g.saldo)}</b><small>sem rendimento</small></span>
+      <span class="c-rend n">—</span><span class="c-mes n">—</span><span class="c-venc">—</span>
+    </div>`;
+  const total = ativas.length + _invGrupos.length > 1 ? `<div class="ia-l tot">
+      <span class="c-nome"><b>Total</b></span><span class="c-taxa"></span><span class="c-ap n">${fmtR(tot.P)}</span><span class="c-val n"><b>${fmtR(tot.V)}</b></span>
+      <span class="c-rend n"><b class="${tot.ganho < 0 ? 'neg' : tot.ganho > 0 ? 'pos' : ''}">${tot.ganho ? sinalR(tot.ganho) : fmtR(0)}</b></span><span class="c-mes n">${fmtR(tot.jm)}</span><span class="c-venc"></span>
+    </div>` : '';
+  const enc = encerradas.length ? `<details class="ia-enc"><summary>${encerradas.length} ${encerradas.length > 1 ? 'aplicações encerradas' : 'aplicação encerrada'}</summary>
+    ${encerradas.map(s => { const lucro = s.resgatado - s.aportado; return `<button type="button" class="ia-l" data-id="${escAttr(s.a.id)}" onclick="abrirAtivo(this.dataset.id, this)">
+      <span class="c-nome"><b>${escHtml(s.a.nome)}</b><small>${escHtml(s.a.produto || '')}${s.encerradaEm ? ' · encerrada em ' + fmtDataBR(s.encerradaEm) : ''}</small></span>
+      <span class="c-taxa"><b>${escHtml(rotuloTaxa(s.a))}</b></span>
+      <span class="c-ap n">${fmtR(s.aportado)}</span>
+      <span class="c-val n"><b>${fmtR(s.resgatado)}</b><small>resgatado</small></span>
+      <span class="c-rend n"><b class="${lucro < 0 ? 'neg' : 'pos'}">${sinalR(lucro)}</b><small>${s.aportado > 0 ? sinalPct(lucro / s.aportado * 100) : ''}</small></span>
+      <span class="c-mes n">—</span><span class="c-venc"><b>${s.a.vencimento ? fmtDataBR(s.a.vencimento) : '—'}</b></span>
+    </button>`; }).join('')}</details>` : '';
+  el.innerHTML = cab + ativas.map(linha).join('') + _invGrupos.map(linhaSem).join('') + total + enc;
+}
+// Onde está o dinheiro: valor atual por produto
+function renderInvComposicao(ativas, V){
+  const el = document.getElementById('inv-comp');
+  if(!el) return;
+  const g = {};
+  ativas.forEach(s => { if(s.V > 0){ const k = s.a.produto || 'Outro'; g[k] = (g[k] || 0) + s.V; } });
+  _invGrupos.forEach(x => { const k = x.sub || x.cat; g[k] = (g[k] || 0) + x.saldo; });
+  let itens = Object.entries(g).sort((a, b) => b[1] - a[1]);
+  if(itens.length > 6) itens = [...itens.slice(0, 5), ['Outros', itens.slice(5).reduce((x, i) => x + i[1], 0)]];
+  if(!itens.length || V <= 0){ el.innerHTML = '<div class="dash-vazio">Nada aplicado ainda.</div>'; return; }
+  const isento = ativas.filter(s => !pagaIR(s.a) && !invProduto(s.a.produto).irProprio).reduce((x, s) => x + s.V, 0);
+  const maior = itens[0][1];
+  el.innerHTML = itens.map(([nome, v]) => `<div class="dk-cat">
+      <div class="dk-cat-l"><span>${escHtml(nome)}</span><span class="mono">${fmtR(v)} <small>${numBR(v / V * 100, 1)}%</small></span></div>
+      <div class="dk-cat-bar"><i style="width:${Math.max(2, v / maior * 100).toFixed(1)}%"></i></div>
+    </div>`).join('') + (isento ? `<div class="dash-sub inv-isento">Isento de IR: ${fmtR(isento)} (${numBR(isento / V * 100, 1)}%)</div>` : '');
+}
+// Anos com investimento (do primeiro movimento ao ano que vem)
+function anosInvest(d, hojeISO){
+  const atual = getAno(hojeISO);
+  let ini = atual;
+  ativosInv(d).forEach(a => eventosAtivo(a, d).forEach(e => { ini = Math.min(ini, getAno(e.data)); }));
+  const out = [];
+  for(let a = ini; a <= atual + 1; a++) out.push(a);
+  return out;
+}
+// Juros de cada mês: barras do que rendeu e do que ainda deve render no ano
+function renderInvRendimentos(){
+  const d = gs(), hj = today(), atual = getAno(hj), sel = document.getElementById('inv-ano');
+  const anos = anosInvest(d, hj);
+  if(sel){
+    const prev = sel.dataset.init ? +sel.value : atual;
+    sel.innerHTML = anos.map(a => `<option value="${a}">${a}</option>`).join('');
+    sel.value = String(anos.includes(prev) ? prev : atual);
+    sel.dataset.init = '1';
+  }
+  const ano = sel ? +sel.value : atual;
+  const M = rendimentosMensais(d, ano, hj);
+  const rendeu = M.map(x => x.rendeu), prev = M.map(x => x.previsto);
+  const soma = l => l.reduce((x, v) => x + v, 0);
+  const tR = soma(rendeu), tP = soma(prev), tRec = soma(M.map(x => x.recebido));
+  const temAtivo = ativosInv(d).length > 0;
+  const box = document.getElementById('inv-rm-box'), vazio = document.getElementById('inv-rm-vazio');
+  if(box) box.style.display = temAtivo ? '' : 'none';
+  if(vazio) vazio.style.display = temAtivo ? 'none' : '';
+  set('inv-rm-sub', ano === atual ? 'Estimado pelas taxas; depois de hoje, o que ainda deve render' : ano < atual ? 'Estimado pelas taxas e pelos saldos informados' : 'O que deve render, nas taxas de hoje');
+  const nomes = {};
+  ativosInv(d).forEach(a => { nomes[a.id] = a.nome; });
+  const cJ = corTema('--viz-juros') || '#16ad69', cF = cJ + '59', sup = corTema('--surface1') || '#131926';
+  // canto arredondado só na ponta de cada barra (o segmento de cima)
+  const ponta = (v, topo) => !topo ? 0 : v < 0 ? { bottomLeft:4, bottomRight:4, topLeft:0, topRight:0 } : { topLeft:4, topRight:4, bottomLeft:0, bottomRight:0 };
+  mkCh('ch-inv-mes', {
+    type:'bar',
+    data:{ labels:MESES3, datasets:[
+      { label:'Rendeu', data:rendeu, backgroundColor:cJ, borderRadius:c => ponta(rendeu[c.dataIndex], !prev[c.dataIndex]), borderSkipped:false, maxBarThickness:22, stack:'j' },
+      { label:'A render', data:prev, backgroundColor:cF, borderColor:sup, borderWidth:c => rendeu[c.dataIndex] && prev[c.dataIndex] ? { bottom:2, top:0, left:0, right:0 } : 0,
+        borderRadius:c => ponta(prev[c.dataIndex], true), borderSkipped:false, maxBarThickness:22, stack:'j' },
+    ]},
+    options:{ ...chartBase, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+      scales:{ x:{ ...chartBase.scales.x, stacked:true, grid:{ display:false },
+          ticks:{ ...chartBase.scales.x.ticks, maxRotation:0, autoSkip:false, callback(v, i){ return this.chart.width < 460 ? MESES3[i].charAt(0) : MESES3[i]; } } },
+        y:{ ...chartBase.scales.y, stacked:true, ticks:{ ...chartBase.scales.y.ticks, callback:fmtEixoR } } },
+      plugins:{ legend:{ display:false }, tooltip:{ ...dicaInv([cJ, cJ]),
+        filter:c => !!c.raw,
+        callbacks:{ ...dicaInv([cJ, cJ]).callbacks,
+          title:its => `${MESES[its[0].dataIndex]} de ${ano}`,
+          label:c => ` ${fmtR(c.raw)}  ${c.dataset.label.toLowerCase()}`,
+          footer:its => {
+            const m = M[its[0].dataIndex], out = [];
+            const top = Object.entries(m.por).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 3);
+            if(top.length > 1) top.forEach(([id, v]) => out.push(`${nomes[id] || '—'}: ${fmtR(v)}`));
+            if(Math.abs(m.ajuste) >= 0.01) out.push(`Inclui ${sinalR(m.ajuste)} de acerto pelo saldo informado`);
+            if(m.recebido) out.push(`Entrou na conta: ${fmtR(m.recebido)}`);
+            return out;
+          } } } } }
+  });
+  const res = document.getElementById('inv-rm-resumo');
+  if(res){
+    const partes = [];
+    if(ano < atual) partes.push(`Em ${ano}: rendeu <b>${fmtR(tR)}</b>`, `média de ${fmtR(tR / 12)} por mês`);
+    else if(ano > atual) partes.push(`Em ${ano}: deve render <b>${fmtR(tP)}</b>`, `média de ${fmtR(tP / 12)} por mês`);
+    else partes.push(`Rendeu <b>${fmtR(tR)}</b> até hoje`, `deve render mais <b>${fmtR(tP)}</b> até dezembro`, `média de ${fmtR((tR + tP) / 12)} por mês`);
+    if(tRec) partes.push(`entrou na conta: ${fmtR(tRec)}`);
+    res.innerHTML = partes.join(' · ');
+  }
+  const tab = document.getElementById('inv-rm-tabela');
+  if(tab) tab.innerHTML = `<div class="tbl-wrap"><table class="tbl inv-tbl"><thead><tr><th>Mês</th><th class="n">Rendeu</th><th class="n">A render</th><th class="n">Entrou na conta</th></tr></thead>
+    <tbody>${M.map((x, i) => `<tr><td>${MESES[i]}</td><td class="n">${x.rendeu ? fmtR(x.rendeu) : '—'}</td><td class="n">${x.previsto ? fmtR(x.previsto) : '—'}</td><td class="n">${x.recebido ? fmtR(x.recebido) : '—'}</td></tr>`).join('')}</tbody>
+    <tfoot><tr><td>Total</td><td class="n">${fmtR(tR)}</td><td class="n">${fmtR(tP)}</td><td class="n">${fmtR(tRec)}</td></tr></tfoot></table></div>`;
+}
+// Projeção de lucro: quanto as aplicações (e os aportes, se houver) podem render no prazo
+function renderInvProjecao(){
+  const d = gs(), hj = today();
+  const meses = +(document.getElementById('inv-pz')?.value || 12);
+  const aporte = Math.max(0, parseFloat(document.getElementById('inv-ap')?.value) || 0);
+  const txEl = document.getElementById('inv-tx'), txPadrao = taxaMediaCarteira(d, hj);
+  if(txEl) txEl.placeholder = numBR(txPadrao);
+  const taxa = txEl && txEl.value !== '' ? Math.max(0, parseFloat(txEl.value) || 0) : txPadrao;
+  const pj = projetarInvest(d, { hoje:hj, meses, aporte, taxaAportes:taxa });
+  const tem = pj.hojeTot > 0 || aporte > 0;
+  const box = document.getElementById('inv-proj-box'), vazio = document.getElementById('inv-proj-vazio');
+  if(box) box.style.display = tem ? '' : 'none';
+  if(vazio) vazio.style.display = tem ? 'none' : '';
+  if(!tem) return;
+  const quando = mesAnoCurto(pj.fim);
+  const num = document.getElementById('inv-proj-num');
+  if(num) num.innerHTML = `
+    <div class="ip-destaque"><small>Valor em ${quando}</small><b>${fmtR(pj.total)}</b><em>hoje: ${fmtR(pj.hojeTot)}${aporte ? ` + aportes de ${fmtR(pj.aportes.total)}` : ''}</em></div>
+    <div><small>Juros no período</small><b class="pos">${sinalR(pj.juros)}</b></div>
+    <div><small>IR estimado</small><b>${pj.ir ? '−' + fmtR(pj.ir) : fmtR(0)}</b></div>
+    <div><small>Lucro líquido</small><b class="pos">${sinalR(pj.liquido)}</b></div>
+    <div><small>Juros por mês no fim</small><b>${fmtR(pj.rendaMes)}</b></div>`;
+  // série: de mês em mês até 2 anos; depois, de ano em ano
+  let pts = pj.serie.map((p, k) => ({ ...p, k }));
+  if(meses > 24) pts = pts.filter(p => (p.k + 1) % 12 === 0 || p.k === meses - 1);
+  const cA = corTema('--viz-aplic') || '#3987e5', cJ = corTema('--viz-juros') || '#16ad69';
+  const ultimo = pts.length - 1;
+  mkCh('ch-inv-proj', {
+    type:'line',
+    data:{ labels:pts.map(p => mesAnoCurto(p.data)), datasets:[
+      { label:'Dinheiro aplicado', data:pts.map(p => p.aplicado), borderColor:cA, backgroundColor:cA + '1a', fill:'origin', borderWidth:2, tension:0,
+        pointRadius:pts.map((_, i) => i === ultimo ? 4 : 0), pointHoverRadius:5, pointBackgroundColor:cA, pointBorderColor:corTema('--surface1') || '#131926', pointBorderWidth:2, stack:'p' },
+      { label:'Juros', data:pts.map(p => p.juros), borderColor:cJ, backgroundColor:cJ + '1a', fill:'-1', borderWidth:2, tension:0,
+        pointRadius:pts.map((_, i) => i === ultimo ? 4 : 0), pointHoverRadius:5, pointBackgroundColor:cJ, pointBorderColor:corTema('--surface1') || '#131926', pointBorderWidth:2, stack:'p' },
+    ]},
+    options:{ ...chartBase, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+      scales:{ x:{ ...chartBase.scales.x, grid:{ display:false }, ticks:{ ...chartBase.scales.x.ticks, maxRotation:0, autoSkipPadding:14 } },
+        y:{ ...chartBase.scales.y, stacked:true, beginAtZero:true, ticks:{ ...chartBase.scales.y.ticks, callback:fmtEixoR } } },
+      plugins:{ legend:{ display:false }, tooltip:{ ...dicaInv([cA, cJ]),
+        callbacks:{ ...dicaInv([cA, cJ]).callbacks,
+          title:its => `Em ${mesAnoCurto(pts[its[0].dataIndex].data)}`,
+          label:c => ` ${fmtR(c.raw)}  ${c.dataset.label.toLowerCase()}`,
+          footer:its => `Total: ${fmtR(pts[its[0].dataIndex].total)}` } } } },
+    plugins:[invCrosshair]
+  });
+  const tPts = document.getElementById('inv-proj-serie');
+  if(tPts) tPts.innerHTML = `<div class="tbl-wrap"><table class="tbl inv-tbl"><thead><tr><th>Em</th><th class="n">Dinheiro aplicado</th><th class="n">Juros</th><th class="n">Total</th></tr></thead>
+    <tbody>${pts.map(p => `<tr><td>${mesAnoCurto(p.data)}</td><td class="n">${fmtR(p.aplicado)}</td><td class="n">${fmtR(p.juros)}</td><td class="n">${fmtR(p.total)}</td></tr>`).join('')}</tbody></table></div>`;
+  const tab = document.getElementById('inv-proj-tab');
+  if(tab){
+    const ir = l => l.irProprio ? 'regras próprias' : l.isento ? 'isento' : l.ir ? '−' + fmtR(l.ir) : '—';
+    const linhas = pj.linhas.slice().sort((a, b) => b.juros - a.juros).map(l => `<tr><td>${escHtml(l.nome)}<small>${l.r > 0 ? `${numBR(l.r * 100)}% ao ano` : 'sem taxa'}</small></td>
+      <td class="n c-hoje">${fmtR(l.hoje)}</td><td class="n c-em">${fmtR(l.fim)}</td><td class="n pos">${sinalR(l.juros)}</td><td class="n c-ir">${ir(l)}</td><td class="n">${sinalR(l.juros - l.ir)}</td></tr>`);
+    if(pj.semTaxa) linhas.push(`<tr><td>Sem taxa cadastrada<small>não rende na projeção</small></td><td class="n c-hoje">${fmtR(pj.semTaxa)}</td><td class="n c-em">${fmtR(pj.semTaxa)}</td><td class="n">—</td><td class="n c-ir">—</td><td class="n">—</td></tr>`);
+    if(aporte) linhas.push(`<tr><td>Aportes de ${fmtR(aporte)} por mês<small>${numBR(pj.rAp * 100)}% ao ano</small></td><td class="n c-hoje">—</td><td class="n c-em">${fmtR(pj.aportes.fim)}</td>
+      <td class="n pos">${sinalR(pj.aportes.juros)}</td><td class="n c-ir">${pj.aportes.ir ? '−' + fmtR(pj.aportes.ir) : '—'}</td><td class="n">${sinalR(pj.aportes.juros - pj.aportes.ir)}</td></tr>`);
+    tab.innerHTML = `<div class="tbl-wrap"><table class="tbl inv-tbl"><thead><tr><th>Aplicação</th><th class="n c-hoje">Hoje</th><th class="n c-em">Em ${quando}</th><th class="n">Juros</th><th class="n c-ir">IR</th><th class="n">Líquido</th></tr></thead>
+      <tbody>${linhas.join('')}</tbody>
+      <tfoot><tr><td>Total</td><td class="n c-hoje">${fmtR(pj.hojeTot)}</td><td class="n c-em">${fmtR(pj.total)}</td><td class="n pos">${sinalR(pj.juros)}</td><td class="n c-ir">${pj.ir ? '−' + fmtR(pj.ir) : '—'}</td><td class="n">${sinalR(pj.liquido)}</td></tr></tfoot></table></div>`;
+  }
+}
+
+// ── Detalhe de uma aplicação ──
+function abrirAtivo(id, origem){
+  _invAtivoId = id;
+  if(!renderAtivoDetalhe()) return;
+  openM('m-ativo', origem);
+  animarAberturaModal(document.getElementById('m-ativo'), origem);
+}
+function renderAtivoDetalhe(){
+  const d = gs(), a = ativosInv(d).find(x => x.id === _invAtivoId);
+  if(!a) return false;
+  const hj = today(), cfg = invCfg(d), s = situacaoAtivo(a, d, hj, cfg);
+  set('ad-titulo', a.nome);
+  set('ad-sub', [a.produto, a.instituicao, rotuloTaxa(a)].filter(Boolean).join(' · '));
+  const irTxt = !pagaIR(a) ? (invProduto(a.produto).irProprio ? 'IR com regras próprias' : 'isento de IR')
+    : s.ir || s.iof ? `IR ${numBR(aliquotaIR(s.dias), 1)}%${s.iof ? ' + IOF' : ''}: −${fmtR(s.ir + s.iof)}` : 'sem IR a pagar';
+  // no vencimento (ou em 12 meses, sem vencimento): quanto deve valer e o lucro
+  let proj = '';
+  if(s.ativa && s.V > 0){
+    const alvo = a.vencimento && a.vencimento > hj ? a.vencimento : !a.vencimento ? addMesesISO(hj, 12) : '';
+    if(alvo){
+      const r = taxaAnualAtivo(a, cfg, true);
+      const vf = s.V * Math.pow(1 + r, diasEntreISO(hj, alvo) / 365), lucro = vf - s.P;
+      const ir = pagaIR(a) && lucro > 0 ? lucro * aliquotaIR(diasEntreISO(s.media || hj, alvo)) / 100 : 0;
+      proj = r > 0 ? `<div><span>${a.vencimento ? 'No vencimento' : 'Em 12 meses'}</span><b>${fmtR(vf)}</b>
+        <small>lucro ${fmtR(lucro)}${ir ? ` · IR −${fmtR(ir)} · líquido ${fmtR(vf - ir)}` : ''}</small></div>` : '';
+    }
+  }
+  const venc = !a.vencimento ? '<b>Sem vencimento</b>' : `<b class="${s.venceu ? 'alerta' : ''}">${fmtDataBR(a.vencimento)}</b><small>${s.venceu ? 'já venceu: registre o resgate' : a.vencimento > hj ? 'faltam ' + prazoTxt(diasEntreISO(hj, a.vencimento)) : ''}</small>`;
+  // movimentações: aplicações, resgates, saldos informados e rendimentos que entraram na conta
+  const hist = s.ev.map(e => ({ ...e }));
+  (d.lancs || []).forEach(l => { if(l.ativoId === a.id && l.tipo === 'Receita' && !l.refResgateId && l.status !== 'cancelado') hist.push({ data:l.data, tipo:'receita', v:l.valor || 0, desc:l.desc }); });
+  hist.sort((x, y) => y.data.localeCompare(x.data));
+  const ROT = { aporte:['↗', 'Aplicação', 'ap'], resgate:['↙', 'Resgate', 'rs'], saldo:['✎', 'Saldo informado', 'sd'], fim:['■', 'Encerrada', 'fim'], receita:['+', 'Rendimento na conta', 'rc'] };
+  const histHtml = hist.length ? hist.map(e => { const [ic, rot, cls] = ROT[e.tipo];
+    return `<div class="ad-mov ${cls}"><span class="ad-mov-ic" aria-hidden="true">${ic}</span>
+      <span class="ad-mov-txt"><b>${escHtml(e.base ? e.desc : e.tipo === 'saldo' || e.tipo === 'fim' ? rot : e.desc || rot)}</b><small>${fmtDataBR(e.data)} · ${rot}${e.lucro ? ` · lucro ${fmtR(e.lucro)}` : ''}</small></span>
+      <span class="ad-mov-v">${e.tipo === 'fim' ? '' : fmtR(e.v)}</span>
+      ${e.tipo === 'saldo' ? `<button type="button" class="ad-mov-x" data-id="${escAttr(e.saldoId || '')}" onclick="apagarInvSaldo(this.dataset.id)" title="Apagar este saldo" aria-label="Apagar o saldo de ${fmtDataBR(e.data)}">✕</button>` : ''}
+    </div>`; }).join('') : '<div class="dash-vazio">Nenhuma movimentação.</div>';
+  const corpo = document.getElementById('ad-corpo');
+  if(corpo) corpo.innerHTML = `
+    <div class="ad-num">
+      <div><small>Aplicado</small><b>${fmtR(s.P)}</b></div>
+      <div><small>Valor atual</small><b>${fmtR(s.V)}</b><em>${s.informado ? 'informado em ' + fmtDataBR(s.informado) : s.r > 0 ? 'estimado pela taxa' : 'sem taxa: informe o saldo'}</em></div>
+      <div><small>Rendimento</small><b class="${s.ganho < 0 ? 'neg' : 'pos'}">${sinalR(s.ganho)}</b><em>${s.P > 0 ? sinalPct(s.pct) + ' sobre o aplicado' : ''}</em></div>
+      <div><small>Se resgatar hoje</small><b>${fmtR(s.liquido)}</b><em>${irTxt}</em></div>
     </div>
-    <div class="cart-l cab"><span>Categoria</span><span class="mono ap">Aplicado</span><span class="mono rs">Resgatado</span><span class="mono">Investido</span></div>
-    ${linhas.map(x => `<div class="cart-l"><span>${escHtml(x.sub || x.cat)}${x.sub ? `<small>${escHtml(x.cat)}</small>` : ''}</span>
-      <span class="mono ap">${fmtR(x.ap)}</span><span class="mono rs">${x.rs ? fmtR(x.rs) : '—'}</span><span class="mono saldo">${fmtR(x.saldo)}</span></div>`).join('')}
-    <div class="cart-sub">Últimas movimentações</div>
-    ${movs.slice(0, 6).map(m => `<div class="dk-ul"><span class="dk-ul-txt"><b>${escHtml(m.desc || '—')}</b><small>${fmtDataBR(m.data)} · ${m.tipo === 'Resgate' ? 'resgate' : 'aplicação'}${m.subcat ? ' · ' + escHtml(m.subcat) : ''}</small></span>
-      <span class="dk-ul-val ${m.v >= 0 ? 'inv' : 'resg'}">${m.v >= 0 ? '↗ ' : '↙ '}${fmtR(Math.abs(m.v))}</span></div>`).join('')}
-    <div class="dash-sub" style="margin-top:12px">São os valores aplicados e resgatados, sem o rendimento. O lucro informado num resgate fica em Receitas › Rendimentos.</div>`;
+    <div class="ad-info">
+      <div><span>Rentabilidade</span><b>${escHtml(rotuloTaxa(a))}</b><small>${s.r > 0 && a.indexador !== 'pre' ? `≈ ${numBR(s.r * 100)}% ao ano hoje` : a.indexador === 'livre' ? (+a.taxa ? `espera ${numBR(a.taxa)}% ao ano` : 'sem taxa fixa') : ''}</small></div>
+      <div><span>Juros por mês</span><b>${s.jurosMes ? fmtR(s.jurosMes) : '—'}</b><small>${s.jurosMes ? 'nas taxas de hoje' : ''}</small></div>
+      <div><span>Vencimento</span>${venc}</div>
+      ${proj}
+    </div>
+    <div class="ad-hist-hd"><span>Movimentações</span><button type="button" class="inv-link" onclick="rendimentoAtivo(null, this)">+ Rendimento que entrou na conta</button></div>
+    <div class="ad-hist">${histHtml}</div>`;
+  return true;
+}
+function aportarAtivo(id, origem){ id = id || _invAtivoId; closeM('m-ativo'); novoLancTipo('Investimento', origem, id); }
+function resgatarAtivo(id, origem, total){
+  id = id || _invAtivoId; closeM('m-ativo'); novoLancTipo('Resgate', origem, id);
+  if(total){ const ck = document.getElementById('l-resg-total'); if(ck){ ck.checked = true; marcarResgateTotal(); } }
+}
+// Rendimento pago na conta (juros de cupom, dividendos de FII…): uma receita ligada à aplicação
+function rendimentoAtivo(id, origem){
+  id = id || _invAtivoId;
+  const a = ativosInv().find(x => x.id === id);
+  closeM('m-ativo');
+  openM('m-lanc', origem);
+  const $ = x => document.getElementById(x);
+  $('l-tipo').value = 'Receita'; updLancTipo();
+  const cat = papel('rendimentos'), sub = papelSub('rendimentos');
+  if([...$('l-cat').options].some(o => o.value === cat)){ $('l-cat').value = cat; updLancSubcats(); }
+  if(sub) $('l-subcat').value = sub;
+  updLancAtivo();
+  if(a){ $('l-ativo').value = a.id; $('l-desc').value = `Rendimento — ${a.nome}`; }
+  updLancAtivo();
+}
+function excluirAtivo(){
+  const d = gs(), a = ativosInv(d).find(x => x.id === _invAtivoId);
+  if(!a || !confirm(`Excluir a aplicação “${a.nome}”?\n\nOs lançamentos de aplicação e resgate continuam; só deixam de estar ligados a ela.`)) return;
+  d.invAtivos = ativosInv(d).filter(x => x.id !== a.id);
+  (d.lancs || []).forEach(l => { if(l.ativoId === a.id) delete l.ativoId; });
+  (d.bancos || []).forEach(b => (b.movs || []).forEach(m => { if(m.ativoId === a.id) delete m.ativoId; }));
+  ss(d); closeM('m-ativo'); refreshAll();
+}
+
+// ── Cadastro e edição de aplicação ──
+function opcoesProdutoInv(){
+  const grupos = [...new Set(INV_PRODUTOS.map(x => x.g))];
+  return grupos.map(g => `<optgroup label="${g}">${INV_PRODUTOS.filter(x => x.g === g).map(x => `<option value="${escAttr(x.p)}">${escHtml(x.p)}</option>`).join('')}</optgroup>`).join('');
+}
+function afCats(cat, sub){
+  const $ = x => document.getElementById(x);
+  const cats = allCats('Investimento');
+  $('af-cat').innerHTML = cats.map(c => `<option value="${escAttr(c)}">${escHtml(c)}</option>`).join('');
+  $('af-cat').value = cats.includes(cat) ? cat : (cats.includes(papel('investimentoPadrao')) ? papel('investimentoPadrao') : cats[0] || '');
+  afSubcats(sub);
+}
+function afSubcats(sub){
+  const $ = x => document.getElementById(x), subs = subcats('Investimento', $('af-cat').value);
+  $('af-subcat').innerHTML = '<option value="">— Sem subcategoria —</option>' + subs.map(s => `<option value="${escAttr(s)}">${escHtml(s)}</option>`).join('');
+  $('af-subcat').value = subs.includes(sub) ? sub : '';
+}
+// grupo = índice de um grupo "sem taxa cadastrada": a aplicação nasce com esses movimentos
+function abrirAtivoForm(id, origem, grupo){
+  const $ = x => document.getElementById(x), d = gs();
+  const a = id ? ativosInv(d).find(x => x.id === id) : null;
+  const g = grupo != null ? _invGrupos[grupo] : null;
+  if(id && !a) return;
+  $('af-produto').innerHTML = opcoesProdutoInv();
+  $('af-idx').innerHTML = Object.entries(INV_IDX).map(([k, v]) => `<option value="${k}">${v.nome}</option>`).join('');
+  $('af-id').value = a ? a.id : '';
+  $('af-grupo').value = g ? g.k : '';   // a chave (categoria › subcategoria), não a posição na lista
+  $('af-err').style.display = 'none';
+  $('af-titulo').textContent = a ? 'Editar aplicação' : g ? 'Cadastrar a taxa' : 'Nova aplicação';
+  $('af-sub').textContent = a ? a.nome : g ? `${g.sub || g.cat}: ${g.n} ${g.n > 1 ? 'movimentações' : 'movimentação'} passam a fazer parte desta aplicação` : 'Um CDB, um título do Tesouro, uma LCI, ações…';
+  if(a){
+    $('af-produto').value = a.produto || 'Outro';
+    $('af-nome').value = a.nome || ''; $('af-inst').value = a.instituicao || '';
+    $('af-idx').value = a.indexador || 'pre'; $('af-taxa').value = a.taxa != null && a.taxa !== '' ? a.taxa : '';
+    $('af-inicio').value = a.inicio || ''; $('af-venc').value = a.vencimento || '';
+    $('af-isento').checked = !!a.isento; $('af-obs').value = a.obs || '';
+    afCats(a.cat, a.subcat);
+  } else {
+    const prod = g ? (INV_PRODUTOS.find(x => x.sub && x.sub === g.sub) || invProduto('Outro')).p : 'CDB';
+    $('af-produto').value = prod;
+    $('af-nome').value = g ? (g.sub || g.cat) : ''; $('af-inst').value = '';
+    $('af-inicio').value = g ? g.inicio : today(); $('af-venc').value = '';
+    $('af-obs').value = '';
+    afProduto(true);
+    if(g) afCats(g.cat, g.sub);
+  }
+  // valor: ao cadastrar, conta de onde sai o dinheiro ou o que já estava aplicado; na edição, só o valor anterior ao sistema
+  $('af-valor-box').style.display = a || g ? 'none' : '';
+  $('af-base-box').style.display = a && a.base ? '' : 'none';
+  if(a && a.base){ $('af-base').value = a.base.valor; $('af-base-data').value = a.base.data || a.inicio || ''; }
+  if(!a && !g){
+    document.querySelector('input[name="af-modo"][value="nova"]').checked = true;
+    $('af-valor').value = ''; $('af-atual').value = '';
+    popCaixas('af-conta');
+    $('af-conta').options[0].textContent = '— Selecione a conta —';
+    afModo();
+  }
+  $('af-salvar').textContent = a ? 'Salvar alterações' : 'Salvar aplicação';
+  afIdx();
+  closeM('m-ativo');
+  openM('m-ativo-form', origem);
+  animarAberturaModal(document.getElementById('m-ativo-form'), origem);
+}
+function editarAtivoAtual(origem){ abrirAtivoForm(_invAtivoId, origem); }
+// Produto escolhido: sugere rentabilidade, isenção de IR e subcategoria
+function afProduto(inicio){
+  const $ = x => document.getElementById(x), p = invProduto($('af-produto').value);
+  $('af-idx').value = p.idx;
+  $('af-taxa').value = p.taxa != null ? p.taxa : '';
+  $('af-isento').checked = !!p.isento;
+  afCats(papel('investimentoPadrao'), p.sub);
+  if(!inicio) afIdx();
+}
+function afIdx(){
+  const $ = x => document.getElementById(x), idx = $('af-idx').value, info = INV_IDX[idx] || INV_IDX.pre;
+  $('af-taxa-fg').style.display = info.campo ? '' : 'none';
+  $('af-taxa-lbl').textContent = info.campo;
+  $('af-taxa').placeholder = idx === 'cdi' ? 'Ex.: 110' : idx === 'livre' ? 'Opcional' : 'Ex.: 6,5';
+  afEquiv();
+}
+// Quanto a taxa dá ao ano, com as taxas de referência de hoje
+function afEquiv(){
+  const $ = x => document.getElementById(x), cfg = invCfg();
+  const a = { indexador:$('af-idx').value, taxa:parseFloat($('af-taxa').value) || 0 };
+  const r = taxaAnualAtivo(a, cfg, true);
+  const base = { cdi:`com o CDI a ${numBR(cfg.cdi)}%`, selic:`com a Selic a ${numBR(cfg.selic)}%`, ipca:`com o IPCA a ${numBR(cfg.ipca)}%`,
+    poupanca:`0,5% ao mês + TR (${numBR(cfg.tr)}%), com a Selic acima de 8,5%` }[a.indexador];
+  $('af-equiv').innerHTML = a.indexador === 'livre' ? 'O valor vem dos saldos que você informar; o retorno esperado só entra na projeção.'
+    : r > 0 ? `≈ <b>${numBR(r * 100)}% ao ano</b>${base ? ' ' + base : ''} · ≈ ${numBR(taxaMensal(r) * 100)}% ao mês` : '';
+}
+function afModo(){
+  const $ = x => document.getElementById(x), nova = document.querySelector('input[name="af-modo"]:checked')?.value !== 'existente';
+  $('af-conta-fg').style.display = nova ? '' : 'none';
+  $('af-atual-fg').style.display = nova ? 'none' : '';
+  $('af-valor-lbl').textContent = nova ? 'Valor aplicado *' : 'Quanto você aplicou *';
+}
+function salvarAtivo(){
+  const $ = x => document.getElementById(x), d = gs(), erro = msg => { $('af-err').textContent = '⚠️ ' + msg; $('af-err').style.display = 'block'; };
+  const id = $('af-id').value, chave = $('af-grupo').value;
+  const grupo = chave ? gruposSemAtivo(d, today()).find(g => g.k === chave) : null;
+  if(chave && !grupo) return erro('Essas movimentações já não estão sem taxa. Feche e abra de novo.');
+  const nome = $('af-nome').value.trim(), idx = $('af-idx').value, inicio = $('af-inicio').value, venc = $('af-venc').value;
+  const taxaTxt = $('af-taxa').value, taxa = taxaTxt === '' ? null : Math.max(0, parseFloat(taxaTxt) || 0);
+  if(!nome){ $('af-nome').focus(); return erro('Dê um nome para a aplicação.'); }
+  if(!inicio){ $('af-inicio').focus(); return erro('Informe a data da aplicação.'); }
+  if(venc && venc <= inicio){ $('af-venc').focus(); return erro('O vencimento precisa ser depois da data da aplicação.'); }
+  if(['cdi', 'pre', 'ipca'].includes(idx) && !(taxa > 0)){ $('af-taxa').focus(); return erro('Informe a taxa da aplicação.'); }
+  const dados = { nome, produto:$('af-produto').value, instituicao:$('af-inst').value.trim(), indexador:idx, taxa:INV_IDX[idx].campo ? taxa : null,
+    inicio, vencimento:venc, isento:$('af-isento').checked, cat:$('af-cat').value, subcat:$('af-subcat').value, obs:$('af-obs').value.trim() };
+  d.invAtivos = ativosInv(d);
+  if(id){
+    const a = d.invAtivos.find(x => x.id === id);
+    if(!a) return;
+    Object.assign(a, dados, { editadoEm:new Date().toISOString() });
+    if(a.base){
+      const bv = parseFloat($('af-base').value) || 0;
+      if(bv > 0) a.base = { valor:+bv.toFixed(2), data:$('af-base-data').value || inicio }; else delete a.base;
+    }
+    // os lançamentos ligados acompanham a categoria da aplicação
+    (d.lancs || []).forEach(l => { if(l.ativoId === a.id && ehMovInvest(l.tipo)){ l.cat = a.cat; l.subcat = a.subcat; } });
+    ss(d); closeM('m-ativo-form'); refreshAll();
+    _invAtivoId = a.id; if(renderAtivoDetalhe()) openM('m-ativo');
+    return;
+  }
+  const a = { id:uid(), ...dados, saldos:[], ts:Date.now() };
+  if(grupo){
+    // cadastrar a taxa de um grupo: os movimentos passam a ser desta aplicação
+    const lancs = new Set(grupo.itens.map(m => m.lancId).filter(Boolean)), movs = new Set(grupo.itens.map(m => m.movId).filter(Boolean));
+    (d.lancs || []).forEach(l => { if(lancs.has(l.id) || (l.refResgateId && lancs.has(l.refResgateId))) l.ativoId = a.id; });
+    (d.bancos || []).forEach(b => (b.movs || []).forEach(m => { if(movs.has(m.id)) m.ativoId = a.id; }));
+  } else {
+    const valor = parseFloat($('af-valor').value) || 0;
+    const nova = document.querySelector('input[name="af-modo"]:checked')?.value !== 'existente';
+    if(!(valor > 0)){ $('af-valor').focus(); return erro('Informe o valor aplicado.'); }
+    if(nova){
+      const caixaId = $('af-conta').value;
+      if(!caixaId && (d.bancos || []).length){ $('af-conta').focus(); return erro('Escolha a conta de onde sai o dinheiro.'); }
+      const caixaNome = caixaId ? ((d.bancos || []).find(b => b.id === caixaId) || {}).nome || '' : '';
+      const l = { id:uid(), data:inicio, tipo:'Investimento', cat:a.cat, subcat:a.subcat, desc:nome, valor:+valor.toFixed(2), caixaId, caixaNome,
+        pago:inicio <= today() ? 'Pago' : 'Agendado', obs:'', ts:Date.now(), status:'ativo', ativoId:a.id };
+      d.lancs.push(l);
+      if(caixaId && l.pago === 'Pago') lancToCaixa(l, d);
+    } else {
+      a.base = { valor:+valor.toFixed(2), data:inicio };
+      const atual = parseFloat($('af-atual').value) || 0;
+      if(atual > 0) a.saldos.push({ id:uid(), data:today() < inicio ? inicio : today(), valor:+atual.toFixed(2) });
+    }
+  }
+  d.invAtivos.push(a);
+  ss(d); closeM('m-ativo-form'); refreshAll();
+}
+
+// ── Atualizar saldo: o valor que o banco ou a corretora mostra ──
+function abrirInvSaldo(id, origem){
+  id = id || _invAtivoId;
+  const a = ativosInv().find(x => x.id === id);
+  if(!a) return;
+  _invAtivoId = id;
+  const $ = x => document.getElementById(x);
+  set('is-sub', a.nome);
+  $('is-data').value = today(); $('is-valor').value = '';
+  $('is-err').style.display = 'none';
+  invSaldoDica();
+  closeM('m-ativo');
+  openM('m-inv-saldo', origem);
+  animarAberturaModal(document.getElementById('m-inv-saldo'), origem);
+  setTimeout(() => $('is-valor').focus(), 50);
+}
+function invSaldoDica(){
+  const $ = x => document.getElementById(x), d = gs(), a = ativosInv(d).find(x => x.id === _invAtivoId), dt = $('is-data').value;
+  if(!a || !dt){ $('is-dica').textContent = ''; return; }
+  const v = serieAtivo(a, d, [dt], { somentePagos:true })[0].V;
+  $('is-dica').innerHTML = v > 0 ? `Pelas contas do sistema, valeria cerca de <b>${fmtR(v)}</b> nessa data.` : '';
+}
+function salvarInvSaldo(){
+  const $ = x => document.getElementById(x), d = gs(), a = ativosInv(d).find(x => x.id === _invAtivoId);
+  if(!a) return;
+  const dt = $('is-data').value, v = parseFloat($('is-valor').value);
+  if(!dt || !(v >= 0) || $('is-valor').value === ''){
+    $('is-err').textContent = '⚠️ Informe a data e o valor.'; $('is-err').style.display = 'block'; return;
+  }
+  a.saldos = (a.saldos || []).filter(s => s.data !== dt);
+  a.saldos.push({ id:uid(), data:dt, valor:+v.toFixed(2) });
+  a.saldos.sort((x, y) => x.data.localeCompare(y.data));
+  ss(d); closeM('m-inv-saldo'); refreshAll();
+  if(renderAtivoDetalhe()) openM('m-ativo');
+}
+function apagarInvSaldo(saldoId){
+  const d = gs(), a = ativosInv(d).find(x => x.id === _invAtivoId);
+  if(!a || !confirm('Apagar este saldo informado? O valor volta a ser estimado pela taxa.')) return;
+  a.saldos = (a.saldos || []).filter(s => s.id !== saldoId);
+  ss(d); refreshAll(); renderAtivoDetalhe();
+}
+
+// ── Taxas de referência (premissas) ──
+function abrirInvTaxas(origem){
+  const $ = x => document.getElementById(x), cfg = invCfg();
+  $('it-cdi').value = cfg.cdi; $('it-selic').value = cfg.selic; $('it-ipca').value = cfg.ipca; $('it-tr').value = cfg.tr;
+  set('it-data', fmtDataBR(cfg.atualizadoEm));
+  $('it-err').style.display = 'none';
+  openM('m-inv-taxas', origem);
+  animarAberturaModal(document.getElementById('m-inv-taxas'), origem);
+}
+function salvarInvTaxas(){
+  const $ = x => document.getElementById(x), v = id => parseFloat($(id).value);
+  const n = { cdi:v('it-cdi'), selic:v('it-selic'), ipca:v('it-ipca'), tr:v('it-tr') };
+  if(Object.values(n).some(x => isNaN(x) || x < 0 || x > 100)){
+    $('it-err').textContent = '⚠️ Use números entre 0 e 100.'; $('it-err').style.display = 'block'; return;
+  }
+  const d = gs();
+  d.invCfg = { ...n, atualizadoEm:today() };
+  ss(d); closeM('m-inv-taxas'); refreshAll();
+}
+function restaurarInvTaxas(){
+  const $ = x => document.getElementById(x);
+  $('it-cdi').value = INV_CFG_PADRAO.cdi; $('it-selic').value = INV_CFG_PADRAO.selic; $('it-ipca').value = INV_CFG_PADRAO.ipca; $('it-tr').value = INV_CFG_PADRAO.tr;
+}
+
+// ── No lançamento: de qual aplicação é a aplicação/resgate (e o rendimento recebido) ──
+// manter: aplicação que precisa continuar na lista mesmo encerrada (ao editar um lançamento dela)
+function updLancAtivo(escolheu, manter){
+  const $ = x => document.getElementById(x), row = $('l-ativo-row'), sel = $('l-ativo');
+  if(!row || !sel) return;
+  const t = $('l-tipo')?.value || 'Despesa', rendSub = papelSub('rendimentos');
+  const mostra = ehMovInvest(t) || (t === 'Receita' && !!rendSub && $('l-cat')?.value === papel('rendimentos') && $('l-subcat')?.value === rendSub);
+  const d = gs(), atual = manter || sel.value;
+  if(mostra){
+    const lista = ativosInv(d).filter(a => !a.encerradoEm || a.id === atual);
+    sel.innerHTML = '<option value="">— Nenhuma —</option>' + lista.map(a => `<option value="${escAttr(a.id)}">${escHtml(a.nome)}</option>`).join('');
+    sel.value = lista.some(a => a.id === atual) ? atual : '';
+  }
+  row.style.display = mostra && ativosInv(d).length ? 'grid' : 'none';
+  if(!mostra) sel.value = '';
+  const a = ativosInv(d).find(x => x.id === sel.value);
+  if(escolheu && a && ehMovInvest(t)){
+    if([...$('l-cat').options].some(o => o.value === a.cat)){ $('l-cat').value = a.cat; updLancSubcats(); }
+    if(a.subcat) $('l-subcat').value = a.subcat;
+  }
+  updLancRendEst();
+}
+// Abre o lançamento já ligado a uma aplicação (Aportar / Resgatar)
+function escolherAtivoNoLanc(ativoId, tipo){
+  const $ = x => document.getElementById(x), a = ativosInv().find(x => x.id === ativoId);
+  if(!a) return;
+  updLancAtivo();
+  $('l-ativo').value = a.id;
+  updLancAtivo(true);
+  $('l-desc').value = `${tipo === 'Resgate' ? 'Resgate' : 'Aporte'} — ${a.nome}`;
+}
+// Resgate de uma aplicação: quanto do valor é rendimento, pela taxa; "resgatei tudo" encerra a aplicação
+function updLancRendEst(){
+  const $ = x => document.getElementById(x), box = $('l-rend-est'), totRow = $('l-resg-total-row');
+  const t = $('l-tipo')?.value, novo = !$('l-edit-id')?.value;
+  const d = gs(), a = ativosInv(d).find(x => x.id === $('l-ativo')?.value);
+  const mostra = t === 'Resgate' && novo && !!a && $('l-ativo-row')?.style.display !== 'none';
+  if(totRow) totRow.style.display = mostra ? 'flex' : 'none';
+  if(!box) return;
+  if(!mostra){ box.innerHTML = ''; if($('l-resg-total')) $('l-resg-total').checked = false; return; }
+  const s = situacaoAtivo(a, d, $('l-data')?.value || today());
+  const total = !!$('l-resg-total')?.checked, v = parseFloat($('l-valor')?.value) || 0;
+  if(total){
+    const lucro = Math.max(0, +(v - s.P).toFixed(2));
+    $('l-rend').value = lucro ? lucro.toFixed(2) : '';
+    box.innerHTML = `Aplicado: ${fmtR(s.P)}${s.V > 0 ? ` · valor estimado hoje: ${fmtR(s.V)}` : ''}. O que passar do aplicado é o rendimento.`;
+    return;
+  }
+  const est = s.V > 0 && s.ganho > 0 && v > 0 ? Math.min(v, v * s.ganho / s.V) : 0;
+  box.innerHTML = est >= 0.01 ? `Pela taxa, cerca de <b>${fmtR(est)}</b> desse valor é rendimento. <button type="button" class="inv-link" onclick="usarRendEst(${est.toFixed(2)})">Usar</button>` : '';
+}
+function usarRendEst(v){ const el = document.getElementById('l-rend'); if(el){ el.value = (+v).toFixed(2); el.focus(); } }
+function marcarResgateTotal(){
+  const $ = x => document.getElementById(x), d = gs(), a = ativosInv(d).find(x => x.id === $('l-ativo')?.value);
+  if($('l-resg-total')?.checked && a){
+    const s = situacaoAtivo(a, d, $('l-data')?.value || today());
+    if(s.V > 0) $('l-valor').value = s.V.toFixed(2);
+  } else if($('l-rend')) $('l-rend').value = '';
+  updLancRendEst();
 }
 
 // ── Correção do que entrou errado antes (resgate como receita, aplicação como despesa) ──
@@ -8012,6 +9200,7 @@ function updLancInvest(){
   const linha = $('l-rend-row');
   if(linha) linha.style.display = t === 'Resgate' && novo ? 'grid' : 'none';
   if(t !== 'Resgate' && $('l-rend')) $('l-rend').value = '';
+  updLancAtivo();
 }
 function saveLanc(){
   const editId  = document.getElementById('l-edit-id')?.value;
@@ -8024,6 +9213,7 @@ function saveLanc(){
   const caixaId = document.getElementById('l-caixa')?.value||'';
   const pago    = document.getElementById('l-pago')?.value;
   const obs     = document.getElementById('l-obs')?.value?.trim();
+  const ativoId = document.getElementById('l-ativo-row')?.style.display !== 'none' ? (document.getElementById('l-ativo')?.value || '') : '';
   if(!data||!tipo||!desc||!valor){
     const errEl = document.getElementById('l-lanc-err');
     const msgs = [];
@@ -8054,18 +9244,24 @@ function saveLanc(){
       // Reverter caixa anterior
       if(l.caixaId){const bc=(d.bancos||[]).find(b=>b.id===l.caixaId);if(bc)bc.movs=(bc.movs||[]).filter(m=>m.refLancId!==editId);}
       Object.assign(l,{data,tipo,cat,subcat,desc,valor,caixaId,caixaNome,pago,obs,editadoEm:new Date().toISOString()});
+      // a aplicação ligada (e o lucro informado no resgate acompanha)
+      d.lancs.forEach(x => { if(x === l || x.refResgateId === l.id){ if(ativoId) x.ativoId = ativoId; else delete x.ativoId; } });
       if(caixaId && pago==='Pago') lancToCaixa(l,d);
     }
   } else {
-    const nl={id:uid(),data,tipo,cat,subcat,desc,valor:+(valor - rend).toFixed(2),caixaId,caixaNome,pago,obs,ts:Date.now(),status:'ativo'};
+    const nl={id:uid(),data,tipo,cat,subcat,desc,valor:+(valor - rend).toFixed(2),caixaId,caixaNome,pago,obs,ts:Date.now(),status:'ativo',...(ativoId ? { ativoId } : {})};
     d.lancs.push(nl);
     if(caixaId && pago==='Pago') lancToCaixa(nl,d);
     if(rend){
       const rl={id:uid(),data,tipo:'Receita',cat:papel('rendimentos'),subcat:papelSub('rendimentos'),desc:`Rendimento — ${desc}`,valor:+rend.toFixed(2),
-        caixaId,caixaNome,pago,obs:'Lucro informado no resgate',ts:Date.now()+1,status:'ativo',refResgateId:nl.id};
+        caixaId,caixaNome,pago,obs:'Lucro informado no resgate',ts:Date.now()+1,status:'ativo',refResgateId:nl.id,...(ativoId ? { ativoId } : {})};
       d.lancs.push(rl);
       if(caixaId && pago==='Pago') lancToCaixa(rl,d);
     }
+    // "resgatei tudo" encerra a aplicação; uma nova aplicação reabre a que estava encerrada
+    const at = ativoId && (d.invAtivos || []).find(x => x.id === ativoId);
+    if(at && tipo === 'Resgate' && document.getElementById('l-resg-total')?.checked) at.encerradoEm = data;
+    else if(at && tipo === 'Investimento' && at.encerradoEm && at.encerradoEm <= data) delete at.encerradoEm;
   }
   ss(d); closeM('m-lanc'); refreshAll();
 }
@@ -8088,6 +9284,7 @@ function refreshAll(){
   if(_page==='orc')     renderOrc();
   if(_page==='contas')  renderContas();
   if(_page==='bancos')  renderBancos();
+  if(_page==='invest')  renderInvest();
   // Sempre atualiza dash no fundo para gráficos ficarem prontos
   if(_page!=='dash') renderDash();
 }
@@ -8145,6 +9342,8 @@ function editLanc(){
   document.getElementById('l-pago').value    = l.pago||'Pago';
   document.getElementById('l-obs').value     = l.obs||'';
   document.getElementById('l-tipo').value    = l.tipo;
+  document.getElementById('l-ativo').value   = '';
+  document.getElementById('l-resg-total').checked = false;
   updLancCats();
   setTimeout(()=>{
     const catEl = document.getElementById('l-cat');
@@ -8152,6 +9351,7 @@ function editLanc(){
     setTimeout(()=>{
       const sc = document.getElementById('l-subcat'); if(sc) sc.value = l.subcat||'';
       const cx = document.getElementById('l-caixa');  if(cx && l.caixaId) cx.value = l.caixaId;
+      updLancAtivo(false, l.ativoId);
     }, 80);
   }, 80);
   document.getElementById('m-lanc').style.display = 'flex';

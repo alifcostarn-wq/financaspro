@@ -115,19 +115,18 @@ DATA:OFXSGML
     return [$('l-tipo').value, $('l-cat').value, $('l-subcat').value, getComputedStyle($('l-rend-row')).display].join('|'); }), 'Resgate|Investimentos|Tesouro Direto|none');
   await p.evaluate(() => closeM('m-lanc'));
 
-  // ── 4. Carteira e patrimônio ──
+  // ── 4. Aba Investimentos (sem aplicação cadastrada: por categoria, pelo valor aplicado) e patrimônio ──
   eq('investido até hoje (lançamentos + Bancos)', await p.evaluate(() => investidoAte('2026-10-31', { somentePagos:true })), 3300);
   await p.click('#page-lanc .inv-link');
-  eq('carteira: totais', await txt(p, '#carteira-corpo .cart-tot b'), 'R$ 6.100,00 | R$ 2.800,00 | R$ 3.300,00');
-  eq('carteira: por categoria, do maior para o menor', await p.evaluate(() => [...document.querySelectorAll('#carteira-corpo .cart-l:not(.cab)')]
-    .map(e => `${e.children[0].firstChild.textContent}=${e.querySelector('.saldo').textContent}`).join(', ')),
+  eq('Lançamentos: "Ver investimentos" abre a aba', await p.evaluate(() => _page), 'invest');
+  eq('aba: valor atual e aplicado (sem taxa, sem rendimento)', await txt(p, '#ik-valor, #ik-aplic'), 'R$ 3.300,00 | R$ 3.300,00');
+  eq('aba: por categoria, do maior para o menor, prontos para cadastrar a taxa', await p.evaluate(() => [...document.querySelectorAll('#inv-lista .ia-sem')]
+    .map(e => `${e.querySelector('.c-nome b').textContent}=${e.querySelector('.c-val b').textContent}`).join(', ')),
     'Renda Fixa=R$ 1.900,00, Tesouro Direto=R$ 1.000,00, Investimentos=R$ 400,00');
-  await p.evaluate(() => closeM('m-carteira'));
   await p.evaluate(() => irPagina('dash'));
   eq('Dashboard: patrimônio com o investido de verdade', await txt(p, '#dk-patrimonio-sub'), 'caixa R$ 13,7 mil · investido R$ 3,3 mil');
   await p.click('#dk-patrimonio-sub .inv-link');
-  eq('Dashboard: "investido" abre a carteira', await p.evaluate(() => getComputedStyle(document.getElementById('m-carteira')).display), 'flex');
-  await p.evaluate(() => closeM('m-carteira'));
+  eq('Dashboard: "investido" abre a aba Investimentos', await p.evaluate(() => _page), 'invest');
 
   // ── 5. Relatórios e orçamento: investimento líquido; resgate fora da receita ──
   eq('Central de Relatórios: investimentos líquidos e receita sem resgate', await p.evaluate(() => { const a = absMesISO('2026-10'), s = l => +l.reduce((x, y) => x + y.valor, 0).toFixed(2);
@@ -162,9 +161,9 @@ DATA:OFXSGML
 
   // ── celular ──
   await p.setViewportSize({ width:390, height:844 });
-  await p.evaluate(() => { irPagina('lanc'); abrirCarteira(); });
-  eq('celular: carteira cabe na tela', await p.evaluate(() => document.querySelector('#m-carteira .modal').getBoundingClientRect().right <= 390 && document.documentElement.scrollWidth === 390), true);
-  await p.evaluate(() => { closeM('m-carteira'); const d = gs(); d.lancs.push({ id:'z9', data:'2026-10-20', tipo:'Despesa', cat:'Outras Despesas', subcat:'', desc:'APLIC AUT MAIS', valor:50, caixaId:'bk', caixaNome:'Itaú', pago:'Pago', obs:'', ts:99, status:'ativo' }); ss(d); abrirRevisarInvest(); });
+  await p.evaluate(() => { irPagina('invest'); window.scrollTo(0, 0); });
+  eq('celular: aba Investimentos cabe na tela', await p.evaluate(() => document.documentElement.scrollWidth), 390);
+  await p.evaluate(() => { irPagina('lanc'); const d = gs(); d.lancs.push({ id:'z9', data:'2026-10-20', tipo:'Despesa', cat:'Outras Despesas', subcat:'', desc:'APLIC AUT MAIS', valor:50, caixaId:'bk', caixaNome:'Itaú', pago:'Pago', obs:'', ts:99, status:'ativo' }); ss(d); abrirRevisarInvest(); });
   eq('celular: revisão cabe na tela', await p.evaluate(() => document.querySelector('#m-inv-revisar .modal').getBoundingClientRect().right <= 390 && document.documentElement.scrollWidth === 390), true);
 
   eq('sem erros de JS', errs.join(' ; '), '');

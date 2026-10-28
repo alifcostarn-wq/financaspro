@@ -4,6 +4,105 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-28] Aba Investimentos: aplicações, juros por mês e projeção de lucro
+
+### 🎯 O que foi pedido
+
+Criar uma aba no sistema para tratar de **investimentos**: aplicações financeiras, **rendimentos mensais de juros**
+e **projeções de lucro** dos investimentos.
+
+### ✨ Implementado
+
+- **Nova aba "Investimentos"** no menu (em Financeiro, depois de Contas Bancárias; no celular, em "Mais").
+- **A carteira em quatro números:** valor atual, total aplicado, rendimento acumulado (em R$ e %) e juros por mês
+  (com quanto isso dá no ano).
+- **Cadastro de aplicações com rentabilidade:**
+  - produto (CDB, LCI, LCA, Tesouro Selic, Prefixado e IPCA+, poupança, debênture, CRI/CRA, fundo, previdência,
+    ações, FII, ETF, cripto), banco ou corretora, data da aplicação, vencimento e isenção de IR;
+  - rentabilidade em % do CDI, prefixada, IPCA + taxa, Selic + taxa, regra da poupança ou sem taxa fixa (renda
+    variável, com retorno esperado opcional para a projeção);
+  - o formulário mostra quanto a taxa dá ao ano e ao mês (ex.: 110% do CDI ≈ 15,11% ao ano);
+  - **"Estou aplicando agora"**: cria o lançamento de aplicação e o dinheiro sai da conta escolhida;
+  - **"Já tenho essa aplicação"**: registra o que já estava aplicado antes do sistema, sem mexer no saldo das
+    contas (e, se quiser, quanto vale hoje).
+- **Lista de aplicações:** rentabilidade, aplicado, valor atual (estimado ou informado), rendimento, juros por mês e
+  vencimento (com quanto falta), total da carteira e as aplicações encerradas num grupo à parte.
+- **Detalhe de cada aplicação:**
+  - aplicado, valor atual, rendimento e quanto sobra se resgatar hoje (já sem IR e IOF);
+  - juros por mês e quanto deve valer no vencimento (lucro, IR e líquido);
+  - todas as movimentações;
+  - botões Aportar, Resgatar, Atualizar saldo, Editar e Excluir.
+- **Valor de hoje:**
+  - estimado pela taxa a partir das aplicações e dos resgates (dias corridos; para de render no vencimento);
+  - **"Atualizar saldo"** usa o valor que o banco ou a corretora mostra, e a estimativa recomeça dali;
+  - renda variável vale pelo último saldo informado.
+- **Juros por mês:**
+  - gráfico do ano com o que já rendeu (até hoje) e o que ainda deve render (até dezembro), com seletor de ano;
+  - resumo com total, média por mês e quanto entrou na conta, mais uma tabela com os mesmos valores;
+  - ao passar o mouse, o mês mostra as aplicações que mais renderam e o acerto quando um saldo informado corrige
+    a estimativa.
+- **Onde está o dinheiro:** valor por produto e quanto da carteira é isento de IR.
+- **Projeção de lucro:**
+  - prazo de 6 meses a 20 anos, aporte por mês opcional e taxa dos aportes (padrão: a média da carteira);
+  - mostra o valor no fim, os juros do período, o IR estimado, o lucro líquido e os juros por mês no fim;
+  - gráfico do dinheiro aplicado × juros e tabela por aplicação (hoje, no fim, juros, IR e líquido);
+  - sem nenhuma aplicação, funciona como simulador de aportes.
+- **IR e IOF estimados:**
+  - tabela regressiva da renda fixa: 22,5% até 180 dias, 20% até 360, 17,5% até 720 e 15% depois;
+  - IOF nos resgates dos primeiros 30 dias;
+  - LCI, LCA, CRI, CRA e poupança são isentos; renda variável e previdência ficam de fora (têm regras próprias).
+- **Taxas de referência editáveis:** CDI 13,65% ao ano, Selic 13,75% ao ano, IPCA 4,58% em 12 meses e TR 0,17% ao mês
+  (valores de 28/10/2026). Depois de 45 dias, a aba lembra de conferir.
+- **Avisos na aba:**
+  - aplicação vencida sem resgate, com botão para registrar o resgate total;
+  - movimentações que parecem investimento mas estão contadas como receita ou despesa.
+- **Investimentos antigos sem taxa** (inclusive os feitos em Bancos ou vindos do extrato) aparecem por categoria ›
+  subcategoria, pelo valor aplicado, com o botão **"Cadastrar taxa"**: as movimentações passam a ser da aplicação.
+- **No lançamento:**
+  - campo **"Aplicação"** em aplicações e resgates (e em Receitas › Rendimentos);
+  - no resgate, a estimativa de quanto do valor é rendimento, com o botão "Usar";
+  - **"Resgatei tudo"** preenche o valor e o rendimento e encerra a aplicação;
+  - **"Rendimento que entrou na conta"** (dividendos, cupons) liga a receita à aplicação.
+
+### 🔧 Alterado
+
+- **Dashboard:**
+  - o patrimônio soma os investimentos pelo valor de hoje, com o rendimento estimado ou informado (sem aplicações
+    cadastradas, o valor continua o mesmo);
+  - o link "investido" abre a nova aba;
+  - "Precisa de atenção" avisa de aplicação vencida.
+- **Lançamentos:** "Ver carteira ›" virou "Ver investimentos ›" e abre a aba.
+- O modal **"Seus investimentos"** saiu: a aba faz o que ele fazia, e mais.
+- Cores dos gráficos novos (dinheiro aplicado × juros) validadas para daltonismo e contraste nos temas claro e escuro.
+
+### 🧪 Testes
+
+- **`test-aba-investimentos.js` — 98 verificações, conferidas com contas feitas no próprio teste, sem o código do
+  sistema:**
+  - taxas, IR e IOF;
+  - valor de hoje de cada tipo de aplicação (CDB, LCI vencida, Tesouro IPCA+ com saldo informado, ações e
+    poupança com resgate);
+  - a aba (números, lista, aviso e composição) e os juros por mês (o total do ano bate com a variação do valor;
+    acerto pelo saldo informado);
+  - projeção (valor, IR e aportes);
+  - detalhe, aportar, resgate parcial e total, rendimento recebido, editar lançamento, atualizar e apagar saldo;
+  - cadastro (validações, "aplicando agora", "já tenho"), cadastrar taxa de grupo antigo, editar, taxas de
+    referência e excluir;
+  - Dashboard e Lançamentos, celular, tema claro, tela vazia e nenhum erro de JS.
+- `test-investimentos.js` e `test-menu.js` atualizados para a aba.
+- **592 verificações** passando em 14 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+- **Nada muda sozinho:** caixa, DRE, relatórios e orçamento continuam iguais, porque aplicação e resgate seguem
+  sendo os mesmos lançamentos.
+- O que já foi investido aparece na aba agrupado por categoria, pelo valor aplicado (sem rendimento), até você
+  cadastrar a taxa.
+- Tudo na aba é **estimativa** com as taxas de referência. Para o valor exato, use "Atualizar saldo" com o número
+  do banco ou da corretora.
+
+---
+
 ## [2026-10-27] Investimentos: aplicação não é despesa, resgate não é receita
 
 ### 🎯 O que foi pedido
