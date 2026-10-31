@@ -4,6 +4,67 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-10-31] Contas a Pagar: detalhe da conta com todas as parcelas
+
+### 🎯 O que foi pedido
+
+Ao clicar numa conta a pagar, mostrar as **informações dela** e as **parcelas pagas ou em aberto**, com a
+**descrição completa**.
+
+### ✨ Implementado
+
+- **Clique na linha abre o detalhe** (em qualquer ponto fora dos botões). A descrição também é um botão, então
+  dá para abrir pelo teclado. No menu ⋯ entrou "🔎 Detalhes e parcelas"; o primeiro item continua sendo "Pagar".
+- **Informações da conta ou parcela:**
+  - vencimento;
+  - valor (e o valor pago, com juros/multa ou desconto quando difere do previsto);
+  - situação (paga em…, vence em…, venceu há…);
+  - conta usada no pagamento, ou o cartão e a fatura;
+  - categoria › subcategoria;
+  - tipo (parcela X de N, ocorrência da recorrência com a regra, conta única);
+  - observação e observação do pagamento.
+- **Todas as parcelas, com a descrição completa de cada uma:** número, descrição, observações, vencimento, valor
+  e situação (paga em dd/mm com a conta, vencida há N dias, vence em N dias).
+  - Resumo: total, pagas, em aberto (e vencidas), próxima parcela e barra de quanto já foi pago.
+  - Filtros: Todas · Em aberto · Pagas · Vencidas.
+  - A parcela clicada fica marcada e a lista rola até ela; clicar noutra parcela mostra as informações dela.
+  - **✓ Pagar** e **↺ Desfazer** em cada parcela, sem sair do detalhe.
+- **Funciona para todas as origens:**
+  - **conta parcelada:** todas as parcelas do parcelamento;
+  - **conta recorrente:** todas as ocorrências geradas, com a periodicidade, desde quando e até quando;
+  - **parcela de dívida:** todas as parcelas da dívida, com valor da dívida, saldo devedor e juros;
+  - **dívida sem parcelas cadastradas:** as parcelas estimadas, o saldo, a parcela mensal e quantos meses faltam;
+  - **fatura de cartão:** as compras da fatura com a parcela de cada uma (ex.: 1 de 10) e o valor total da compra;
+  - **conta no cartão:** em qual fatura entra e quando ela vence;
+  - **conta única:** as informações, sem lista de parcelas.
+- **Botões do rodapé**, sempre à vista: Pagar ou Desfazer pagamento, Editar e Excluir (contas); Pagar parcela e
+  Ver dívida (dívidas); Pagar fatura e Ver fatura no cartão (faturas). Pagar, editar e excluir abrem por cima do
+  detalhe, e ele se atualiza sozinho depois. Se a conta for excluída, o detalhe fecha.
+
+### 🔧 Alterado
+
+- Menu ⋯ da lista: novo item "Detalhes e parcelas" (ou "Detalhes e compras", na fatura), antes de "Excluir".
+- A descrição das contas na lista passa a ser protegida contra HTML (o texto aparece igual).
+
+### 🧪 Testes
+
+- **`test-detalhe-pagar.js` — 48 verificações:**
+  - clique na linha, informações, resumo e lista completa com observações e pagamento com desconto;
+  - filtros, escolha de outra parcela, pagar e desfazer pela lista;
+  - dívida (pagar pela janela e "Ver dívida"), recorrente (rolagem até a ocorrência e filtro de vencidas) e
+    fatura (compras e parcelas);
+  - dívida estimada, conta única, conta no cartão e conta paga;
+  - editar e excluir pelo detalhe, menu ⋯, teclado e clique no "▸ compras" sem abrir o detalhe;
+  - celular e nenhum erro de JS.
+- `test-acoes.js` atualizado com o item novo do menu ⋯.
+- **640 verificações** passando em 15 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+- Nenhum: o detalhe só lê os dados. Pagar, desfazer, editar e excluir usam os mesmos caminhos de antes.
+
+---
+
 ## [2026-10-28] Aba Investimentos: aplicações, juros por mês e projeção de lucro
 
 ### 🎯 O que foi pedido

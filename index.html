@@ -1310,6 +1310,69 @@ td.cc-trava{width:44px;text-align:center;color:var(--t3)}
 .cp-acoes-pop .btn:hover,.cp-acoes-pop .btn:focus-visible{background:var(--surface3);outline:none}
 .cp-acoes-pop .btn-green{color:var(--green);font-weight:700}
 .cp-acoes-pop .btn-red{color:var(--red);border-top:1px solid var(--line);border-radius:0 0 7px 7px;margin-top:2px}
+/* ── Detalhe da conta a pagar (clique na linha) ── */
+#cp-tbody tr.cp-clic{cursor:pointer}
+.cp-abrir{border:none;background:none;padding:0;margin:0;color:inherit;font:inherit;text-align:left;cursor:pointer;line-height:inherit}
+.cp-abrir:hover,.cp-abrir:focus-visible{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--t3);outline:none}
+.cp-abrir:focus-visible{box-shadow:0 0 0 2px var(--blue);border-radius:3px}
+.cpd-qual{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.cpd-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.cpd-info > div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cpd-info > div > span{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.cpd-info .badge{align-self:flex-start}
+#m-cp-det .modal{display:flex;flex-direction:column;overflow:hidden}
+#m-cp-det .modal-bd{overflow-y:auto;min-height:0;flex:1 1 auto}
+.cpd-info b{font-size:13px;color:var(--t1);font-weight:600;overflow-wrap:anywhere}
+.cpd-info small{font-size:11px;color:var(--t3);overflow-wrap:anywhere}
+.cpd-info .larga{grid-column:1 / -1}
+.cpd-info .larga b{font-weight:500;font-size:12.5px}
+.cpd-sec{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px}
+.cpd-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.cpd-tiles > div{background:var(--surface2);border-radius:var(--r2);padding:10px 12px;min-width:0}
+.cpd-tiles small{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.cpd-tiles b{display:block;font:700 14px 'JetBrains Mono',monospace;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cpd-tiles em{display:block;font-style:normal;font-size:10.5px;color:var(--t3);margin-top:2px}
+.cpd-prog{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cpd-prog .prog-track{flex:1}
+.cpd-prog span{font-size:11px;color:var(--t2);white-space:nowrap}
+.cpd-nota{font-size:11px;color:var(--t3);margin:-4px 0 12px}
+.cpd-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cpd-chip{border:1px solid var(--line2);background:var(--surface2);color:var(--t2);border-radius:20px;padding:4px 11px;font:600 11px 'Sora',sans-serif;cursor:pointer}
+.cpd-chip b{font-family:'JetBrains Mono',monospace;color:var(--t3);margin-left:2px}
+.cpd-chip:hover{color:var(--t1)}
+.cpd-chip[aria-pressed="true"]{background:var(--surface4);color:var(--t1);border-color:var(--t3)}
+.cpd-chip[aria-pressed="true"] b{color:var(--t1)}
+.cpd-chip:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.cpd-lista{position:relative;max-height:clamp(180px, calc(90vh - 540px), 380px);overflow-y:auto;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface1)}
+.cpd-l{display:flex;align-items:center;gap:4px;border-top:1px solid var(--line);padding-right:8px}
+.cpd-l:first-child{border-top:none}
+.cpd-l.sel{background:var(--surface2);box-shadow:inset 3px 0 0 var(--blue)}
+.cpd-l-main{flex:1;min-width:0;display:grid;grid-template-columns:46px minmax(0,1fr) 84px 98px 150px;grid-template-areas:"n desc venc v st";gap:10px;align-items:center;padding:9px 10px;border:none;background:transparent;color:var(--t2);font:inherit;font-size:12px;text-align:left;cursor:pointer}
+.cpd-l-main:hover{background:var(--surface2)}
+.cpd-l-main:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.cpd-n{grid-area:n;font:600 11px 'JetBrains Mono',monospace;color:var(--t3)}
+.cpd-desc{grid-area:desc;min-width:0}
+.cpd-desc b{display:block;color:var(--t1);font-weight:600;overflow-wrap:anywhere}
+.cpd-desc small{display:block;font-size:10.5px;color:var(--t3);margin-top:2px;overflow-wrap:anywhere}
+.cpd-venc{grid-area:venc;font:500 11.5px 'JetBrains Mono',monospace;color:var(--t2)}
+.cpd-v{grid-area:v;font:600 12px 'JetBrains Mono',monospace;color:var(--t1);text-align:right;white-space:nowrap}
+.cpd-st{grid-area:st;display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+.cpd-st small{font-size:10px;color:var(--t3);overflow-wrap:anywhere}
+.cpd-l.pago .cpd-desc b,.cpd-l.pago .cpd-v{color:var(--t2)}
+.cpd-ac{width:34px;flex:none;display:flex;justify-content:center}
+.cpd-compra{display:grid;grid-template-columns:56px minmax(0,1fr) 100px;grid-template-areas:"n desc v";gap:10px;align-items:center;padding:9px 12px;font-size:12px;color:var(--t2)}
+.cpd-tot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--t3);padding:8px 2px 0}
+.cpd-tot b{color:var(--t1);font-family:'JetBrains Mono',monospace;font-weight:600}
+.cpd-ft{flex-wrap:wrap}
+.cpd-ft .cpd-esq{margin-right:auto}
+@media (max-width:768px){
+  .cpd-info{grid-template-columns:1fr 1fr;gap:12px 14px}
+  .cpd-tiles{grid-template-columns:1fr 1fr}
+  .cpd-l-main{grid-template-columns:38px minmax(0,1fr) auto;grid-template-areas:"n desc v" "n venc st";row-gap:4px;column-gap:8px;padding:9px 8px}
+  .cpd-st{align-items:flex-end;text-align:right}
+  .cpd-lista{max-height:none}
+  .cpd-compra{grid-template-columns:44px minmax(0,1fr) auto}
+}
 #page-contas #cp-tbody .tbl-actions .btn{white-space:nowrap}
 @media (max-width:1100px){
   #page-contas .cp-proj-corpo{grid-template-columns:1fr}
@@ -3056,6 +3119,19 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
 <!-- ═══════════════ MODAIS ═══════════════ -->
 
 <!-- Modal: Kanban Card -->
+<!-- Modal: detalhe da conta a pagar (informações e parcelas). Fica antes dos outros modais:
+     pagar, editar e excluir abrem por cima dele. -->
+<div class="overlay" id="m-cp-det" style="display:none" onclick="cmoOut(event,'m-cp-det')">
+  <div class="modal" style="max-width:780px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div style="min-width:0"><h2 id="cpd-titulo">Conta a pagar</h2><div class="card-sub" id="cpd-sub"></div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-cp-det')" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-bd" id="cpd-corpo"></div>
+    <div class="modal-ft cpd-ft" id="cpd-ft"></div>
+  </div>
+</div>
+
 <div class="overlay" id="m-kanban" style="display:none" onclick="cmoOut(event,'m-kanban')">
   <div class="modal" style="max-width:500px" onclick="event.stopPropagation()">
     <div class="modal-hd">
@@ -9285,6 +9361,7 @@ function refreshAll(){
   if(_page==='contas')  renderContas();
   if(_page==='bancos')  renderBancos();
   if(_page==='invest')  renderInvest();
+  if(document.getElementById('m-cp-det')?.style.display === 'flex') renderDetalhePagar();
   // Sempre atualiza dash no fundo para gráficos ficarem prontos
   if(_page!=='dash') renderDash();
 }
@@ -12081,10 +12158,10 @@ function linhaContaPagar(x, d){
   const difPg = st === 'Pago' && c.valorPago != null && Math.abs(c.valorPago - c.valor) > 0.005
     ? `<div style="font-size:9px;color:${c.valorPago > c.valor ? 'var(--amber)' : 'var(--green)'}">previsto ${fmtR(c.valor)}</div>` : '';
   const stBdg = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red', 'No cartão':'bdg-purple' };
-  return `<tr${c.serieId ? ' class="cp-serie-row"' : ''}>
+  return `<tr class="cp-clic${c.serieId ? ' cp-serie-row' : ''}" data-chave="${escAttr(x.chave)}" onclick="cpLinhaClique(event, this.dataset.chave)">
       ${celulaVencPagar(x)}
       <td style="color:var(--t1)">
-        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">${c.desc}${parcLabel}${recLabel}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap"><button type="button" class="cp-abrir" onclick="abrirDetalhePagar(this.closest('tr').dataset.chave, this)" title="Ver informações e parcelas">${escHtml(c.desc)}</button>${parcLabel}${recLabel}</div>
         ${c.obs ? `<div style="font-size:9px;color:var(--t3);margin-top:2px">${c.obs}</div>` : ''}
       </td>
       ${celulaOrigemPagar(x)}
@@ -12102,6 +12179,7 @@ function linhaContaPagar(x, d){
           : st !== 'Pago' ? { r:'✓ Pagar', f:`pagarConta('${c.id}')`, c:'btn-green' }
           : { r:'↩ Desfazer pagamento', f:`desfazerPagamento('${c.id}')` },
         { r:'✎ Editar', f:`editConta('${c.id}')` },
+        { r:'🔎 Detalhes e parcelas', f:`abrirDetalhePagar('${x.chave}')` },
         { r:'✕ Excluir', f:`delConta('${c.id}')`, c:'btn-red' } ])}
     </tr>`;
 }
@@ -12118,10 +12196,10 @@ function linhaFaturaPagar(x, busca){
   const difPg = !x.aberto && x.previsto > 0 && Math.abs(x.valor - x.previsto) > 0.005
     ? `<div style="font-size:9px;color:var(--t3)">calculado ${fmtR(x.previsto)}</div>` : '';
   const stBdg = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red' }[x.status] || 'bdg-gray';
-  return `<tr class="cp-fat-row">
+  return `<tr class="cp-fat-row cp-clic" data-chave="${escAttr(x.chave)}" onclick="cpLinhaClique(event, this.dataset.chave)">
       ${celulaVencPagar(x)}
       <td style="color:var(--t1)">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${escHtml(descPagavel(x))}
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><button type="button" class="cp-abrir" onclick="abrirDetalhePagar(this.closest('tr').dataset.chave, this)" title="Ver informações e compras">${escHtml(descPagavel(x))}</button>
           ${n ? `<button type="button" class="cp-ver" aria-expanded="${aberta}" onclick="cpAlternarFatura('${x.chave}')" title="${aberta ? 'Esconder' : 'Mostrar'} as compras desta fatura">${aberta ? '▾' : '▸'} ${n} compra${n > 1 ? 's' : ''}</button>` : ''}
         </div>
         ${fase || det ? `<div class="cp-nota">${[fase, det].filter(Boolean).join(' · ')}</div>` : ''}
@@ -12137,7 +12215,8 @@ function linhaFaturaPagar(x, busca){
       ${acoesPagar(descPagavel(x), [
         x.aberto ? { r:'✓ Pagar fatura', f:`pagarFatura('${x.cc.id}',${x.mes},${x.ano})`, c:'btn-green' }
           : x.fatId ? { r:'↩ Desfazer pagamento', f:`desfazerPagFat('${x.cc.id}','${x.fatId}')` } : null,
-        { r:'💳 Ver fatura no cartão', f:`abrirFatura('${x.cc.id}',${x.mes},${x.ano})` } ])}
+        { r:'💳 Ver fatura no cartão', f:`abrirFatura('${x.cc.id}',${x.mes},${x.ano})` },
+        { r:'🔎 Detalhes e compras', f:`abrirDetalhePagar('${x.chave}')` } ])}
     </tr>${aberta ? linhaItensFatura(x) : ''}`;
 }
 // Compras que compõem a fatura (abre e fecha pela própria linha)
@@ -12161,10 +12240,10 @@ function linhaDividaPagar(x){
   const pc = x.pc;
   const difPg = !est && !x.aberto && pc.valorPago != null && Math.abs(pc.valorPago - (pc.valor || 0)) > 0.005
     ? `<div style="font-size:9px;color:${pc.valorPago > pc.valor ? 'var(--amber)' : 'var(--green)'}">previsto ${fmtR(pc.valor)}</div>` : '';
-  return `<tr${est ? ' class="cp-est"' : ''}>
+  return `<tr class="cp-clic${est ? ' cp-est' : ''}" data-chave="${escAttr(x.chave)}" onclick="cpLinhaClique(event, this.dataset.chave)">
       ${celulaVencPagar(x)}
       <td style="color:var(--t1)">
-        <div>${escHtml(x.desc)}</div>
+        <div><button type="button" class="cp-abrir" onclick="abrirDetalhePagar(this.closest('tr').dataset.chave, this)" title="Ver informações e parcelas">${escHtml(x.desc)}</button></div>
         ${est ? `<div class="cp-nota">estimada pela parcela mensal · saldo ${fmtR(saldoDivida(x.dv))} · ${x.restam === 1 ? 'último mês' : `faltam ${x.restam} meses`}</div>` : ''}
       </td>
       ${celulaOrigemPagar(x)}
@@ -12178,9 +12257,225 @@ function linhaDividaPagar(x){
       ${acoesPagar(x.desc, [
         est ? null : x.aberto ? { r:'✓ Pagar parcela', f:`pagarParcela('${x.dv.id}','${pc.id}')`, c:'btn-green' }
           : { r:'↩ Desfazer pagamento', f:`desfazerPgDiv('${x.dv.id}','${pc.id}')` },
-        { r:'📉 Ver dívida', f:`abrirDivida('${x.dv.id}')` } ])}
+        { r:'📉 Ver dívida', f:`abrirDivida('${x.dv.id}')` },
+        { r:'🔎 Detalhes e parcelas', f:`abrirDetalhePagar('${x.chave}')` } ])}
     </tr>`;
 }
+// ── Detalhe de uma conta a pagar: as informações dela e todas as parcelas (pagas e em aberto) ──
+// Abre ao clicar na linha. O modal vem antes dos outros no HTML: pagar, editar e excluir
+// abrem por cima dele, e ele se redesenha sozinho quando os dados mudam (refreshAll).
+let _cpDet = null, _cpDetFiltro = 'todas';
+const nomeSemParcela = s => String(s || '').replace(/\s*\(\d+\/\d+\)\s*$/, '');
+const BDG_PAGAR = { Pago:'bdg-green', Pendente:'bdg-amber', Vencida:'bdg-red', 'No cartão':'bdg-purple', Estimada:'bdg-gray' };
+// Clique na linha da lista (fora dos botões dela)
+function cpLinhaClique(ev, chave){
+  if(ev.target.closest('button, a, input, select, label, .cp-acoes')) return;
+  abrirDetalhePagar(chave, ev.currentTarget);
+}
+function abrirDetalhePagar(chave, origem){
+  _cpDet = chave; _cpDetFiltro = 'todas';
+  if(!renderDetalhePagar()) return;
+  openM('m-cp-det', origem);
+  animarAberturaModal(document.getElementById('m-cp-det'), origem);
+  cpdMostrarSel();
+}
+// Rola a lista até a parcela escolhida
+function cpdMostrarSel(){
+  const lista = document.getElementById('cpd-lista'), sel = lista && lista.querySelector('.cpd-l.sel');
+  if(sel) lista.scrollTop = Math.max(0, sel.offsetTop - lista.clientHeight / 2 + sel.offsetHeight / 2);
+}
+function cpdSelecionar(chave){ _cpDet = chave; renderDetalhePagar(); }
+function cpdFiltrar(f){ _cpDetFiltro = f; renderDetalhePagar(); cpdMostrarSel(); }
+// Quitado? A conta no cartão fica paga quando a fatura dela é paga
+const pagoPagar = y => y.status === 'Pago' || (y.tipo === 'conta-cartao' && !!(y.fat && y.fat.paga));
+// As "parcelas" do item: o parcelamento, a série recorrente, as parcelas da dívida ou as compras da fatura
+function grupoPagar(x, todos){
+  if(x.tipo === 'fatura') return { tipo:'fatura', itens:[x] };
+  const porVenc = (a, b) => (a.venc || '').localeCompare(b.venc || '');
+  if(x.conta){
+    const c = x.conta;
+    if(c.grupoId && c.totalParcelas > 1) return { tipo:'parcelado',
+      itens:todos.filter(y => y.conta && y.conta.grupoId === c.grupoId).sort((a, b) => (a.conta.parcela || 0) - (b.conta.parcela || 0) || porVenc(a, b)) };
+    if(c.serieId) return { tipo:'serie', itens:todos.filter(y => y.conta && y.conta.serieId === c.serieId).sort(porVenc) };
+    return { tipo:'unica', itens:[x] };
+  }
+  if(x.dv) return { tipo:x.tipo === 'divida-est' ? 'divida-est' : 'divida', itens:todos.filter(y => y.dv && y.dv.id === x.dv.id).sort(porVenc) };
+  return { tipo:'unica', itens:[x] };
+}
+// Número da parcela na lista
+function numPagar(y){
+  if(y.pc) return `${y.pc.num}/${y.pc.total}`;
+  if(y.conta && y.conta.totalParcelas > 1) return `${y.conta.parcela}/${y.conta.totalParcelas}`;
+  if(y.conta && y.conta.serieId) return `#${y.conta.serieNum || 1}`;
+  return '';
+}
+function selStatusPagar(y){
+  if(y.tipo === 'conta-cartao') return y.fat && y.fat.paga ? ['💳 Fatura paga', 'bdg-green'] : ['💳 No cartão', 'bdg-purple'];
+  return [y.status, BDG_PAGAR[y.status] || 'bdg-gray'];
+}
+// Situação em palavras: quando foi paga (e com qual conta) ou quanto falta/passou do vencimento
+function situacaoPagarTxt(y){
+  const mesAno = (m, a) => `${MESES3[m].toLowerCase()}/${String(a).slice(2)}`;
+  if(y.estimado) return `estimada para ${mesAno(y.mes, y.ano)}`;
+  if(y.tipo === 'conta-cartao') return !y.fat ? 'lançada no cartão'
+    : y.fat.paga ? `paga na fatura de ${mesAno(y.fat.mes, y.fat.ano)}` : `na fatura de ${mesAno(y.fat.mes, y.fat.ano)}, que vence ${fmtDataBR(y.fat.venc)}`;
+  if(y.status === 'Pago') return (y.dataPg ? `paga em ${fmtDataBR(y.dataPg)}` : 'paga') + (y.caixaNome ? ` · ${y.caixaNome}` : '');
+  const dd = diasAte(y.venc);
+  if(dd === null) return '';
+  if(dd < 0) return `venceu há ${-dd} ${dd === -1 ? 'dia' : 'dias'}`;
+  return dd === 0 ? 'vence hoje' : `vence em ${dd} ${dd === 1 ? 'dia' : 'dias'}`;
+}
+// Valores da parcela: o previsto e o que foi pago de fato
+function valoresPagar(y){
+  if(y.pc) return { prev:+(y.pc.valor || 0), pago:y.pc.valorPago };
+  if(y.conta) return { prev:+(y.conta.valor || 0), pago:y.conta.valorPago };
+  if(y.tipo === 'fatura') return { prev:y.previsto, pago:y.aberto ? null : y.valor };
+  return { prev:y.valor, pago:null };
+}
+// Detalhes que completam a descrição: observação, valor pago diferente do previsto, observação do pagamento
+function detalhesPagar(y){
+  const v = valoresPagar(y), out = [];
+  const obs = y.conta ? y.conta.obs : y.pc ? y.pc.obs : '';
+  if(obs) out.push(obs);
+  if(pagoPagar(y) && v.pago != null && Math.abs(v.pago - v.prev) > 0.005) out.push(`previsto ${fmtR(v.prev)}`);
+  if(y.conta && y.conta.obsPagamento) out.push(y.conta.obsPagamento);
+  return out;
+}
+function regraRecTxt(c){
+  const r = c.recFim || {}, per = (PERIODICIDADES[c.rec] || {}).label || c.rec || '';
+  const fim = c.recAtiva === false ? 'encerrada' : r.tipo === 'ate' && r.ate ? `até ${fmtDataBR(r.ate)}` : r.tipo === 'qtd' && r.qtd ? `${r.qtd} vezes` : 'sem data para acabar';
+  return `${per} · desde ${fmtDataBR(c.recAncora || c.venc)} · ${fim}`;
+}
+function renderDetalhePagar(){
+  const d = gs(), todos = pagaveis(d), x = todos.find(y => y.chave === _cpDet);
+  if(!x){ closeM('m-cp-det'); return false; }
+  const g = grupoPagar(x, todos), c = x.conta;
+  const origem = x.tipo === 'fatura' ? 'Fatura de cartão' : x.tipo === 'conta-cartao' ? 'Conta no cartão' : x.dv ? 'Dívida' : 'Conta (boleto, PIX…)';
+  const titulo = x.tipo === 'fatura' ? `Fatura ${x.cc.nome || 'do cartão'} · ${MESES[x.mes]}/${x.ano}` : x.dv ? x.dv.nome : g.tipo === 'parcelado' ? nomeSemParcela(c.desc) : x.desc;
+  const tipoTxt = x.tipo === 'fatura' ? `${x.itens.length} ${x.itens.length === 1 ? 'compra' : 'compras'}`
+    : g.tipo === 'parcelado' ? `parcelada em ${c.totalParcelas}x` : g.tipo === 'serie' ? `recorrente ${((PERIODICIDADES[c.rec] || {}).label || '').toLowerCase()}`
+    : g.tipo === 'divida' ? `${x.pc.total} parcelas` : g.tipo === 'divida-est' ? 'parcela mensal estimada' : 'conta única';
+  set('cpd-titulo', titulo);
+  set('cpd-sub', [origem, [x.cat, x.subcat].filter(Boolean).join(' › '), tipoTxt].filter(Boolean).join(' · '));
+
+  // ── 1. Informações desta conta / parcela ──
+  const v = valoresPagar(x), [stTxt, stBdg] = selStatusPagar(x);
+  const kv = (rot, val, sub, cls) => `<div${cls ? ` class="${cls}"` : ''}><span>${rot}</span><b>${val}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  const qual = x.tipo === 'fatura' ? 'Esta fatura' : x.dv ? (x.pc ? `Parcela ${x.pc.num} de ${x.pc.total}` : 'Parcela estimada')
+    : g.tipo === 'parcelado' ? `Parcela ${c.parcela} de ${c.totalParcelas}` : g.tipo === 'serie' ? `Ocorrência ${c.serieNum || 1}` : 'Esta conta';
+  const dif = pagoPagar(x) && v.pago != null ? +(v.pago - v.prev).toFixed(2) : 0;
+  const pagoCom = x.tipo === 'conta-cartao' ? (x.fat ? `💳 ${escHtml(x.fat.cc.nome || 'cartão')}` : '💳 cartão') : x.caixaNome ? `🏦 ${escHtml(x.caixaNome)}` : '—';
+  const obs = c ? c.obs : x.pc ? x.pc.obs : '';
+  const info = [
+    kv('Vencimento', x.estimado ? `${MESES[x.mes]}/${x.ano}` : fmtDataBR(x.venc), x.estimado ? 'sem dia definido' : ''),
+    kv(pagoPagar(x) && v.pago != null ? 'Valor pago' : 'Valor', fmtR(pagoPagar(x) && v.pago != null ? v.pago : v.prev),
+      Math.abs(dif) >= 0.01 ? `previsto ${fmtR(v.prev)} · ${dif > 0 ? 'juros/multa' : 'desconto'} de ${fmtR(Math.abs(dif))}` : ''),
+    kv('Situação', `<span class="badge ${stBdg}">${escHtml(stTxt)}</span>`, escHtml(situacaoPagarTxt(x))),
+    kv(x.tipo === 'conta-cartao' ? 'No cartão' : 'Pago com', pagoCom, x.tipo === 'conta-cartao' && x.fat ? `fatura de ${MESES[x.fat.mes].toLowerCase()}/${x.fat.ano}` : ''),
+    kv('Categoria', escHtml(x.cat || '—'), escHtml(x.subcat || '')),
+    x.tipo === 'fatura' ? kv('Cartão', escHtml(x.cc.nome || '—'), `competência ${MESES[x.mes].toLowerCase()}/${x.ano}`)
+      : kv('Tipo', escHtml(g.tipo === 'unica' ? 'Conta única' : qual), g.tipo === 'serie' ? escHtml(regraRecTxt(c)) : ''),
+    x.tipo === 'fatura' ? kv('Fechamento', x.fech ? fmtDataBR(x.fech) : '—', x.fechManual ? 'ajustado à mão' : '') : '',
+    obs ? kv('Observação', escHtml(obs), '', 'larga') : '',
+    c && c.obsPagamento ? kv('Observação do pagamento', escHtml(c.obsPagamento), '', 'larga') : '',
+  ].join('');
+
+  // ── 2. As parcelas: resumo e lista ──
+  let parcelas = '';
+  if(x.tipo === 'fatura'){
+    parcelas = `<div class="cpd-sec"><span>Compras nesta fatura</span></div>
+      ${x.itens.length ? `<div class="cpd-lista">${x.itens.map(i => `<div class="cpd-l cpd-compra">
+          <span class="cpd-n">${i.total > 1 ? `${i.num}/${i.total}` : 'à vista'}</span>
+          <span class="cpd-desc"><b>${escHtml(i.g.desc || '—')}</b><small>compra em ${fmtDataBR(i.g.data)}${i.total > 1 ? ` · parcela ${i.num} de ${i.total}${i.num === i.total ? ' (última)' : ''} · total ${fmtR(i.g.val || 0)}` : ''}${i.g.refContaId ? ' · conta a pagar' : ''}</small></span>
+          <span class="cpd-v">${fmtR(i.valor)}</span>
+        </div>`).join('')}</div>
+        <div class="cpd-tot"><span>${x.itens.length} ${x.itens.length === 1 ? 'compra' : 'compras'}</span><span>Total calculado: <b>${fmtR(x.previsto)}</b></span></div>`
+      : '<div class="dash-vazio">Nenhuma compra lançada nesta fatura.</div>'}`;
+  } else if(g.itens.length > 1){
+    const soma = l => +l.reduce((a, y) => a + (y.valor || 0), 0).toFixed(2);
+    const pagos = g.itens.filter(pagoPagar), abertos = g.itens.filter(y => !pagoPagar(y)), vencidas = abertos.filter(y => y.status === 'Vencida');
+    const prox = abertos.slice().sort((a, b) => (a.venc || '').localeCompare(b.venc || ''))[0];
+    const n = g.itens.length, pl = (k, um, varios) => `${k} ${k === 1 ? um : varios}`;
+    const nome = g.tipo === 'serie' ? ['ocorrência', 'ocorrências'] : ['parcela', 'parcelas'];
+    const ultimo = g.itens[n - 1];
+    const tiles = g.tipo === 'divida-est' ? [
+        ['Saldo devedor', fmtR(saldoDivida(x.dv)), x.dv.total ? `de ${fmtR(x.dv.total)}` : ''],
+        ['Parcela mensal', fmtR(x.dv.mensal || 0), x.dv.juros ? `${pct(x.dv.juros)} a.m.` : ''],
+        ['Faltam', pl(n, 'mês', 'meses'), ultimo && ultimo.estimado ? `até ${MESES3[ultimo.mes].toLowerCase()}/${ultimo.ano}` : ''],
+      ] : g.tipo === 'divida' ? [
+        ['Valor da dívida', fmtR(x.dv.total || soma(g.itens)), `${pl(n, 'parcela', 'parcelas')}${x.dv.juros ? ` · ${pct(x.dv.juros)} a.m.` : ''}`],
+        ['Pagas', fmtR(soma(pagos)), `${pagos.length} de ${n}`],
+        ['Saldo devedor', fmtR(saldoDivida(x.dv)), `${pl(abertos.length, 'parcela', 'parcelas')} em aberto${vencidas.length ? ` · ${vencidas.length} vencida${vencidas.length > 1 ? 's' : ''}` : ''}`],
+      ] : [
+        ['Total', fmtR(soma(g.itens)), g.tipo === 'serie' ? `${pl(n, 'ocorrência gerada', 'ocorrências geradas')}` : pl(n, 'parcela', 'parcelas')],
+        ['Pagas', fmtR(soma(pagos)), `${pagos.length} de ${n}`],
+        ['Em aberto', fmtR(soma(abertos)), `${pl(abertos.length, nome[0], nome[1])}${vencidas.length ? ` · ${vencidas.length} vencida${vencidas.length > 1 ? 's' : ''}` : ''}`],
+      ];
+    tiles.push(['Próxima', prox ? (prox.estimado ? `${MESES3[prox.mes]}/${prox.ano}` : fmtDataBR(prox.venc)) : 'Tudo pago ✓',
+      prox ? [fmtR(prox.valor), numPagar(prox)].filter(Boolean).join(' · ') : '']);
+    // progresso: parcelas pagas; na dívida sem parcelas, quanto do valor já foi pago
+    const est = g.tipo === 'divida-est', totDv = +(x.dv && x.dv.total) || 0, pagoDv = est ? Math.max(0, totDv - saldoDivida(x.dv)) : 0;
+    const pctPago = est ? (totDv > 0 ? Math.round(pagoDv / totDv * 100) : 0) : Math.round(pagos.length / n * 100);
+    const progTxt = est ? `${pctPago}% pago · ${fmtR(pagoDv)} de ${fmtR(totDv)}` : `${pctPago}% pago · ${pagos.length} de ${n} ${nome[1]}`;
+    const filtro = { todas:() => true, abertas:y => !pagoPagar(y), pagas:pagoPagar, vencidas:y => y.status === 'Vencida' }[_cpDetFiltro] || (() => true);
+    const vis = g.itens.filter(filtro);
+    const chip = (f, rot, k) => `<button type="button" class="cpd-chip" aria-pressed="${_cpDetFiltro === f}" onclick="cpdFiltrar('${f}')">${rot} <b>${k}</b></button>`;
+    const linhas = vis.map(y => {
+      const [t, b] = selStatusPagar(y), det = detalhesPagar(y), sel = y.chave === x.chave;
+      const acao = y.tipo === 'conta' ? (y.aberto ? `<button type="button" class="btn btn-green btn-xs" title="Pagar" aria-label="Pagar ${escAttr(y.desc)}" onclick="pagarConta('${y.conta.id}')">✓</button>`
+          : `<button type="button" class="btn btn-ghost btn-xs" title="Desfazer pagamento" aria-label="Desfazer o pagamento de ${escAttr(y.desc)}" onclick="cpdDesfazerConta('${y.conta.id}')">↺</button>`)
+        : y.tipo === 'divida' ? (y.aberto ? `<button type="button" class="btn btn-green btn-xs" title="Pagar parcela" aria-label="Pagar ${escAttr(y.desc)}" onclick="pagarParcela('${y.dv.id}','${y.pc.id}')">✓</button>`
+          : `<button type="button" class="btn btn-ghost btn-xs" title="Desfazer pagamento" aria-label="Desfazer o pagamento de ${escAttr(y.desc)}" onclick="desfazerPgDiv('${y.dv.id}','${y.pc.id}')">↺</button>`) : '';
+      return `<div class="cpd-l${sel ? ' sel' : ''}${pagoPagar(y) ? ' pago' : ''}">
+        <button type="button" class="cpd-l-main" data-chave="${escAttr(y.chave)}" onclick="cpdSelecionar(this.dataset.chave)" aria-current="${sel}">
+          <span class="cpd-n">${numPagar(y)}</span>
+          <span class="cpd-desc"><b>${escHtml(y.desc)}</b>${det.length ? `<small>${escHtml(det.join(' · '))}</small>` : ''}</span>
+          <span class="cpd-venc">${y.estimado ? `${MESES3[y.mes]}/${y.ano}` : fmtDataBR(y.venc)}</span>
+          <span class="cpd-v">${fmtR(y.valor)}</span>
+          <span class="cpd-st"><span class="badge ${b}">${escHtml(t)}</span><small>${escHtml(situacaoPagarTxt(y))}</small></span>
+        </button>
+        <span class="cpd-ac">${acao}</span>
+      </div>`;
+    }).join('');
+    parcelas = `
+      <div class="cpd-sec"><span>${g.tipo === 'serie' ? 'Ocorrências' : g.tipo === 'divida' ? 'Parcelas da dívida' : g.tipo === 'divida-est' ? 'Parcelas estimadas' : 'Parcelas'}</span></div>
+      <div class="cpd-tiles">${tiles.map(([r, val, s]) => `<div><small>${r}</small><b>${val}</b>${s ? `<em>${s}</em>` : ''}</div>`).join('')}</div>
+      <div class="cpd-prog"><div class="prog-track"><div class="prog-fill" style="width:${pctPago}%;background:var(--green)"></div></div><span>${progTxt}</span></div>
+      ${g.tipo === 'divida-est' ? '<div class="cpd-nota">A dívida não tem parcelas cadastradas: os valores são estimados pela parcela mensal até o saldo acabar.</div>' : ''}
+      ${g.tipo === 'serie' ? `<div class="cpd-nota">O sistema mantém as ocorrências dos próximos ${HORIZONTE_REC_MESES} meses geradas.</div>` : ''}
+      ${est ? '' : `<div class="cpd-chips" role="group" aria-label="Mostrar">
+        ${chip('todas', 'Todas', n)}${chip('abertas', 'Em aberto', abertos.length)}${chip('pagas', 'Pagas', pagos.length)}${vencidas.length ? chip('vencidas', 'Vencidas', vencidas.length) : ''}
+      </div>`}
+      <div class="cpd-lista" id="cpd-lista">${linhas || '<div class="dash-vazio">Nenhuma nesta situação.</div>'}</div>
+      <div class="cpd-tot"><span>Mostrando ${vis.length} de ${n}</span><span>Pago: <b>${fmtR(soma(pagos))}</b> · em aberto: <b>${fmtR(soma(abertos))}</b></span></div>`;
+  } else {
+    parcelas = `<div class="cpd-nota">${g.tipo === 'serie' ? 'Recorrência com uma ocorrência só gerada até agora.' : 'Pagamento único: esta conta não é parcelada.'}</div>`;
+  }
+  const corpo = document.getElementById('cpd-corpo');
+  if(corpo) corpo.innerHTML = `<div><div class="cpd-qual">${escHtml(qual)}</div><div class="cpd-info">${info}</div></div><div>${parcelas}</div>`;
+  const ft = document.getElementById('cpd-ft');
+  if(ft) ft.innerHTML = acoesDetalhePagar(x);
+  return true;
+}
+// Botões do rodapé: o que dá para fazer com a conta (ou parcela) escolhida
+function acoesDetalhePagar(x){
+  const b = (rot, fn, cls, esq) => `<button type="button" class="btn ${cls || 'btn-ghost'}${esq ? ' cpd-esq' : ''}" onclick="${fn}">${rot}</button>`;
+  const sai = fn => `closeM('m-cp-det');${fn}`;   // ações que levam para outra aba fecham o detalhe
+  if(x.tipo === 'fatura') return b('💳 Ver fatura no cartão', sai(`abrirFatura('${x.cc.id}',${x.mes},${x.ano})`), '', true)
+    + (x.aberto ? b('✓ Pagar fatura', `pagarFatura('${x.cc.id}',${x.mes},${x.ano})`, 'btn-green') : x.fatId ? b('↩ Desfazer pagamento', `desfazerPagFat('${x.cc.id}','${x.fatId}')`) : '');
+  if(x.dv) return b('📉 Ver dívida', sai(`abrirDivida('${x.dv.id}')`), '', true)
+    + (x.tipo === 'divida-est' ? '' : x.aberto ? b('✓ Pagar parcela', `pagarParcela('${x.dv.id}','${x.pc.id}')`, 'btn-green') : b('↩ Desfazer pagamento', `desfazerPgDiv('${x.dv.id}','${x.pc.id}')`));
+  const c = x.conta;
+  return b('✕ Excluir', `delConta('${c.id}')`, 'btn-red', true) + b('✎ Editar', `editConta('${c.id}')`)
+    + (x.tipo === 'conta-cartao' ? b('💳 Ver fatura do cartão', sai(`abrirFaturaDaConta('${c.id}')`))
+      : x.aberto ? b('✓ Pagar', `pagarConta('${c.id}')`, 'btn-green') : b('↩ Desfazer pagamento', `cpdDesfazerConta('${c.id}')`));
+}
+// Desfazer pelo detalhe pede confirmação (o lançamento gerado pelo pagamento sai junto)
+function cpdDesfazerConta(id){
+  const c = gs().contas.find(x => x.id === id);
+  if(c && confirm(`Desfazer o pagamento de "${c.desc}"?\n\nO lançamento gerado pelo pagamento é removido e a conta volta a ficar em aberto.`)) desfazerPagamento(id);
+}
+
 function cpAlternarFatura(chave){
   if(_cpAbertas.has(chave)) _cpAbertas.delete(chave); else _cpAbertas.add(chave);
   renderContas();

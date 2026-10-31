@@ -33,7 +33,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
       const r = pop.getBoundingClientRect();
       return [!pop.hidden, [...pop.querySelectorAll('button')].map(b => b.textContent).join(','), btn.getAttribute('aria-expanded'),
         document.activeElement === pop.querySelector('button'), r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight].join('|'); });
-    eq(tag + 'menu com rótulos completos, foco no 1º, dentro da tela', m, 'true|✓ Pagar,✎ Editar,✕ Excluir|true|true|true');
+    eq(tag + 'menu com rótulos completos, foco no 1º, dentro da tela', m, 'true|✓ Pagar,✎ Editar,🔎 Detalhes e parcelas,✕ Excluir|true|true|true');
     // teclado: seta e Esc
     await p.keyboard.press('ArrowDown');
     const k = await p.evaluate(() => document.activeElement.textContent);
@@ -56,11 +56,11 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
     await p.evaluate(() => closeM('m-pagar'));
     // fatura e dívida têm as ações delas
     const ops = async t => { await p.locator(linha(t) + ' .cp-mais').first().click(); const v = await p.evaluate(() => [...document.querySelectorAll('#cp-acoes-pop button')].map(b => b.textContent).join(',')); await p.keyboard.press('Escape'); return v; };
-    eq(tag + 'fatura', await ops('Fatura Nubank · Out/26'), '✓ Pagar fatura,💳 Ver fatura no cartão');
-    eq(tag + 'parcela de dívida', await ops('parcela 3/6'), '✓ Pagar parcela,📉 Ver dívida');
-    eq(tag + 'conta no cartão', await ops('Netflix'), '💳 Ver fatura do cartão,✎ Editar,✕ Excluir');
-    eq(tag + 'conta paga', await ops('Internet'), '↩ Desfazer pagamento,✎ Editar,✕ Excluir');
-    eq(tag + 'dívida estimada', await ops('Renner'), '📉 Ver dívida');
+    eq(tag + 'fatura', await ops('Fatura Nubank · Out/26'), '✓ Pagar fatura,💳 Ver fatura no cartão,🔎 Detalhes e compras');
+    eq(tag + 'parcela de dívida', await ops('parcela 3/6'), '✓ Pagar parcela,📉 Ver dívida,🔎 Detalhes e parcelas');
+    eq(tag + 'conta no cartão', await ops('Netflix'), '💳 Ver fatura do cartão,✎ Editar,🔎 Detalhes e parcelas,✕ Excluir');
+    eq(tag + 'conta paga', await ops('Internet'), '↩ Desfazer pagamento,✎ Editar,🔎 Detalhes e parcelas,✕ Excluir');
+    eq(tag + 'dívida estimada', await ops('Renner'), '📉 Ver dívida,🔎 Detalhes e parcelas');
     // excluir pede confirmação (cancelada) e nada some
     await p.locator(linha('Luz') + ' .cp-mais').click();
     await p.locator('#cp-acoes-pop button:has-text("Excluir")').click();
