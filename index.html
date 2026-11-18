@@ -3768,6 +3768,30 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
 </div>
 
+<!-- Modal: excluir uma parcela de dívida e recalcular o restante -->
+<div class="overlay" id="m-del-parc" style="display:none" onclick="cmoOut(event,'m-del-parc')">
+  <div class="modal" style="max-width:460px" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div><h2 style="color:var(--red)">Excluir parcela</h2><div class="card-sub" id="xp-sub"></div></div>
+      <button class="btn btn-ghost btn-xs" onclick="closeM('m-del-parc')" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div style="background:var(--surface2);border-radius:var(--r2);padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--t1)" id="xp-desc">—</div>
+        <div style="display:flex;gap:14px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--t3)" id="xp-venc">—</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--red)" id="xp-valor">—</span>
+        </div>
+      </div>
+      <div id="xp-aviso" style="font-size:12px;color:var(--t2);margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px" id="xp-opcoes"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeM('m-del-parc')" style="flex:1;justify-content:center">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Dívida -->
 <div class="overlay" id="m-div" style="display:none" onclick="cmoOut(event,'m-div')">
   <div class="modal" style="max-width:580px" onclick="event.stopPropagation()">
@@ -12258,7 +12282,8 @@ function linhaDividaPagar(x){
         est ? null : x.aberto ? { r:'✓ Pagar parcela', f:`pagarParcela('${x.dv.id}','${pc.id}')`, c:'btn-green' }
           : { r:'↩ Desfazer pagamento', f:`desfazerPgDiv('${x.dv.id}','${pc.id}')` },
         { r:'📉 Ver dívida', f:`abrirDivida('${x.dv.id}')` },
-        { r:'🔎 Detalhes e parcelas', f:`abrirDetalhePagar('${x.chave}')` } ])}
+        { r:'🔎 Detalhes e parcelas', f:`abrirDetalhePagar('${x.chave}')` },
+        est ? null : { r:'✕ Excluir parcela', f:`abrirExcluirParcela('${x.dv.id}','${pc.id}')`, c:'btn-red' } ])}
     </tr>`;
 }
 // ── Detalhe de uma conta a pagar: as informações dela e todas as parcelas (pagas e em aberto) ──
@@ -12347,7 +12372,13 @@ function regraRecTxt(c){
   return `${per} · desde ${fmtDataBR(c.recAncora || c.venc)} · ${fim}`;
 }
 function renderDetalhePagar(){
-  const d = gs(), todos = pagaveis(d), x = todos.find(y => y.chave === _cpDet);
+  const d = gs(), todos = pagaveis(d);
+  let x = todos.find(y => y.chave === _cpDet);
+  if(!x && /^divida:/.test(_cpDet || '')){   // parcela excluída: segue na próxima em aberto da mesma dívida
+    const dvId = _cpDet.split(':')[1], irmas = todos.filter(y => y.dv && y.dv.id === dvId);
+    x = irmas.find(y => y.aberto) || irmas[0];
+    if(x) _cpDet = x.chave;
+  }
   if(!x){ closeM('m-cp-det'); return false; }
   const g = grupoPagar(x, todos), c = x.conta;
   const origem = x.tipo === 'fatura' ? 'Fatura de cartão' : x.tipo === 'conta-cartao' ? 'Conta no cartão' : x.dv ? 'Dívida' : 'Conta (boleto, PIX…)';
@@ -12463,7 +12494,8 @@ function acoesDetalhePagar(x){
   const sai = fn => `closeM('m-cp-det');${fn}`;   // ações que levam para outra aba fecham o detalhe
   if(x.tipo === 'fatura') return b('💳 Ver fatura no cartão', sai(`abrirFatura('${x.cc.id}',${x.mes},${x.ano})`), '', true)
     + (x.aberto ? b('✓ Pagar fatura', `pagarFatura('${x.cc.id}',${x.mes},${x.ano})`, 'btn-green') : x.fatId ? b('↩ Desfazer pagamento', `desfazerPagFat('${x.cc.id}','${x.fatId}')`) : '');
-  if(x.dv) return b('📉 Ver dívida', sai(`abrirDivida('${x.dv.id}')`), '', true)
+  if(x.dv) return (x.pc ? b('✕ Excluir parcela', `abrirExcluirParcela('${x.dv.id}','${x.pc.id}')`, 'btn-red', true) : '')
+    + b('📉 Ver dívida', sai(`abrirDivida('${x.dv.id}')`), '', !x.pc)
     + (x.tipo === 'divida-est' ? '' : x.aberto ? b('✓ Pagar parcela', `pagarParcela('${x.dv.id}','${x.pc.id}')`, 'btn-green') : b('↩ Desfazer pagamento', `desfazerPgDiv('${x.dv.id}','${x.pc.id}')`));
   const c = x.conta;
   return b('✕ Excluir', `delConta('${c.id}')`, 'btn-red', true) + b('✎ Editar', `editConta('${c.id}')`)
@@ -12811,7 +12843,8 @@ function renderDividas(){
                   <td class="mono" style="color:var(--t3)">${pc.dataPg?fmtDataBR(pc.dataPg):'—'}</td>
                   <td style="white-space:nowrap">${pc.status!=='Pago'
                     ? `<button class="btn btn-green btn-xs" title="Pagar parcela" onclick="pagarParcela('${dv.id}','${pc.id}')">✓</button>`
-                    : `<button class="btn btn-ghost btn-xs" title="Desfazer pagamento" onclick="desfazerPgDiv('${dv.id}','${pc.id}')">↺</button>`}</td>
+                    : `<button class="btn btn-ghost btn-xs" title="Desfazer pagamento" onclick="desfazerPgDiv('${dv.id}','${pc.id}')">↺</button>`}
+                    <button class="btn btn-red btn-xs" title="Excluir só esta parcela" aria-label="Excluir a parcela ${pc.num}/${nparc}" onclick="abrirExcluirParcela('${dv.id}','${pc.id}')">✕</button></td>
                 </tr>`).join('')}
             </tbody>
           </table>
@@ -12948,6 +12981,67 @@ function desfazerPgDiv(divId, parcId){
   dv.pagas = (dv.parcelas || []).filter(p => p.status === 'Pago').length;
   dv.saldo = saldoDivida(dv);
   ss(d); renderDividas(); refreshAll();
+}
+
+// ── Excluir uma parcela da dívida (ex.: renegociação) e recalcular o que fica ──
+// "reduzir": a dívida diminui o valor da parcela; "redistribuir": o valor dela é dividido
+// entre as parcelas em aberto que ficam (o total da dívida não muda). Nos dois casos a
+// numeração é refeita (n/N), e o total, o saldo, a parcela mensal e as descrições dos
+// pagamentos já feitos acompanham.
+let _delParc = null;
+function abrirExcluirParcela(divId, parcId){
+  const d = gs(), dv = d.divs.find(x => x.id === divId), pc = dv && (dv.parcelas || []).find(p => p.id === parcId);
+  if(!pc) return;
+  if((dv.parcelas || []).length <= 1){ alert(`"${dv.nome}" só tem esta parcela. Para tirá-la, exclua a dívida na aba Dívidas.`); return; }
+  _delParc = { divId, parcId };
+  const pago = pc.status === 'Pago', restam = dv.parcelas.length - 1;
+  const abertas = dv.parcelas.filter(p => p.id !== parcId && p.status !== 'Pago');
+  const totNovo = +(dv.parcelas.reduce((a, p) => a + (p.valor || 0), 0) - (pc.valor || 0)).toFixed(2);
+  set('xp-sub', dv.nome);
+  set('xp-desc', `${dv.nome} — parcela ${pc.num}/${pc.total}`);
+  set('xp-venc', `Vence em ${fmtDataBR(pc.venc)}${pago ? ` · paga em ${fmtDataBR(pc.dataPg)}` : ''}`);
+  set('xp-valor', fmtR(pc.valor || 0));
+  document.getElementById('xp-aviso').innerHTML = `A dívida fica com <b>${restam} parcela${restam > 1 ? 's' : ''}</b>, numeradas de novo (1/${restam} a ${restam}/${restam}).`
+    + (pago ? '<br><span style="color:var(--amber)">Esta parcela está paga: o pagamento e o lançamento dele também são removidos.</span>' : '');
+  const botao = (cls, titulo, sub, acao, off) => `
+    <button class="btn ${cls}" style="justify-content:flex-start;gap:12px;padding:12px 16px;width:100%;text-align:left" onclick="${acao}"${off ? ' disabled' : ''}>
+      <div><div style="font-size:13px;font-weight:600">${titulo}</div><div style="font-size:11px;opacity:.75;font-weight:400">${sub}</div></div>
+    </button>`;
+  const parte = abertas.length ? (pc.valor || 0) / abertas.length : 0;
+  document.getElementById('xp-opcoes').innerHTML =
+    botao('btn-red', 'Excluir e diminuir a dívida', `O total passa de ${fmtR(totNovo + (pc.valor || 0))} para ${fmtR(totNovo)}; as outras parcelas não mudam.`, `excluirParcelaDiv('reduzir')`) +
+    botao('btn-ghost', 'Excluir e dividir o valor nas que ficam', abertas.length
+      ? `Cerca de +${fmtR(parte)} em cada uma das ${abertas.length} parcela${abertas.length > 1 ? 's' : ''} em aberto; o total continua ${fmtR(totNovo + (pc.valor || 0))}.`
+      : 'Não há outra parcela em aberto para receber o valor.', `excluirParcelaDiv('redistribuir')`, !abertas.length);
+  openM('m-del-parc');
+}
+function excluirParcelaDiv(modo){
+  if(!_delParc) return;
+  const d = gs(), dv = d.divs.find(x => x.id === _delParc.divId);
+  const pc = dv && (dv.parcelas || []).find(p => p.id === _delParc.parcId);
+  if(!pc) return;
+  removerLancDaParcela(pc.id, d);
+  dv.pags = (dv.pags || []).filter(x => x.parcId !== pc.id);
+  dv.parcelas = dv.parcelas.filter(p => p.id !== pc.id);
+  const abertas = dv.parcelas.filter(p => p.status !== 'Pago').sort((a, b) => (a.venc || '').localeCompare(b.venc || ''));
+  if(modo === 'redistribuir' && abertas.length)
+    dividirParcelas(pc.valor || 0, abertas.length).forEach((v, i) => { abertas[i].valor = +((abertas[i].valor || 0) + v).toFixed(2); });
+  recalcularDivida(dv, d);
+  _delParc = null;
+  ss(d); closeM('m-del-parc'); renderDividas(); refreshAll();
+}
+// Numeração, total, saldo e parcela mensal a partir das parcelas que existem
+function recalcularDivida(dv, d){
+  const ps = (dv.parcelas || []).sort((a, b) => (a.venc || '').localeCompare(b.venc || '') || (a.num || 0) - (b.num || 0));
+  ps.forEach((p, i) => { p.num = i + 1; p.total = ps.length; });
+  dv.nparc = ps.length;
+  dv.pagas = ps.filter(p => p.status === 'Pago').length;
+  dv.total = +ps.reduce((a, p) => a + (p.valor || 0), 0).toFixed(2);
+  dv.saldo = saldoDivida(dv);
+  const prox = ps.find(p => p.status !== 'Pago');
+  dv.mensal = +((prox || ps[ps.length - 1] || {}).valor || 0);
+  // os lançamentos dos pagamentos já feitos levam a numeração nova
+  (d.lancs || []).forEach(l => { const p = l.refDivId === dv.id && ps.find(x => x.id === l.refDivParcId); if(p) l.desc = `${dv.nome} — parcela ${p.num}/${p.total}`; });
 }
 
 function delDiv(id){

@@ -4,6 +4,51 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-11-18] Dívidas: excluir uma parcela só e recalcular o restante
+
+### 🎯 O que foi pedido
+
+Poder excluir **apenas uma parcela** de uma dívida (por exemplo, numa renegociação), com o restante
+**recalculado automaticamente**. Antes só dava para excluir a dívida inteira.
+
+### ✨ Implementado
+
+- **Botão ✕ em cada parcela** da dívida, em três lugares:
+  - na tabela de parcelas da aba Dívidas;
+  - no menu ⋯ da parcela em Contas a Pagar;
+  - no detalhe da parcela em Contas a Pagar.
+- **Duas formas de excluir**, e cada botão já mostra o resultado antes de confirmar:
+  - **Excluir e diminuir a dívida:** o total cai pelo valor da parcela e as outras parcelas não mudam
+    (ex.: R$ 2.400,00 vira R$ 2.000,00);
+  - **Excluir e dividir o valor nas que ficam:** o valor da parcela é repartido entre as parcelas em aberto
+    e o total da dívida continua o mesmo (ex.: cerca de +R$ 133,33 em cada uma de 3 parcelas).
+- **Recálculo automático do que fica:**
+  - as parcelas são renumeradas (de 6 parcelas, a dívida passa a ter 5: 1/5 a 5/5);
+  - total, saldo devedor, parcela mensal e quantidade de parcelas pagas são recalculados;
+  - os lançamentos dos pagamentos que já foram feitos passam a mostrar a numeração nova.
+- **Parcela paga:** o aviso diz que o pagamento e o lançamento dela também saem.
+- Com o detalhe aberto, ele continua na próxima parcela em aberto da mesma dívida.
+- **Limites:**
+  - a única parcela de uma dívida não se exclui por aqui (para isso, exclua a dívida);
+  - "dividir o valor" fica desligado quando não sobra nenhuma parcela em aberto para receber o valor.
+
+### 🧪 Testes
+
+- **`test-excluir-parcela.js` — 15 verificações:**
+  - diminuir a dívida pela aba Dívidas;
+  - dividir o valor pelo detalhe de Contas a Pagar;
+  - excluir parcela paga (o lançamento sai e a numeração dos outros muda);
+  - menu ⋯;
+  - os limites e nenhum erro de JS.
+- `test-acoes.js` e `test-detalhe-pagar.js` atualizados com o botão novo.
+- **655 verificações** passando em 16 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+- Nada muda sozinho: só muda a dívida em que você excluir uma parcela, e só depois de escolher a opção.
+
+---
+
 ## [2026-10-31] Contas a Pagar: detalhe da conta com todas as parcelas
 
 ### 🎯 O que foi pedido

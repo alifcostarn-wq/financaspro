@@ -57,7 +57,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
     // fatura e dívida têm as ações delas
     const ops = async t => { await p.locator(linha(t) + ' .cp-mais').first().click(); const v = await p.evaluate(() => [...document.querySelectorAll('#cp-acoes-pop button')].map(b => b.textContent).join(',')); await p.keyboard.press('Escape'); return v; };
     eq(tag + 'fatura', await ops('Fatura Nubank · Out/26'), '✓ Pagar fatura,💳 Ver fatura no cartão,🔎 Detalhes e compras');
-    eq(tag + 'parcela de dívida', await ops('parcela 3/6'), '✓ Pagar parcela,📉 Ver dívida,🔎 Detalhes e parcelas');
+    eq(tag + 'parcela de dívida', await ops('parcela 3/6'), '✓ Pagar parcela,📉 Ver dívida,🔎 Detalhes e parcelas,✕ Excluir parcela');
     eq(tag + 'conta no cartão', await ops('Netflix'), '💳 Ver fatura do cartão,✎ Editar,🔎 Detalhes e parcelas,✕ Excluir');
     eq(tag + 'conta paga', await ops('Internet'), '↩ Desfazer pagamento,✎ Editar,🔎 Detalhes e parcelas,✕ Excluir');
     eq(tag + 'dívida estimada', await ops('Renner'), '📉 Ver dívida,🔎 Detalhes e parcelas');

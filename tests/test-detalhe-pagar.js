@@ -78,12 +78,12 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
     'Valor da dívida / R$ 2.400,00 / 6 parcelas # Pagas / R$ 800,00 / 2 de 6 # Saldo devedor / R$ 1.600,00 / 4 parcelas em aberto # Próxima / 15/10/2026 / R$ 400,00 · 3/6');
   eq('dívida: todas as parcelas', (await linhas(p)).map(l => l.split(' | ').slice(0, 2).join(' ') + ' · ' + l.split(' | ')[4].split(' ~ ')[0]).join(', '),
     '1/6 Empréstimo Itaú — parcela 1/6 · Pago, 2/6 Empréstimo Itaú — parcela 2/6 · Pago, 3/6 Empréstimo Itaú — parcela 3/6 · Pendente, 4/6 Empréstimo Itaú — parcela 4/6 · Pendente, 5/6 Empréstimo Itaú — parcela 5/6 · Pendente, 6/6 Empréstimo Itaú — parcela 6/6 · Pendente');
-  eq('dívida: rodapé', await rodape(p), '📉 Ver dívida | ✓ Pagar parcela');
+  eq('dívida: rodapé', await rodape(p), '✕ Excluir parcela | 📉 Ver dívida | ✓ Pagar parcela');
   await p.click('#cpd-ft .btn-green');
   eq('dívida: pagar abre o pagamento já na parcela 3', `${await aberto(p, 'm-pg-div')}|${await p.evaluate(() => document.getElementById('pgd-parc').value)}`, 'true|ep2');
   await p.evaluate(() => savePgDiv());
-  eq('dívida: depois de pagar, 3 de 6 pagas e o rodapé oferece desfazer', (await tiles(p)).split(' # ')[1] + ' # ' + await rodape(p), 'Pagas / R$ 1.200,00 / 3 de 6 # 📉 Ver dívida | ↩ Desfazer pagamento');
-  await p.click('#cpd-ft .cpd-esq');
+  eq('dívida: depois de pagar, 3 de 6 pagas e o rodapé oferece desfazer', (await tiles(p)).split(' # ')[1] + ' # ' + await rodape(p), 'Pagas / R$ 1.200,00 / 3 de 6 # ✕ Excluir parcela | 📉 Ver dívida | ↩ Desfazer pagamento');
+  await p.locator('#cpd-ft .btn', { hasText:'Ver dívida' }).click();
   eq('"Ver dívida" fecha o detalhe e abre a aba Dívidas', `${await aberto(p, 'm-cp-det')}|${await p.evaluate(() => _page)}`, 'false|dividas');
   await p.evaluate(() => irPagina('contas'));
 
