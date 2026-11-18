@@ -200,7 +200,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
     const ano = getComputedStyle(document.querySelector('#cp-tbody .cp-item:not(.cab) .ano')).display;
     return [wrap.scrollWidth > wrap.clientWidth, antes, depois, ano].join('|');
   });
-  eq('celular: ✎ das compras à vista mesmo rolando a tabela', m2, 'true|true|true|none');
+  eq('celular: a lista não rola de lado (vira cartões) e o ✎ das compras fica à vista', m2, 'false|true|true|none');
   eq('sem erros de JS', errs.join(' ; '), '');
 
   let ok=0; T.forEach(t=>{ if(t.ok) ok++; console.log((t.ok?'✓ ':'✗ ')+t.n+(t.ok?'':`  → obtido: ${t.g} | esperado: ${t.e}`)); });

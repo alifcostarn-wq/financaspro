@@ -4,6 +4,67 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-11-18] Celular: listas em cartões, filtros recolhíveis e extrato em páginas
+
+### 🎯 O que foi pedido
+
+Analisar a parte móvel do sistema e corrigir os problemas encontrados.
+
+### 🔎 O que a análise mostrou
+
+Foram verificadas 11 telas a 390 px e a 360 px de largura, mais as janelas de cadastro:
+
+- nenhuma tela passava da largura;
+- as listas de **Lançamentos** e **Contas a Pagar** eram tabelas largas (917 e 792 px), e o **valor**, a
+  **situação** e o botão **⋯** ficavam escondidos à direita;
+- o extrato de **Bancos** mostrava todas as movimentações de uma vez (página com quase 18.000 px de altura);
+- os filtros ocupavam meia tela;
+- havia textos de 9 px e botões de 21 a 26 px, pequenos para o dedo;
+- a saudação do Dashboard aparecia deslocada para a direita.
+
+### ✨ Implementado
+
+- **Listas em cartões no celular:** cada item mostra a descrição e o **valor** em cima, e a data, a categoria (ou
+  origem) e a situação embaixo, com o ⋯ ao lado. Nada fica fora da tela e nada rola de lado.
+  - **Lançamentos**;
+  - **Contas a Pagar** (as compras da fatura abrem em largura inteira);
+  - **extrato de Bancos** (mostra só o lado com valor, entrada ou saída, e o saldo depois do movimento);
+  - **faturas do ano em Cartões**.
+- **Filtros recolhíveis:** à vista ficam só o ano, o mês e a busca. O botão **"⚙ Mais filtros"** mostra os
+  outros e, fechado, avisa quantos estão em uso (ex.: "· 1 em uso"). Vale para Lançamentos, Contas a Pagar e
+  Bancos.
+- **Extrato em páginas:** mostra 60 movimentações por vez (as mais recentes), e "Mostrar mais" traz as outras.
+  Ao mudar um filtro, a contagem recomeça. Isso vale também no computador.
+- **Textos e toques maiores no celular:**
+  - rótulos e notas dos números com 10,5 px (eram 9 px);
+  - botões pequenos com pelo menos 32 px;
+  - ✎/✕ dos cartões com 34 px;
+  - links como "Ver investimentos" com área de toque maior.
+
+### 🔧 Corrigido
+
+- Saudação do Dashboard alinhada à esquerda no celular.
+- Saiu o "+" da barra do topo: ele repetia o botão flutuante de novo lançamento.
+- Os meses do eixo dos gráficos não ficam mais inclinados; quando não cabem, alguns são pulados.
+
+### 🧪 Testes
+
+- **`test-celular.js` — 21 verificações:**
+  - nenhuma tela passa da largura;
+  - cartões nas quatro listas (valor e ações dentro da tela);
+  - extrato em páginas;
+  - filtros recolhíveis com o contador;
+  - tamanho dos textos e dos botões, saudação, barra do topo e eixo dos gráficos;
+  - nenhum erro de JS.
+- `test-editar-compras.js` atualizado: no celular, a lista de Contas a Pagar não rola mais de lado.
+- **676 verificações** passando em 17 arquivos (`node tests/rodar.js`).
+
+### ⚠️ Impacto nos dados existentes
+
+- Nenhum: só muda a forma de mostrar. No computador, a única diferença é o extrato de Bancos em páginas de 60.
+
+---
+
 ## [2026-11-18] Dívidas: excluir uma parcela só e recalcular o restante
 
 ### 🎯 O que foi pedido

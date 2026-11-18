@@ -1485,6 +1485,92 @@ td.cc-trava{width:44px;text-align:center;color:var(--t3)}
   body.cr-imprimindo #cr-rel{position:absolute;left:0;top:0;width:100%;border:none}
   body.cr-imprimindo #cr-rel .cr-acoes{display:none !important}
 }
+
+/* ══ Celular: listas em cartões, filtros recolhíveis, textos e toques maiores ══ */
+.fil-tgl{display:none}
+.bk-mais td{text-align:center;padding:12px!important}
+@media (max-width:768px){
+  .dash-topo{align-items:stretch}   /* no celular o topo vira coluna: a saudação fica à esquerda */
+  /* textos mínimos */
+  .kpi-label{font-size:10.5px}
+  .kpi-sub,.dk-nota{font-size:10.5px}
+  /* toques: alvos de pelo menos ~32-36px */
+  .btn-xs{min-height:32px;min-width:32px;justify-content:center;font-size:11px}
+  .cc-act{width:34px!important;height:34px!important}
+  .cp-mais{width:38px;height:34px}
+  .inv-link,.dash-link{padding:8px 0}
+  .tgl{min-height:34px;display:inline-flex;align-items:center}
+  /* filtros: o essencial à vista, o resto no "Mais filtros" */
+  .fil-mob{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;width:100%}
+  .fil-mob > *{width:100%!important;min-width:0;max-width:none!important}
+  .fil-mob input[type=text]:not(#l-fil-dia){grid-column:1 / -1}
+  .fil-mob:not(.aberto) .fil-extra{display:none!important}
+  .fil-mob select,.fil-mob input{min-height:38px;font-size:12px!important}
+  .fil-tgl{display:flex;align-items:center;justify-content:center;grid-column:1 / -1;min-height:36px;border:1px dashed var(--line2);background:transparent;color:var(--t2);border-radius:var(--r2);font:600 12px 'Sora',sans-serif;cursor:pointer}
+  .fil-mob.aberto .fil-tgl{border-style:solid;color:var(--t1)}
+  .card-header:has(.fil-mob){flex-direction:column;align-items:stretch}
+
+  /* listas viram cartões */
+  .tbl.tbl-cartoes,#bk-extrato-tbl.tbl-cartoes{min-width:0;display:block;width:100%}
+  .tbl-cartoes tbody,.tbl-cartoes tfoot{display:block}
+  .tbl-cartoes thead{display:none}
+  .tbl-cartoes tbody tr,.tbl-cartoes tfoot tr{display:grid;align-items:center;column-gap:10px;row-gap:4px;padding:11px 8px;border-bottom:1px solid var(--line)}
+  .tbl-cartoes tbody td,.tbl-cartoes tfoot td{padding:0!important;border:none!important;min-width:0;max-width:none!important;background:none!important;white-space:normal}
+  .tbl-cartoes tbody tr:hover{background:var(--surface2)}
+  .tbl-cartoes td[colspan]{grid-column:1 / -1}
+  .tbl-cartoes .badge{font-size:10px!important}
+  .tbl-cartoes .mono{font-size:12px}
+
+  /* Lançamentos: descrição e valor em cima; data, categoria e situação embaixo */
+  .tbl-lanc tbody tr.l-row{grid-template-columns:22px auto minmax(0,1fr) auto 34px;grid-template-areas:"chk desc desc valor ac" "chk data cat st ac"}
+  .tbl-lanc tr.l-row > td:nth-child(1){grid-area:chk}
+  .tbl-lanc tr.l-row > td:nth-child(2){grid-area:data;font-size:11px}
+  .tbl-lanc tr.l-row > td:nth-child(3){grid-area:desc}
+  .tbl-lanc tr.l-row > td:nth-child(3) > div:first-child{font-size:13px!important;font-weight:600;white-space:normal!important}
+  .tbl-lanc tr.l-row > td:nth-child(4){grid-area:cat;overflow:hidden}
+  .tbl-lanc tr.l-row > td:nth-child(4) .cat-tag,.tbl-bk tr.bk-mov > td:nth-child(3) .cat-tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tbl-lanc tr.l-row > td:nth-child(5),.tbl-lanc tr.l-row > td:nth-child(6),.tbl-lanc tr.l-row > td:nth-child(7),.tbl-lanc tr.l-row > td:nth-child(10){display:none}
+  .tbl-lanc tr.l-row > td:nth-child(8){grid-area:st;justify-self:end}
+  .tbl-lanc tr.l-row > td:nth-child(9){grid-area:valor;font-size:13px;text-align:right;white-space:nowrap}
+  .tbl-lanc tr.l-row > td:nth-child(11){grid-area:ac;justify-self:end}
+
+  /* Contas a Pagar: descrição e valor; vencimento, origem e situação */
+  .tbl-cp tbody tr:not(.cp-itens-row){grid-template-columns:auto minmax(0,1fr) auto 38px;grid-template-areas:"desc desc valor ac" "venc orig st ac"}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(1){grid-area:venc}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(2){grid-area:desc;font-size:13px;font-weight:600}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(3){grid-area:orig}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(4),.tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(6){display:none}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(5){grid-area:valor;font-size:13px;text-align:right;white-space:nowrap}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(7){grid-area:st;justify-self:end}
+  .tbl-cp tbody tr:not(.cp-itens-row) > td:nth-child(8){grid-area:ac;justify-self:end}
+  .tbl-cp tr.cp-itens-row{display:block;padding:0 0 8px}
+
+  /* Bancos: descrição e valor; data, categoria e saldo */
+  .tbl-bk tbody tr.bk-mov{grid-template-columns:auto minmax(0,1fr) auto 34px;grid-template-areas:"desc desc val ac" "data cat saldo ac"}
+  .tbl-bk tr.bk-mov > td:nth-child(1){grid-area:data;font-size:11px}
+  .tbl-bk tr.bk-mov > td:nth-child(2){grid-area:desc;font-size:13px;font-weight:600}
+  .tbl-bk tr.bk-mov > td:nth-child(2) > div:first-child{white-space:normal!important}
+  .tbl-bk tr.bk-mov > td:nth-child(3){grid-area:cat;overflow:hidden}
+  .tbl-bk tr.bk-mov > td:nth-child(2) .badge.bdg-gray{display:none}   /* "lançamento" em toda linha: no celular só ocupa espaço */
+  .tbl-bk tr.bk-mov > td.bk-val{grid-area:val;font-size:13px}
+  .tbl-bk tr.bk-mov > td.bk-vazio{display:none}
+  .tbl-bk tr.bk-mov > td.bk-saldo{grid-area:saldo;font-size:11px;font-weight:500!important;color:var(--t3)!important}
+  .tbl-bk tr.bk-mov > td.bk-saldo::before{content:'saldo '}
+  .tbl-bk tr.bk-mov > td:nth-child(7){grid-area:ac;justify-self:end}
+  .tbl-bk tbody tr:not(.bk-mov),.tbl-bk tfoot tr{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px}
+  .tbl-bk tbody tr:not(.bk-mov) > td:empty,.tbl-bk tfoot td:empty{display:none}
+
+  /* Cartões: faturas do ano */
+  .tbl-ccfat tbody tr{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"comp valor" "venc st" "ac ac"}
+  .tbl-ccfat tr > td:nth-child(1){grid-area:comp;font-size:13px;font-weight:600}
+  .tbl-ccfat tr > td:nth-child(2),.tbl-ccfat tr > td:nth-child(5){display:none}
+  .tbl-ccfat tr > td:nth-child(3){grid-area:venc;font-size:11px}
+  .tbl-ccfat tr > td:nth-child(3)::before{content:'vence '}
+  .tbl-ccfat tr > td:nth-child(4){grid-area:valor;font-size:13px;text-align:right}
+  .tbl-ccfat tr > td:nth-child(6){grid-area:st;justify-self:end}
+  .tbl-ccfat tr > td:nth-child(7){grid-area:ac;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .tbl-ccfat tr > td[colspan]{grid-area:auto}
+}
 </style>
 </head>
 <body>
@@ -1606,9 +1692,6 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   </div>
   <div class="mob-topbar-right">
     <div class="mob-icon-btn" id="mob-theme-btn" onclick="toggleTheme()" title="Alternar tema" style="font-size:15px">🌙</div>
-    <div class="mob-icon-btn" onclick="openM('m-lanc',this)" title="Novo lançamento">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </div>
     <div class="mob-icon-btn" id="mob-menu-btn" onclick="toggleDrawer()" title="Menu">
       <svg id="mob-ham-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
@@ -2265,7 +2348,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
   <div class="card">
     <div class="card-header">
       <span class="card-title">Extrato</span>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="fil-mob" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <select id="l-fil-ano" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
         <select id="l-fil-mes" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os meses</option>
@@ -2274,31 +2357,32 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
           <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
         </select>
-        <div style="position:relative;display:flex;align-items:center">
+        <div class="fil-extra" style="position:relative;display:flex;align-items:center">
           <input id="l-fil-dia" type="text" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtDiaInput(this);renderLanc()"
             style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'JetBrains Mono',monospace;width:112px;letter-spacing:.03em">
           <button id="l-fil-dia-clear" onclick="document.getElementById('l-fil-dia').value='';renderLanc()" title="Limpar"
             style="display:none;position:absolute;right:6px;background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;line-height:1;padding:0">✕</button>
         </div>
-        <select id="l-fil-tipo" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+        <select class="fil-extra" id="l-fil-tipo" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os tipos</option>
           <option>Receita</option><option>Despesa</option><option value="Investimento">Investimento (aplicação)</option><option value="Resgate">Resgate de investimento</option><option>Transferência</option>
         </select>
-        <select id="l-fil-visao" onchange="renderLanc()" title="Separa o que compõe o resultado do que está em contas de reserva" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+        <select class="fil-extra" id="l-fil-visao" onchange="renderLanc()" title="Separa o que compõe o resultado do que está em contas de reserva" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="resultado">📈 Resultado (sem reservas)</option>
           <option value="reservas">🔒 Somente reservas</option>
           <option value="tudo">Tudo</option>
         </select>
-        <select id="l-fil-status" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+        <select class="fil-extra" id="l-fil-status" onchange="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os status</option>
           <option value="pago">✓ Pago</option>
           <option value="aberto">⏳ Aberto (a pagar / a receber)</option>
         </select>
+<button type="button" class="fil-tgl" onclick="this.closest('.fil-mob').classList.toggle('aberto');atualizarFiltrosMob()" aria-expanded="false">⚙ Mais filtros</button>
         <input id="l-busca" type="text" placeholder="Buscar…" oninput="renderLanc()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
       </div>
     </div>
     <div class="tbl-wrap">
-      <table class="tbl">
+      <table class="tbl tbl-cartoes tbl-lanc">
         <thead><tr>
           <th style="width:28px;padding:7px 6px 7px 10px">
             <input type="checkbox" id="l-chk-all" title="Selecionar todos" onchange="lancSelAll(this.checked)"
@@ -2586,7 +2670,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         <span class="card-title">Contas, faturas e parcelas</span>
         <div class="cp-proj-sub" id="cp-lista-sub"></div>
       </div>
-      <div class="cp-filtros">
+      <div class="cp-filtros fil-mob">
         <select id="cp-fil-ano" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
         <select id="cp-fil-mes" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os meses</option>
@@ -2595,21 +2679,22 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
           <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
         </select>
-        <select id="cp-fil-orig" onchange="renderContas()" aria-label="Origem" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+        <select class="fil-extra" id="cp-fil-orig" onchange="renderContas()" aria-label="Origem" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todas as origens</option>
           <option value="conta">🧾 Contas (boleto, PIX…)</option>
           <option value="cartao">💳 Cartões de crédito</option>
           <option value="divida">📉 Dívidas</option>
         </select>
-        <select id="cp-fil-st" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+        <select class="fil-extra" id="cp-fil-st" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
           <option value="">Todos os status</option><option>Pendente</option><option>Pago</option><option>Vencida</option><option>No cartão</option>
         </select>
-        <select id="cp-fil-cat" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
+        <select class="fil-extra" id="cp-fil-cat" onchange="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
+<button type="button" class="fil-tgl" onclick="this.closest('.fil-mob').classList.toggle('aberto');atualizarFiltrosMob()" aria-expanded="false">⚙ Mais filtros</button>
         <input id="cp-busca" type="text" placeholder="Buscar…" oninput="renderContas()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
       </div>
     </div>
     <div class="tbl-wrap">
-      <table class="tbl">
+      <table class="tbl tbl-cartoes tbl-cp">
         <thead><tr><th>Vencimento</th><th>Descrição</th><th>Origem</th><th>Categoria</th><th>Valor</th><th>Pago em</th><th>Status</th><th></th></tr></thead>
         <tbody id="cp-tbody"></tbody>
       </table>
@@ -2717,7 +2802,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
         </div>
       </div>
       <div id="cc-faturas-view">
-        <div class="tbl-wrap"><table class="tbl">
+        <div class="tbl-wrap"><table class="tbl tbl-cartoes tbl-ccfat">
           <thead><tr><th>Competência</th><th>Fechamento</th><th>Vencimento</th><th>Valor</th><th>Pago em</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="cc-fat-tbody"></tbody>
         </table></div>
@@ -2915,7 +3000,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
           <span class="card-title">Extrato da Conta</span>
           <div class="card-sub" id="bk-extrato-periodo">—</div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="fil-mob" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <select id="bk-fil-ano" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif"></select>
           <select id="bk-fil-mes" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
             <option value="">Todos os meses</option>
@@ -2924,13 +3009,14 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
             <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
             <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
           </select>
-          <select id="bk-fil-tipo" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
+          <select class="fil-extra" id="bk-fil-tipo" onchange="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif">
             <option value="">Todos</option><option value="entrada">Entradas</option><option value="saida">Saídas</option><option value="transferencia">Transferências</option>
           </select>
+<button type="button" class="fil-tgl" onclick="this.closest('.fil-mob').classList.toggle('aberto');atualizarFiltrosMob()" aria-expanded="false">⚙ Mais filtros</button>
           <input id="bk-fil-busca" type="text" placeholder="Buscar…" oninput="renderExtratoDetalhe()" style="background:var(--surface2);border:1px solid var(--line);color:var(--t1);padding:6px 10px;border-radius:var(--r2);font-size:11px;font-family:'Sora',sans-serif;width:130px">
-          <button id="bk-btn-ordem" class="btn btn-ghost btn-sm" onclick="toggleOrdemExtrato()" title="Inverter a ordem das datas">↑ Mais antiga primeiro</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportarExtratoCSV()" title="Baixar o extrato filtrado em CSV">⬇ CSV</button>
-          <button class="btn btn-ghost btn-sm" onclick="openOfxImport()" title="Importar OFX / Conciliação Bancária" style="display:flex;align-items:center;gap:6px">
+          <button id="bk-btn-ordem" class="btn btn-ghost btn-sm fil-extra" onclick="toggleOrdemExtrato()" title="Inverter a ordem das datas">↑ Mais antiga primeiro</button>
+          <button class="btn btn-ghost btn-sm fil-extra" onclick="exportarExtratoCSV()" title="Baixar o extrato filtrado em CSV">⬇ CSV</button>
+          <button class="btn btn-ghost btn-sm fil-extra" onclick="openOfxImport()" title="Importar OFX / Conciliação Bancária" style="display:flex;align-items:center;gap:6px">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             OFX
           </button>
@@ -2941,7 +3027,7 @@ if(localStorage.getItem(AUTH_KEY)==='1'){
       <div id="bk-extrato-resumo" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px"></div>
 
       <div class="tbl-wrap">
-        <table class="tbl" id="bk-extrato-tbl">
+        <table class="tbl tbl-cartoes tbl-bk" id="bk-extrato-tbl">
           <thead><tr>
             <th style="width:104px">Data</th>
             <th>Descrição</th>
@@ -4966,7 +5052,7 @@ function getChartBase(){
 }
 // chartBase is now a getter — use getChartBase() for spreads internally
 // For backward compat with ...chartBase spread, we redefine mkCh to inject colors
-const chartBase = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4d6178',font:{size:10}},grid:{color:'#1f2838'}},y:{ticks:{color:'#4d6178',font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:'#1f2838'}}}};
+const chartBase = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4d6178',font:{size:10},maxRotation:0,autoSkipPadding:8},grid:{color:'#1f2838'}},y:{ticks:{color:'#4d6178',font:{size:10},callback:v=>'R$'+Number(v).toLocaleString('pt-BR')},grid:{color:'#1f2838'}}}};
 
 // ── NAVIGATION ──
 let _page='dash';
@@ -14749,6 +14835,22 @@ const DIA_SEM = ['dom','seg','ter','qua','qui','sex','sáb'];
 const fmtDataBR = iso => iso ? iso.split('-').reverse().join('/') : '—';
 
 // ── Extrato com filtros ──
+const BK_PAGINA = 60;
+let _bkLimite = BK_PAGINA, _bkPagChave = '';
+function bkMostrarMais(){ _bkLimite += BK_PAGINA; renderExtratoDetalhe(); }
+// Celular: o botão "Mais filtros" diz quantos dos filtros recolhidos estão em uso
+function atualizarFiltrosMob(){
+  document.querySelectorAll('.fil-mob').forEach(box => {
+    const btn = box.querySelector('.fil-tgl');
+    if(!btn) return;
+    const ativos = [...box.querySelectorAll('select.fil-extra, .fil-extra input')].filter(e => e.value !== (e.tagName === 'SELECT' && e.options[0] ? e.options[0].value : '')).length;
+    const aberto = box.classList.contains('aberto');
+    btn.textContent = `${aberto ? '▴ Menos filtros' : '⚙ Mais filtros'}${ativos ? ` · ${ativos} em uso` : ''}`;
+    btn.setAttribute('aria-expanded', aberto);
+  });
+}
+document.addEventListener('change', e => { if(e.target.closest && e.target.closest('.fil-mob')) atualizarFiltrosMob(); });
+document.addEventListener('input', e => { if(e.target.closest && e.target.closest('.fil-mob')) atualizarFiltrosMob(); });
 function renderExtratoDetalhe() {
   const d = gs();
   const c = d.bancos.find(b => b.id === _bkSel);
@@ -14848,15 +14950,21 @@ function renderExtratoDetalhe() {
   }
   if (empty) empty.style.display = 'none';
 
-  // ── Linhas, em ordem cronológica ──
-  const lista = _bkOrdem === 'asc' ? movs : movs.slice().reverse();
+  // ── Linhas, em ordem cronológica — 60 por vez (as mais recentes); "mostrar mais" traz as outras ──
+  const chaveFil = [c.id, anoF, mesF, tipoF, busca, _bkOrdem].join('|');
+  if(chaveFil !== _bkPagChave){ _bkPagChave = chaveFil; _bkLimite = BK_PAGINA; }
+  const ordenada = _bkOrdem === 'asc' ? movs : movs.slice().reverse();
+  const ocultas = Math.max(0, ordenada.length - _bkLimite);
+  const lista = !ocultas ? ordenada : _bkOrdem === 'asc' ? ordenada.slice(ocultas) : ordenada.slice(0, _bkLimite);
+  const maisBtn = ocultas ? `<tr class="bk-mais"><td colspan="7"><button type="button" class="btn btn-ghost btn-sm" onclick="bkMostrarMais()">Mostrar mais ${Math.min(BK_PAGINA, ocultas)} · ${ocultas} ${_bkOrdem === 'asc' ? 'anteriores' : 'mais antigas'} ocultas</button></td></tr>` : '';
   const hoje = today();
   const mostrarMes = !temMes;                  // separadores de mês quando o filtro é amplo
   let mesAtual = '';
   const linhas = [];
 
-  // Linha de abertura com o saldo anterior (só na ordem cronológica)
-  if (_bkOrdem === 'asc') {
+  if (ocultas && _bkOrdem === 'asc') linhas.push(maisBtn);
+  // Linha de abertura com o saldo anterior (só na ordem cronológica, com o período inteiro à mostra)
+  if (_bkOrdem === 'asc' && !ocultas) {
     linhas.push(`<tr style="background:var(--surface0)">
       <td class="mono" style="color:var(--t3)">${anteriores.length ? fmtDataBR(anteriores[anteriores.length-1].data) : '—'}</td>
       <td colspan="4" style="color:var(--t3);font-size:11px;font-style:italic">Saldo anterior ao período</td>
@@ -14891,7 +14999,7 @@ function renderExtratoDetalhe() {
     const origem  = m.origemLanc      ? '<span class="badge bdg-gray" style="font-size:8px">lançamento</span>'
                   : isTransfMov(m)    ? '<span class="badge bdg-blue" style="font-size:8px">⇄ transferência</span>'
                   : m.forma === 'OFX' ? '<span class="badge bdg-cyan" style="font-size:8px">OFX</span>' : '';
-    linhas.push(`<tr${ehHoje ? ' style="background:var(--blue-dim)"' : ''}>
+    linhas.push(`<tr class="bk-mov"${ehHoje ? ' style="background:var(--blue-dim)"' : ''}>
       <td class="mono" style="color:${ehHoje?'var(--blue)':'var(--t3)'};white-space:nowrap">
         ${fmtDataBR(m.data)}
         <div style="font-size:9px;color:var(--t4)">${diaSem}${ehHoje ? ' · hoje' : ''}</div>
@@ -14901,15 +15009,16 @@ function renderExtratoDetalhe() {
         ${origem || m.forma && m.forma !== 'Lançamento' ? `<div style="margin-top:2px;display:flex;gap:4px;align-items:center">${origem}${m.forma && m.forma !== 'Lançamento' && m.forma !== 'OFX' ? `<span style="font-size:9px;color:var(--t3)">${m.forma}</span>` : ''}</div>` : ''}
       </td>
       <td><span class="cat-tag" style="font-size:9px">${m.cat || '—'}</span></td>
-      <td class="mono" style="text-align:right;color:${isEnt?'var(--green)':'var(--t4)'};font-weight:${isEnt?600:400}">${isEnt ? fmtRs(m.val) : '—'}</td>
-      <td class="mono" style="text-align:right;color:${!isEnt?'var(--red)':'var(--t4)'};font-weight:${!isEnt?600:400}">${!isEnt ? fmtRs(m.val) : '—'}</td>
-      <td class="mono" style="text-align:right;color:${saldoRow>=0?'var(--t1)':'var(--red)'};font-weight:600">${fmtRs(saldoRow)}</td>
+      <td class="mono bk-val${isEnt ? '' : ' bk-vazio'}" style="text-align:right;color:${isEnt?'var(--green)':'var(--t4)'};font-weight:${isEnt?600:400}">${isEnt ? fmtRs(m.val) : '—'}</td>
+      <td class="mono bk-val${!isEnt ? '' : ' bk-vazio'}" style="text-align:right;color:${!isEnt?'var(--red)':'var(--t4)'};font-weight:${!isEnt?600:400}">${!isEnt ? '−' + fmtRs(m.val) : '—'}</td>
+      <td class="mono bk-saldo" style="text-align:right;color:${saldoRow>=0?'var(--t1)':'var(--red)'};font-weight:600">${fmtRs(saldoRow)}</td>
       <td>${m.origemLanc
         ? `<button class="btn btn-ghost btn-xs" title="Vem da aba Lançamentos" onclick="openLancOps('${m.refLancId}')">⋯</button>`
         : `<button class="btn btn-red btn-xs" onclick="delMov('${c.id}','${m.id}')" title="Excluir movimentação">✕</button>`}</td>
     </tr>`);
   });
 
+  if (ocultas && _bkOrdem !== 'asc') linhas.push(maisBtn);
   tbody.innerHTML = linhas.join('');
 
   // ── Rodapé com os totais do que está listado ──
