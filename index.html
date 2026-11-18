@@ -11748,6 +11748,9 @@ function desfazerPagamento(id){
 }
 
 // ── Exclusão com escopo (conta única, parcelamento ou série recorrente) ──
+// Conta paga fica travada: só se exclui depois de voltar a ficar em aberta (desfazendo o pagamento).
+// A conta lançada no cartão fica travada quando a fatura em que ela entrou já foi paga.
+const contaPagaTravada = (c, d) => statusConta(c) === 'Pago' || (!!c.ccId && !!(faturaDaConta(c, d) || {}).paga);
 function delConta(id){
   const d = gs();
   const c = d.contas.find(x => x.id === id);
@@ -11767,7 +11770,15 @@ function delConta(id){
       </div>
     </button>`;
 
-  if(c.serieId){
+  if(contaPagaTravada(c, d)){
+    const noCartao = statusConta(c) !== 'Pago';
+    aviso.innerHTML = noCartao
+      ? '🔒 <strong>Esta conta já foi paga junto com a fatura do cartão.</strong> Para excluí-la, desfaça antes o pagamento da fatura.'
+      : `🔒 <strong>Esta conta está paga${c.dataPg ? ` (em ${fmtDataBR(c.dataPg)})` : ''}.</strong> Conta paga não pode ser excluída: para excluir, desfaça o pagamento e ela volta a ficar em aberto.`;
+    opts.innerHTML = noCartao
+      ? botao('btn-ghost', '💳 Ver a fatura do cartão', 'Lá dá para desfazer o pagamento da fatura', `closeM('m-del-conta');abrirFaturaDaConta('${c.id}')`)
+      : botao('btn-ghost', '↩ Desfazer o pagamento', 'A conta volta a ficar em aberto; o lançamento do pagamento é removido', `desfazerPagamento('${c.id}');delConta('${c.id}')`);
+  } else if(c.serieId){
     const serie   = d.contas.filter(x => x.serieId === c.serieId);
     const futuras = serie.filter(x => x.venc > c.venc && statusConta(x) !== 'Pago').length;
     aviso.innerHTML = `Esta conta faz parte de uma <strong style="color:var(--cyan)">recorrência ${(PERIODICIDADES[c.rec]||{}).label || ''}</strong>`
@@ -11777,10 +11788,13 @@ function delConta(id){
       botao('btn-red',   'Encerrar a recorrência',     'Remove as futuras em aberto e para de gerar novas', `execDelConta('serie')`);
   } else if(c.grupoId && c.totalParcelas > 1){
     const grupo = d.contas.filter(x => x.grupoId === c.grupoId);
-    aviso.innerHTML = `Esta é a parcela <strong>${c.parcela} de ${c.totalParcelas}</strong> de um parcelamento com ${grupo.length} parcela(s) cadastrada(s).`;
+    const pagas = grupo.filter(x => contaPagaTravada(x, d)).length, abertas = grupo.length - pagas;
+    aviso.innerHTML = `Esta é a parcela <strong>${c.parcela} de ${c.totalParcelas}</strong> de um parcelamento com ${grupo.length} parcela(s) cadastrada(s)`
+      + (pagas ? `, sendo <strong>${pagas} já paga(s)</strong>. As pagas ficam: não são excluídas.` : '.');
     opts.innerHTML =
       botao('btn-ghost', 'Excluir somente esta parcela', 'As demais parcelas continuam', `execDelConta('uma')`) +
-      botao('btn-red',   'Excluir todo o parcelamento',  'Remove todas as parcelas do grupo', `execDelConta('grupo')`);
+      botao('btn-red',   pagas ? `Excluir as ${abertas} parcela(s) em aberto` : 'Excluir todo o parcelamento',
+        pagas ? `Remove só as em aberto; as ${pagas} paga(s) continuam` : 'Remove todas as parcelas do grupo', `execDelConta('grupo')`);
   } else {
     aviso.innerHTML = 'Esta ação não pode ser desfeita. O lançamento gerado por ela (se houver) também será removido.';
     opts.innerHTML = botao('btn-red', 'Excluir conta', 'Remove definitivamente', `execDelConta('uma')`);
@@ -11799,6 +11813,8 @@ function execDelConta(escopo){
     alvos = d.contas.filter(x => x.serieId === c.serieId && x.venc >= c.venc && statusConta(x) !== 'Pago');
     d.contas.forEach(x => { if(x.serieId === c.serieId) x.recAtiva = false; });
   }
+  alvos = alvos.filter(x => !contaPagaTravada(x, d));   // conta paga nunca é excluída (nem junto com o grupo)
+  if(!alvos.length){ closeM('m-del-conta'); return; }
   const ids = new Set(alvos.map(x => x.id));
   alvos.forEach(x => removerLancDaConta(x, d));
   d.contas = d.contas.filter(x => !ids.has(x.id));
@@ -13080,15 +13096,25 @@ function abrirExcluirParcela(divId, parcId){
   if(!pc) return;
   if((dv.parcelas || []).length <= 1){ alert(`"${dv.nome}" só tem esta parcela. Para tirá-la, exclua a dívida na aba Dívidas.`); return; }
   _delParc = { divId, parcId };
-  const pago = pc.status === 'Pago', restam = dv.parcelas.length - 1;
+  if(pc.status === 'Pago'){
+    set('xp-sub', dv.nome);
+    set('xp-desc', `${dv.nome} — parcela ${pc.num}/${pc.total}`);
+    set('xp-venc', `Vence em ${fmtDataBR(pc.venc)}${pc.dataPg ? ` · paga em ${fmtDataBR(pc.dataPg)}` : ''}`);
+    set('xp-valor', fmtR(pc.valorPago != null ? pc.valorPago : (pc.valor || 0)));
+    document.getElementById('xp-aviso').innerHTML = '🔒 <strong>Esta parcela está paga.</strong> Parcela paga não pode ser excluída: para excluir, desfaça o pagamento e ela volta a ficar em aberto.';
+    document.getElementById('xp-opcoes').innerHTML = `<button class="btn btn-ghost" style="justify-content:flex-start;gap:12px;padding:12px 16px;width:100%;text-align:left" onclick="closeM('m-del-parc');desfazerPgDiv('${divId}','${parcId}')">
+      <div><div style="font-size:13px;font-weight:600">↩ Desfazer o pagamento</div><div style="font-size:11px;opacity:.75;font-weight:400">A parcela volta a ficar em aberto; o lançamento do pagamento é removido</div></div></button>`;
+    openM('m-del-parc');
+    return;
+  }
+  const restam = dv.parcelas.length - 1;
   const abertas = dv.parcelas.filter(p => p.id !== parcId && p.status !== 'Pago');
   const totNovo = +(dv.parcelas.reduce((a, p) => a + (p.valor || 0), 0) - (pc.valor || 0)).toFixed(2);
   set('xp-sub', dv.nome);
   set('xp-desc', `${dv.nome} — parcela ${pc.num}/${pc.total}`);
-  set('xp-venc', `Vence em ${fmtDataBR(pc.venc)}${pago ? ` · paga em ${fmtDataBR(pc.dataPg)}` : ''}`);
+  set('xp-venc', `Vence em ${fmtDataBR(pc.venc)}`);
   set('xp-valor', fmtR(pc.valor || 0));
-  document.getElementById('xp-aviso').innerHTML = `A dívida fica com <b>${restam} parcela${restam > 1 ? 's' : ''}</b>, numeradas de novo (1/${restam} a ${restam}/${restam}).`
-    + (pago ? '<br><span style="color:var(--amber)">Esta parcela está paga: o pagamento e o lançamento dele também são removidos.</span>' : '');
+  document.getElementById('xp-aviso').innerHTML = `A dívida fica com <b>${restam} parcela${restam > 1 ? 's' : ''}</b>, numeradas de novo (1/${restam} a ${restam}/${restam}).`;
   const botao = (cls, titulo, sub, acao, off) => `
     <button class="btn ${cls}" style="justify-content:flex-start;gap:12px;padding:12px 16px;width:100%;text-align:left" onclick="${acao}"${off ? ' disabled' : ''}>
       <div><div style="font-size:13px;font-weight:600">${titulo}</div><div style="font-size:11px;opacity:.75;font-weight:400">${sub}</div></div>
@@ -13105,7 +13131,7 @@ function excluirParcelaDiv(modo){
   if(!_delParc) return;
   const d = gs(), dv = d.divs.find(x => x.id === _delParc.divId);
   const pc = dv && (dv.parcelas || []).find(p => p.id === _delParc.parcId);
-  if(!pc) return;
+  if(!pc || pc.status === 'Pago') return;   // parcela paga fica travada
   removerLancDaParcela(pc.id, d);
   dv.pags = (dv.pags || []).filter(x => x.parcId !== pc.id);
   dv.parcelas = dv.parcelas.filter(p => p.id !== pc.id);

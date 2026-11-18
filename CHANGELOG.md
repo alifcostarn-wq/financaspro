@@ -4,6 +4,24 @@ Todas as alterações relevantes do sistema são registradas neste arquivo.
 
 ---
 
+## [2026-11-18] Contas a Pagar: conta paga não se exclui; excluir o parcelamento mantém as pagas
+
+### Corrigido
+- **Excluir o parcelamento apagava parcelas já pagas.** Agora "Excluir todo o parcelamento" remove **somente as parcelas em aberto**. As pagas e os lançamentos delas continuam. O mesmo vale para "encerrar a recorrência".
+- O aviso diz quantas parcelas já estão pagas. O botão passa a ser **"Excluir as N parcela(s) em aberto"**.
+
+### Alterado
+- **Conta paga fica travada.** Ao tentar excluir uma conta paga, o sistema mostra 🔒 *"Conta paga não pode ser excluída"*, e a única opção é **↩ Desfazer o pagamento**. Desfeito o pagamento, a conta volta a ficar em aberto e a exclusão aparece no mesmo instante.
+- **Conta no cartão com a fatura já paga** também fica travada, com o atalho **💳 Ver a fatura do cartão** (para excluir, reabra ou desfaça o pagamento da fatura).
+- **Parcela paga de dívida** segue a mesma regra: para excluí-la, desfaça o pagamento antes. Antes ela podia ser excluída junto com o pagamento.
+- A trava vale para todos os caminhos: menu ⋯, detalhe da conta, aba Dívidas e exclusão da compra pelo cartão.
+
+### Testes
+- Novo `tests/test-excluir-conta.js` (14 verificações): parcelamento com parcela paga, conta paga travada, desfazer e excluir, recorrência e fatura paga.
+- `test-excluir-parcela.js` e `test-conta-cartao.js` ajustados à nova regra. Suíte completa: 693/693.
+
+---
+
 ## [2026-11-18] Celular: listas em cartões, filtros recolhíveis e extrato em páginas
 
 ### 🎯 O que foi pedido

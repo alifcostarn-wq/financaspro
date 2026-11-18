@@ -45,13 +45,18 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('o detalhe continua aberto, na parcela em aberto seguinte', `${await aberto('m-cp-det')}|${await txt('#cpd-corpo .cpd-qual')}|${await txt('#cpd-corpo .cpd-tiles > div:first-child b')}`, 'true|Parcela 3 de 4|R$ 2.000,00');
   await p.evaluate(() => closeM('m-cp-det'));
 
-  // ── 3. Parcela paga: o pagamento e o lançamento saem; os outros lançamentos levam a numeração nova ──
+  // ── 3. Parcela paga fica travada: só se exclui depois de desfazer o pagamento ──
   await p.evaluate(() => { const d = gs(), dv = d.divs.find(x => x.id === 'emp');
     dv.parcelas.filter(x => x.status === 'Pago').forEach(pc => { pc.gerarLanc = true; pc.dataPg = pc.venc; gerarLancDaParcela(dv, pc, d); }); ss(d); });
   await p.evaluate(() => abrirExcluirParcela('emp', gs().divs.find(x => x.id === 'emp').parcelas[0].id));
-  eq('parcela paga: avisa que o pagamento sai junto', (await txt('#xp-aviso')).includes('o pagamento e o lançamento dele também são removidos'), true);
+  eq('parcela paga: travada, a única opção é desfazer o pagamento', `${(await txt('#xp-aviso')).includes('Parcela paga não pode ser excluída')}|${await txt('#xp-opcoes .btn > div > div:first-child')}`, 'true|↩ Desfazer o pagamento');
   await p.evaluate(() => excluirParcelaDiv('reduzir'));
-  eq('parcela paga excluída: 3 parcelas, total sem ela', await div(), '3x · total 1600 · saldo 1200 · mensal 600 · pagas 1 · 1/3:09-15=400✓ 2/3:10-15=600 3/3:12-15=600');
+  eq('parcela paga: nem chamando a exclusão direto ela sai', (await div()).slice(0, 2), '4x');
+  await p.click('#xp-opcoes .btn');
+  eq('desfeito o pagamento, ela volta a ficar em aberto', await p.evaluate(() => gs().divs.find(x => x.id === 'emp').parcelas[0].status), 'Pendente');
+  await p.evaluate(() => abrirExcluirParcela('emp', gs().divs.find(x => x.id === 'emp').parcelas[0].id));
+  await p.evaluate(() => excluirParcelaDiv('reduzir'));
+  eq('em aberto, aí sim se exclui: 3 parcelas, total sem ela', await div(), '3x · total 1600 · saldo 1200 · mensal 600 · pagas 1 · 1/3:09-15=400✓ 2/3:10-15=600 3/3:12-15=600');
   eq('lançamentos: só o da parcela que ficou, com a numeração nova', await p.evaluate(() => gs().lancs.filter(l => l.refDivId === 'emp').map(l => l.desc).join(',')), 'Empréstimo Itaú — parcela 1/3');
 
   // ── 4. Menu ⋯ e limites ──
@@ -61,7 +66,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   await p.evaluate(() => { const d = gs(), dv = d.divs.find(x => x.id === 'emp'); dv.parcelas = dv.parcelas.slice(0, 1); recalcularDivida(dv, d); ss(d); abrirExcluirParcela('emp', dv.parcelas[0].id); });
   eq('a única parcela não se exclui por aqui (exclui-se a dívida)', `${await aberto('m-del-parc')}|${await p.evaluate(() => gs().divs.find(x => x.id === 'emp').parcelas.length)}`, 'false|1');
   await p.evaluate(() => { const d = gs(), dv = d.divs.find(x => x.id === 'emp');
-    dv.parcelas.push({ id:'n2', venc:'2027-02-15', valor:300, status:'Pago', dataPg:'2026-10-01' }); recalcularDivida(dv, d); ss(d); abrirExcluirParcela('emp', 'n2'); });
+    dv.parcelas.push({ id:'n2', venc:'2027-02-15', valor:300, status:'Pendente' }); recalcularDivida(dv, d); ss(d); abrirExcluirParcela('emp', 'n2'); });
   eq('sem outra parcela em aberto, "dividir" fica desligado', await p.evaluate(() => document.querySelectorAll('#xp-opcoes .btn')[1].disabled), true);
 
   eq('sem erros de JS', errs.join(' ; '), '');

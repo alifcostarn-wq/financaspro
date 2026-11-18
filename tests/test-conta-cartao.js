@@ -176,6 +176,10 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
 
     // ── excluir a compra espelho pelo cartão = excluir a conta ──
     delGasto('cc1','cp'+c.id);
+    o.delTravada = (faturaDaConta(c, gs())||{}).paga + '|' + $('del-conta-opcoes').textContent.includes('Ver a fatura do cartão');
+    closeM('m-del-conta');
+    d = gs(); d.ccs[0].faturas = d.ccs[0].faturas.filter(f=>f.id!=='fp'); ss(d);   // fatura reaberta: a conta volta a poder sair
+    delGasto('cc1','cp'+c.id);
     o.delGastoModal = vis('m-del-conta') + '|' + ($('del-conta-id').value===c.id);
     execDelConta('uma');
     d = gs();
@@ -246,6 +250,7 @@ const T=[]; const eq=(n,g,e)=>T.push({n,g:String(g),e:String(e),ok:String(g)===S
   eq('renomear ok', r.renomeia, '');
   eq('renomear propaga ao espelho', r.renomeado, 'Casa|Casa');
   eq('excluir compra espelho abre exclusão da conta', r.delGastoModal, 'true|true');
+  eq('fatura paga trava a exclusão da conta no cartão', r.delTravada, 'true|true');
   eq('excluir conta remove espelho', r.delConta, 'false|false');
   eq('encerrar recorrência limpa espelhos', r.encerrar, 'true|true');
   eq('valida cartão obrigatório', r.validacao, 'true|true');
